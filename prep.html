@@ -10,13 +10,13 @@
 <meta property="og:title" content="行前準備與落地 SOP｜澳打指南針">
 <meta property="og:description" content="澳洲打工度假行前時間軸、行李帶什麼不帶什麼、落地 72 小時、第一週三大號（銀行、TFN、super）的正確順序——照著做就不會卡關。">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
 
 <header class="site-header">
   <nav class="nav-inner">
-    <a class="brand" href="index.html"><span class="logo">🧭</span>澳打指南針</a>
+    <a class="brand" href="index.html"><span class="logo"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>澳打指南針</a>
     <div class="nav-links">
       <a href="why.html">自我釐清</a>
       <a href="visa.html">簽證集簽</a>
@@ -46,6 +46,7 @@
     <a href="#72h">落地 72 小時</a>
     <a href="#first-week">第一週三大號</a>
     <a href="#mistakes">常見錯誤快查</a>
+    <a href="#checklist">互動清單</a>
   </div>
 
   <h2 id="timeline">一、出發前時間軸</h2>
@@ -134,16 +135,27 @@
       <tr><td>落地才開始找住宿</td><td>被急迫感逼著踩詐騙</td><td>先訂 1–2 週緩衝住宿（<a href="housing.html">住宿租屋</a>）</td></tr>
     </tbody>
   </table></div>
+
+  <h2 id="checklist">七、互動檢查清單</h2>
+  <div class="tool">
+    <span class="tool-tag">互動工具</span>
+    <p>把整頁濃縮成一張可以打勾的清單。進度自動存在你自己的瀏覽器（不會上傳），出發前歸零重測一次。</p>
+    <div class="progress-wrap"><div class="progress-bar" id="prep-progress-bar"></div></div>
+    <p class="progress-label" id="prep-progress-label"></p>
+    <div id="prep-checklist"></div>
+    <div class="ws-actions"><button type="button" class="btn ghost" id="prep-reset">清空重來</button></div>
+  </div>
 </main>
 
 <footer class="site-footer">
   <div class="foot-inner">
-    <p>🧭 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
+    <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
     <p class="disclaimer">本站為經驗分享與資訊整理，非移民代理（RMA），內容不構成移民、法律或財務建議。簽證與政策隨時可能變動，請一律以
     <a href="https://immi.homeaffairs.gov.au/" rel="noopener">澳洲內政部官網</a>為準。</p>
   </div>
 </footer>
 
 <script src="assets/main.js"></script>
+<script src="assets/tools.js"></script>
 </body>
 </html>

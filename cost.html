@@ -10,13 +10,13 @@
 <meta property="og:title" content="物價與薪水：帶多少錢、賺多少錢？｜澳打指南針">
 <meta property="og:description" content="澳洲打工度假 2026 最新：最低時薪、背包客稅率、退休金、各城市房租伙食交通行情，以及起步資金該帶多少。每個數字附官方來源。">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
 
 <header class="site-header">
   <nav class="nav-inner">
-    <a class="brand" href="index.html"><span class="logo">🧭</span>澳打指南針</a>
+    <a class="brand" href="index.html"><span class="logo"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>澳打指南針</a>
     <div class="nav-links">
       <a href="why.html">自我釐清</a>
       <a href="visa.html">簽證集簽</a>
@@ -128,7 +128,44 @@
     <li><strong>實際建議（社群共識，非官方）</strong>：準備 <strong>A$7,000–10,000</strong>——主因是<strong>落地找工空窗常達 2–6 週</strong>（旺季雪梨墨爾本燒錢最快），加上押金、置裝，以及一筆「隨時可以買機票回家」的底氣。錢帶得夠，你才有拒絕爛工作的本錢。</li>
   </ul>
 
-  <h2 id="math">簡單試算：存得到錢嗎？</h2>
+  <h2 id="math">存得到錢嗎？自己拉拉看</h2>
+
+  <div class="tool" id="save-calc">
+    <span class="tool-tag">互動工具</span>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-dollar"/></svg> 存錢試算器</h3>
+    <p>調整時薪、工時、城市與生活型態，即時看你的一年能存多少（WHM 稅 15%、以一年實際有班 46 週保守估）。</p>
+    <div class="tool-row"><label for="calc-rate">時薪（稅前）</label><input type="range" id="calc-rate" min="24" max="45" step="0.05" value="33.05"><output id="calc-rate-out">$33.05</output></div>
+    <div class="tool-row"><label for="calc-hours">每週工時</label><input type="range" id="calc-hours" min="0" max="50" step="1" value="38"><output id="calc-hours-out">38 小時</output></div>
+    <div class="tool-row"><label for="calc-city">住哪裡</label>
+      <select id="calc-city">
+        <option value="300">雪梨（房租約 $300/週）</option>
+        <option value="280">墨爾本（約 $280/週）</option>
+        <option value="230" selected>布里斯本／柏斯（約 $230/週）</option>
+        <option value="210">阿德雷德（約 $210/週）</option>
+        <option value="180">偏遠小鎮（約 $180/週）</option>
+      </select>
+    </div>
+    <div class="tool-row"><label for="calc-life">生活型態</label>
+      <select id="calc-life">
+        <option value="160">省到極致（伙食雜支 $160/週）</option>
+        <option value="220" selected>正常過日子（$220/週）</option>
+        <option value="320">吃好喝好常出遊（$320/週）</option>
+      </select>
+    </div>
+    <div class="result-card">
+      <div class="result-grid">
+        <div class="stat"><b id="calc-gross">—</b><span>週薪（稅前）</span></div>
+        <div class="stat"><b id="calc-net">—</b><span>稅後實領</span></div>
+        <div class="stat"><b id="calc-exp">—</b><span>週支出</span></div>
+        <div class="stat"><b id="calc-save">—</b><span>週存款</span></div>
+        <div class="stat"><b id="calc-year">—</b><span>年存款（46 週）</span></div>
+        <div class="stat"><b id="calc-twd">—</b><span>換算台幣</span></div>
+      </div>
+      <p class="result-verdict" id="calc-verdict"></p>
+      <p class="fact-meta">雇主另提撥 super <span id="calc-super">—</span>/週（離澳領回打 3.5 折，見<a href="leave.html#dasp">報稅離澳</a>）。粗估工具，實際依 award 加成與個人狀況而異；匯率以 22.8 計。</p>
+    </div>
+  </div>
+
   <div class="panel">
     <p>以 casual 最低時薪 $33.05、每週工作 38 小時、在中型城市生活為例（2026 數字）：</p>
     <ul>
@@ -144,12 +181,13 @@
 
 <footer class="site-footer">
   <div class="foot-inner">
-    <p>🧭 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
+    <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
     <p class="disclaimer">本站為經驗分享與資訊整理，非移民代理（RMA），內容不構成移民、法律或財務建議。簽證與政策隨時可能變動，請一律以
     <a href="https://immi.homeaffairs.gov.au/" rel="noopener">澳洲內政部官網</a>為準。</p>
   </div>
 </footer>
 
 <script src="assets/main.js"></script>
+<script src="assets/tools.js"></script>
 </body>
 </html>

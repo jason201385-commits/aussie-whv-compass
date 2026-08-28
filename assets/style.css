@@ -276,6 +276,95 @@ details .details-body { padding: 0 18px 14px; }
 .toc strong { display: block; margin-bottom: 6px; }
 .toc a { display: inline-block; margin: 2px 10px 2px 0; }
 
+/* ---------- SVG 圖示 ---------- */
+.icon {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.18em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: inline-block;
+}
+.brand .logo { color: var(--accent); display: inline-flex; }
+.brand .logo .icon { width: 1.35em; height: 1.35em; }
+.card .card-emoji { color: var(--accent); display: inline-flex; }
+.card .card-emoji .icon { width: 1.7em; height: 1.7em; }
+h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
+.free-badge .icon { width: 1em; height: 1em; }
+
+/* ---------- 互動工具 ---------- */
+.tool {
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface) 55%);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+}
+.tool h3 { margin-top: 0; }
+.tool .tool-tag {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 2px 10px;
+  margin-bottom: 8px;
+}
+.tool-row { display: flex; align-items: center; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+.tool-row label { font-weight: 700; min-width: 7.5em; font-size: .95rem; }
+.tool-row output { font-weight: 800; color: var(--accent); min-width: 4.5em; text-align: right; font-variant-numeric: tabular-nums; }
+.tool input[type="range"] { flex: 1; min-width: 140px; accent-color: var(--accent); height: 6px; }
+.tool select, .tool input[type="number"], .tool input[type="text"] {
+  font: inherit; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.tool input[type="text"], .tool input[type="number"] { width: 8em; }
+.tool select:focus, .tool input:focus { outline: 2px solid var(--accent); }
+
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+.result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; }
+.result-grid .stat b { display: block; font-size: 1.35rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.result-grid .stat span { font-size: .8rem; color: var(--ink-soft); }
+.result-verdict { margin: 12px 0 0; font-weight: 700; text-align: center; }
+.result-ok { color: var(--green); }
+.result-no { color: var(--danger); }
+
+/* 進度條 */
+.progress-wrap { background: var(--line); border-radius: 99px; height: 14px; overflow: hidden; margin: 10px 0; }
+.progress-bar { background: var(--green); height: 100%; width: 0%; transition: width .4s ease; border-radius: 99px; }
+.progress-label { font-size: .88rem; color: var(--ink-soft); text-align: right; }
+
+/* 互動清單 */
+.icheck { list-style: none; padding: 0; }
+.icheck li { margin: 0; }
+.icheck label {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: .96rem;
+}
+.icheck label:hover { background: var(--accent-soft); }
+.icheck input[type="checkbox"] { accent-color: var(--green); width: 18px; height: 18px; margin-top: 3px; flex-shrink: 0; }
+.icheck input:checked + span { color: var(--ink-soft); text-decoration: line-through; }
+
+/* 測驗 */
+.quiz-scenario { font-size: 1.02rem; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+.quiz-btns { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
+.quiz-btns .btn { flex: 1; min-width: 120px; }
+.quiz-feedback { border-radius: 10px; padding: 13px 16px; margin: 12px 0; font-size: .95rem; display: none; }
+.quiz-feedback.good { display: block; background: var(--green-soft); border-left: 4px solid var(--green); }
+.quiz-feedback.bad { display: block; background: var(--danger-soft); border-left: 4px solid var(--danger); }
+.quiz-progress { font-size: .85rem; color: var(--ink-soft); }
+
 @media (max-width: 640px) {
   body { font-size: 15.5px; }
   .nav-inner { padding: 8px 14px; }

@@ -10,13 +10,13 @@
 <meta property="og:title" content="簽證與集簽：417 一簽二簽三簽完整規則｜澳打指南針">
 <meta property="og:description" content="台灣人申請澳洲打工度假簽證（417）2026 現行規則：費用、申請流程、二簽三簽的 88/179 天指定工作怎麼算、哪些產業地區可以集簽、怎麼保存證據與保護自己。">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
 
 <header class="site-header">
   <nav class="nav-inner">
-    <a class="brand" href="index.html"><span class="logo">🧭</span>澳打指南針</a>
+    <a class="brand" href="index.html"><span class="logo"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>澳打指南針</a>
     <div class="nav-links">
       <a href="why.html">自我釐清</a>
       <a href="visa.html">簽證集簽</a>
@@ -111,6 +111,25 @@
   </ul>
 
   <h2 id="where">哪些工作、哪些地區可以集簽</h2>
+
+  <div class="tool" id="postcode-tool">
+    <span class="tool-tag">互動工具</span>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> 集簽資格快查器</h3>
+    <p>輸入工作地點的郵遞區號、選工作類型，馬上知道能不能計入二簽／三簽——資料來自官方清單（2026-08-29 抓取）。</p>
+    <div class="tool-row">
+      <label for="pc-input">郵遞區號</label>
+      <input type="text" id="pc-input" inputmode="numeric" maxlength="4" placeholder="例：4880">
+      <select id="pc-cat">
+        <option value="plant">動植物栽培／漁業採珠／植林伐木／採礦／營建</option>
+        <option value="tourism">觀光與餐旅</option>
+        <option value="bushfire">火災復原</option>
+        <option value="disaster">天災復原</option>
+      </select>
+      <button type="button" class="btn" id="pc-check">查詢</button>
+    </div>
+    <div id="pc-result" class="result-card" style="display:none"></div>
+  </div>
+
   <div class="table-wrap"><table>
     <thead><tr><th>產業</th><th>地區限制</th></tr></thead>
     <tbody>
@@ -173,12 +192,14 @@
 
 <footer class="site-footer">
   <div class="foot-inner">
-    <p>🧭 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
+    <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
     <p class="disclaimer">本站為經驗分享與資訊整理，非移民代理（RMA），內容不構成移民、法律或財務建議。簽證與政策隨時可能變動，請一律以
     <a href="https://immi.homeaffairs.gov.au/" rel="noopener">澳洲內政部官網</a>為準。</p>
   </div>
 </footer>
 
 <script src="assets/main.js"></script>
+<script src="assets/postcodes.js"></script>
+<script src="assets/tools.js"></script>
 </body>
 </html>

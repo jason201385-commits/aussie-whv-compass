@@ -10,13 +10,13 @@
 <meta property="og:title" content="報稅、退休金與離澳｜澳打指南針">
 <meta property="og:description" content="澳洲打工度假報稅實作（myTax 免費自己報）、super 帳戶管理、DASP 離境領回退休金全流程、離澳 checklist、回台職涯銜接。">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
 
 <header class="site-header">
   <nav class="nav-inner">
-    <a class="brand" href="index.html"><span class="logo">🧭</span>澳打指南針</a>
+    <a class="brand" href="index.html"><span class="logo"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>澳打指南針</a>
     <div class="nav-links">
       <a href="why.html">自我釐清</a>
       <a href="visa.html">簽證集簽</a>
@@ -83,19 +83,36 @@
     </li>
     <li>收款：可匯澳洲帳戶（所以銀行帳戶先別急著關）或國際匯款。</li>
   </ol>
+
+  <div class="tool" id="dasp-calc">
+    <span class="tool-tag">互動工具</span>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-zap"/></svg> DASP 速算：我實際能領回多少？</h3>
+    <div class="tool-row">
+      <label for="dasp-balance">super 帳戶餘額</label>
+      <input type="number" id="dasp-balance" min="0" step="100" placeholder="例：8000">
+      <span>AUD</span>
+    </div>
+    <div class="result-card">
+      <div class="result-grid">
+        <div class="stat"><b id="dasp-take">$0</b><span>實拿（35%）</span></div>
+        <div class="stat"><b id="dasp-tax">$0</b><span>被課走（65%）</span></div>
+      </div>
+      <p class="result-verdict" id="dasp-verdict"></p>
+    </div>
+  </div>
   <p class="fact-meta">來源：<a href="https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/temporary-residents-and-superannuation/departing-australia-superannuation-payment-dasp" rel="noopener">ATO DASP 官方頁</a>；實務地雷為社群經驗整理（非官方）｜2026-08-28 查核</p>
 
   <h2 id="checklist">四、離澳 checklist</h2>
   <div class="panel"><ul>
-    <li>☐ 賣車：過戶當場完成、rego 處理乾淨（別留罰單尾巴，見<a href="scam.html#money">防詐騙</a>）</li>
-    <li>☐ 退租：提前依約通知、照<a href="housing.html#bond">押金流程</a>拿回 bond（對照入住時的照片）</li>
-    <li>☐ 向雇主拿推薦信（之後<a href="pr.html">回來走擔保</a>或回台求職都用得上）</li>
-    <li>☐ DASP 文件認證與申請草稿（見上）</li>
-    <li>☐ 報稅：年中離澳可提前申報，或報稅季再線上報（人在台灣也能報）</li>
-    <li>☐ <strong>銀行帳戶先留著</strong>——等退稅與 DASP 都入帳再關（多數銀行可寫信遠端關戶）</li>
-    <li>☐ 電信解約或轉最低月租；myGov 帳號留著（報稅與 DASP 都要用）</li>
-    <li>☐ 行李：超重費很貴——不要的衣物捐二手店，書和紀念品考慮海運</li>
-    <li>☐ 台灣健保：出國期間若辦了停保，回台記得復保</li>
+    <li>賣車：過戶當場完成、rego 處理乾淨（別留罰單尾巴，見<a href="scam.html#money">防詐騙</a>）</li>
+    <li>退租：提前依約通知、照<a href="housing.html#bond">押金流程</a>拿回 bond（對照入住時的照片）</li>
+    <li>向雇主拿推薦信（之後<a href="pr.html">回來走擔保</a>或回台求職都用得上）</li>
+    <li>DASP 文件認證與申請草稿（見上）</li>
+    <li>報稅：年中離澳可提前申報，或報稅季再線上報（人在台灣也能報）</li>
+    <li><strong>銀行帳戶先留著</strong>——等退稅與 DASP 都入帳再關（多數銀行可寫信遠端關戶）</li>
+    <li>電信解約或轉最低月租；myGov 帳號留著（報稅與 DASP 都要用）</li>
+    <li>行李：超重費很貴——不要的衣物捐二手店，書和紀念品考慮海運</li>
+    <li>台灣健保：出國期間若辦了停保，回台記得復保</li>
   </ul></div>
 
   <h2 id="career">五、回台職涯銜接：把一年寫成能力，不是空窗</h2>
@@ -110,12 +127,13 @@
 
 <footer class="site-footer">
   <div class="foot-inner">
-    <p>🧭 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
+    <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
     <p class="disclaimer">本站為經驗分享與資訊整理，非移民代理（RMA），內容不構成移民、法律或財務建議。簽證與政策隨時可能變動，請一律以
     <a href="https://immi.homeaffairs.gov.au/" rel="noopener">澳洲內政部官網</a>為準。</p>
   </div>
 </footer>
 
 <script src="assets/main.js"></script>
+<script src="assets/tools.js"></script>
 </body>
 </html>

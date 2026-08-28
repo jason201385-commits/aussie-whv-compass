@@ -10,13 +10,13 @@
 <meta property="og:title" content="常見詐騙手法：認手法，不認名字｜澳打指南針">
 <meta property="og:description" content="澳洲打工度假常見詐騙與剝削手法：先付錢才有工作、賣 88 天、假房東、假移民局電話、黑工假承攬。認得手法與紅旗句，就不容易上當。附完整官方求助管道。">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
 
 <header class="site-header">
   <nav class="nav-inner">
-    <a class="brand" href="index.html"><span class="logo">🧭</span>澳打指南針</a>
+    <a class="brand" href="index.html"><span class="logo"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>澳打指南針</a>
     <div class="nav-links">
       <a href="why.html">自我釐清</a>
       <a href="visa.html">簽證集簽</a>
@@ -41,6 +41,7 @@
   <div class="toc">
     <strong>本頁目錄</strong>
     <a href="#defense">三道防線</a>
+    <a href="#quiz">實戰測驗</a>
     <a href="#job">求職類</a>
     <a href="#visa-scam">簽證類</a>
     <a href="#rent">租屋類</a>
@@ -51,7 +52,7 @@
 
   <h2 id="defense">三道防線（先記這個，其他慢慢看）</h2>
   <div class="panel">
-    <h3>🔍 第一道：動錢、簽名、給證件之前，花 5 分鐘查證</h3>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg> 第一道：動錢、簽名、給證件之前，花 5 分鐘查證</h3>
     <ul>
       <li>雇主 → <a href="https://abr.business.gov.au/" rel="noopener">ABN Lookup</a> 查公司是否存在、名稱是否一致（免費）</li>
       <li>房源 → 照片反搜＋比對行情，<strong>沒進室內看過的房，一毛不匯</strong></li>
@@ -59,12 +60,26 @@
       <li>二手車 → <a href="https://www.ppsr.gov.au/searching/do-used-car-or-vehicle-search" rel="noopener">PPSR 官方查詢</a>（$2，查貸款/失竊/報廢）</li>
       <li>派遣仲介 → 查州牌照登記（見<a href="work.html#verify">找工作頁</a>）</li>
     </ul>
-    <h3>🚩 第二道：紅旗句字典——聽到任何一句，退一步查證</h3>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-flag"/></svg> 第二道：紅旗句字典——聽到任何一句，退一步查證</h3>
     <p style="line-height:2.2">
       「先付錢／先付訂金」・「今天不決定就沒了」・「不用簽約比較彈性」・「大家都這樣」・「現金實拿比較多」・「剛來先撐一下」・「沒 ABN 就不給工」・「保證過簽／包過」・「不用真的做 88 天」・「留在市區就能集簽」・「配合調查要保密」・「先上培訓課保證就業」
     </p>
-    <h3>🆘 第三道：中招救濟包（<a href="#help">見文末總表</a>，現在就存進手機）</h3>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-lifebuoy"/></svg> 第三道：中招救濟包（<a href="#help">見文末總表</a>，現在就存進手機）</h3>
     <p>記住兩件官方白紙黑字的事：<strong>向 Fair Work 求助不會導致簽證被取消</strong>；<strong>雇主沒有權力取消任何人的簽證</strong>（只有移民署可以）。「敢申訴就讓你回不了澳洲」永遠是唬人的。</p>
+  </div>
+
+  <h2 id="quiz">實戰測驗：這是不是詐騙？</h2>
+  <div class="tool" id="scam-quiz">
+    <span class="tool-tag">互動測驗</span>
+    <p>八個真實情境改編的判斷題——測測你現在是肥羊還是老鳥。答錯沒關係，在這裡錯不用錢。</p>
+    <p class="quiz-progress" id="quiz-progress"></p>
+    <div class="quiz-scenario" id="quiz-scenario"></div>
+    <div class="quiz-btns">
+      <button type="button" class="btn secondary" id="quiz-accept">看起來可以，接受</button>
+      <button type="button" class="btn" id="quiz-run">不對勁，快跑</button>
+      <button type="button" class="btn" id="quiz-next" style="display:none">下一題</button>
+    </div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
   </div>
 
   <h2 id="job">一、求職類</h2>
@@ -261,12 +276,13 @@
 
 <footer class="site-footer">
   <div class="foot-inner">
-    <p>🧭 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
+    <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 永久免費・開源維護・<a href="about.html">只接受自願贊助</a></p>
     <p class="disclaimer">本站為經驗分享與資訊整理，非移民代理（RMA），內容不構成移民、法律或財務建議。簽證與政策隨時可能變動，請一律以
     <a href="https://immi.homeaffairs.gov.au/" rel="noopener">澳洲內政部官網</a>為準。</p>
   </div>
 </footer>
 
 <script src="assets/main.js"></script>
+<script src="assets/tools.js"></script>
 </body>
 </html>
