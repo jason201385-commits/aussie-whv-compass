@@ -40,6 +40,46 @@
     if (a.getAttribute("href") === path) a.classList.add("active");
   });
 
+  // ---------- 回饋列（全站注入，讓這套系統有進步的可能） ----------
+  var footer = document.querySelector(".site-footer");
+  if (footer) {
+    var pageName = (document.title.split("｜")[0] || document.title).trim();
+    var issueUrl = "https://github.com/jason201385-commits/aussie-whv-compass/issues/new"
+      + "?template=report.yml"
+      + "&title=" + encodeURIComponent("[" + pageName + "] ")
+      + "&page=" + encodeURIComponent(pageName + "（" + (location.pathname.split("/").pop() || "index.html") + "）");
+    var bar = document.createElement("div");
+    bar.className = "feedback-bar";
+    bar.innerHTML = '<span class="fb-q">這一頁有幫助嗎？</span>'
+      + '<div class="feedback-actions">'
+      + '<button type="button" class="btn secondary" id="fb-share">有幫助，複製網址分享</button>'
+      + '<a class="btn" target="_blank" rel="noopener" href="' + issueUrl + '">回報問題／提建議</a>'
+      + '</div>';
+    footer.parentNode.insertBefore(bar, footer);
+    var shareBtn = document.getElementById("fb-share");
+    shareBtn.addEventListener("click", function () {
+      var done = function () {
+        bar.querySelector(".fb-q").innerHTML = '<span class="fb-thanks">已複製連結——分享給下一個要出發的人，就是最好的回饋。</span>';
+        shareBtn.style.display = "none";
+      };
+      try {
+        navigator.clipboard.writeText(location.href).then(done, done);
+      } catch (e) { done(); }
+    });
+  }
+
+  // ---------- 快選籤：點一下代替打字（data-fill → 填入指定 textarea） ----------
+  document.addEventListener("click", function (e) {
+    var chip = e.target.closest ? e.target.closest(".chip[data-fill]") : null;
+    if (!chip) return;
+    var ta = document.getElementById(chip.getAttribute("data-target"));
+    if (!ta) return;
+    var text = chip.getAttribute("data-fill");
+    ta.value = ta.value.trim() ? ta.value.replace(/[、\s]+$/, "") + "、" + text : text;
+    ta.dispatchEvent(new Event("input"));
+    ta.focus();
+  });
+
   // ---------- 自我釐清工作表（只在 why.html 生效） ----------
   var form = document.getElementById("worksheet");
   if (!form) return;

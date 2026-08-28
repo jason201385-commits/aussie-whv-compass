@@ -74,14 +74,32 @@
 
     <div class="worksheet-q">
       <label for="q4">4. 這一趟我想帶回來的東西，按重要性排序是？</label>
-      <p class="q-hint">常見選項：錢／英文／一技之長（農業、餐飲、咖啡、工地技能……）／旅行回憶／獨立生活的能力／新的職涯方向／二簽三簽甚至 PR。全都想要很正常，但排序會決定你怎麼選城市和工作。</p>
+      <p class="q-hint">全都想要很正常，但排序會決定你怎麼選城市和工作。點下面的籤按重要順序加入，再補寫「為什麼」。</p>
+      <div class="chip-row">
+        <button type="button" class="chip" data-target="q4" data-fill="錢">錢</button>
+        <button type="button" class="chip" data-target="q4" data-fill="英文">英文</button>
+        <button type="button" class="chip" data-target="q4" data-fill="一技之長">一技之長</button>
+        <button type="button" class="chip" data-target="q4" data-fill="旅行回憶">旅行回憶</button>
+        <button type="button" class="chip" data-target="q4" data-fill="獨立生活的能力">獨立能力</button>
+        <button type="button" class="chip" data-target="q4" data-fill="新的職涯方向">職涯方向</button>
+        <button type="button" class="chip" data-target="q4" data-fill="二簽三簽">二簽三簽</button>
+        <button type="button" class="chip" data-target="q4" data-fill="朝 PR 前進">PR</button>
+      </div>
       <textarea id="q4" placeholder="第一：…（為什麼）&#10;第二：…&#10;第三：…"></textarea>
     </div>
 
     <div class="worksheet-q">
       <label for="q5">5. 殘酷二選一：錢、英文、旅行、履歷——只能顧好兩個，我選哪兩個？</label>
-      <p class="q-hint">偏遠農場錢多但練不到英文也玩不到；大城市咖啡廳練英文但存不了什麼錢。這題的答案，就是你前三個月該去哪裡的答案。</p>
-      <textarea id="q5"></textarea>
+      <p class="q-hint">偏遠農場錢多但練不到英文也玩不到；大城市咖啡廳練英文但存不了什麼錢。這題的答案，就是你前三個月該去哪裡的答案。點一個組合，再寫下你的理由。</p>
+      <div class="chip-row">
+        <button type="button" class="chip" data-target="q5" data-fill="我選：錢＋英文">錢＋英文</button>
+        <button type="button" class="chip" data-target="q5" data-fill="我選：錢＋旅行">錢＋旅行</button>
+        <button type="button" class="chip" data-target="q5" data-fill="我選：錢＋履歷">錢＋履歷</button>
+        <button type="button" class="chip" data-target="q5" data-fill="我選：英文＋旅行">英文＋旅行</button>
+        <button type="button" class="chip" data-target="q5" data-fill="我選：英文＋履歷">英文＋履歷</button>
+        <button type="button" class="chip" data-target="q5" data-fill="我選：旅行＋履歷">旅行＋履歷</button>
+      </div>
+      <textarea id="q5" placeholder="因為…"></textarea>
     </div>
 
     <h3>Part 3・現實與底線</h3>

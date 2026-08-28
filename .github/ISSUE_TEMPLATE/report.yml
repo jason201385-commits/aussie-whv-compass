@@ -1,0 +1,43 @@
+name: 回報過時或錯誤資訊
+description: 發現數字過時、政策變了、連結壞了？用這張表告訴我們，讓後來的人少走冤枉路。
+title: "[頁面] 一句話說明問題"
+labels: ["需要查證"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝你幫忙讓這份攻略保持正確——這正是它能永久免費的原因。
+        不需要完美的描述，能指出「哪裡怪怪的」就很有價值。
+  - type: input
+    id: page
+    attributes:
+      label: 哪一頁？
+      description: 從網站點「回報問題」進來的話，這欄已自動填好。
+      placeholder: 例：物價薪水（cost.html）
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: 問題類型
+      options:
+        - 數字過時了（費用、薪資、稅率、門檻…）
+        - 政策變了（簽證、集簽、移民規則…）
+        - 連結壞了
+        - 內容寫錯或前後矛盾
+        - 工具算錯或壞掉
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: 哪裡怪怪的？
+      placeholder: 例：417 首簽費用官網已改為 $XXX，本站還寫 $840。
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: 官方來源連結（選填，有附查證更快）
+      placeholder: https://immi.homeaffairs.gov.au/...

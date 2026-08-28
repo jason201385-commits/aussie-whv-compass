@@ -87,6 +87,12 @@
     };
     document.getElementById("pc-check").addEventListener("click", run);
     document.getElementById("pc-input").addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });
+    pcTool.querySelectorAll(".chip[data-pc]").forEach(function (c) {
+      c.addEventListener("click", function () {
+        document.getElementById("pc-input").value = c.getAttribute("data-pc");
+        run();
+      });
+    });
   }
 
   /* ================= 存錢試算器（cost.html） ================= */
@@ -269,5 +275,8 @@
     };
     bal.addEventListener("input", calcDasp);
     calcDasp();
+    dasp.querySelectorAll(".chip[data-amt]").forEach(function (c) {
+      c.addEventListener("click", function () { bal.value = c.getAttribute("data-amt"); calcDasp(); });
+    });
   }
 })();

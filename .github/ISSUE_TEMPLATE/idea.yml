@@ -1,0 +1,29 @@
+name: 內容許願與建議
+description: 覺得少了什麼主題、哪個工具可以更好用？告訴我們。
+title: "[許願] "
+labels: ["許願池"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 這是什麼類型的建議？
+      options:
+        - 想要新的主題或頁面
+        - 現有內容可以寫得更好
+        - 互動工具的改善
+        - 網站設計與使用體驗
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: 說說你的想法
+      placeholder: 例：希望有各州採收季節的月曆對照表。
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 你的情境（選填）
+      placeholder: 例：我正在規劃明年 3 月出發，發現……
