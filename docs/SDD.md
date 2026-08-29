@@ -47,7 +47,7 @@
 | `pr.html` | PR 路徑總覽 |
 | `about.html` | 關於、贊助（按鈕待站長提供連結）、授權、免責 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
-| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回饋列注入、chip 填字、工作表 |
+| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、工作表 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化回饋表單（report.yml／idea.yml／thanks.yml／config.yml） |
@@ -65,6 +65,8 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - 兩個 IIFE（`main.js` 全站、`tools.js` 工具頁），無模組系統。
 - **特徵偵測模式**：每個功能塊以 `document.getElementById(...)` 判斷是否在該頁，
   不存在就跳過——tools.js 可安全掛在任何頁。
+- **旅程順序單一來源**：`main.js` 的 `JOURNEY_ORDER` 與首頁四階段一致，負責內容頁的
+  上一站／下一站與位置顯示；首頁只提供 `#journey-map` 全貌，不注入頁尾導覽。
 - **localStorage keys**（改動＝使用者資料遺失，不得更名）：
   - `whv-worksheet-v1`：工作表答案（{q1..q8: string}）
   - `whv-prep-check-v1`：行前清單勾選（{pc2-g-i: bool}）

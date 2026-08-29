@@ -60,19 +60,24 @@
 
   // ---------- 最近閱讀：只記錄白名單頁名，作為首頁的回訪續接 ----------
   var LAST_PAGE_KEY = "whv-last-page-v1";
-  var JOURNEY_PAGES = {
-    "why.html": { title: "自我釐清", stage: "還在考慮" },
-    "cost.html": { title: "物價與薪水", stage: "還在考慮" },
-    "visa.html": { title: "簽證與集簽", stage: "還在考慮" },
-    "prep.html": { title: "行前準備與落地", stage: "準備出發" },
-    "health.html": { title: "健康與安全", stage: "準備出發" },
-    "english.html": { title: "英文資源與策略", stage: "準備出發" },
-    "housing.html": { title: "住宿與租屋", stage: "已在澳洲" },
-    "work.html": { title: "找工作", stage: "已在澳洲" },
-    "scam.html": { title: "防詐騙", stage: "已在澳洲" },
-    "pr.html": { title: "PR 路徑總覽", stage: "規劃留下" },
-    "leave.html": { title: "報稅、退休金與離澳", stage: "準備回程" }
-  };
+  var JOURNEY_ORDER = [
+    { path: "why.html", title: "自我釐清", phase: "01", stage: "還在考慮", remember: true },
+    { path: "cost.html", title: "物價與薪水", phase: "01", stage: "還在考慮", remember: true },
+    { path: "visa.html", title: "簽證與集簽", phase: "01", stage: "還在考慮", remember: true },
+    { path: "prep.html", title: "行前準備與落地", phase: "02", stage: "決定要去", remember: true },
+    { path: "health.html", title: "健康與安全", phase: "02", stage: "決定要去", remember: true },
+    { path: "english.html", title: "英文資源與策略", phase: "02", stage: "決定要去", remember: true },
+    { path: "housing.html", title: "住宿與租屋", phase: "03", stage: "已在澳洲", remember: true },
+    { path: "work.html", title: "找工作", phase: "03", stage: "已在澳洲", remember: true },
+    { path: "scam.html", title: "防詐騙", phase: "03", stage: "已在澳洲", remember: true },
+    { path: "pr.html", title: "PR 路徑總覽", phase: "03", stage: "已在澳洲", remember: true },
+    { path: "leave.html", title: "報稅、退休金與離澳", phase: "04", stage: "回程與延續", remember: true },
+    { path: "about.html", title: "留下感謝・關於本站", phase: "04", stage: "回程與延續", remember: false }
+  ];
+  var JOURNEY_PAGES = {};
+  JOURNEY_ORDER.forEach(function (item) {
+    if (item.remember) JOURNEY_PAGES[item.path] = { title: item.title, stage: item.stage };
+  });
   var resume = document.getElementById("journey-resume");
   if (resume) {
     try {
@@ -98,6 +103,57 @@
     }
   } else if (Object.prototype.hasOwnProperty.call(JOURNEY_PAGES, path)) {
     try { localStorage.setItem(LAST_PAGE_KEY, JSON.stringify({ path: path })); } catch (e) {}
+  }
+
+  // ---------- 內容頁旅程導覽：讀完後仍知道上一站、全貌與下一站 ----------
+  var journeyIndex = JOURNEY_ORDER.findIndex(function (item) { return item.path === path; });
+  if (main && journeyIndex >= 0) {
+    var currentJourney = JOURNEY_ORDER[journeyIndex];
+    var previousJourney = journeyIndex > 0 ? JOURNEY_ORDER[journeyIndex - 1] : null;
+    var nextJourney = journeyIndex < JOURNEY_ORDER.length - 1 ? JOURNEY_ORDER[journeyIndex + 1] : null;
+    var pageJourneyNav = document.createElement("nav");
+    pageJourneyNav.className = "page-journey-nav";
+    pageJourneyNav.setAttribute("aria-label", "本頁在打工度假旅程中的位置");
+
+    var journeyHead = document.createElement("div");
+    journeyHead.className = "page-journey-head";
+    var journeyEyebrow = document.createElement("span");
+    journeyEyebrow.className = "section-eyebrow";
+    journeyEyebrow.textContent = "JOURNEY " + currentJourney.phase;
+    var journeyPosition = document.createElement("strong");
+    journeyPosition.textContent = currentJourney.stage + "・第 " + (journeyIndex + 1) + " / " + JOURNEY_ORDER.length + " 頁";
+    var journeyHint = document.createElement("small");
+    journeyHint.textContent = "可以跳著讀；想順著走時，從這裡接下去。";
+    journeyHead.appendChild(journeyEyebrow);
+    journeyHead.appendChild(journeyPosition);
+    journeyHead.appendChild(journeyHint);
+
+    var makeJourneyStep = function (label, item, fallbackTitle, extraClass) {
+      var link = document.createElement("a");
+      link.className = "page-journey-step " + extraClass;
+      link.href = item ? item.path : "index.html#journey-map";
+      var direction = document.createElement("span");
+      direction.textContent = label;
+      var title = document.createElement("strong");
+      title.textContent = item ? item.title : fallbackTitle;
+      link.appendChild(direction);
+      link.appendChild(title);
+      return link;
+    };
+
+    var journeyLinks = document.createElement("div");
+    journeyLinks.className = "page-journey-links";
+    journeyLinks.appendChild(makeJourneyStep("上一站", previousJourney, "旅程首頁", "previous"));
+    var overview = document.createElement("a");
+    overview.className = "page-journey-overview";
+    overview.href = "index.html#journey-map";
+    overview.textContent = "查看完整旅程";
+    journeyLinks.appendChild(overview);
+    journeyLinks.appendChild(makeJourneyStep("下一站", nextJourney, "重新選階段", "next"));
+
+    pageJourneyNav.appendChild(journeyHead);
+    pageJourneyNav.appendChild(journeyLinks);
+    main.appendChild(pageJourneyNav);
   }
 
   // ---------- 首頁 SVG 剪紙視差（減少動態與行動版停用） ----------

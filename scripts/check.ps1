@@ -90,6 +90,17 @@ if (-not $mainJs.Contains('template=thanks.yml')) {
   Write-Output 'FAIL [main.js] 全站回饋列缺感謝入口'
   $errors++
 }
+$journeyMatches = [regex]::Matches($mainJs, '\{ path: "([^"]+\.html)", title:')
+$journeyPaths = @($journeyMatches | ForEach-Object { $_.Groups[1].Value })
+if ($journeyPaths.Count -ne 12) { Write-Output "FAIL [main.js] JOURNEY_ORDER 頁數=$($journeyPaths.Count)（應為 12）"; $errors++ }
+$journeyDuplicates = @($journeyPaths | Group-Object | Where-Object Count -gt 1)
+if ($journeyDuplicates.Count -gt 0) { Write-Output "FAIL [main.js] JOURNEY_ORDER 路徑重複：$(($journeyDuplicates.Name) -join ', ')"; $errors++ }
+foreach ($journeyPath in $journeyPaths) {
+  if (-not (Test-Path (Join-Path $dir $journeyPath))) { Write-Output "FAIL [main.js] JOURNEY_ORDER 壞路徑：$journeyPath"; $errors++ }
+}
+foreach ($journeyNeedle in @('className = "page-journey-nav"', 'index.html#journey-map', '上一站', '查看完整旅程', '下一站')) {
+  if (-not $mainJs.Contains($journeyNeedle)) { Write-Output "FAIL [main.js] 缺頁尾旅程導覽：$journeyNeedle"; $errors++ }
+}
 foreach ($resumeNeedle in @('whv-last-page-v1', 'JOURNEY_PAGES', 'hasOwnProperty.call(JOURNEY_PAGES', 'JSON.parse(localStorage.getItem(LAST_PAGE_KEY)', 'localStorage.removeItem(LAST_PAGE_KEY)')) {
   if (-not $mainJs.Contains($resumeNeedle)) {
     Write-Output "FAIL [main.js] 最近閱讀缺安全條件：$resumeNeedle"
@@ -117,6 +128,10 @@ if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not
   $errors++
 }
 $indexText = [System.IO.File]::ReadAllText((Join-Path $dir 'index.html'), [System.Text.Encoding]::UTF8)
+if (-not $indexText.Contains('id="journey-map"')) {
+  Write-Output 'FAIL [index.html] 缺完整旅程錨點：journey-map'
+  $errors++
+}
 foreach ($resumeId in @('journey-resume', 'journey-resume-link', 'journey-resume-clear')) {
   if (-not $indexText.Contains("id=`"$resumeId`"")) {
     Write-Output "FAIL [index.html] 缺最近閱讀元件：$resumeId"

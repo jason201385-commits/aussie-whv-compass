@@ -974,6 +974,54 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .gratitude-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
 .gratitude-actions .btn { min-height: 44px; }
 
+/* ---------- 內容頁：上一站／全貌／下一站 ---------- */
+.page-journey-nav {
+  margin: 64px 0 0;
+  padding: 22px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--blue-soft);
+  box-shadow: var(--shadow-pop);
+}
+.page-journey-head { display: flex; align-items: baseline; gap: 10px 16px; flex-wrap: wrap; }
+.page-journey-head .section-eyebrow { margin: 0; }
+.page-journey-head > strong { font-family: var(--font-serif); font-size: 1.08rem; }
+.page-journey-head > small { margin-left: auto; color: var(--ink-soft); font-size: .8rem; }
+.page-journey-links {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.page-journey-step,
+.page-journey-overview {
+  min-height: 68px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.page-journey-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 14px;
+  line-height: 1.45;
+}
+.page-journey-step.next { align-items: flex-end; text-align: right; }
+.page-journey-step span { color: var(--ink-soft); font-size: .74rem; font-weight: 800; }
+.page-journey-step strong { font-family: var(--font-serif); font-size: .96rem; }
+.page-journey-overview {
+  display: grid;
+  place-items: center;
+  padding: 10px 16px;
+  font-size: .86rem;
+  font-weight: 900;
+  text-align: center;
+}
+.page-journey-step:hover,
+.page-journey-overview:hover { background: var(--gold-soft); text-decoration: none; }
+
 /* 錨點跳轉後仍要露出標題，不被多列 sticky 導覽蓋住 */
 main [id] { scroll-margin-top: 170px; }
 
@@ -981,6 +1029,11 @@ main [id] { scroll-margin-top: 170px; }
   .feedback-actions { width: 100%; margin-left: 0; }
   .feedback-actions .btn { flex: 1 1 100%; width: 100%; text-align: center; }
   .gratitude-actions .btn { flex: 1 1 100%; text-align: center; }
+  .page-journey-nav { margin-top: 46px; padding: 18px 16px; }
+  .page-journey-head { align-items: flex-start; }
+  .page-journey-head > small { flex-basis: 100%; margin-left: 0; }
+  .page-journey-links { grid-template-columns: 1fr; }
+  .page-journey-step.next { align-items: flex-start; text-align: left; }
 }
 
 /* ---------- 行動版：緊湊單列導覽 ---------- */
@@ -1044,7 +1097,7 @@ main [id] { scroll-margin-top: 170px; }
 }
 
 @media print {
-  .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar { display: none; }
+  .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar, .page-journey-nav { display: none; }
   body { background: #fff; color: #000; }
   body::after { display: none; }
   .panel, details, .card, .table-wrap, .tool { box-shadow: none; }
