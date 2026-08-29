@@ -164,6 +164,27 @@ foreach ($carNeedle in @(
   if (-not $costText.Contains($carNeedle)) { Write-Output "FAIL [cost.html] 缺買車行動入口或執行邊界：$carNeedle"; $errors++ }
 }
 
+foreach ($livingNeedle in @(
+  'id="food"',
+  'https://stores.spudshed.com.au/',
+  'https://www.aldi.com.au/storelocator',
+  'https://www.coles.com.au/on-special',
+  'https://www.woolworths.com.au/shop/browse/specials',
+  'https://www.accc.gov.au/business/pricing/unit-pricing',
+  'https://askizzy.org.au/',
+  '4 道新手也能完成的共用食材料理',
+  'https://www.foodstandards.gov.au/consumer/prevention-of-foodborne-illness/food-safety-basics',
+  'id="clothes"',
+  'https://goodsammy.com.au/locations/',
+  'https://www.vinnies.org.au/wa/vinnies-shops',
+  'https://www.salvosstores.com.au/stores',
+  'https://shop.redcross.org.au/store-locator/',
+  '每次穿著成本',
+  'https://www.worksafe.wa.gov.au/personal-protective-equipment-ppe'
+)) {
+  if (-not $costText.Contains($livingNeedle)) { Write-Output "FAIL [cost.html] 缺吃穿省錢入口或安全資訊：$livingNeedle"; $errors++ }
+}
+
 # GitHub Pages 自訂網域必須鎖定正式 www 主機名
 $cnamePath = Join-Path $dir 'CNAME'
 if (-not (Test-Path $cnamePath)) {
