@@ -387,6 +387,42 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 40px 20px 70px; }
 .journey-resume-actions { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 .journey-resume-actions .btn { min-height: 44px; text-align: center; }
 
+/* ---------- 在澳當下需求：零打字快導 ---------- */
+.support-hub {
+  margin: 42px 0 18px;
+  padding: 28px;
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+}
+.support-hub h2 { margin: .25em 0 .25em; }
+.support-hub-intro { margin: 0; color: var(--ink-soft); }
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+.support-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 88px;
+  padding: 15px;
+  border: 1.5px solid var(--ink);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  transition: transform .12s ease, background .12s ease;
+}
+.support-link:hover { transform: translateY(-2px); background: var(--gold-soft); text-decoration: none; }
+.support-link .icon { flex: 0 0 auto; width: 26px; height: 26px; margin-top: 2px; color: var(--link); }
+.support-link span, .support-link strong, .support-link small { display: block; }
+.support-link strong { line-height: 1.45; }
+.support-link small { margin-top: 3px; color: var(--ink-soft); font-size: .76rem; line-height: 1.45; }
+.support-emergency { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line-soft); font-size: .86rem; }
+
 /* ---------- 首頁旅程索引 ---------- */
 .journey-directory {
   display: grid;
@@ -974,6 +1010,9 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   .journey-resume-mark { width: 48px; height: 48px; }
   .journey-resume-actions { grid-column: 1 / -1; justify-content: stretch; }
   .journey-resume-actions .btn { flex: 1 1 100%; width: 100%; }
+  .support-hub { padding: 22px 16px; }
+  .support-grid { grid-template-columns: 1fr; }
+  .support-link { min-height: 72px; }
   .home-page .card-grid { grid-template-columns: 1fr; }
   .featured-tool { grid-template-columns: 1fr; padding: 26px 22px 30px; }
   .featured-poster-preview { width: min(210px, 78%); min-height: 200px; justify-self: center; }

@@ -102,6 +102,14 @@ foreach ($resumeId in @('journey-resume', 'journey-resume-link', 'journey-resume
     $errors++
   }
 }
+$supportBlock = [regex]::Match($indexText, '(?s)<section class="support-hub".*?</section>')
+if (-not $supportBlock.Success) {
+  Write-Output 'FAIL [index.html] 缺當下需求快導'
+  $errors++
+} else {
+  $supportLinks = [regex]::Matches($supportBlock.Value, 'class="support-link"').Count
+  if ($supportLinks -ne 6) { Write-Output "FAIL [index.html] 當下需求入口數=$supportLinks（應為 6）"; $errors++ }
+}
 foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml')) {
   $formPath = Join-Path $dir ".github\ISSUE_TEMPLATE\$formName"
   if (-not (Test-Path $formPath)) {

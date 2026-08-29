@@ -35,6 +35,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 自我釐清工作表 | why.html `#worksheet` | 8 題 textarea＋Q4/Q5 快選 chips | 600ms 防抖存 `whv-worksheet-v1`；chips 以頓號接續填入 | 匯出 .txt／列印／清空 |
 | 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→`report.yml`；感謝鈕→`thanks.yml`，兩者都自動帶入頁名 | — |
 | 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | localStorage `whv-last-page-v1` 只存 `{path}`；首頁以固定頁名／階段 map 顯示，拒絕未知 path | 續讀連結＋清除紀錄；首次訪問或無效資料時隱藏 |
+| 當下需求快導 | 首頁 `#support-hub` | 6 個情境式零打字入口 | 只連向既有內容錨點：找房、工作查核、詐騙救濟、就醫、心理支援、離澳清單；另列緊急聯絡總表 | 直接跳到處理步驟，不複製可能過時的電話或政策數字 |
 
 ### 1.3 回饋機制
 
