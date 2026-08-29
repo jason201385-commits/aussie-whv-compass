@@ -80,9 +80,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - 兩個 IIFE（`main.js` 全站、`tools.js` 工具頁），無模組系統。
 - **特徵偵測模式**：每個功能塊以 `document.getElementById(...)` 判斷是否在該頁，
   不存在就跳過——tools.js 可安全掛在任何頁。
-- **私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字與 `mailto:`，不建立
-  localStorage key、不呼叫 fetch、不自動寄信；輸入只以 `textContent`／`value` 呈現，寄信參數必須
-  `encodeURIComponent`。clipboard 不可用時只選取預覽文字，不得誤報已複製。
+- **私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字；使用者可選 Gmail web compose、
+  `mailto:` 或複製文字，不建立 localStorage key、不呼叫 fetch、不自動寄信。產生預覽時內容仍只在本頁，
+  使用者主動點寄信入口後才交給所選服務；所有收件者、主旨與內文參數必須 `encodeURIComponent`。
+  clipboard 不可用時只選取預覽文字，不得誤報已複製。
 - **站內搜尋**：`main.js` 注入全站 dialog 與 header 入口，首次開啟才載入
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。

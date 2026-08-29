@@ -132,7 +132,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260829-6";
+      script.src = "assets/search-index.js?v=20260829-7";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -827,6 +827,7 @@
     var briefOutcome = document.getElementById("brief-outcome");
     var briefOutput = document.getElementById("brief-output");
     var briefPreview = document.getElementById("brief-preview");
+    var briefGmailLink = document.getElementById("brief-gmail-link");
     var briefEmailLink = document.getElementById("brief-email-link");
     var briefCopy = document.getElementById("brief-copy");
     var briefStatus = document.getElementById("brief-status");
@@ -866,10 +867,11 @@
       var briefText = makeBrief();
       var subject = "[合作詢問] " + briefType.value.trim();
       briefPreview.value = briefText;
+      briefGmailLink.href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent("chunaenqiu6@gmail.com") + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
       briefEmailLink.href = "mailto:chunaenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
       briefOutput.hidden = false;
-      setBriefStatus("需求單已整理好；請預覽後開啟 Email，最後由你確認寄出");
-      briefEmailLink.focus();
+      setBriefStatus("需求單已整理好；可用 Gmail、郵件 App 或複製文字，最後由你確認寄出");
+      briefGmailLink.focus();
     });
 
     if (briefCopy) briefCopy.addEventListener("click", function () {

@@ -584,11 +584,12 @@ foreach ($collabNeedle in @('id="collaborate"', 'template=collaborate.yml', '提
   if (-not $aboutText.Contains($collabNeedle)) { Write-Output "FAIL [about.html] 缺合作入口或邊界：$collabNeedle"; $errors++ }
 }
 $aboutText = [System.IO.File]::ReadAllText((Join-Path $dir 'about.html'), [System.Text.Encoding]::UTF8)
-foreach ($privateId in @('private-contact', 'private-email-direct', 'contact-brief', 'brief-type', 'brief-timing', 'brief-problem', 'brief-outcome', 'brief-boundary', 'brief-status', 'brief-output', 'brief-preview', 'brief-email-link', 'brief-copy')) {
+foreach ($privateId in @('private-contact', 'private-email-direct', 'contact-brief', 'brief-type', 'brief-timing', 'brief-problem', 'brief-outcome', 'brief-boundary', 'brief-status', 'brief-output', 'brief-preview', 'brief-gmail-link', 'brief-email-link', 'brief-copy')) {
   if (-not $aboutText.Contains("id=`"$privateId`"")) { Write-Output "FAIL [about.html] 缺私人合作需求單元件：$privateId"; $errors++ }
 }
 foreach ($privateNeedle in @(
   'mailto:chunaenqiu6@gmail.com',
+  'https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chunaenqiu6%40gmail.com',
   '內容不會送到本站或儲存',
   '最後仍由你確認並寄出',
   '送出不代表委託成立、保證處理或承諾免費服務',
@@ -601,7 +602,7 @@ if (-not $briefScript.Success) {
   Write-Output 'FAIL [main.js] 缺私人合作需求單功能塊'
   $errors++
 } else {
-  foreach ($briefNeedle in @('briefForm.checkValidity()', 'briefForm.reportValidity()', 'encodeURIComponent(subject)', 'encodeURIComponent(briefText)', 'navigator.clipboard.writeText(briefPreview.value)', 'briefPreview.select()')) {
+  foreach ($briefNeedle in @('briefForm.checkValidity()', 'briefForm.reportValidity()', 'briefGmailLink.href = "https://mail.google.com/mail/?view=cm', 'encodeURIComponent("chunaenqiu6@gmail.com")', 'encodeURIComponent(subject)', 'encodeURIComponent(briefText)', 'navigator.clipboard.writeText(briefPreview.value)', 'briefPreview.select()')) {
     if (-not $briefScript.Value.Contains($briefNeedle)) { Write-Output "FAIL [main.js] 私人需求單缺驗證／編碼／複製備援：$briefNeedle"; $errors++ }
   }
   foreach ($forbidden in @('localStorage', 'fetch(', 'XMLHttpRequest')) {

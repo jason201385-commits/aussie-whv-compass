@@ -79,7 +79,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260829-6">
+<link rel="stylesheet" href="assets/style.css?v=20260829-7">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -139,7 +139,8 @@
     <h3 id="private-contact-title">私人合作：直接寄 Email，或先寫一張需求單</h3>
     <p>最快的方法是直接寄到 <a href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">chunaenqiu6@gmail.com</a>。不知道怎麼開頭，也可以先填下面四格，本站會替你整理成 Email 草稿。</p>
     <div class="contact-route-actions">
-      <a class="btn" id="private-email-direct" href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">直接寫 Email</a>
+      <a class="btn" id="private-email-direct" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chunaenqiu6%40gmail.com&amp;su=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A" target="_blank" rel="noopener noreferrer">用 Gmail 寫信</a>
+      <a class="btn secondary" href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">使用郵件 App</a>
       <a class="btn secondary" href="#contact-brief">先寫需求單</a>
     </div>
 
@@ -168,7 +169,7 @@
           <textarea id="brief-outcome" required maxlength="800" rows="4" placeholder="例如：讓讀者能完成某件事、把流程做簡單、先判斷方向是否可行。"></textarea>
         </div>
       </div>
-      <p class="brief-privacy" id="brief-privacy"><strong>內容不會送到本站或儲存。</strong>產生後只會放進你自己的 Email 草稿，最後仍由你確認並寄出。第一封請不要附證件、帳密、醫療或法律個案、第三人個資、未公開客戶資料。</p>
+      <p class="brief-privacy" id="brief-privacy"><strong>內容不會送到本站或儲存。</strong>產生需求單只在這個頁面內整理文字；你按下 Gmail 或郵件 App 後，內容才會交給所選服務建立草稿，最後仍由你確認並寄出。第一封請不要附證件、帳密、醫療或法律個案、第三人個資、未公開客戶資料。</p>
       <label class="brief-confirm" for="brief-boundary">
         <input id="brief-boundary" type="checkbox" required>
         <span>我知道這只是初步需求，送出不代表委託成立、保證處理或承諾免費服務。</span>
@@ -181,12 +182,13 @@
         <label for="brief-preview">需求單預覽</label>
         <textarea id="brief-preview" rows="12" readonly></textarea>
         <div class="contact-route-actions">
-          <a class="btn" id="brief-email-link" href="mailto:chunaenqiu6@gmail.com">開啟 Email 草稿</a>
+          <a class="btn" id="brief-gmail-link" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chunaenqiu6%40gmail.com" target="_blank" rel="noopener noreferrer">用 Gmail 開啟草稿</a>
+          <a class="btn secondary" id="brief-email-link" href="mailto:chunaenqiu6@gmail.com">使用郵件 App</a>
           <button type="button" class="btn secondary" id="brief-copy">複製需求單</button>
         </div>
-        <p class="brief-privacy">若裝置沒有設定預設郵件 App，請按「複製需求單」，再自行貼到 Gmail、Outlook 或其他信箱寄出。</p>
+        <p class="brief-privacy">Gmail 會在瀏覽器開新草稿；郵件 App 需要裝置已設定預設信箱。兩者都無法使用時，請複製需求單再貼到其他信箱。</p>
       </div>
-      <noscript><p class="warning">需求單產生器需要 JavaScript；你仍可使用上方「直接寫 Email」。</p></noscript>
+      <noscript><p class="warning">需求單產生器需要 JavaScript；你仍可使用上方 Gmail 或郵件 App 入口。</p></noscript>
     </form>
   </section>
 
@@ -262,8 +264,8 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260829-6"></script>
-<script src="assets/analytics.js?v=20260829-6"></script>
-<script src="assets/main.js?v=20260829-6"></script>
+<script src="assets/analytics-config.js?v=20260829-7"></script>
+<script src="assets/analytics.js?v=20260829-7"></script>
+<script src="assets/main.js?v=20260829-7"></script>
 </body>
 </html>
