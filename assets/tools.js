@@ -556,7 +556,7 @@
 
       ctx.fillStyle = "#221d15";
       ctx.font = '700 21px "Noto Sans TC", sans-serif';
-      ctx.fillText("澳打指南針 ・ 永久免費 ・ 資料只留在本機", 420, 1690);
+      ctx.fillText("澳打指南針 ・ 公開攻略免費 ・ 資料只留在本機", 420, 1690);
       return canvas;
     };
 

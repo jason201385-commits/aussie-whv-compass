@@ -30,7 +30,7 @@
 
 ## 關於與合作
 
-- [關於本站・合作・贊助](https://www.aussiewhvcompass.com/about.html): 澳打指南針為什麼永久免費、如何提出合作或協助需求、自願贊助，以及如何在 GitHub 上一起維護這份開源攻略。
+- [關於本站・合作・贊助](https://www.aussiewhvcompass.com/about.html): 澳打指南針的公開攻略與核心工具免費；客製課程、講座、內容及數位工具可另行合作。本站不提供簽證或移民代辦。
 
 ## 使用與授權
 

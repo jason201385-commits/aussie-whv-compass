@@ -132,7 +132,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260829-11";
+      script.src = "assets/search-index.js?v=20260829-12";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -853,7 +853,7 @@
         "希望結果：",
         outcome,
         "",
-        "我知道這只是初步需求，送出不代表委託成立、保證處理或承諾免費服務。"
+        "我知道本站不提供簽證或移民代辦；這只是初步需求，是否承接、工作範圍、費用與交付都要另行確認，送出不代表委託成立或保證處理。"
       ].join("\n");
     }
 
@@ -870,7 +870,7 @@
       briefGmailLink.href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent("chunaenqiu6@gmail.com") + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
       briefEmailLink.href = "mailto:chunaenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
       briefOutput.hidden = false;
-      setBriefStatus("需求單已整理好；可用 Gmail、郵件 App 或複製文字，最後由你確認寄出");
+      setBriefStatus("需求單已整理好；請再次確認未放入簽證、移民或其他敏感個案資料，再由你選擇方式寄出");
       briefGmailLink.focus();
     });
 

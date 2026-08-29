@@ -442,7 +442,7 @@ if (-not (Test-Path $englishScamPath)) {
     'Scamwatch helps disrupt scams; ReportCyber is the online police-report route for cybercrime',
     'Helps disruption and warnings; it is not a police report',
     'ABN Lookup only confirms registration data',
-    'paid immigration assistance must come from an OMARA-registered migration agent or an Australian legal practitioner',
+    'only an OMARA-registered migration agent, an Australian legal practitioner or a legally exempt person may provide immigration assistance',
     'Your employer cannot cancel your visa',
     'id="scam-quiz"',
     'id="quiz-scenario" tabindex="-1" aria-live="polite" aria-atomic="true"',
@@ -929,6 +929,7 @@ foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml', 'collaborate.yml
   }
 }
 $collabFormPath = Join-Path $dir '.github\ISSUE_TEMPLATE\collaborate.yml'
+$collabFormText = ''
 if (Test-Path $collabFormPath) {
   $collabFormText = [System.IO.File]::ReadAllText($collabFormPath, [System.Text.Encoding]::UTF8)
   foreach ($collabNeedle in @('id: problem', 'id: outcome', 'id: privacy', 'id: boundary', '不代表已接受委託')) {
@@ -955,10 +956,78 @@ foreach ($privateNeedle in @(
   'https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chunaenqiu6%40gmail.com',
   '內容不會送到本站或儲存',
   '最後仍由你確認並寄出',
-  '送出不代表委託成立、保證處理或承諾免費服務',
-  '第一封請不要附證件、帳密、醫療或法律個案、第三人個資、未公開客戶資料'
+  '是否承接、工作範圍、費用與交付都要另行確認',
+  '不要填入證件、帳密、簽證／移民／醫療／法律／稅務個案、第三人個資或未公開客戶資料',
+  'aria-describedby="brief-privacy"',
+  'id="private-email-boundary"',
+  'aria-describedby="private-email-boundary"'
 )) {
   if (-not $aboutText.Contains($privateNeedle)) { Write-Output "FAIL [about.html] 缺私人 Email 或資料邊界：$privateNeedle"; $errors++ }
+}
+foreach ($businessNeedle in @(
+  '公開攻略免費',
+  '客製合作可收費',
+  '客製課程、講座與工作坊',
+  '工作範圍、時程、費用、交付方式與取消條件',
+  '本站不提供任何形式的簽證或移民代辦',
+  '不論是否收費都一樣',
+  '目前先提供 OMARA 官方名冊',
+  '目前沒有指定合作代理，也沒有啟用佣金轉介',
+  '若未來與特定專業人士建立商業轉介關係',
+  '是否收取轉介費會先完成法律與稅務確認，確認前不啟用',
+  '未經你明確同意，不會把你的聯絡方式或個案內容交給任何人',
+  '你仍直接與該專業人士簽約、付款並自行決定是否採用',
+  'https://immi.homeaffairs.gov.au/help-support/who-can-help-with-your-application/overview',
+  'https://www.mara.gov.au/search-the-register-of-migration-agents/',
+  '2026-08-29 查核'
+)) {
+  if (-not $aboutText.Contains($businessNeedle)) { Write-Output "FAIL [about.html] 缺免費／付費合作或受管制服務邊界：$businessNeedle"; $errors++ }
+}
+foreach ($businessOption in @('客製課程、講座或工作坊', '網站與數位工具', '內容、資料或社群合作')) {
+  if (-not $aboutText.Contains("<option value=`"$businessOption`">$businessOption</option>")) {
+    Write-Output "FAIL [about.html] 私人需求單缺合作類型：$businessOption"
+    $errors++
+  }
+  if (-not $collabFormText.Contains("- $businessOption")) {
+    Write-Output "FAIL [collaborate.yml] 公開需求單缺合作類型：$businessOption"
+    $errors++
+  }
+}
+foreach ($forbiddenServiceOption in @('一般行政', '資訊指路', '簽證', '移民', '代辦')) {
+  $briefTypeBlock = [regex]::Match($aboutText, '(?s)<select id="brief-type".*?</select>')
+  if (-not $briefTypeBlock.Success -or $briefTypeBlock.Value.Contains($forbiddenServiceOption)) {
+    Write-Output "FAIL [about.html] 私人需求類型不得招攬可能誤解為代辦的服務：$forbiddenServiceOption"
+    $errors++
+  }
+  $collabOptionsBlock = [regex]::Match($collabFormText, '(?s)label: 你想談哪一類？.*?validations:')
+  if (-not $collabOptionsBlock.Success -or $collabOptionsBlock.Value.Contains($forbiddenServiceOption)) {
+    Write-Output "FAIL [collaborate.yml] 公開合作類型不得招攬可能誤解為代辦的服務：$forbiddenServiceOption"
+    $errors++
+  }
+}
+foreach ($forbiddenPromisePattern in @('不賣課', '不接代辦業配', '唯一(?:的)?收入來源', '只(?:能|接受).{0,8}贊助', '整站.{0,4}永久免費')) {
+  foreach ($promiseFile in @('index.html', 'about.html', 'README.md', 'docs\SDD.md', 'docs\SPEC.md')) {
+    $promiseText = [System.IO.File]::ReadAllText((Join-Path $dir $promiseFile), [System.Text.Encoding]::UTF8)
+    if ($promiseText -match $forbiddenPromisePattern) {
+      Write-Output "FAIL [$promiseFile] 仍含已撤回的絕對商業承諾：$forbiddenPromisePattern"
+      $errors++
+    }
+  }
+}
+foreach ($rootPage in $pages + '404.html') {
+  $rootPageText = [System.IO.File]::ReadAllText((Join-Path $dir $rootPage), [System.Text.Encoding]::UTF8)
+  if (-not $rootPageText.Contains('澳打指南針 — 公開攻略免費・開源維護・')) {
+    Write-Output "FAIL [$rootPage] 頁尾未同步公開內容免費／合作另議定位"
+    $errors++
+  }
+  if (-not $rootPageText.Contains('>合作與關於</a>')) {
+    Write-Output "FAIL [$rootPage] 主導覽未同步合作定位"
+    $errors++
+  }
+}
+$issueConfigText = [System.IO.File]::ReadAllText((Join-Path $dir '.github\ISSUE_TEMPLATE\config.yml'), [System.Text.Encoding]::UTF8)
+foreach ($issueConfigNeedle in @('blank_issues_enabled: false', 'https://www.aussiewhvcompass.com/about.html#private-contact', 'https://www.mara.gov.au/search-the-register-of-migration-agents/')) {
+  if (-not $issueConfigText.Contains($issueConfigNeedle)) { Write-Output "FAIL [config.yml] Issue 分流缺安全入口：$issueConfigNeedle"; $errors++ }
 }
 $briefScript = [regex]::Match($mainJs, '(?s)// ---------- 私人合作需求單.*?// ---------- 自我釐清工作表')
 if (-not $briefScript.Success) {
@@ -968,12 +1037,35 @@ if (-not $briefScript.Success) {
   foreach ($briefNeedle in @('briefForm.checkValidity()', 'briefForm.reportValidity()', 'briefGmailLink.href = "https://mail.google.com/mail/?view=cm', 'encodeURIComponent("chunaenqiu6@gmail.com")', 'encodeURIComponent(subject)', 'encodeURIComponent(briefText)', 'navigator.clipboard.writeText(briefPreview.value)', 'briefPreview.select()')) {
     if (-not $briefScript.Value.Contains($briefNeedle)) { Write-Output "FAIL [main.js] 私人需求單缺驗證／編碼／複製備援：$briefNeedle"; $errors++ }
   }
+  if (-not $briefScript.Value.Contains('本站不提供簽證或移民代辦；這只是初步需求') -or -not $briefScript.Value.Contains('請再次確認未放入簽證、移民或其他敏感個案資料')) {
+    Write-Output 'FAIL [main.js] 私人需求單預覽未同步收費合作界線'
+    $errors++
+  }
   foreach ($forbidden in @('localStorage', 'fetch(', 'XMLHttpRequest')) {
     if ($briefScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 私人需求單不得儲存或上傳：$forbidden"; $errors++ }
   }
 }
 if (-not $indexText.Contains('href="about.html#collaborate"')) {
   Write-Output 'FAIL [index.html] 缺首頁合作入口'
+  $errors++
+}
+foreach ($indexBusinessNeedle in @('公開內容免費，客製合作可收費', '本站不提供簽證或移民代辦', 'https://www.mara.gov.au/search-the-register-of-migration-agents/')) {
+  if (-not $indexText.Contains($indexBusinessNeedle)) { Write-Output "FAIL [index.html] 首頁缺免費／付費或移民代辦邊界：$indexBusinessNeedle"; $errors++ }
+}
+if (-not $aboutText.Contains('<nav class="support-grid" aria-label="合作與協助類型">') -or $aboutText.Contains('class="warning"')) {
+  Write-Output 'FAIL [about.html] 合作類型語意或 noscript 警示樣式未修正'
+  $errors++
+}
+foreach ($docBoundary in @(
+  @{ File = 'docs\SDD.md'; Text = '**不做簽證或移民代辦**' },
+  @{ File = 'docs\SPEC.md'; Text = '不論是否收費，都不得提供' },
+  @{ File = 'README.md'; Text = '不論是否收費，都不提供' }
+)) {
+  $docText = [System.IO.File]::ReadAllText((Join-Path $dir $docBoundary.File), [System.Text.Encoding]::UTF8)
+  if (-not $docText.Contains($docBoundary.Text)) { Write-Output "FAIL [$($docBoundary.File)] 缺移民代辦不可協商邊界"; $errors++ }
+}
+if (-not $toolsJs.Contains('澳打指南針 ・ 公開攻略免費 ・ 資料只留在本機')) {
+  Write-Output 'FAIL [tools.js] 行前海報未同步公開攻略免費定位'
   $errors++
 }
 foreach ($entryNeedle in @('先用 2 分鐘快思看見四個準備面向', '快思測驗＋慢想工作表', '私人合作可以直接寄 Email')) {
