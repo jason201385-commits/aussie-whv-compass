@@ -34,10 +34,28 @@
   mount.innerHTML = SPRITE;
   document.body.insertBefore(mount.firstChild, document.body.firstChild);
 
+  // ---------- 鍵盤使用者可略過重複導覽 ----------
+  var main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    var skip = document.createElement("a");
+    skip.className = "skip-link";
+    skip.href = "#" + main.id;
+    skip.textContent = "跳到主要內容";
+    document.body.insertBefore(skip, document.body.firstChild);
+  }
+
   // 導覽列目前頁面標示
   var path = location.pathname.split("/").pop() || "index.html";
+  if (path === "index.html") {
+    var brand = document.querySelector(".brand");
+    if (brand) brand.setAttribute("aria-current", "page");
+  }
   document.querySelectorAll(".nav-links a").forEach(function (a) {
-    if (a.getAttribute("href") === path) a.classList.add("active");
+    if (a.getAttribute("href") === path) {
+      a.classList.add("active");
+      a.setAttribute("aria-current", "page");
+    }
   });
 
   // ---------- 首頁 SVG 剪紙視差（減少動態與行動版停用） ----------

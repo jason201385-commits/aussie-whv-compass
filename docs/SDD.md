@@ -33,7 +33,7 @@
 
 | 檔案 | 角色 |
 |---|---|
-| `index.html` | 首頁：hero、跑馬燈、12 張頁面卡、6 張工具卡、原則、閱讀順序 |
+| `index.html` | 首頁：hero、靜態承諾列、4 段旅程／12 張頁面卡、主打工具、6 張工具卡、原則 |
 | `why.html` | 自我釐清互動工作表（8 題、chips、localStorage、匯出 txt） |
 | `visa.html` | 簽證與集簽＋**集簽資格快查器** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
@@ -86,7 +86,9 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 | `--surface` | `#fffdf8` | `#262019` | 卡片面 |
 | `--ink` | `#221d15` | `#f0e8da` | 文字／墨線 |
 | `--accent` | `#c44d2b` | `#e8724c` | 主色（**#c44d2b 是 WCAG AA 修正值**：白字 4.6:1，不得調淺） |
+| `--link` | `#b74427` | `#e8724c` | 內文連結；淺色紙底須達 WCAG AA |
 | `--green`/`--gold`/`--blue` | 尤加利/豔陽/海岸 | 提亮版 | 輔色循環 |
+| `--green-ink` | `#32694f` | `#6fae8e` | 綠色系底面上的小字／狀態文字 |
 | `--on-accent`/`--on-gold` | 前景色語意 token | dark 時翻轉 | **禁止硬編碼前景色** |
 | `--shadow-pop` | `4px 4px 0 var(--ink)` | `4px 4px 0 #000` | 貼紙硬陰影 |
 
@@ -104,7 +106,11 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - **h2**：flex 對齊＋有機色塊 `::before`（三色循環 `nth-of-type(3n)`）。
 - **select**：`appearance:none`＋自訂 SVG 箭頭（深淺色各一組 data-URI）。
 - **手工紙質地**：`body::after` fixed 噪點層 opacity .035（print 隱藏）。
-- **跑馬燈**：`.marquee` 22s 循環，內容重複兩份配 `translateX(-50%)`。
+- **首頁承諾列**：`.trust-strip` 靜態呈現，不做無法暫停的循環動畫。
+- **首頁資訊架構**：首頁可放寬至 1160px，內容頁維持 880px；12 張入口卡依旅程
+  分成四個有標題的 `<section>`，不可退回無分組的等權重卡片牆。
+- **首頁動態**：hero SVG 形變僅在桌面載入時播放一次且每段不超過 5 秒；捲動視差
+  由使用者捲動直接控制。行動版與 `prefers-reduced-motion` 停用。
 
 ### 4.4 SVG 圖示系統
 
@@ -114,8 +120,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 
 ### 4.5 無障礙基線（不得倒退）
 
-`:focus-visible` 焦點環全站可見；主色過 AA；全域 `prefers-reduced-motion`；
-觸控目標 ≥34px；nav 行動版單列橫向捲動（見 §6 教訓）。
+`:focus-visible` 焦點環全站可見；主色與文字連結過 AA；inline link 持續顯示底線，
+不只靠顏色辨識；全域 `prefers-reduced-motion`；
+提供「跳到主要內容」skip link 與 `aria-current="page"`；一般觸控目標 ≥34px，行動版 nav
+目標 ≥44px 且維持單列橫向捲動（見 §6 教訓）。
 
 ## 5. 資料：`assets/postcodes.js`
 

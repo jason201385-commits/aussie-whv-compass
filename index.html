@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
-<body>
+<body class="home-page">
 
 <header class="site-header">
   <nav class="nav-inner">
@@ -37,7 +37,7 @@
   </nav>
 </header>
 
-<main>
+<main id="main-content">
   <section class="hero">
     <div class="hero-cutouts" aria-hidden="true">
       <svg class="hero-cut hero-cut-gold" viewBox="0 0 280 250" focusable="false">
@@ -55,9 +55,9 @@
     <p class="lede">這裡沒有代辦、沒有課程推銷。只有一個正在走這條路的人，把出發前該想清楚、該查證的事，整理成一份人人可用、人人可改的開源攻略。</p>
   </section>
 
-  <div class="marquee" aria-hidden="true"><div class="marquee-track">
-    <span>永久免費</span><span>/</span><span>開源維護</span><span>/</span><span>沒有業配</span><span>/</span><span>每個數字都有官方來源</span><span>/</span><span>認手法不認名字</span><span>/</span><span>回家不是失敗，是計畫的一部分</span><span>/</span><span>永久免費</span><span>/</span><span>開源維護</span><span>/</span><span>沒有業配</span><span>/</span><span>每個數字都有官方來源</span><span>/</span><span>認手法不認名字</span><span>/</span><span>回家不是失敗，是計畫的一部分</span><span>/</span>
-  </div></div>
+  <div class="trust-strip" aria-label="本站承諾">
+    <span>永久免費</span><span>開源維護</span><span>沒有業配</span><span>重要數字附官方來源</span><span>認手法不認名字</span><span>回家也是計畫的一部分</span>
+  </div>
 
   <aside class="community-callout" aria-labelledby="perth-community-title">
     <span class="community-mark"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></span>
@@ -69,71 +69,117 @@
     <a class="btn" href="https://line.me/ti/g2/JKYRJbgvE3vz4oXBazHqRhm67iWO5g3NI7Z0Wg?utm_source=invitation&amp;utm_medium=link_copy&amp;utm_campaign=default" target="_blank" rel="noopener noreferrer nofollow">開啟 LINE 社群</a>
   </aside>
 
-  <div class="card-grid">
-    <a class="card" href="why.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg></span>
-      <h3>我為什麼要去？</h3>
-      <p>出發前最重要的一步：用八個問題釐清動機、想學什麼、底線在哪。附可儲存、可匯出的互動工作表。</p>
-    </a>
-    <a class="card" href="visa.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-idcard"/></svg></span>
-      <h3>簽證與集簽</h3>
-      <p>417 簽證怎麼申請、二簽三簽的指定工作天數與地區怎麼算、怎麼保護自己不被剝削。</p>
-    </a>
-    <a class="card" href="prep.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-luggage"/></svg></span>
-      <h3>行前準備與落地</h3>
-      <p>出發前時間軸、行李帶什麼、落地 72 小時、第一週三大號（銀行、TFN、super）正確順序。</p>
-    </a>
-    <a class="card" href="cost.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-dollar"/></svg></span>
-      <h3>物價與薪水</h3>
-      <p>最低時薪、背包客稅率、退休金、各城市房租伙食行情，以及該帶多少錢起步。</p>
-    </a>
-    <a class="card" href="housing.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span>
-      <h3>住宿與租屋</h3>
-      <p>Hostel、share house、working hostel 怎麼選，押金自保、合約陷阱、室友文化。</p>
-    </a>
-    <a class="card" href="work.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-briefcase"/></svg></span>
-      <h3>工作機會在哪裡？</h3>
-      <p>求職平台、政府職缺板、working hostel、需要哪些證照，以及怎麼確認雇主合法。</p>
-    </a>
-    <a class="card" href="scam.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg></span>
-      <h3>常見詐騙手法</h3>
-      <p>先付錢才有工作、賣集簽、假房東、假移民局電話——認得手法，就不容易上當。</p>
-    </a>
-    <a class="card" href="english.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></span>
-      <h3>英文不好怎麼辦？</h3>
-      <p>出發前免費自學資源、抵澳後的免費課程與語言交換、各種工作實際需要的英文程度。</p>
-    </a>
-    <a class="card" href="health.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-health"/></svg></span>
-      <h3>保險・就醫・心理・安全</h3>
-      <p>台灣人沒有 Medicare：保險怎麼買、就醫怎麼分流、心理低潮與女性安全、行車安全。</p>
-    </a>
-    <a class="card" href="leave.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-plane"/></svg></span>
-      <h3>報稅、退休金與離澳</h3>
-      <p>myTax 自己報免費、DASP 領回退休金全流程、離澳 checklist、回台職涯銜接。</p>
-    </a>
-    <a class="card" href="pr.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-key"/></svg></span>
-      <h3>如果想留下來（PR）</h3>
-      <p>現行的雇主擔保、技術移民路徑長什麼樣，背包客最常走的路與最常踩的坑。</p>
-    </a>
-    <a class="card" href="about.html">
-      <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span>
-      <h3>關於本站・贊助</h3>
-      <p>為什麼永久免費、怎麼贊助一杯咖啡、怎麼一起維護這份攻略讓後來的人更方便。</p>
-    </a>
-  </div>
+  <nav class="journey-directory" aria-label="依旅程階段瀏覽">
+    <a href="#considering"><span>01</span>還在考慮</a>
+    <a href="#committed"><span>02</span>決定要去</a>
+    <a href="#in-australia"><span>03</span>已在澳洲</a>
+    <a href="#next-step"><span>04</span>回程與延續</a>
+  </nav>
+
+  <section class="journey-phase" id="considering" aria-labelledby="considering-title">
+    <p class="section-eyebrow">PHASE 01</p>
+    <h2 id="considering-title">還在考慮：先確認適不適合</h2>
+    <div class="card-grid">
+      <a class="card" href="why.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg></span>
+        <h3>我為什麼要去？</h3>
+        <p>出發前最重要的一步：用八個問題釐清動機、想學什麼、底線在哪。附可儲存、可匯出的互動工作表。</p>
+      </a>
+      <a class="card" href="cost.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-dollar"/></svg></span>
+        <h3>物價與薪水</h3>
+        <p>最低時薪、背包客稅率、退休金、各城市房租伙食行情，以及該帶多少錢起步。</p>
+      </a>
+      <a class="card" href="visa.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-idcard"/></svg></span>
+        <h3>簽證與集簽</h3>
+        <p>417 簽證怎麼申請、二簽三簽的指定工作天數與地區怎麼算、怎麼保護自己不被剝削。</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="journey-phase" id="committed" aria-labelledby="committed-title">
+    <p class="section-eyebrow">PHASE 02</p>
+    <h2 id="committed-title">決定要去：把出發條件備齊</h2>
+    <div class="card-grid">
+      <a class="card" href="prep.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-luggage"/></svg></span>
+        <h3>行前準備與落地</h3>
+        <p>出發前時間軸、行李帶什麼、落地 72 小時、第一週三大號（銀行、TFN、super）正確順序。</p>
+      </a>
+      <a class="card" href="health.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-health"/></svg></span>
+        <h3>保險・就醫・心理・安全</h3>
+        <p>台灣人沒有 Medicare：保險怎麼買、就醫怎麼分流、心理低潮與女性安全、行車安全。</p>
+      </a>
+      <a class="card" href="english.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></span>
+        <h3>英文不好怎麼辦？</h3>
+        <p>出發前免費自學資源、抵澳後的免費課程與語言交換、各種工作實際需要的英文程度。</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="journey-phase" id="in-australia" aria-labelledby="in-australia-title">
+    <p class="section-eyebrow">PHASE 03</p>
+    <h2 id="in-australia-title">已在澳洲：安頓、求職與自保</h2>
+    <div class="card-grid">
+      <a class="card" href="housing.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span>
+        <h3>住宿與租屋</h3>
+        <p>Hostel、share house、working hostel 怎麼選，押金自保、合約陷阱、室友文化。</p>
+      </a>
+      <a class="card" href="work.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-briefcase"/></svg></span>
+        <h3>工作機會在哪裡？</h3>
+        <p>求職平台、政府職缺板、working hostel、需要哪些證照，以及怎麼確認雇主合法。</p>
+      </a>
+      <a class="card" href="scam.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg></span>
+        <h3>常見詐騙手法</h3>
+        <p>先付錢才有工作、賣集簽、假房東、假移民局電話——認得手法，就不容易上當。</p>
+      </a>
+      <a class="card" href="pr.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-key"/></svg></span>
+        <h3>如果想留下來（PR）</h3>
+        <p>現行的雇主擔保、技術移民路徑長什麼樣，背包客最常走的路與最常踩的坑。</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="journey-phase" id="next-step" aria-labelledby="next-step-title">
+    <p class="section-eyebrow">PHASE 04</p>
+    <h2 id="next-step-title">回程與延續：收好成果再出發</h2>
+    <div class="card-grid">
+      <a class="card" href="leave.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-plane"/></svg></span>
+        <h3>報稅、退休金與離澳</h3>
+        <p>myTax 自己報免費、DASP 領回退休金全流程、離澳 checklist、回台職涯銜接。</p>
+      </a>
+      <a class="card" href="about.html">
+        <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span>
+        <h3>關於本站・贊助</h3>
+        <p>為什麼永久免費、怎麼贊助一杯咖啡、怎麼一起維護這份攻略讓後來的人更方便。</p>
+      </a>
+    </div>
+  </section>
 
   <h2>不只是攻略，是工具箱</h2>
   <p>每個重要決定都做了互動工具——不用讀完整頁，先玩玩看：</p>
+  <a class="featured-tool" href="prep.html#prep-poster">
+    <span class="featured-tool-copy">
+      <span class="section-eyebrow">FEATURED TOOL</span>
+      <strong>把行前計畫帶在手機裡</strong>
+      <span>填完行前清單與存錢試算後，免費匯出一張只存在你裝置上的 PNG 行前海報。</span>
+      <span class="featured-tool-cta">製作我的行前海報 <span aria-hidden="true">→</span></span>
+    </span>
+    <span class="featured-poster-preview" aria-hidden="true">
+      <span class="featured-poster-title">澳洲行前計畫</span>
+      <span class="featured-poster-line featured-poster-line-long"></span>
+      <span class="featured-poster-line"></span>
+      <span class="featured-poster-grid"><i></i><i></i><i></i><i></i></span>
+    </span>
+  </a>
   <div class="card-grid">
     <a class="card" href="visa.html#where">
       <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg></span>
@@ -175,12 +221,6 @@
       <li><strong>開源、可修正。</strong>發現過時或錯誤的資訊，任何人都可以在 GitHub 上提出修改，讓後來的人少走冤枉路。</li>
     </ol>
   </div>
-
-  <h2>建議的閱讀順序（照旅程走）</h2>
-  <p><strong>還在考慮要不要去</strong>：<a href="why.html">自我釐清</a> → <a href="cost.html">物價與薪水</a>（估可行性）→ <a href="visa.html">簽證與集簽</a>。</p>
-  <p><strong>決定要去了</strong>：<a href="visa.html">簽證</a> → <a href="prep.html">行前準備與落地</a>（含保險！）→ <a href="health.html">健康安全</a> → <a href="english.html">英文</a>（出發前就能開始）。</p>
-  <p><strong>已經在澳洲</strong>：<a href="housing.html">住宿租屋</a> → <a href="work.html">找工作</a>＋<a href="scam.html">防詐騙</a>（一起讀）→ 想留下來看 <a href="pr.html">PR 之路</a>。</p>
-  <p><strong>準備回家或轉換</strong>：<a href="leave.html">報稅、退休金與離澳</a>。</p>
 
   <div class="warn"><strong>安全提醒：</strong>任何要你先付錢才給工作的「仲介」、聲稱可以「買集簽天數」或「保證下簽」的服務，幾乎都是詐騙或違法行為，碰了可能賠錢又丟簽證。本站的<a href="visa.html">簽證頁</a>有教你怎麼自我保護。</div>
 </main>
