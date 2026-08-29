@@ -612,7 +612,27 @@
   /* ================= 防詐測驗（scam.html） ================= */
   var quiz = document.getElementById("scam-quiz");
   if (quiz) {
-    var Q = [
+    var quizButtons = quiz.querySelector(".quiz-btns");
+    if (quizButtons) quizButtons.hidden = false;
+    var quizEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+    var Q = quizEnglish ? [
+      { id: "upfront_job_fee", s: "A recruiter messages you: 'Farm job, instant hire. Transfer a $300 security deposit today and start tomorrow.'", run: true,
+        why: "Paying money to start a job is a major warning sign. Verify the recruiter independently and never transfer an up-front recruitment deposit." },
+      { id: "short_supervised_trial", s: "Before it starts, a cafe manager explains that a one-hour coffee-making skill demonstration is unpaid. You agree, remain directly supervised and do not cover a normal shift.", run: false, both: true,
+        why: "Caution is valid, and you can always decline. This may fit a lawful unpaid trial only if it is no longer than reasonably needed to show the skill and remains directly supervised. Productive work or a whole unpaid shift changes the answer." },
+      { id: "hostel_leverage", s: "A working hostel requires four weeks of rent before any shifts and says it will withhold your specified-work records if you leave.", run: true,
+        why: "Work tied to prepaid accommodation plus threats about genuine records creates several exploitation red flags. Get the job and accommodation terms separately in writing." },
+      { id: "exchange_screenshot", s: "Someone in a group offers a better exchange rate and sends a screenshot showing that their transfer to you succeeded.", run: true,
+        why: "Screenshots and pending payments can be faked. Use a regulated service and rely only on independently confirmed funds in your own account." },
+      { id: "written_onboarding", s: "A new employer gives you a written offer, legitimate onboarding, a TFN declaration and a clear date for your first payslip.", run: false,
+        why: "Those are reasonable employment signals. Still verify the business, rate and first payment because no single document proves the whole offer is safe." },
+      { id: "visa_payment_call", s: "A caller claims to be from Home Affairs and says you must pay $1,000 today or your visa will be cancelled.", run: true,
+        why: "End the call. Do not pay or reveal account details. Check your own ImmiAccount and contact Home Affairs through details you found independently." },
+      { id: "rental_deposit", s: "A rental is far below the local price. The owner is overseas and offers only a video tour, but wants the bond now.", run: true,
+        why: "An unusually low price, no in-person inspection, an overseas story and urgent payment are multiple rental-scam warnings." },
+      { id: "sham_contracting", s: "You are rostered, paid hourly and use the business's equipment, but the boss says you need an ABN and must invoice to start.", run: true,
+        why: "An ABN does not decide whether you are a contractor. This may be sham contracting designed to remove employee entitlements." }
+    ] : [
       { s: "臉書社團有人私訊你：「農場缺工，秒錄取！先轉 $300 保證金，明天就能上工。」", run: true,
         why: "「先付錢才有工作」是頭號紅旗——合法雇主不會向求職者收錢。錢轉出去，工作和人都會消失。" },
       { s: "咖啡店店長請你現場拉花 1 小時給他看，全程站在旁邊看你操作，沒有付錢。", run: false,
@@ -638,33 +658,63 @@
     var btnRun = document.getElementById("quiz-run");
     var btnNext = document.getElementById("quiz-next");
     var show = function () {
-      sEl.textContent = "情境 " + (qi + 1) + "：" + Q[qi].s;
+      sEl.textContent = quizEnglish
+        ? "Situation " + (qi + 1) + ": " + Q[qi].s
+        : "情境 " + (qi + 1) + "：" + Q[qi].s;
       fEl.className = "quiz-feedback";
       fEl.textContent = "";
-      pEl.textContent = "第 " + (qi + 1) + " / " + Q.length + " 題";
+      pEl.textContent = quizEnglish
+        ? "Question " + (qi + 1) + " of " + Q.length
+        : "第 " + (qi + 1) + " / " + Q.length + " 題";
       btnOk.style.display = btnRun.style.display = "";
       btnNext.style.display = "none";
     };
     var answer = function (saidRun) {
-      var correct = (saidRun === Q[qi].run);
+      var correct = Q[qi].both === true || (saidRun === Q[qi].run);
       if (correct) score++;
       fEl.className = "quiz-feedback " + (correct ? "good" : "bad");
-      fEl.innerHTML = icon(correct ? "check" : "alert") + " <strong>" + (correct ? "答對了！" : "危險！") + "</strong> " + Q[qi].why;
+      fEl.innerHTML = (quizEnglish ? "" : icon(correct ? "check" : "alert")) + " <strong>"
+        + (quizEnglish ? (correct ? "Correct." : "Recheck this one.") : (correct ? "答對了！" : "危險！"))
+        + "</strong> " + Q[qi].why;
       btnOk.style.display = btnRun.style.display = "none";
       btnNext.style.display = "";
-      btnNext.textContent = (qi === Q.length - 1) ? "看結果" : "下一題";
+      btnNext.textContent = quizEnglish
+        ? ((qi === Q.length - 1) ? "See result" : "Next situation")
+        : ((qi === Q.length - 1) ? "看結果" : "下一題");
+      btnNext.focus();
     };
     var finish = function () {
-      var title = score >= 7 ? "【防詐大師】可以出師帶學弟妹了。"
-        : score >= 5 ? "【有 sense】再把紅旗句字典掃一次就穩了。"
-        : "【肥羊體質】出發前把這頁認真讀三遍，會替你省下好幾千。";
-      sEl.innerHTML = "測驗結束！你答對 <strong>" + score + " / " + Q.length + "</strong> 題。<br>" + title;
+      var title = quizEnglish
+        ? (score >= 7 ? "Strong scam-safety instincts. Keep checking independently."
+          : score >= 5 ? "Good start. Review the explanations you missed."
+          : "Review the red flags before sending money or identity documents.")
+        : (score >= 7 ? "【防詐大師】可以出師帶學弟妹了。"
+          : score >= 5 ? "【有 sense】再把紅旗句字典掃一次就穩了。"
+          : "【肥羊體質】出發前把這頁認真讀三遍，會替你省下好幾千。");
+      sEl.innerHTML = quizEnglish
+        ? "Quiz complete: <strong>" + score + " of " + Q.length + "</strong> correct.<br>" + title
+        : "測驗結束！你答對 <strong>" + score + " / " + Q.length + "</strong> 題。<br>" + title;
       fEl.className = "quiz-feedback";
       pEl.textContent = "";
-      btnNext.textContent = "再玩一次";
-      btnNext.onclick = function () { qi = 0; score = 0; btnNext.onclick = nextHandler; show(); };
+      btnNext.textContent = quizEnglish ? "Try again" : "再玩一次";
+      btnNext.onclick = function () {
+        qi = 0;
+        score = 0;
+        btnNext.onclick = nextHandler;
+        show();
+        sEl.focus();
+      };
+      btnNext.focus();
     };
-    var nextHandler = function () { if (qi === Q.length - 1) { finish(); } else { qi++; show(); } };
+    var nextHandler = function () {
+      if (qi === Q.length - 1) {
+        finish();
+      } else {
+        qi++;
+        show();
+        sEl.focus();
+      }
+    };
     btnOk.addEventListener("click", function () { answer(false); });
     btnRun.addEventListener("click", function () { answer(true); });
     btnNext.onclick = nextHandler;

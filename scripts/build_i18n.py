@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260829-10"
+ASSET_VERSION = "20260829-11"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -35,11 +35,12 @@ GUIDES = [
     ("collaborate", "/about.html#collaborate"),
 ]
 FULL_GUIDE_TRANSLATIONS = {
-    "en": {"visa": "/lang/en/visa/", "work": "/lang/en/work/"},
+    "en": {"visa": "/lang/en/visa/", "work": "/lang/en/work/", "scam": "/lang/en/scam/"},
 }
 FULL_TOPIC_ROUTES = {
     "visa": {"zh-Hant": "/visa.html", "en": "/lang/en/visa/"},
     "work": {"zh-Hant": "/work.html", "en": "/lang/en/work/"},
+    "scam": {"zh-Hant": "/scam.html", "en": "/lang/en/scam/"},
 }
 
 

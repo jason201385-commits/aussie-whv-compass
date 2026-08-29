@@ -419,6 +419,153 @@ if (-not (Test-Path $englishWorkPath)) {
   }
 }
 
+# 完整英文防詐頁：跨護照風險辨識、英文測驗、事後處置與正確官方分流不得遺失
+$englishScamPath = Join-Path $dir 'lang\en\scam\index.html'
+if (-not (Test-Path $englishScamPath)) {
+  Write-Output 'FAIL 缺完整英文防詐頁：lang/en/scam/'
+  $errors++
+} else {
+  $englishScamText = [System.IO.File]::ReadAllText($englishScamPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    '<meta name="viewport"',
+    'data-i18n-topic="scam"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/scam/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/scam.html">',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking Australian consumer-protection or victim-support professional',
+    'This page names methods, not alleged offenders',
+    'If money, identity details or account access have already been lost',
+    '<strong>Immediate danger:</strong> call 000',
+    '<strong>Money:</strong> call your bank or card provider now using the number in its official app',
+    '<strong>Identity:</strong> if a passport, driver licence, TFN or other identity detail was shared, contact IDCARE',
+    'Scamwatch helps disrupt scams; ReportCyber is the online police-report route for cybercrime',
+    'Helps disruption and warnings; it is not a police report',
+    'ABN Lookup only confirms registration data',
+    'paid immigration assistance must come from an OMARA-registered migration agent or an Australian legal practitioner',
+    'Your employer cannot cancel your visa',
+    'id="scam-quiz"',
+    'id="quiz-scenario" tabindex="-1" aria-live="polite" aria-atomic="true"',
+    '<div class="quiz-btns" hidden>',
+    'id="quiz-feedback" role="status" aria-live="polite"',
+    '<noscript><p class="warn">The practice quiz needs JavaScript',
+    'https://www.scamwatch.gov.au/report-a-scam',
+    'https://www.cyber.gov.au/report-and-recover/report',
+    'https://www.homeaffairs.gov.au/help-and-support/departmental-forms/online-forms/border-watch',
+    'https://forms.afp.gov.au/online_forms/report-commonwealth-crime',
+    'https://www.tisnational.gov.au/en/Contact-us',
+    'PPSR search using the VIN',
+    'This site does not collect quiz answers or reports',
+    '/assets/tools.js?v='
+  )) {
+    if (-not $englishScamText.Contains($needle)) { Write-Output "FAIL [lang/en/scam/] 缺內容、來源或安全邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishScamText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishScamText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/scam/] 必須只有一個 h1 與 main'
+    $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishScamText, '<a href="#([^"]+)"')) {
+    if (-not $englishScamText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/scam/] TOC 錨點不存在：$($anchor.Groups[1].Value)"
+      $errors++
+    }
+  }
+  $englishScamIds = [regex]::Matches($englishScamText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishScamIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/scam/] 含重複 id'
+    $errors++
+  }
+  if ($englishScamText -match '[\u3400-\u9fff]') {
+    Write-Output 'FAIL [lang/en/scam/] 完整英文頁仍含 CJK 文字'
+    $errors++
+  }
+  if ($englishScamText.Contains('/assets/main.js?v=')) {
+    Write-Output 'FAIL [lang/en/scam/] 不得載入會注入中文搜尋、回饋列與 skip link 的 main.js'
+    $errors++
+  }
+  $englishScamAssetVersions = @([regex]::Matches($englishScamText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|main\.js|tools\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishScamAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishScamAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/scam/] 資產版本與全站不一致：$(($englishScamAssetVersions) -join ', ')"
+    $errors++
+  }
+  foreach ($link in [regex]::Matches($englishScamText, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/scam/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  $englishScamJsonText = [regex]::Match($englishScamText, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+  try {
+    $englishScamJson = $englishScamJsonText | ConvertFrom-Json
+    if ($englishScamJson.'@context' -ne 'https://schema.org' -or -not $englishScamJson.'@graph') {
+      Write-Output 'FAIL [lang/en/scam/] JSON-LD 缺 schema.org context 或 graph'; $errors++
+    }
+  } catch { Write-Output 'FAIL [lang/en/scam/] JSON-LD 不是合法 JSON'; $errors++ }
+
+  $traditionalScamText = [System.IO.File]::ReadAllText((Join-Path $dir 'scam.html'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/scam/">',
+    '<body data-i18n-topic="scam">',
+    'https://forms.afp.gov.au/online_forms/report-commonwealth-crime'
+  )) {
+    if (-not $traditionalScamText.Contains($needle)) { Write-Output "FAIL [scam.html] 缺英文 reciprocal hreflang、主題標記或現行 AFP 通報：$needle"; $errors++ }
+  }
+  if ($traditionalScamText.Contains('afp-warns-domestic-and-overseas-workers-forced-labour-indicators-amid')) {
+    Write-Output 'FAIL [scam.html] 仍使用已失效的 AFP 強迫勞動連結'
+    $errors++
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/scam/">')) {
+    Write-Output 'FAIL [lang/en/] 防詐卡未連到完整英文頁'
+    $errors++
+  }
+  $scamToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @('var quizEnglish =', 'Situation " + (qi + 1)', 'Quiz complete:', 'Strong scam-safety instincts', 'Q[qi].both === true', 'btnNext.focus()', 'sEl.focus()')) {
+    if (-not $scamToolsText.Contains($needle)) { Write-Output "FAIL [tools.js] 防詐測驗缺英文輸出：$needle"; $errors++ }
+  }
+  $englishQuizBlock = [regex]::Match($scamToolsText, '(?s)var Q = quizEnglish \? \[(.*?)\] : \[').Groups[1].Value
+  if ([regex]::Matches($englishQuizBlock, '\{ id:').Count -ne 8 -or
+      [regex]::Matches($englishQuizBlock, 'run: true').Count -ne 6 -or
+      [regex]::Matches($englishQuizBlock, 'run: false').Count -ne 2 -or
+      [regex]::Matches($englishQuizBlock, 'both: true').Count -ne 1) {
+    Write-Output 'FAIL [tools.js] 英文防詐測驗必須維持 8 題、6 個明確紅旗、2 個非自動紅旗與 1 題雙安全答案'
+    $errors++
+  }
+  $englishQuizExpected = @(
+    @{ Id = 'upfront_job_fee'; Run = 'true'; Both = $false },
+    @{ Id = 'short_supervised_trial'; Run = 'false'; Both = $true },
+    @{ Id = 'hostel_leverage'; Run = 'true'; Both = $false },
+    @{ Id = 'exchange_screenshot'; Run = 'true'; Both = $false },
+    @{ Id = 'written_onboarding'; Run = 'false'; Both = $false },
+    @{ Id = 'visa_payment_call'; Run = 'true'; Both = $false },
+    @{ Id = 'rental_deposit'; Run = 'true'; Both = $false },
+    @{ Id = 'sham_contracting'; Run = 'true'; Both = $false }
+  )
+  foreach ($expectedQuiz in $englishQuizExpected) {
+    $entryPattern = '(?s)\{ id: "' + [regex]::Escape($expectedQuiz.Id) + '",(.*?)\}'
+    $entryMatch = [regex]::Match($englishQuizBlock, $entryPattern)
+    if (-not $entryMatch.Success) {
+      Write-Output "FAIL [tools.js] 英文防詐測驗缺固定情境：$($expectedQuiz.Id)"
+      $errors++
+      continue
+    }
+    $entryText = $entryMatch.Value
+    $actualRun = [regex]::Match($entryText, 'run: (true|false)').Groups[1].Value
+    $actualBoth = $entryText.Contains('both: true')
+    if ($actualRun -ne $expectedQuiz.Run -or $actualBoth -ne $expectedQuiz.Both) {
+      Write-Output "FAIL [tools.js] 英文防詐測驗答案被改壞：$($expectedQuiz.Id) run=$actualRun both=$actualBoth"
+      $errors++
+    }
+  }
+  $i18nScamText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  if (-not $i18nScamText.Contains('"scam":{"zh-Hant":"/scam.html","en":"/lang/en/scam/"}')) {
+    Write-Output 'FAIL [i18n.js] 缺防詐主題中英文路由'
+    $errors++
+  }
+  $scamToolsScriptAt = $englishScamText.IndexOf('<script src="/assets/tools.js?v=')
+  if ($scamToolsScriptAt -lt 0) {
+    Write-Output 'FAIL [lang/en/scam/] 缺英文測驗 tools.js'
+    $errors++
+  }
+}
+
 # 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
 $searchBuilder = Join-Path $dir 'scripts\build_search.py'
@@ -574,6 +721,7 @@ if (-not (Test-Path $sitemapPath)) {
     $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
     $expectedUrls += "$canonicalOrigin/lang/en/visa/"
     $expectedUrls += "$canonicalOrigin/lang/en/work/"
+    $expectedUrls += "$canonicalOrigin/lang/en/scam/"
   }
   if ($sitemapUrls.Count -ne $expectedUrls.Count) {
     Write-Output "FAIL sitemap 頁數=$($sitemapUrls.Count)（應為 $($expectedUrls.Count)）"
@@ -613,7 +761,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/work/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }

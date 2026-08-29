@@ -1312,6 +1312,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   font-weight: 500;
 }
 .quiz-btns { display: flex; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
+.quiz-btns[hidden] { display: none; }
 .quiz-btns .btn { flex: 1; min-width: 130px; }
 .quiz-feedback { border-radius: 12px; padding: 14px 17px; margin: 12px 0; font-size: .96rem; display: none; border: 2px solid; }
 .quiz-feedback.good { display: block; background: var(--green-soft); border-color: var(--green); }
