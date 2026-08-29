@@ -291,6 +291,41 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 40px 20px 70px; }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
 
+/* ---------- 外部社群入口 ---------- */
+.community-callout {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 26px 0 34px;
+  padding: 20px 22px;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  background: var(--green-soft);
+  box-shadow: var(--shadow-pop);
+}
+.community-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--green);
+}
+.community-mark .icon { width: 27px; height: 27px; }
+.community-callout h3 { margin: 2px 0 4px; font-family: var(--font-serif); font-size: 1.25rem; }
+.community-callout p { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+.community-eyebrow { color: var(--green); font-size: .72rem; font-weight: 900; letter-spacing: .08em; }
+.community-callout .btn { flex: 0 0 auto; min-height: 44px; margin-left: auto; }
+
+@media (max-width: 700px) {
+  .community-callout { align-items: flex-start; flex-wrap: wrap; padding: 18px; }
+  .community-callout > div { flex: 1; min-width: calc(100% - 78px); }
+  .community-callout .btn { width: 100%; margin-left: 0; text-align: center; }
+}
+
 /* ---------- 卡片：貼紙感 ---------- */
 .card-grid {
   display: grid;
