@@ -113,17 +113,27 @@
   <p class="fact-meta">來源：<a href="https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/temporary-residents-and-superannuation/departing-australia-superannuation-payment-dasp" rel="noopener">ATO DASP 官方頁</a>；實務地雷為社群經驗整理（非官方）｜2026-08-28 查核</p>
 
   <h2 id="checklist">四、離澳 checklist</h2>
-  <div class="panel"><ul>
-    <li>賣車：過戶當場完成、rego 處理乾淨（別留罰單尾巴，見<a href="scam.html#money">防詐騙</a>）</li>
-    <li>退租：提前依約通知、照<a href="housing.html#bond">押金流程</a>拿回 bond（對照入住時的照片）</li>
-    <li>向雇主拿推薦信（之後<a href="pr.html">回來走擔保</a>或回台求職都用得上）</li>
-    <li>DASP 文件認證與申請草稿（見上）</li>
-    <li>報稅：年中離澳可提前申報，或報稅季再線上報（人在台灣也能報）</li>
-    <li><strong>銀行帳戶先留著</strong>——等退稅與 DASP 都入帳再關（多數銀行可寫信遠端關戶）</li>
-    <li>電信解約或轉最低月租；myGov 帳號留著（報稅與 DASP 都要用）</li>
-    <li>行李：超重費很貴——不要的衣物捐二手店，書和紀念品考慮海運</li>
-    <li>台灣健保：出國期間若辦了停保，回台記得復保</li>
-  </ul></div>
+  <div class="tool" id="leave-checklist-tool">
+    <span class="tool-tag">全程留在本機</span>
+    <h3><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> 我的離澳收尾進度</h3>
+    <p>照自己的順序完成即可。勾選進度只存在這個瀏覽器，不會上傳；換裝置或清除瀏覽資料後不會同步。</p>
+    <div class="progress-wrap" aria-hidden="true"><div class="progress-bar" id="leave-progress-bar"></div></div>
+    <p class="progress-label" id="leave-progress-label" aria-live="polite">0 / 9 完成（0%）</p>
+    <ul class="icheck leave-checklist" id="leave-checklist">
+      <li><label><input type="checkbox" id="lc-0"><span>賣車：完成過戶並確認 rego 與罰單責任已處理</span></label></li>
+      <li><label><input type="checkbox" id="lc-1"><span>退租：依約通知、保留退房證據並追蹤 bond</span></label></li>
+      <li><label><input type="checkbox" id="lc-2"><span>向雇主索取推薦信與需要保留的工作紀錄</span></label></li>
+      <li><label><input type="checkbox" id="lc-3"><span>向 super 基金確認 DASP 文件，完成需要的認證與申請草稿</span></label></li>
+      <li><label><input type="checkbox" id="lc-4"><span>確認報稅時程，留好 income statement、收據與登入方式</span></label></li>
+      <li><label><input type="checkbox" id="lc-5"><span>保留澳洲銀行帳戶，等退稅與 DASP 入帳後再處理關戶</span></label></li>
+      <li><label><input type="checkbox" id="lc-6"><span>處理電信方案，並保留 myGov 與 ATO 的登入方式</span></label></li>
+      <li><label><input type="checkbox" id="lc-7"><span>完成行李取捨、捐贈、寄送與托運安排</span></label></li>
+      <li><label><input type="checkbox" id="lc-8"><span>確認返台後健保復保與個人必要行政事項</span></label></li>
+    </ul>
+    <p class="checklist-complete" id="leave-checklist-complete" hidden><strong>收尾完成。</strong>如果這裡曾幫到你，歡迎到下方<a href="#pass-it-on">留一句給下一位出發的人</a>；不留下也完全沒關係。</p>
+    <div class="ws-actions"><button type="button" class="btn ghost" id="leave-reset">清除全部勾選</button></div>
+    <noscript><p class="note">未啟用 JavaScript：仍可閱讀與勾選，但進度不會在重新開啟頁面後保留。</p></noscript>
+  </div>
 
   <h2 id="career">五、回台職涯銜接：把一年寫成能力，不是空窗</h2>
   <ul>

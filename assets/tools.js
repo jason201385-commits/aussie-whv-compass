@@ -588,6 +588,46 @@
     show();
   }
 
+  /* ================= 離澳收尾清單（leave.html） ================= */
+  var leaveChecklist = document.getElementById("leave-checklist");
+  if (leaveChecklist) {
+    var LEAVE_KEY = "whv-leave-check-v1";
+    var leaveBoxes = leaveChecklist.querySelectorAll('input[type="checkbox"]');
+    var leaveSaved = {};
+    try {
+      var parsedLeave = JSON.parse(localStorage.getItem(LEAVE_KEY) || "{}");
+      if (parsedLeave && typeof parsedLeave === "object" && !Array.isArray(parsedLeave)) leaveSaved = parsedLeave;
+    } catch (e) { /* 私密視窗、封鎖儲存或無效資料時略過 */ }
+
+    leaveBoxes.forEach(function (box) { box.checked = leaveSaved[box.id] === true; });
+    var leaveBar = document.getElementById("leave-progress-bar");
+    var leaveLabel = document.getElementById("leave-progress-label");
+    var leaveComplete = document.getElementById("leave-checklist-complete");
+    var refreshLeave = function () {
+      var done = leaveChecklist.querySelectorAll("input:checked").length;
+      var total = leaveBoxes.length;
+      var pct = total ? Math.round(done / total * 100) : 0;
+      leaveBar.style.width = pct + "%";
+      leaveLabel.textContent = done + " / " + total + " 完成（" + pct + "%）";
+      leaveComplete.hidden = done !== total;
+      try {
+        var data = {};
+        leaveBoxes.forEach(function (box) { data[box.id] = box.checked; });
+        localStorage.setItem(LEAVE_KEY, JSON.stringify(data));
+      } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
+    };
+
+    leaveChecklist.addEventListener("change", refreshLeave);
+    refreshLeave();
+    var leaveReset = document.getElementById("leave-reset");
+    if (leaveReset) leaveReset.addEventListener("click", function () {
+      if (!confirm("清除所有離澳清單勾選？")) return;
+      leaveBoxes.forEach(function (box) { box.checked = false; });
+      refreshLeave();
+      leaveReset.focus();
+    });
+  }
+
   /* ================= DASP 速算（leave.html） ================= */
   var dasp = document.getElementById("dasp-calc");
   if (dasp) {

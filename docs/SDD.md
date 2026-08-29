@@ -43,7 +43,7 @@
 | `scam.html` | 防詐騙（三道防線、16 手法、救濟包）＋**防詐測驗** |
 | `english.html` | 英文資源與策略 |
 | `health.html` | 保險就醫心理安全 |
-| `leave.html` | 報稅退休金離澳＋**DASP 速算** |
+| `leave.html` | 報稅退休金離澳＋**DASP 速算**＋**本機離澳收尾清單** |
 | `pr.html` | PR 路徑總覽 |
 | `about.html` | 關於、贊助（按鈕待站長提供連結）、授權、免責 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
@@ -68,6 +68,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - **localStorage keys**（改動＝使用者資料遺失，不得更名）：
   - `whv-worksheet-v1`：工作表答案（{q1..q8: string}）
   - `whv-prep-check-v1`：行前清單勾選（{pc2-g-i: bool}）
+  - `whv-leave-check-v1`：離澳收尾清單勾選（{lc-i: bool}）
   - `whv-save-calc-v1`：存錢試算器輸入與最近一次結果（行前海報使用）
   - `whv-last-page-v1`：最近閱讀的白名單頁名（`{path}`），供首頁續讀卡使用
 - SVG sprite 由 main.js 注入 `<body>` 開頭；頁面以
@@ -124,7 +125,8 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 `:focus-visible` 焦點環全站可見；主色與文字連結過 AA；inline link 持續顯示底線，
 不只靠顏色辨識；全域 `prefers-reduced-motion`；
 提供「跳到主要內容」skip link 與 `aria-current="page"`；一般觸控目標 ≥34px，行動版 nav
-目標 ≥44px 且維持單列橫向捲動（見 §6 教訓）。
+目標 ≥44px 且維持單列橫向捲動；所有內容錨點保留 sticky header 安全距離，跳轉後標題
+不得被導覽遮住（見 §6 教訓）。
 
 ## 5. 資料：`assets/postcodes.js`
 

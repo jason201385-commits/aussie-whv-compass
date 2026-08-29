@@ -85,6 +85,7 @@ if (-not (Test-Path $thanksForm)) {
   if ($thanksText.Contains('type: upload')) { Write-Output 'FAIL [thanks.yml] 不得提供檔案上傳欄位'; $errors++ }
 }
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
+$toolsJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
 if (-not $mainJs.Contains('template=thanks.yml')) {
   Write-Output 'FAIL [main.js] 全站回饋列缺感謝入口'
   $errors++
@@ -94,6 +95,26 @@ foreach ($resumeNeedle in @('whv-last-page-v1', 'JOURNEY_PAGES', 'hasOwnProperty
     Write-Output "FAIL [main.js] 最近閱讀缺安全條件：$resumeNeedle"
     $errors++
   }
+}
+$leaveText = [System.IO.File]::ReadAllText((Join-Path $dir 'leave.html'), [System.Text.Encoding]::UTF8)
+foreach ($leaveId in @('leave-checklist-tool', 'leave-checklist', 'leave-progress-bar', 'leave-progress-label', 'leave-checklist-complete', 'leave-reset')) {
+  if (-not $leaveText.Contains("id=`"$leaveId`"")) {
+    Write-Output "FAIL [leave.html] 缺離澳清單元件：$leaveId"
+    $errors++
+  }
+}
+$leaveChecks = [regex]::Matches($leaveText, 'id="lc-[0-9]+"').Count
+if ($leaveChecks -ne 9) { Write-Output "FAIL [leave.html] 離澳清單項目數=$leaveChecks（應為 9）"; $errors++ }
+foreach ($leaveNeedle in @('whv-leave-check-v1', 'leaveSaved[box.id] === true', 'leaveComplete.hidden = done !== total', 'confirm("清除所有離澳清單勾選？")')) {
+  if (-not $toolsJs.Contains($leaveNeedle)) {
+    Write-Output "FAIL [tools.js] 離澳清單缺必要行為：$leaveNeedle"
+    $errors++
+  }
+}
+$styleText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\style.css'), [System.Text.Encoding]::UTF8)
+if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not $styleText.Contains('main [id] { scroll-margin-top: 82px; }')) {
+  Write-Output 'FAIL [style.css] 內容錨點缺 sticky header 安全距離'
+  $errors++
 }
 $indexText = [System.IO.File]::ReadAllText((Join-Path $dir 'index.html'), [System.Text.Encoding]::UTF8)
 foreach ($resumeId in @('journey-resume', 'journey-resume-link', 'journey-resume-clear')) {

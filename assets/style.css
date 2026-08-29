@@ -852,6 +852,14 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .icheck label:hover { background: var(--gold-soft); }
 .icheck input[type="checkbox"] { accent-color: var(--green); width: 19px; height: 19px; margin-top: 3px; flex-shrink: 0; }
 .icheck input:checked + span { color: var(--ink-soft); text-decoration: line-through; }
+.leave-checklist { margin: 12px 0; }
+.leave-checklist li + li { border-top: 1px dashed color-mix(in srgb, var(--ink) 22%, transparent); }
+.checklist-complete {
+  padding: 14px 16px;
+  border: 2px solid var(--green);
+  border-radius: 12px;
+  background: var(--green-soft);
+}
 
 /* 測驗 */
 .quiz-scenario {
@@ -965,6 +973,10 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .gratitude-note { color: var(--ink-soft); font-size: .88rem; }
 .gratitude-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
 .gratitude-actions .btn { min-height: 44px; }
+
+/* 錨點跳轉後仍要露出標題，不被多列 sticky 導覽蓋住 */
+main [id] { scroll-margin-top: 170px; }
+
 @media (max-width: 640px) {
   .feedback-actions { width: 100%; margin-left: 0; }
   .feedback-actions .btn { flex: 1 1 100%; width: 100%; text-align: center; }
@@ -973,6 +985,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 
 /* ---------- 行動版：緊湊單列導覽 ---------- */
 @media (max-width: 768px) {
+  main [id] { scroll-margin-top: 82px; }
   .nav-inner {
     flex-wrap: nowrap;
     padding: 8px 0 8px 14px;
