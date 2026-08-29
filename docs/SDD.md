@@ -29,7 +29,7 @@
   由 Pages 導向 `www`；不得使用 wildcard DNS。
   改檔 → commit → push 即自動部署（1–2 分鐘）。
 - **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。全站本機 CSS／JS／資料檔
-  共用 `?v=20260829-2` 版本查詢碼；任何這些資產異動時，push 前必須全站同步升版。
+  共用同一個 `?v=` 版本查詢碼；任何這些資產異動時，push 前必須全站同步升版。
   驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
 - **外部依賴**：僅 Google Fonts（Noto Sans TC、Noto Serif TC）。其餘全部自含。
 
@@ -53,16 +53,18 @@
 | `404.html` | 自訂錯誤復原頁：保留 noindex，導回最近閱讀、卡關捷徑與四階段旅程 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
+| `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
-| `CNAME`／`sitemap.xml`／`robots.txt` | 正式網域、13 頁搜尋探索清單與 sitemap 宣告 |
+| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 頁搜尋探索、全 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
+| `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots 與 llms.txt；`--check` 防止產物過期 |
 | `docs/` | 本文件與 SPEC |
 
 ### 2.2 頁面共同結構
 
-每頁：`<head>`（meta＋OG＋fonts＋style＋SVG favicon）→ sticky header
+每頁：`<head>`（description＋canonical＋OG／Twitter 分享圖＋WebSite／WebPage／Breadcrumb JSON-LD＋fonts＋style＋SVG favicon）→ sticky header
 （brand＋12 項 nav）→ `<main>`（page-title → toc → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨架、nav 全站同步加項
 （13 個檔案都要改——用腳本批次替換，別手改）、index 加卡片。

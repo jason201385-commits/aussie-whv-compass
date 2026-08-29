@@ -59,6 +59,18 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
   郵件 App；本站不接收、儲存或自動寄出內容。第一封明示不附證件、帳密、第三人個資、
   未公開客戶資料及醫療／法律個案，且最後寄出動作由使用者本人完成。
 
+### 1.4 搜尋引擎與 AI 探索
+
+- 13 個內容頁各有唯一 title、description、canonical、Open Graph／Twitter 分享資訊，
+  並以 JSON-LD 描述 `WebSite`、`WebPage`；內容頁另含 `BreadcrumbList`。
+- `robots.txt` 對 `User-agent: *` 開放，並指向 13 頁 `sitemap.xml`；404 維持
+  `noindex,follow`，不放 canonical 或結構化資料。
+- `llms.txt` 提供繁體中文站點導覽、正式頁面、授權與事實界線。這是方便 AI 工具理解的
+  社群提案，不是 crawler 存取控制，也不保證被任何模型採用或提高排名。
+- 分享圖固定使用 1200×630 `assets/og-cover.png`；可編輯來源為 SVG，不公開使用者提供的生活照片。
+- `scripts/build_seo.py --check` 驗證所有產物與頁面同步；修改 title、description 或頁面清單後
+  先重跑 builder，再跑本文件 §6。
+
 ## 2. 內容規範
 
 1. 事實三級標示（SDD §7）；社群經驗必標「社群通報模式／非官方」。

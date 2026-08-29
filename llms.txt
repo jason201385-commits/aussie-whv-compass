@@ -1,0 +1,41 @@
+# 澳打指南針
+
+> 給台灣打工度假者的澳洲開源攻略與本地互動工具。內容以繁體中文撰寫，重要政策與數字附官方來源與查核日期。
+
+本站不是澳洲政府、移民代理、法律或醫療服務。政策、簽證、勞動權益與安全資訊應以各頁連結的官方來源為準；遇到不同說法時，請保留不確定性並引用原頁網址。
+
+## 首頁
+
+- [澳打指南針](https://www.aussiewhvcompass.com/): 全站旅程地圖、當下需求快導與互動工具入口。
+
+## 開始前
+
+- [自我釐清：我為什麼要去打工度假？](https://www.aussiewhvcompass.com/why.html): 用 2 分鐘快思測驗與慢想工作表，從自主動機、人生價值、現實準備與支持底線釐清澳洲打工度假。答案只存在自己的瀏覽器。
+- [簽證與集簽：417 一簽二簽三簽完整規則](https://www.aussiewhvcompass.com/visa.html): 台灣人申請澳洲打工度假簽證（417）2026 現行規則：費用、申請流程、二簽三簽的 88/179 天指定工作怎麼算、哪些產業地區可以集簽、怎麼保存證據與保護自己。
+- [行前準備與落地 SOP](https://www.aussiewhvcompass.com/prep.html): 澳洲打工度假行前時間軸、行李帶什麼不帶什麼、落地 72 小時、第一週三大號（銀行、TFN、super）的正確順序——照著做就不會卡關。
+
+## 在澳洲生活與工作
+
+- [物價與薪水：帶多少錢、賺多少錢？](https://www.aussiewhvcompass.com/cost.html): 澳洲打工度假 2026 最新：最低時薪、背包客稅率、房租交通行情，以及 Perth 省錢採買、簡易食譜、二手衣與安全買車入口。
+- [住宿與租屋：找房、押金、Share House 生存](https://www.aussiewhvcompass.com/housing.html): 澳洲打工度假住宿全攻略：直接前往短住訂房、合租與整租平台，並看懂找房流程、inspection 清單、押金自保、share house 文化與退租申訴。
+- [工作機會在哪裡？求職管道與證照全攻略](https://www.aussiewhvcompass.com/work.html): 澳洲打工度假找工作：求職網站、政府職缺板、working hostel、掃街投履歷，怎麼查雇主與仲介合法性，RSA/白卡/叉車證怎麼考，澳式履歷與推薦人文化。
+- [常見詐騙手法：認手法，不認名字](https://www.aussiewhvcompass.com/scam.html): 澳洲打工度假常見詐騙與剝削手法：先付錢才有工作、賣 88 天、假房東、假移民局電話、黑工假承攬。認得手法與紅旗句，就不容易上當。附完整官方求助管道。
+- [英文不好怎麼辦？](https://www.aussiewhvcompass.com/english.html): 澳洲打工度假的英文解方：出發前免費自學資源、抵澳後的免費會話班與語言交換、各類工作實際需要的英文程度。
+- [保險、就醫、心理與安全](https://www.aussiewhvcompass.com/health.html): 台灣人在澳洲不能用 Medicare：保險怎麼買（旅平險 vs OVHC、體力勞動除外條款）、就醫分流、心理健康資源、女性安全與職場性騷擾申訴、行車安全。
+
+## 離開或留下
+
+- [報稅、退休金與離澳](https://www.aussiewhvcompass.com/leave.html): 澳洲打工度假報稅實作（myTax 免費自己報）、super 帳戶管理、DASP 離境領回退休金全流程、離澳 checklist、回台職涯銜接。
+- [如果想留下來：打工度假轉 PR 的現行路徑](https://www.aussiewhvcompass.com/pr.html): 2026 現行政策下，澳洲打工度假背包客轉永久居留（PR）的主要路徑：雇主擔保 482→186、DAMA、技術移民 189/190/491、學生簽轉換，含最新薪資門檻與邀請分數。
+
+## 關於與合作
+
+- [關於本站・合作・贊助](https://www.aussiewhvcompass.com/about.html): 澳打指南針為什麼永久免費、如何提出合作或協助需求、自願贊助，以及如何在 GitHub 上一起維護這份開源攻略。
+
+## 使用與授權
+
+- [Sitemap](https://www.aussiewhvcompass.com/sitemap.xml): 全部可索引頁面與最後修改日期。
+- [來源與免責](https://www.aussiewhvcompass.com/about.html): 維護方式、授權、合作與免責說明。
+- [GitHub 原始碼](https://github.com/jason201385-commits/aussie-whv-compass): 可檢視內容版本與提出修正。
+- 文字內容採 CC BY-SA 4.0；程式碼採 MIT。轉載或改作時請註明澳打指南針與原頁網址，並遵守相同方式分享的授權條件。
+- 不要把社群經驗、估算值或互動工具輸出描述成官方判定；請保留頁面上的查核日期與限制。

@@ -90,6 +90,37 @@ foreach ($p in $pages) {
   if (-not $t.Contains('site-footer'))  { Write-Output "FAIL [$p] 缺 footer"; $errors++ }
   if (-not $t.Contains('assets/main.js')) { Write-Output "FAIL [$p] 未掛 main.js"; $errors++ }
 
+  # 搜尋引擎與 AI 探索：每頁描述自身的 Open Graph 分享圖、crawler 指令與 JSON-LD
+  foreach ($seoNeedle in @(
+    '<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">',
+    '<meta property="og:site_name" content="澳打指南針">',
+    '<meta property="og:image" content="https://www.aussiewhvcompass.com/assets/og-cover.png">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">',
+    '<link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt"',
+    '<script type="application/ld+json">'
+  )) {
+    if (-not $t.Contains($seoNeedle)) { Write-Output "FAIL [$p] 缺 SEO／AI 探索資訊：$seoNeedle"; $errors++ }
+  }
+  if ([regex]::Matches($t, '<script type="application/ld\+json">').Count -ne 1) {
+    Write-Output "FAIL [$p] JSON-LD 數量必須為 1"
+    $errors++
+  } else {
+    $jsonLdText = [regex]::Match($t, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+    try {
+      $jsonLd = $jsonLdText | ConvertFrom-Json
+      if ($jsonLd.'@context' -ne 'https://schema.org' -or -not $jsonLd.'@graph') {
+        Write-Output "FAIL [$p] JSON-LD 缺 schema.org context 或 graph"
+        $errors++
+      }
+    } catch {
+      Write-Output "FAIL [$p] JSON-LD 不是合法 JSON"
+      $errors++
+    }
+  }
+
   # 正式網址：每頁 canonical 與 og:url 必須一致，首頁使用網域根路徑
   $pageUrl = if ($p -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$p" }
   $canonicalTag = '<link rel="canonical" href="{0}">' -f $pageUrl
@@ -257,10 +288,38 @@ if (-not (Test-Path $robotsPath)) {
   $errors++
 } else {
   $robotsText = [System.IO.File]::ReadAllText($robotsPath, [System.Text.Encoding]::UTF8)
+  if (-not $robotsText.Contains("User-agent: *") -or -not $robotsText.Contains("Allow: /") -or $robotsText -match '(?im)^\s*Disallow:') {
+    Write-Output 'FAIL robots.txt 必須允許所有 crawler，且不得含 Disallow'
+    $errors++
+  }
   if (-not $robotsText.Contains("Sitemap: $canonicalOrigin/sitemap.xml")) {
     Write-Output 'FAIL robots.txt 未宣告正式 sitemap'
     $errors++
   }
+}
+
+# llms.txt 是輔助 AI 理解的社群提案，不取代 sitemap／robots；仍需完整列出 13 個正式 URL 與事實邊界
+$llmsPath = Join-Path $dir 'llms.txt'
+if (-not (Test-Path $llmsPath)) {
+  Write-Output 'FAIL 缺 llms.txt'
+  $errors++
+} else {
+  $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
+  foreach ($url in $expectedUrls) {
+    if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
+  }
+  foreach ($llmsNeedle in @('CC BY-SA 4.0', '不是澳洲政府、移民代理、法律或醫療服務', '不要把社群經驗、估算值或互動工具輸出描述成官方判定')) {
+    if (-not $llmsText.Contains($llmsNeedle)) { Write-Output "FAIL llms.txt 缺授權或事實邊界：$llmsNeedle"; $errors++ }
+  }
+}
+
+$seoBuilder = Join-Path $dir 'scripts\build_seo.py'
+if (-not (Test-Path $seoBuilder)) {
+  Write-Output 'FAIL 缺 scripts/build_seo.py'
+  $errors++
+} else {
+  & python $seoBuilder --check
+  if ($LASTEXITCODE -ne 0) { Write-Output 'FAIL SEO 產物過期或分享圖錯誤'; $errors++ }
 }
 
 # emoji 掃描（HTML + JS；SDD §4.4 禁用 emoji）

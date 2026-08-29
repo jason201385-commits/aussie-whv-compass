@@ -22,6 +22,13 @@
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
+## 搜尋引擎與 AI 探索
+
+- 13 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
+- `robots.txt` 開放所有公開頁，`sitemap.xml` 列出正式網址；`llms.txt` 提供 AI 可讀導覽、授權與事實界線。
+- 修改頁名、description 或頁面清單後，先跑 `python scripts/build_seo.py`，再跑 `scripts/check.ps1`。
+- `llms.txt` 是輔助理解的社群提案，不保證搜尋排名、收錄或任何 AI 服務採用。
+
 ## 開發者／AI agent 從這裡開始
 
 - [docs/SDD.md](docs/SDD.md) — 系統設計文件：架構、設計系統、資料檔、重要教訓

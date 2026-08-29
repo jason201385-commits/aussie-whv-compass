@@ -1,3 +1,4 @@
+# All public content is crawlable. The sitemap is the canonical discovery list.
 User-agent: *
 Allow: /
 
