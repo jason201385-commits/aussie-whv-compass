@@ -1,0 +1,65 @@
+name: 合作或協助需求
+description: 想一起合作，或想請 Jason 協助釐清網站、工具與公開資訊問題。
+title: "[合作／協助] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        這會建立一則公開 GitHub Issue，並連同你的 GitHub 帳號顯示。
+
+        請只寫可公開的需求摘要，不要留下個資。包括真實姓名、電話、Email、LINE ID、證件、住址、帳戶、報價、公司內部資訊、可識別的雇主／客戶／第三人資料，也不要上傳合約、薪資單、證件或對話截圖。
+
+        送出不代表已接受委託、保證能處理或承諾免費服務；如果方向適合，Jason 會先在這則 Issue 回覆下一步。
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 你想談哪一類？
+      options:
+        - 內容、資料或社群合作
+        - 活動、分享或公開資源合作
+        - 網站或數位工具協助
+        - 打工度假公開資訊指路
+        - 其他可公開說明的需求
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 現在卡在哪裡？
+      description: 用 2–5 句描述現況；請移除所有個人與第三人識別資訊。
+      placeholder: 例：我們正在整理 WA 新手租屋資源，但官方入口分散，希望一起做成可查證的中文清單。
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 希望最後得到什麼結果？
+      placeholder: 例：一頁公開、可定期更新的資源導航；預計 10 月前上線。
+    validations:
+      required: true
+
+  - type: textarea
+    id: public_links
+    attributes:
+      label: 可公開參考的連結（選填）
+      description: 只貼公開網站或資料；不要貼雲端私人檔案、邀請連結或含 token 的網址。
+      placeholder: https://example.org/public-page
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: 公開與隱私確認
+      options:
+        - label: 我知道內容與 GitHub 帳號會公開，並確認沒有填入自己或第三人的敏感／可識別資訊，也沒有上傳文件或對話截圖。
+          required: true
+
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: 合作邊界確認
+      options:
+        - label: 我了解送出需求不代表委託成立或保證回覆；緊急、人身安全、簽證、法律、醫療與稅務個案不使用此表單處理。
+          required: true

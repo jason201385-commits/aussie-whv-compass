@@ -367,7 +367,7 @@ if (-not $supportBlock.Success) {
   $supportLinks = [regex]::Matches($supportBlock.Value, 'class="support-link"').Count
   if ($supportLinks -ne 6) { Write-Output "FAIL [index.html] 當下需求入口數=$supportLinks（應為 6）"; $errors++ }
 }
-foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml')) {
+foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml', 'collaborate.yml')) {
   $formPath = Join-Path $dir ".github\ISSUE_TEMPLATE\$formName"
   if (-not (Test-Path $formPath)) {
     Write-Output "FAIL 缺 Issue Form：$formName"
@@ -379,6 +379,28 @@ foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml')) {
       $errors++
     }
   }
+}
+$collabFormPath = Join-Path $dir '.github\ISSUE_TEMPLATE\collaborate.yml'
+if (Test-Path $collabFormPath) {
+  $collabFormText = [System.IO.File]::ReadAllText($collabFormPath, [System.Text.Encoding]::UTF8)
+  foreach ($collabNeedle in @('id: problem', 'id: outcome', 'id: privacy', 'id: boundary', '不代表已接受委託')) {
+    if (-not $collabFormText.Contains($collabNeedle)) { Write-Output "FAIL [collaborate.yml] 缺合作需求安全欄位：$collabNeedle"; $errors++ }
+  }
+  foreach ($requiredId in @('privacy', 'boundary')) {
+    if ($collabFormText -notmatch "(?s)id: $requiredId.*?required: true") {
+      Write-Output "FAIL [collaborate.yml] $requiredId 確認未設為必填"
+      $errors++
+    }
+  }
+  if ($collabFormText.Contains('type: upload')) { Write-Output 'FAIL [collaborate.yml] 不得提供檔案上傳欄位'; $errors++ }
+}
+foreach ($collabNeedle in @('id="collaborate"', 'template=collaborate.yml', '提出需求不代表我已接受委託')) {
+  $aboutText = [System.IO.File]::ReadAllText((Join-Path $dir 'about.html'), [System.Text.Encoding]::UTF8)
+  if (-not $aboutText.Contains($collabNeedle)) { Write-Output "FAIL [about.html] 缺合作入口或邊界：$collabNeedle"; $errors++ }
+}
+if (-not $indexText.Contains('href="about.html#collaborate"')) {
+  Write-Output 'FAIL [index.html] 缺首頁合作入口'
+  $errors++
 }
 if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains('catch (e) { copyFailed(); }')) {
   Write-Output 'FAIL [main.js] clipboard 失敗分支不得誤報已複製'
