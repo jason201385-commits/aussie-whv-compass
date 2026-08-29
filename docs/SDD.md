@@ -38,7 +38,7 @@
 | 檔案 | 角色 |
 |---|---|
 | `index.html` | 首頁：hero、靜態承諾列、最近閱讀、我的收藏、當下需求快導、4 段旅程／12 張頁面卡、主打工具、6 張工具卡、合作入口、原則 |
-| `why.html` | 自我釐清互動工作表（8 題、chips、localStorage、匯出 txt） |
+| `why.html` | 自我釐清雙模式：8 題快思四面向＋8 題慢想工作表、研究／非診斷邊界、localStorage、匯出 txt |
 | `visa.html` | 簽證與集簽＋**集簽資格快查器** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
 | `cost.html` | 物價薪水稅務＋Perth 採買、簡易食譜、二手衣／平價新品＋主要找車／自行刊登平台與官方查核＋**存錢試算器** |
@@ -49,11 +49,11 @@
 | `health.html` | 保險就醫心理安全 |
 | `leave.html` | 報稅退休金離澳＋**DASP 速算**＋**本機離澳收尾清單** |
 | `pr.html` | PR 路徑總覽 |
-| `about.html` | 關於、合作／協助入口、贊助（按鈕待站長提供連結）、授權、免責 |
+| `about.html` | 關於、私人 Email／本地需求單、公開 GitHub 合作入口、贊助（按鈕待站長提供連結）、授權、免責 |
 | `404.html` | 自訂錯誤復原頁：保留 noindex，導回最近閱讀、卡關捷徑與四階段旅程 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
-| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、工作表 |
+| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |

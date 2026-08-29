@@ -459,6 +459,9 @@ if (-not $indexText.Contains('href="about.html#collaborate"')) {
   Write-Output 'FAIL [index.html] 缺首頁合作入口'
   $errors++
 }
+foreach ($entryNeedle in @('先用 2 分鐘快思看見四個準備面向', '快思測驗＋慢想工作表', '私人合作可以直接寄 Email')) {
+  if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
+}
 if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains('catch (e) { copyFailed(); }')) {
   Write-Output 'FAIL [main.js] clipboard 失敗分支不得誤報已複製'
   $errors++
