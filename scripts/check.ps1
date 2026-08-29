@@ -186,8 +186,8 @@ foreach ($f in $scanTargets) {
   }
 }
 
-# 資料檔存在且非空
-foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\tools.js', 'assets\postcodes.js', 'assets\seasons.js')) {
+# 本機資產存在且非空
+foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\tools.js', 'assets\postcodes.js', 'assets\seasons.js', 'assets\lemon-pattern.svg')) {
   $fp = Join-Path $dir $a
   if (-not (Test-Path $fp) -or (Get-Item $fp).Length -lt 100) { Write-Output "FAIL 資產異常：$a"; $errors++ }
 }
@@ -262,6 +262,21 @@ foreach ($leaveNeedle in @('whv-leave-check-v1', 'leaveSaved[box.id] === true', 
   }
 }
 $styleText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\style.css'), [System.Text.Encoding]::UTF8)
+foreach ($lemonNeedle in @('url("lemon-pattern.svg")', '--stripe:', '--on-green:', '.hero-lemon-shape', 'body:not(.home-page) main', '@media (prefers-reduced-motion: reduce)', '.hero-cut path { animation: none !important; }')) {
+  if (-not $styleText.Contains($lemonNeedle)) {
+    Write-Output "FAIL [style.css] 檸檬布紋主題缺必要設計：$lemonNeedle"
+    $errors++
+  }
+}
+if ($styleText -notmatch '(?s)\.tool \.tool-tag\s*\{[^}]*color:\s*var\(--on-accent\)') {
+  Write-Output 'FAIL [style.css] accent 元件必須使用語意前景色，避免深色模式對比不足'
+  $errors++
+}
+$lemonSvg = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\lemon-pattern.svg'), [System.Text.Encoding]::UTF8)
+if ([regex]::Matches($lemonSvg, '<path\b').Count -lt 10 -or -not $lemonSvg.Contains('fill="#efc84c"')) {
+  Write-Output 'FAIL [lemon-pattern.svg] 檸檬與葉片圖樣不完整'
+  $errors++
+}
 if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not $styleText.Contains('main [id] { scroll-margin-top: 82px; }')) {
   Write-Output 'FAIL [style.css] 內容錨點缺 sticky header 安全距離'
   $errors++

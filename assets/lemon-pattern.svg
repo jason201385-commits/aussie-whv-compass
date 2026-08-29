@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="360" viewBox="0 0 520 360">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(24 34) rotate(-8 76 48)">
+      <path d="M30 54C38 24 76 8 112 19c31 10 43 40 24 62-22 26-69 28-94 7-13-11-17-23-12-34Z" fill="#efc84c" fill-opacity=".28" stroke="#ad8d28" stroke-opacity=".18" stroke-width="2"/>
+      <path d="M118 22c15-18 36-21 48-8-10 18-28 25-48 8Z" fill="#56675b" fill-opacity=".24" stroke="#39483f" stroke-opacity=".16" stroke-width="2"/>
+      <path d="M116 24c8-4 15-8 22-14" fill="none" stroke="#4e5d53" stroke-opacity=".2" stroke-width="3"/>
+    </g>
+    <g transform="translate(304 194) rotate(7 92 64)">
+      <path d="M24 72C38 30 84 13 127 25c38 11 58 48 37 79-24 36-80 43-119 17C25 108 17 90 24 72Z" fill="#efc84c" fill-opacity=".25" stroke="#ad8d28" stroke-opacity=".17" stroke-width="2"/>
+      <path d="M129 29c15-25 43-32 62-15-13 24-40 34-62 15Z" fill="#56675b" fill-opacity=".22" stroke="#39483f" stroke-opacity=".16" stroke-width="2"/>
+      <path d="M129 28c6-12 15-20 27-25" fill="none" stroke="#4e5d53" stroke-opacity=".2" stroke-width="3"/>
+      <path d="M143 31c24-11 48-3 55 18-24 12-47 4-55-18Z" fill="#647468" fill-opacity=".18" stroke="#39483f" stroke-opacity=".14" stroke-width="2"/>
+    </g>
+    <g transform="translate(386 48) rotate(14 54 54)">
+      <path d="M53 11a43 43 0 1 1-30 73Z" fill="#f4d66e" fill-opacity=".22" stroke="#bd9d31" stroke-opacity=".17" stroke-width="2"/>
+      <path d="M53 11 23 84M53 11 53 96M53 11 86 80" fill="none" stroke="#c7a735" stroke-opacity=".18" stroke-width="2"/>
+    </g>
+    <g transform="translate(52 264) rotate(-18 64 40)">
+      <path d="M12 45C33 16 78 9 111 25 92 56 46 67 12 45Z" fill="#f1cd57" fill-opacity=".2" stroke="#ad8d28" stroke-opacity=".14" stroke-width="2"/>
+      <path d="M106 24c9-18 28-25 43-14-7 19-25 27-43 14Z" fill="#56675b" fill-opacity=".2" stroke="#39483f" stroke-opacity=".14" stroke-width="2"/>
+    </g>
+  </g>
+</svg>
