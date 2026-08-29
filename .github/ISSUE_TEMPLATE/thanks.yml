@@ -1,0 +1,68 @@
+name: 留下一句感謝
+description: 這份攻略在哪個時刻幫到你？留一句話，也替下一位出發的人打氣。
+title: "[感謝] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        謝謝你願意把這份幫助傳下去。
+
+        這會建立一則**公開的 GitHub Issue**；未登入時 GitHub 會先要求登入，送出後也會顯示你的 GitHub 帳號。
+
+        請不要留下個資，包括真實姓名、電話、Email、LINE ID、護照／簽證號碼、住址、帳戶資料、可識別的雇主或第三人資訊，也不要上傳證件、合約或對話截圖。
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: 你現在走到哪個階段？
+      options:
+        - 還在考慮或準備出發
+        - 已經在澳洲生活或工作
+        - 正在準備離澳或已經回家
+        - 我是前輩、家人或其他協助者
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: 哪一頁幫到你？（選填）
+      description: 從網站的「留下一句感謝」進來時，這欄會自動帶入。
+      placeholder: 例：報稅、退休金與離澳（leave.html）
+
+  - type: textarea
+    id: message
+    attributes:
+      label: 想對這份攻略說什麼？
+      description: 不需要寫得完整，一個具體被幫到的時刻就很有力量。
+      placeholder: 例：第一次到 Perth 不知道先辦什麼，落地 72 小時清單讓我安心很多。
+    validations:
+      required: true
+
+  - type: textarea
+    id: next_person
+    attributes:
+      label: 想留給下一位出發者的話（選填）
+      placeholder: 例：不用一次把所有事情想完，先把第一週走穩就好。
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: 公開與隱私確認
+      options:
+        - label: 我知道內容與 GitHub 帳號會公開，並確認沒有填入自己或第三人的敏感／可識別資訊，也沒有上傳文件或對話截圖。
+          required: true
+
+  - type: checkboxes
+    id: quote_permission
+    attributes:
+      label: 是否同意本站摘錄？（完全自願）
+      description: 不勾選不影響送出，也不會被摘錄到網站。日後可在原 Issue 留言要求移除。
+      options:
+        - label: 我同意本站在不改變原意、不顯示帳號的前提下，摘錄這段話作為公開感謝。
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        送出後仍可編輯或關閉自己的 Issue。若曾同意摘錄，之後也可以在原 Issue 留言要求移除。

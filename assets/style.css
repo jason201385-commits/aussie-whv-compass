@@ -891,7 +891,18 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .feedback-bar .fb-q { font-weight: 800; font-family: "Noto Serif TC", serif; }
 .feedback-bar .fb-thanks { color: var(--green-ink); font-weight: 700; }
 .feedback-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
-@media (max-width: 640px) { .feedback-actions { margin-left: 0; } }
+.feedback-actions .btn { min-height: 44px; }
+.feedback-note { flex: 1 1 100%; margin: 0; color: var(--ink-soft); font-size: .78rem; }
+.gratitude-panel { background: var(--green-soft); }
+.gratitude-panel h3 { margin-top: 0; font-family: var(--font-serif); }
+.gratitude-note { color: var(--ink-soft); font-size: .88rem; }
+.gratitude-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+.gratitude-actions .btn { min-height: 44px; }
+@media (max-width: 640px) {
+  .feedback-actions { width: 100%; margin-left: 0; }
+  .feedback-actions .btn { flex: 1 1 100%; width: 100%; text-align: center; }
+  .gratitude-actions .btn { flex: 1 1 100%; text-align: center; }
+}
 
 /* ---------- 行動版：緊湊單列導覽 ---------- */
 @media (max-width: 768px) {

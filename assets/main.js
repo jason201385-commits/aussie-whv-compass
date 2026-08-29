@@ -95,23 +95,31 @@
       + "?template=report.yml"
       + "&title=" + encodeURIComponent("[" + pageName + "] ")
       + "&page=" + encodeURIComponent(pageName + "（" + (location.pathname.split("/").pop() || "index.html") + "）");
+    var thanksUrl = "https://github.com/jason201385-commits/aussie-whv-compass/issues/new"
+      + "?template=thanks.yml"
+      + "&page=" + encodeURIComponent(pageName + "（" + (location.pathname.split("/").pop() || "index.html") + "）");
     var bar = document.createElement("div");
     bar.className = "feedback-bar";
     bar.innerHTML = '<span class="fb-q">這一頁有幫助嗎？</span>'
       + '<div class="feedback-actions">'
       + '<button type="button" class="btn secondary" id="fb-share">有幫助，複製網址分享</button>'
-      + '<a class="btn" target="_blank" rel="noopener" href="' + issueUrl + '">回報問題／提建議</a>'
-      + '</div>';
+      + '<a class="btn" target="_blank" rel="noopener noreferrer" href="' + issueUrl + '">回報問題／提建議</a>'
+      + '<a class="btn ghost" target="_blank" rel="noopener noreferrer" aria-label="前往 GitHub 公開留下一句感謝（另開新頁）" href="' + thanksUrl + '">留下一句感謝（公開於 GitHub）</a>'
+      + '</div>'
+      + '<p class="feedback-note">回報與感謝會開啟公開的 GitHub Issue，需要登入並會顯示 GitHub 帳號；請勿留下個資或可識別第三人的資訊。</p>';
     footer.parentNode.insertBefore(bar, footer);
     var shareBtn = document.getElementById("fb-share");
     shareBtn.addEventListener("click", function () {
-      var done = function () {
+      var copied = function () {
         bar.querySelector(".fb-q").innerHTML = '<span class="fb-thanks">已複製連結——分享給下一個要出發的人，就是最好的回饋。</span>';
         shareBtn.style.display = "none";
       };
+      var copyFailed = function () {
+        bar.querySelector(".fb-q").textContent = "無法自動複製，請使用瀏覽器的分享或複製網址功能。";
+      };
       try {
-        navigator.clipboard.writeText(location.href).then(done, done);
-      } catch (e) { done(); }
+        navigator.clipboard.writeText(location.href).then(copied, copyFailed);
+      } catch (e) { copyFailed(); }
     });
   }
 

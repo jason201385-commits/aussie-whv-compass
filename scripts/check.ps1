@@ -61,6 +61,52 @@ foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\tools.js', 'asset
   if (-not (Test-Path $fp) -or (Get-Item $fp).Length -lt 100) { Write-Output "FAIL 資產異常：$a"; $errors++ }
 }
 
+# 感謝閉環：Issue Form 與全站 JS 入口不得遺失
+$thanksForm = Join-Path $dir '.github\ISSUE_TEMPLATE\thanks.yml'
+if (-not (Test-Path $thanksForm)) {
+  Write-Output 'FAIL 缺感謝表單：.github\ISSUE_TEMPLATE\thanks.yml'
+  $errors++
+} else {
+  $thanksText = [System.IO.File]::ReadAllText($thanksForm, [System.Text.Encoding]::UTF8)
+  foreach ($required in @('name: 留下一句感謝', 'id: message', 'id: privacy', 'id: quote_permission')) {
+    if (-not $thanksText.Contains($required)) { Write-Output "FAIL [thanks.yml] 缺必要欄位：$required"; $errors++ }
+  }
+  if ($thanksText -notmatch '(?s)id: privacy.*?required: true') {
+    Write-Output 'FAIL [thanks.yml] 公開與隱私確認未設為必填'
+    $errors++
+  }
+  if ($thanksText -notmatch '(?s)id: message.*?validations:.*?required: true') {
+    Write-Output 'FAIL [thanks.yml] 感謝內容未設為必填'
+    $errors++
+  }
+  $fieldIds = [regex]::Matches($thanksText, '(?m)^\s+id:\s*([A-Za-z0-9_-]+)\s*$') | ForEach-Object { $_.Groups[1].Value }
+  $duplicates = $fieldIds | Group-Object | Where-Object { $_.Count -gt 1 }
+  if ($duplicates) { Write-Output "FAIL [thanks.yml] 欄位 id 重複：$(($duplicates.Name) -join ', ')"; $errors++ }
+  if ($thanksText.Contains('type: upload')) { Write-Output 'FAIL [thanks.yml] 不得提供檔案上傳欄位'; $errors++ }
+}
+$mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
+if (-not $mainJs.Contains('template=thanks.yml')) {
+  Write-Output 'FAIL [main.js] 全站回饋列缺感謝入口'
+  $errors++
+}
+foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml')) {
+  $formPath = Join-Path $dir ".github\ISSUE_TEMPLATE\$formName"
+  if (-not (Test-Path $formPath)) {
+    Write-Output "FAIL 缺 Issue Form：$formName"
+    $errors++
+  } else {
+    $formText = [System.IO.File]::ReadAllText($formPath, [System.Text.Encoding]::UTF8)
+    if (-not $formText.Contains('公開') -or -not $formText.Contains('個資')) {
+      Write-Output "FAIL [$formName] 缺公開／個資警示"
+      $errors++
+    }
+  }
+}
+if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains('catch (e) { copyFailed(); }')) {
+  Write-Output 'FAIL [main.js] clipboard 失敗分支不得誤報已複製'
+  $errors++
+}
+
 Write-Output ("-" * 40)
 if ($errors -eq 0) { Write-Output "ALL CHECKS PASSED ($($pages.Count) pages)"; exit 0 }
 else { Write-Output "$errors ERROR(S)"; exit 1 }

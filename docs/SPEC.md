@@ -33,13 +33,18 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
 | DASP 速算 | leave.html `#dasp-calc` | 金額 number＋4 個金額 chips | take=×0.35、tax=×0.65 | 兩格數據＋台幣評語 |
 | 自我釐清工作表 | why.html `#worksheet` | 8 題 textarea＋Q4/Q5 快選 chips | 600ms 防抖存 `whv-worksheet-v1`；chips 以頓號接續填入 | 匯出 .txt／列印／清空 |
-| 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→GitHub issue `?template=report.yml&title=[頁名]&page=頁名（檔名）` | — |
+| 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→`report.yml`；感謝鈕→`thanks.yml`，兩者都自動帶入頁名 | — |
 
 ### 1.3 回饋機制
 
 `.github/ISSUE_TEMPLATE/report.yml`（回報過時/錯誤：頁面自動帶入、類型下拉、
-描述、官方來源選填；label「需要查證」）＋ `idea.yml`（許願池）。
-閉環：網站回饋列 → 結構化 issue → 修正 → push 部署。
+描述、官方來源選填；label「需要查證」）＋ `idea.yml`（許願池）＋ `thanks.yml`
+（公開感謝：旅程階段、受幫助頁面、給後來者的話、隱私確認、摘錄同意）。
+
+- 修正閉環：網站回饋列 → 結構化 issue → 查證修正 → push 部署。
+- 感謝閉環：點擊前與表單頂端明示 GitHub 登入、帳號／內容公開與個資風險 →
+  公開 Issue → 人工確認無敏感／第三人資料 → **只有明確勾選同意**才可
+  去識別化摘錄至本站；使用者可在原 Issue 要求移除。不得自動發布、不得虛構留言。
 
 ## 2. 內容規範
 
