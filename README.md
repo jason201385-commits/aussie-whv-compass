@@ -20,6 +20,7 @@
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
+- Header 與首頁提供**全站搜尋**：搜尋 13 頁／108 個段落，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
 ## 搜尋引擎與 AI 探索
@@ -34,6 +35,7 @@
 - [docs/SDD.md](docs/SDD.md) — 系統設計文件：架構、設計系統、資料檔、重要教訓
 - [docs/SPEC.md](docs/SPEC.md) — 功能規格：現況基線、待辦 backlog（P0–P2）、驗收程序、例行維護
 - `scripts/check.ps1` — 驗收腳本（結構、連結、錨點、emoji 掃描），push 前必跑
+- 修改內容標題或段落錨點後，先跑 `python scripts/build_search.py` 更新搜尋索引。
 
 ## 專案原則
 

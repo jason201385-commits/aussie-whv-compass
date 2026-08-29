@@ -37,7 +37,7 @@
 
 | 檔案 | 角色 |
 |---|---|
-| `index.html` | 首頁：hero、靜態承諾列、最近閱讀、我的收藏、當下需求快導、4 段旅程／12 張頁面卡、主打工具、6 張工具卡、合作入口、原則 |
+| `index.html` | 首頁：hero、靜態承諾列、最近閱讀、我的收藏、當下需求快導、全站搜尋、4 段旅程／12 張頁面卡、主打工具、6 張工具卡、合作入口、原則 |
 | `why.html` | 自我釐清雙模式：8 題快思四面向＋8 題慢想工作表、研究／非診斷邊界、localStorage、匯出 txt |
 | `visa.html` | 簽證與集簽＋**集簽資格快查器** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
@@ -54,12 +54,14 @@
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
-| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
+| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
+| `assets/search-index.js` | 13 頁、108 個頁面／段落的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
 | `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 頁搜尋探索、全 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
 | `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots 與 llms.txt；`--check` 防止產物過期 |
+| `scripts/build_search.py` | 從 13 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
 | `docs/` | 本文件與 SPEC |
 
 ### 2.2 頁面共同結構
@@ -77,6 +79,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - **私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字與 `mailto:`，不建立
   localStorage key、不呼叫 fetch、不自動寄信；輸入只以 `textContent`／`value` 呈現，寄信參數必須
   `encodeURIComponent`。clipboard 不可用時只選取預覽文字，不得誤報已複製。
+- **站內搜尋**：`main.js` 注入全站 dialog 與 header 入口，首次開啟才載入
+  `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
+  builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
+  `/` 開啟、Escape／關閉鈕離開，行動版入口與結果維持至少 44px 可操作高度。
 - **旅程順序單一來源**：`main.js` 的 `JOURNEY_ORDER` 與首頁四階段一致，負責內容頁的
   上一站／下一站與位置顯示；首頁只提供 `#journey-map` 全貌，不注入頁尾導覽。
 - **localStorage keys**（改動＝使用者資料遺失，不得更名）：

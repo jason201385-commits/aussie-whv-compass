@@ -97,6 +97,17 @@ body::after {
 
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 main p a:not(.btn), main li a:not(.btn), .site-footer a {
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
@@ -212,6 +223,114 @@ li { margin: .4em 0; }
   color: var(--on-green);
   font-weight: 700;
 }
+.site-search-open,
+.site-search-close {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 13px;
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.site-search-open:hover,
+.site-search-close:hover { background: var(--gold-soft); }
+.site-search-open .icon,
+.site-search-close .icon { width: 20px; height: 20px; }
+
+/* ---------- 全站搜尋 ---------- */
+.site-search-dialog {
+  width: min(760px, calc(100% - 32px));
+  max-height: min(82vh, 760px);
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  box-shadow: 0 28px 80px color-mix(in srgb, #000 42%, transparent);
+  overflow: auto;
+}
+.site-search-dialog::backdrop { background: color-mix(in srgb, var(--ink) 66%, transparent); backdrop-filter: blur(4px); }
+.site-search-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(10px);
+}
+.site-search-head .section-eyebrow { display: block; margin: 0 0 2px; }
+.site-search-head h2 { margin: 0; font-size: 1.5rem; }
+.site-search-head h2::before { display: none; }
+.site-search-close { flex: 0 0 44px; padding: 8px; }
+.site-search-body { padding: 22px; }
+.site-search-form,
+.site-search-home-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.site-search-form input,
+.site-search-home-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 10px 14px;
+  font: inherit;
+}
+.site-search-form .btn,
+.site-search-home-form .btn { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.site-search-form .btn .icon,
+.site-search-home-form .btn .icon { width: 19px; height: 19px; }
+.site-search-quick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 0; }
+.site-search-quick > span { color: var(--ink-soft); font-size: .82rem; font-weight: 800; }
+.site-search-quick .chip { min-height: 38px; }
+.site-search-privacy { color: var(--ink-soft); font-size: .78rem; margin: 12px 0 0; }
+.site-search-status { margin: 20px 0 10px; font-weight: 800; }
+.site-search-results-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.site-search-results-list li { margin: 0; }
+.site-search-results-list a {
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+}
+.site-search-results-list a:hover { border-color: var(--accent); background: var(--gold-soft); }
+.site-search-result-page { color: var(--accent); font-size: .75rem; font-weight: 900; letter-spacing: .04em; }
+.site-search-results-list strong { font-family: var(--font-serif); font-size: 1.04rem; }
+.site-search-result-snippet { color: var(--ink-soft); font-size: .85rem; line-height: 1.65; }
+.site-search-empty { padding: 18px; border: 2px dashed var(--line); border-radius: 14px; background: var(--bg); }
+.site-search-empty strong { font-family: var(--font-serif); }
+.site-search-empty .btn { min-height: 44px; }
+
+.site-search-home {
+  margin: 26px 0;
+  padding: 28px;
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  background: var(--blue-soft);
+  box-shadow: var(--shadow-pop);
+}
+.site-search-home h2 { margin: .25em 0 .35em; }
+.site-search-home > p:not(.section-eyebrow) { max-width: 760px; color: var(--ink-soft); }
+.site-search-home-form { margin-top: 18px; max-width: 780px; }
 
 /* ---------- 版面 ---------- */
 main { max-width: var(--maxw); margin: 26px auto 52px; padding: 42px 38px 72px; }
@@ -1318,6 +1437,8 @@ main [id] { scroll-margin-top: 170px; }
     gap: 10px;
   }
   .brand { flex-shrink: 0; min-height: 44px; margin-right: 0; }
+  .site-search-open { flex: 0 0 44px; padding: 8px; }
+  .site-search-open span { display: none; }
   .nav-links {
     flex: 1;
     flex-wrap: nowrap;
@@ -1355,6 +1476,12 @@ main [id] { scroll-margin-top: 170px; }
   .support-hub { padding: 22px 16px; }
   .support-grid { grid-template-columns: 1fr; }
   .support-link { min-height: 72px; }
+  .site-search-home { padding: 22px 16px; }
+  .site-search-form,
+  .site-search-home-form { grid-template-columns: 1fr; }
+  .site-search-dialog { width: calc(100% - 18px); max-height: calc(100vh - 18px); border-radius: 18px; }
+  .site-search-head { padding: 14px 16px; }
+  .site-search-body { padding: 16px; }
   .home-page .card-grid { grid-template-columns: 1fr; }
   .featured-tool { grid-template-columns: 1fr; padding: 26px 22px 30px; }
   .featured-poster-preview { width: min(210px, 78%); min-height: 200px; justify-self: center; }
@@ -1373,7 +1500,7 @@ main [id] { scroll-margin-top: 170px; }
 }
 
 @media print {
-  .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar, .page-journey-nav, .saved-pages { display: none; }
+  .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar, .page-journey-nav, .saved-pages, .site-search-home, .site-search-dialog { display: none; }
   body { background: #fff; color: #000; }
   body::after { display: none; }
   .panel, details, .card, .table-wrap, .tool { box-shadow: none; }

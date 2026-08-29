@@ -61,7 +61,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260829-4">
+<link rel="stylesheet" href="assets/style.css?v=20260829-5">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body class="home-page">
@@ -190,6 +190,24 @@
     <p class="support-emergency"><strong>有立即生命危險：</strong>直接查看<a href="health.html#emergency">緊急聯絡總表</a>，不要停在本站等回覆。</p>
   </section>
 
+  <section class="site-search-home" id="search" aria-labelledby="site-search-home-title">
+    <p class="section-eyebrow">SEARCH ALL GUIDES</p>
+    <h2 id="site-search-home-title">不確定在哪一頁？直接搜尋全部攻略</h2>
+    <p>輸入你現在想處理的事情，例如「二簽」、「找房」、「欠薪」或「看醫生」。搜尋只在這台裝置內完成，不會把查詢送到本站或搜尋引擎。</p>
+    <form class="site-search-home-form" id="site-search-home-form" role="search" data-search-ui>
+      <label class="sr-only" for="site-search-home-input">搜尋全部攻略</label>
+      <input id="site-search-home-input" type="search" inputmode="search" autocomplete="off" placeholder="例如：88 天、買二手車、英文面試" maxlength="80">
+      <button class="btn" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg> 搜尋攻略</button>
+    </form>
+    <div class="chip-row" aria-label="熱門搜尋" data-search-ui>
+      <span class="chip-label">可以先點：</span>
+      <button class="chip" type="button" data-home-search-query="二簽 88 天">二簽 88 天</button>
+      <button class="chip" type="button" data-home-search-query="找房">找房</button>
+      <button class="chip" type="button" data-home-search-query="欠薪">欠薪</button>
+      <button class="chip" type="button" data-home-search-query="看醫生">看醫生</button>
+    </div>
+  </section>
+
   <nav class="journey-directory" id="journey-map" aria-label="依旅程階段瀏覽">
     <a href="#considering"><span>01</span>還在考慮</a>
     <a href="#committed"><span>02</span>決定要去</a>
@@ -285,7 +303,7 @@
     </div>
   </section>
 
-  <h2>不只是攻略，是工具箱</h2>
+  <h2 id="toolbox">不只是攻略，是工具箱</h2>
   <p>每個重要決定都做了互動工具——不用讀完整頁，先玩玩看：</p>
   <a class="featured-tool" href="prep.html#prep-poster">
     <span class="featured-tool-copy">
@@ -341,7 +359,7 @@
     <p><a class="btn" href="about.html#collaborate">查看合作與協助方式</a></p>
   </section>
 
-  <h2>這個網站的三個原則</h2>
+  <h2 id="principles">這個網站的三個原則</h2>
   <div class="panel">
     <ol>
       <li><strong>永久免費。</strong>所有內容自由閱讀、自由轉載（註明出處即可）。不賣課、不接代辦業配，只接受自願的 <a href="about.html">donate</a>。</li>
@@ -361,6 +379,6 @@
   </div>
 </footer>
 
-<script src="assets/main.js?v=20260829-4"></script>
+<script src="assets/main.js?v=20260829-5"></script>
 </body>
 </html>

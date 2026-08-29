@@ -59,6 +59,281 @@
     }
   });
 
+  // ---------- 全站搜尋：同站索引、查詢不離開裝置、不保存輸入 ----------
+  var navInner = document.querySelector(".nav-inner");
+  var searchDialog = document.createElement("dialog");
+  searchDialog.className = "site-search-dialog";
+  searchDialog.id = "site-search-dialog";
+  searchDialog.setAttribute("aria-labelledby", "site-search-title");
+  searchDialog.innerHTML = '<div class="site-search-head">'
+    + '<div><span class="section-eyebrow">SEARCH</span><h2 id="site-search-title">搜尋全部攻略</h2></div>'
+    + '<button class="site-search-close" type="button" aria-label="關閉搜尋"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>'
+    + '</div>'
+    + '<div class="site-search-body">'
+    + '<form class="site-search-form" id="site-search-form" role="search">'
+    + '<label class="sr-only" for="site-search-input">輸入要搜尋的主題</label>'
+    + '<input id="site-search-input" type="search" inputmode="search" autocomplete="off" maxlength="80" placeholder="例如：二簽、找房、欠薪、看醫生" required>'
+    + '<button class="btn" type="submit">搜尋</button>'
+    + '</form>'
+    + '<div class="site-search-quick" aria-label="熱門搜尋">'
+    + '<span>可以先點：</span>'
+    + '<button class="chip" type="button" data-search-query="二簽 88 天">二簽 88 天</button>'
+    + '<button class="chip" type="button" data-search-query="找房">找房</button>'
+    + '<button class="chip" type="button" data-search-query="欠薪">欠薪</button>'
+    + '<button class="chip" type="button" data-search-query="看醫生">看醫生</button>'
+    + '</div>'
+    + '<p class="site-search-privacy">搜尋在這台裝置內完成，不會把查詢送到本站或搜尋引擎，也不會保存搜尋紀錄。</p>'
+    + '<p class="site-search-status" id="site-search-status" role="status" aria-live="polite">輸入一個主題，或先點熱門搜尋。</p>'
+    + '<div id="site-search-results"></div>'
+    + '</div>';
+  document.body.appendChild(searchDialog);
+
+  var searchOpen = document.createElement("button");
+  searchOpen.className = "site-search-open";
+  searchOpen.type = "button";
+  searchOpen.setAttribute("aria-haspopup", "dialog");
+  searchOpen.setAttribute("aria-controls", "site-search-dialog");
+  searchOpen.setAttribute("aria-label", "搜尋全部攻略；鍵盤可按斜線開啟");
+  searchOpen.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span>搜尋</span>';
+  if (navInner) {
+    var navLinks = navInner.querySelector(".nav-links");
+    navInner.insertBefore(searchOpen, navLinks || null);
+  }
+
+  var searchInput = document.getElementById("site-search-input");
+  var searchForm = document.getElementById("site-search-form");
+  var searchStatus = document.getElementById("site-search-status");
+  var searchResults = document.getElementById("site-search-results");
+  var searchLoadPromise = null;
+  var SEARCH_SYNONYMS = {
+    "租房": ["找房", "租屋", "住宿", "房租", "sharehouse"],
+    "找房": ["租房", "租屋", "住宿", "房租", "sharehouse"],
+    "二簽": ["集簽", "88天", "指定工作"],
+    "三簽": ["集簽", "179天", "指定工作"],
+    "欠薪": ["薪資", "fairwork", "追薪", "工資"],
+    "醫生": ["看醫生", "gp", "診所", "急診"],
+    "看醫生": ["醫生", "gp", "診所", "急診"],
+    "買車": ["二手車", "ppsr", "過戶", "車輛"],
+    "英文": ["英語", "面試", "口說"],
+    "回台": ["離澳", "dasp", "退休金", "報稅"],
+    "移民": ["pr", "永居", "雇主擔保", "技術移民"]
+  };
+
+  var normalizeSearch = function (value) {
+    var normalized = String(value || "").toLowerCase();
+    try { normalized = normalized.normalize("NFKC"); } catch (e) {}
+    return normalized.replace(/[\s\-_.,，。！？!?、/\\()（）:：;；'"“”‘’]+/g, "");
+  };
+
+  var loadSearchIndex = function () {
+    if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
+      return Promise.resolve(window.WHV_SEARCH_INDEX.entries);
+    }
+    if (searchLoadPromise) return searchLoadPromise;
+    searchLoadPromise = new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = "assets/search-index.js?v=20260829-5";
+      script.async = true;
+      script.onload = function () {
+        if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
+          resolve(window.WHV_SEARCH_INDEX.entries);
+        } else {
+          reject(new Error("invalid search index"));
+        }
+      };
+      script.onerror = function () { reject(new Error("search index unavailable")); };
+      document.head.appendChild(script);
+    });
+    return searchLoadPromise;
+  };
+
+  var tokenScore = function (entry, token) {
+    var options = [token].concat(SEARCH_SYNONYMS[token] || []);
+    var title = normalizeSearch(entry.title);
+    var pageTitle = normalizeSearch(entry.pageTitle);
+    var text = normalizeSearch(entry.text);
+    var keywords = normalizeSearch(entry.keywords);
+    var best = 0;
+    options.forEach(function (option) {
+      var needle = normalizeSearch(option);
+      if (!needle) return;
+      if (title === needle) best = Math.max(best, 140);
+      else if (title.indexOf(needle) >= 0) best = Math.max(best, 95);
+      if (entry.title === "本頁總覽" && pageTitle === needle) best = Math.max(best, 110);
+      else if (entry.title === "本頁總覽" && pageTitle.indexOf(needle) >= 0) best = Math.max(best, 72);
+      if (keywords.indexOf(needle) >= 0) best = Math.max(best, 42);
+      if (text.indexOf(needle) >= 0) best = Math.max(best, 24);
+    });
+    return best;
+  };
+
+  var searchEntries = function (entries, query) {
+    var originalTokens = String(query || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+    var whole = normalizeSearch(query);
+    return entries.map(function (entry, order) {
+      var score = 0;
+      for (var i = 0; i < originalTokens.length; i++) {
+        var matched = tokenScore(entry, normalizeSearch(originalTokens[i]));
+        if (!matched) return null;
+        score += matched;
+      }
+      var title = normalizeSearch(entry.title);
+      var pageTitle = normalizeSearch(entry.pageTitle);
+      var combined = normalizeSearch(entry.text + " " + entry.keywords);
+      if (title.indexOf(whole) >= 0) score += 80;
+      else if (entry.title === "本頁總覽" && pageTitle.indexOf(whole) >= 0) score += 55;
+      else if (combined.indexOf(whole) >= 0) score += 20;
+      return { entry: entry, score: score, order: order };
+    }).filter(Boolean).sort(function (a, b) {
+      return b.score - a.score || a.order - b.order;
+    });
+  };
+
+  var makeSnippet = function (entry, query) {
+    var source = String(entry.text || "").replace(/\s+/g, " ").trim();
+    if (!source) return "開啟這一節查看整理內容與官方來源。";
+    var direct = String(query || "").trim().toLowerCase().split(/\s+/).filter(Boolean)[0] || "";
+    var at = source.toLowerCase().indexOf(direct);
+    var start = at > 48 ? at - 48 : 0;
+    var snippet = source.slice(start, start + 150);
+    return (start ? "…" : "") + snippet + (start + 150 < source.length ? "…" : "");
+  };
+
+  var renderSearch = function (entries, query) {
+    var cleaned = String(query || "").trim();
+    searchResults.textContent = "";
+    if (!cleaned) {
+      searchStatus.textContent = "輸入一個主題，或先點熱門搜尋。";
+      return;
+    }
+    var matches = searchEntries(entries, cleaned);
+    if (!matches.length) {
+      searchStatus.textContent = "找不到符合「" + cleaned + "」的內容。";
+      var empty = document.createElement("div");
+      empty.className = "site-search-empty";
+      var emptyTitle = document.createElement("strong");
+      emptyTitle.textContent = "換一個比較短的關鍵詞試試看";
+      var emptyCopy = document.createElement("p");
+      emptyCopy.textContent = "例如把「我被老闆拖欠薪水」縮成「欠薪」。如果網站真的缺這題，也可以回報建議。";
+      var emptyLink = document.createElement("a");
+      emptyLink.className = "btn ghost";
+      emptyLink.href = "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=idea.yml";
+      emptyLink.target = "_blank";
+      emptyLink.rel = "noopener noreferrer";
+      emptyLink.textContent = "告訴我們缺哪一題";
+      empty.appendChild(emptyTitle);
+      empty.appendChild(emptyCopy);
+      empty.appendChild(emptyLink);
+      searchResults.appendChild(empty);
+    } else {
+      searchStatus.textContent = "找到 " + matches.length + " 個相關段落，先顯示最接近的 " + Math.min(matches.length, 8) + " 個。";
+      var list = document.createElement("ol");
+      list.className = "site-search-results-list";
+      matches.slice(0, 8).forEach(function (match) {
+        var item = document.createElement("li");
+        var link = document.createElement("a");
+        link.href = match.entry.href;
+        var context = document.createElement("span");
+        context.className = "site-search-result-page";
+        context.textContent = match.entry.pageTitle;
+        var title = document.createElement("strong");
+        title.textContent = match.entry.title;
+        var snippet = document.createElement("span");
+        snippet.className = "site-search-result-snippet";
+        snippet.textContent = makeSnippet(match.entry, cleaned);
+        link.appendChild(context);
+        link.appendChild(title);
+        link.appendChild(snippet);
+        item.appendChild(link);
+        list.appendChild(item);
+      });
+      searchResults.appendChild(list);
+    }
+    window.dispatchEvent(new CustomEvent("whv:search", {
+      detail: { resultCount: matches.length, topPage: matches.length ? matches[0].entry.page : "none" }
+    }));
+  };
+
+  var closeSiteSearch = function () {
+    if (typeof searchDialog.close === "function") searchDialog.close();
+    else {
+      searchDialog.removeAttribute("open");
+      searchDialog.hidden = true;
+      searchOpen.focus();
+    }
+  };
+
+  var openSiteSearch = function (initialQuery) {
+    searchDialog.hidden = false;
+    if (typeof searchDialog.showModal === "function") {
+      if (!searchDialog.open) searchDialog.showModal();
+    } else {
+      searchDialog.setAttribute("open", "");
+    }
+    if (typeof initialQuery === "string") searchInput.value = initialQuery;
+    searchStatus.textContent = "正在準備本機搜尋索引…";
+    searchResults.textContent = "";
+    loadSearchIndex().then(function (entries) {
+      renderSearch(entries, searchInput.value);
+      window.setTimeout(function () { searchInput.focus(); searchInput.select(); }, 0);
+    }, function () {
+      searchStatus.textContent = "搜尋索引目前無法載入。你仍可使用上方導覽，或稍後重新整理再試。";
+      searchResults.textContent = "";
+    });
+  };
+  window.openWhvSearch = openSiteSearch;
+
+  searchOpen.addEventListener("click", function () { openSiteSearch(""); });
+  searchDialog.querySelector(".site-search-close").addEventListener("click", closeSiteSearch);
+  searchDialog.addEventListener("click", function (event) {
+    if (event.target === searchDialog) closeSiteSearch();
+  });
+  searchDialog.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    closeSiteSearch();
+  });
+  searchForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (!searchForm.checkValidity()) { searchForm.reportValidity(); return; }
+    loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); });
+  });
+  searchInput.addEventListener("input", function () {
+    loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); });
+  });
+  searchDialog.addEventListener("click", function (event) {
+    var quick = event.target.closest ? event.target.closest("[data-search-query]") : null;
+    if (!quick) return;
+    searchInput.value = quick.getAttribute("data-search-query");
+    loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); searchInput.focus(); });
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) return;
+    var target = event.target;
+    var tag = target && target.tagName ? target.tagName.toLowerCase() : "";
+    if (tag === "input" || tag === "textarea" || tag === "select" || (target && target.isContentEditable)) return;
+    event.preventDefault();
+    openSiteSearch("");
+  });
+
+  var homeSearchForm = document.getElementById("site-search-home-form");
+  if (homeSearchForm) {
+    var homeSearchInput = document.getElementById("site-search-home-input");
+    homeSearchForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var query = homeSearchInput.value.trim();
+      if (!query) { homeSearchInput.focus(); return; }
+      openSiteSearch(query);
+    });
+    document.addEventListener("click", function (event) {
+      var homeQuick = event.target.closest ? event.target.closest("[data-home-search-query]") : null;
+      if (!homeQuick) return;
+      var query = homeQuick.getAttribute("data-home-search-query");
+      homeSearchInput.value = query;
+      openSiteSearch(query);
+    });
+  }
+
   // ---------- 最近閱讀：只記錄白名單頁名，作為首頁的回訪續接 ----------
   var LAST_PAGE_KEY = "whv-last-page-v1";
   var JOURNEY_ORDER = [

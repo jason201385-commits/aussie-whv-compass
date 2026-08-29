@@ -159,6 +159,45 @@ if ($uniqueAssetVersions.Count -ne 1) {
   $errors++
 }
 
+# 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
+$mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
+$searchBuilder = Join-Path $dir 'scripts\build_search.py'
+$searchIndex = Join-Path $dir 'assets\search-index.js'
+if (-not (Test-Path $searchBuilder) -or -not (Test-Path $searchIndex)) {
+  Write-Output 'FAIL 缺站內搜尋 builder 或索引'
+  $errors++
+} else {
+  & python $searchBuilder --check
+  if ($LASTEXITCODE -ne 0) { Write-Output 'FAIL 站內搜尋索引過期或覆蓋不足'; $errors++ }
+}
+$searchScript = [regex]::Match($mainJs, '(?s)// ---------- 全站搜尋.*?// ---------- 最近閱讀')
+if (-not $searchScript.Success) {
+  Write-Output 'FAIL [main.js] 缺全站搜尋功能塊'
+  $errors++
+} else {
+  foreach ($searchNeedle in @(
+    'site-search-dialog',
+    'aria-haspopup',
+    'assets/search-index.js?v=',
+    'textContent = match.entry.title',
+    'textContent = makeSnippet',
+    'CustomEvent("whv:search"',
+    'event.key !== "/"',
+    'resultCount:',
+    'topPage:'
+  )) {
+    if (-not $searchScript.Value.Contains($searchNeedle)) { Write-Output "FAIL [main.js] 搜尋缺安全／鍵盤／量測界面：$searchNeedle"; $errors++ }
+  }
+  foreach ($forbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest')) {
+    if ($searchScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 搜尋不得保存或送出查詢：$forbidden"; $errors++ }
+  }
+  $searchVersion = [regex]::Match($searchScript.Value, 'assets/search-index\.js\?v=([0-9-]+)').Groups[1].Value
+  if ($uniqueAssetVersions.Count -eq 1 -and $searchVersion -ne $uniqueAssetVersions[0]) {
+    Write-Output "FAIL [main.js] 搜尋索引版本=$searchVersion，與全站資產版本=$($uniqueAssetVersions[0]) 不一致"
+    $errors++
+  }
+}
+
 # 租屋頁必須提供可直接行動的平台入口；第三方連結不帶追蹤碼，本站不接收訂房資料
 $housingText = [System.IO.File]::ReadAllText((Join-Path $dir 'housing.html'), [System.Text.Encoding]::UTF8)
 foreach ($housingNeedle in @(
