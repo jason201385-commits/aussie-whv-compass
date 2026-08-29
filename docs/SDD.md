@@ -25,8 +25,9 @@
   貢獻者也能改內容。不得引入 npm/bundler/framework，除非站長明示改變方針。
 - **部署**：GitHub Pages（main 分支根目錄，legacy build）。
   改檔 → commit → push 即自動部署（1–2 分鐘）。
-- **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。驗證剛部署的變更時要
-  cache-bust（`?v=` 或 JS 動態載入），否則會看到舊版並誤判失敗。
+- **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。全站本機 CSS／JS／資料檔
+  共用 `?v=20260829-1` 版本查詢碼；任何這些資產異動時，push 前必須全站同步升版。
+  驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
 - **外部依賴**：僅 Google Fonts（Noto Sans TC、Noto Serif TC）。其餘全部自含。
 
 ### 2.1 檔案地圖

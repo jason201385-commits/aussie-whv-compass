@@ -124,6 +124,7 @@ Pages 設定 enforce HTTPS；全站絕對連結（og、issue 連結）換新網�
 # 1) 結構＋內部連結＋錨點＋nav 數量（0 錯誤才過）
 #    逐頁檢查：<title>、</html>、單一 nav 12 連結、footer、assets 掛載
 #    href="*.html#anchor" 的檔案存在且錨點 id 存在
+#    本機 CSS／JS／資料檔皆有且共用同一個 ?v= 資產版本
 # 2) emoji 掃描（0 命中才過）：regex [\uD83C-\uD83E][\uDC00-\uDFFF]|️ 於 *.html 與 assets/*.js
 # 3) 集簽快查器測試組（線上或本地開頁跑 JS）：
 #    4880/plant=YES  2000/plant=NO  0870/tourism=YES  7215/tourism=YES

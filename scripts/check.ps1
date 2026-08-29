@@ -6,6 +6,7 @@ $ErrorActionPreference = 'Stop'
 $dir = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Join-Path $dir 'index.html'))) { $dir = (Get-Location).Path }
 $errors = 0
+$assetVersions = @()
 
 $pages = Get-ChildItem (Join-Path $dir '*.html') | Select-Object -ExpandProperty Name
 $anchors = @{}
@@ -22,6 +23,12 @@ foreach ($p in $pages) {
   if (-not $t.Contains('</html>'))      { Write-Output "FAIL [$p] 缺 </html>"; $errors++ }
   if (-not $t.Contains('site-footer'))  { Write-Output "FAIL [$p] 缺 footer"; $errors++ }
   if (-not $t.Contains('assets/main.js')) { Write-Output "FAIL [$p] 未掛 main.js"; $errors++ }
+
+  # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|tools\.js|postcodes\.js|seasons\.js)(?:\?v=([^"]+))?"')) {
+    if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
+    else { $assetVersions += $asset.Groups[1].Value }
+  }
 
   # 導覽：單一 nav、12 連結
   $navBlocks = [regex]::Matches($t, '<div class="nav-links">')
@@ -41,6 +48,11 @@ foreach ($p in $pages) {
       if ($anchors[$file] -notcontains $a) { Write-Output "FAIL [$p] 壞錨點 → $file$anc"; $errors++ }
     }
   }
+}
+$uniqueAssetVersions = @($assetVersions | Select-Object -Unique)
+if ($uniqueAssetVersions.Count -ne 1) {
+  Write-Output "FAIL 全站本機資產版本不一致：$(($uniqueAssetVersions) -join ', ')"
+  $errors++
 }
 
 # emoji 掃描（HTML + JS；SDD §4.4 禁用 emoji）
