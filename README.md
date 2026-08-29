@@ -33,7 +33,8 @@ Start 說成全站人工翻譯完成。
 
 英文第二階段已先上線一頁完整 editorial beta：[417／462 簽證與指定工作指南](https://www.aussiewhvcompass.com/lang/en/visa/)；
 它會依護照分流 417／462、保留兩套 specified-work 邊界，並提供明示只適用 417 的英文郵遞區號快查器。
-此頁尚未經母語移民專業人士校對，不標示為 reviewed。
+另有[英文找工作與職場權益指南](https://www.aussiewhvcompass.com/lang/en/work/)，涵蓋求職、雇主／薪資查核、
+職場紅旗、採收月份工具與官方求助路徑。兩頁均尚未經相應母語專業人士校對，不標示為 reviewed。
 
 GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連線 Google Analytics。
 站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；

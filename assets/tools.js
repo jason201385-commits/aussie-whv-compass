@@ -136,14 +136,52 @@
   if (seasonTool) {
     var seasonData = window.WHV_SEASONS;
     var seasonOut = document.getElementById("season-results");
+    var seasonSummary = document.getElementById("season-summary");
+    var seasonDetails = document.getElementById("season-details");
+    var seasonEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+    var seasonStateEn = {
+      NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", SA: "South Australia",
+      WA: "Western Australia", TAS: "Tasmania", NT: "Northern Territory", ACT: "Australian Capital Territory"
+    };
+    var seasonCropEn = {
+      "木瓜": "Papaya", "加工馬鈴薯": "Processing potatoes", "瓜類": "Melons", "白花椰菜": "Cauliflower",
+      "百香果": "Passionfruit", "西瓜": "Watermelon", "杏桃": "Apricots", "芒果": "Mangoes",
+      "岩瓜": "Rockmelons", "青花菜": "Broccoli", "青貯與乾草": "Silage and hay", "南瓜": "Pumpkins",
+      "哈密瓜": "Muskmelons", "柑橘": "Citrus", "紅毛丹": "Rambutans", "胡蘿蔔": "Carrots",
+      "香蕉": "Bananas", "夏季水果": "Summer fruit", "草莓": "Strawberries", "乾果": "Dried fruit",
+      "剪羊毛旺季": "Peak shearing", "剪羊毛與修剪": "Shearing and crutching", "啤酒花採收": "Hop harvest",
+      "啤酒花牽引與整枝": "Hop stringing and training", "梨": "Pears", "球芽甘藍": "Brussels sprouts",
+      "甜菜根": "Beetroot", "莓果": "Berries", "棗": "Dates", "棚內剪羊毛助手": "Shearing shed hands",
+      "椰子": "Coconuts", "腰果": "Cashews", "葉菜種植與採收": "Leafy vegetable planting and harvest",
+      "葡萄柚": "Grapefruit", "酪梨": "Avocados", "種薯": "Seed potatoes", "蜜瓜": "Honeydew melons",
+      "鳳梨": "Pineapples", "穀物": "Grain", "蔬菜": "Vegetables", "橙": "Oranges",
+      "蕪菁甘藍": "Swedes", "鮮食葡萄": "Table grapes", "檸檬與萊姆": "Lemons and limes",
+      "藍莓": "Blueberries", "覆盆莓": "Raspberries", "犢牛飼育": "Calf rearing", "蘋果": "Apples",
+      "蘋果與梨": "Apples and pears", "櫻桃": "Cherries", "釀酒葡萄修剪": "Wine-grape pruning",
+      "釀酒葡萄採收": "Wine-grape harvest"
+    };
+    var seasonRegionEn = {
+      "北部": "North", "北部、西北部": "North and North West", "北部、西北部、南部": "North, North West and South",
+      "北部、南部": "North and South", "西北部、南部": "North West and South", "南部": "South",
+      "產區由北往南開始採收": "Harvest moves from northern to southern growing areas",
+      "Darwin、Katherine": "Darwin and Katherine", "Darwin、Katherine、Alice Springs": "Darwin, Katherine and Alice Springs",
+      "Goulburn Valley、Yarra Valley": "Goulburn Valley and Yarra Valley", "Katherine、Alice Springs": "Katherine and Alice Springs",
+      "North East Victoria、Goulburn Valley、Yarra Valley、Dandenongs、Sunraysia": "North East Victoria, Goulburn Valley, Yarra Valley, Dandenongs and Sunraysia",
+      "Sunraysia、Swan Hill": "Sunraysia and Swan Hill", "Sunraysia、Werribee、East and West Gippsland": "Sunraysia, Werribee, East and West Gippsland",
+      "Swan Hill、Goulburn Valley": "Swan Hill and Goulburn Valley", "Warrnambool 至 Wodonga 一帶": "Warrnambool to Wodonga region",
+      "Yarra Valley、Mornington Peninsula": "Yarra Valley and Mornington Peninsula"
+    };
 
     var seasonSourceLink = function (source) {
-      return '<a href="' + source.url + '" rel="noopener">官方表</a>';
+      return '<a href="' + source.url + '" rel="noopener">' + (seasonEnglish ? "Official table" : "官方表") + '</a>';
     };
 
     var renderSeason = function (month) {
-      if (!seasonData || !seasonOut) {
-        if (seasonOut) seasonOut.innerHTML = '<p class="warn">採收資料沒有載入，請重新整理後再試。</p>';
+      if (!seasonData || !seasonOut || !seasonSummary || !seasonDetails) {
+        if (seasonSummary) seasonSummary.textContent = seasonEnglish
+          ? 'Harvest data could not be loaded. Refresh the page and try again.'
+          : '採收資料沒有載入，請重新整理後再試。';
+        if (seasonDetails) seasonDetails.innerHTML = '';
         return;
       }
 
@@ -156,8 +194,10 @@
         var source = seasonData.sources[state.code];
         if (!source) {
           return '<article class="season-state season-state-missing">'
-            + '<h4><span>' + state.code + '</span>' + state.name + '</h4>'
-            + '<p>本次查核未找到可直接轉成採收月份的州政府表格。</p>'
+            + '<h4><span>' + state.code + '</span>' + (seasonEnglish ? seasonStateEn[state.code] : state.name) + '</h4>'
+            + '<p>' + (seasonEnglish
+              ? 'No state or territory government table suitable for month-by-month conversion was found in this review.'
+              : '本次查核未找到可直接轉成採收月份的州政府表格。') + '</p>'
             + '</article>';
         }
 
@@ -165,20 +205,27 @@
         if (matches.length) verifiedCount++;
         var items = matches.length
           ? '<ul>' + matches.map(function (entry) {
-              return '<li><strong>' + entry.crop + '</strong><span>' + entry.region + '</span></li>';
+              return '<li><strong>' + (seasonEnglish ? (seasonCropEn[entry.crop] || entry.crop) : entry.crop) + '</strong><span>'
+                + (seasonEnglish ? (seasonRegionEn[entry.region] || entry.region) : entry.region) + '</span></li>';
             }).join("") + '</ul>'
-          : '<p>官方表在這個月沒有列出項目。</p>';
+          : '<p>' + (seasonEnglish ? 'The official table lists no item for this month.' : '官方表在這個月沒有列出項目。') + '</p>';
 
         return '<article class="season-state' + (matches.length ? ' is-active' : '') + '">'
-          + '<h4><span>' + state.code + '</span>' + state.name + '</h4>'
+          + '<h4><span>' + state.code + '</span>' + (seasonEnglish ? seasonStateEn[state.code] : state.name) + '</h4>'
           + items
-          + '<p class="fact-meta">' + seasonSourceLink(source) + '・頁面日期 ' + source.pageDate + '</p>'
+          + '<p class="fact-meta">' + seasonSourceLink(source) + (seasonEnglish ? ' · page date ' : '・頁面日期 ')
+          + (seasonEnglish && source.pageDate === '未標示' ? 'not stated' : source.pageDate) + '</p>'
           + '</article>';
       }).join("");
 
-      seasonOut.innerHTML = '<p class="season-summary"><strong>' + month + ' 月：</strong>有 ' + verifiedCount + ' 個州／領地在官方表中列出項目</p>'
-        + '<div class="season-grid">' + cards + '</div>'
-        + '<p class="season-caveat">這是政府公布的採收／供應月份，不是職缺保證。天候、品種與產區會讓日期前後移動，出發前仍要向雇主確認班次。</p>';
+      seasonSummary.innerHTML = seasonEnglish
+        ? '<strong>Month ' + month + ':</strong> ' + verifiedCount + ' state or territory government table(s) list an item'
+        : '<strong>' + month + ' 月：</strong>有 ' + verifiedCount + ' 個州／領地在官方表中列出項目';
+      seasonDetails.innerHTML = seasonEnglish
+        ? '<div class="season-grid">' + cards + '</div>'
+          + '<p class="season-caveat">These are government-published harvest or availability months, not a promise of vacancies. Weather, varieties and local growing areas can shift dates. Confirm actual shifts with the employer before travelling.</p>'
+        : '<div class="season-grid">' + cards + '</div>'
+          + '<p class="season-caveat">這是政府公布的採收／供應月份，不是職缺保證。天候、品種與產區會讓日期前後移動，出發前仍要向雇主確認班次。</p>';
     };
 
     seasonTool.querySelectorAll("[data-season-month]").forEach(function (button) {

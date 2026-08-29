@@ -18,7 +18,7 @@ LAST_MODIFIED = "2026-08-29"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
-FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/"]
+FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/", f"{ORIGIN}/lang/en/work/"]
 PAGES = [
     "index.html",
     "why.html",
@@ -211,6 +211,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
             f"- [GitHub 原始碼](https://github.com/jason201385-commits/aussie-whv-compass): 可檢視內容版本與提出修正。",
             f"- [多國語言 Quick Start]({ORIGIN}/lang/): 目前 417／462 護照國家的主要語言入口；機器翻譯需社群校對，官方來源優先。",
             f"- [English visa and specified-work guide]({ORIGIN}/lang/en/visa/): passport-neutral 417／462 guidance, a subclass 417 postcode checker and official source links; editorial beta, not government advice.",
+            f"- [English work and workplace-rights guide]({ORIGIN}/lang/en/work/): job-search routes, employer and pay checks, harvest timing and official help paths; editorial beta, not legal or tax advice.",
             "- 文字內容採 CC BY-SA 4.0；程式碼採 MIT。轉載或改作時請註明澳打指南針與原頁網址，並遵守相同方式分享的授權條件。",
             "- 不要把社群經驗、估算值或互動工具輸出描述成官方判定；請保留頁面上的查核日期與限制。",
             "",

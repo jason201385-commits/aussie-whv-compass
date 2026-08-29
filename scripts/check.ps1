@@ -332,6 +332,93 @@ if (-not (Test-Path $englishVisaPath)) {
   }
 }
 
+# 完整英文工作頁：跨護照適用、工資與雇傭邊界、英文採收工具及官方求助路徑不得遺失
+$englishWorkPath = Join-Path $dir 'lang\en\work\index.html'
+if (-not (Test-Path $englishWorkPath)) {
+  Write-Output 'FAIL 缺完整英文工作頁：lang/en/work/'
+  $errors++
+} else {
+  $englishWorkText = [System.IO.File]::ReadAllText($englishWorkPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    '<meta name="viewport"',
+    'data-i18n-topic="work"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/work/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/work.html">',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking Australian workplace-relations professional',
+    'AUD 26.44 per hour',
+    'AUD 33.05 per hour',
+    'within <strong>one working day</strong> of payday',
+    'An active ABN proves registration details only',
+    'sham contracting',
+    'id="season-calendar"',
+    'aria-label="Choose a month"',
+    'id="season-summary" class="season-summary" aria-live="polite" aria-atomic="true"',
+    'visa-protections-pilot-programs',
+    'site-footer',
+    '/assets/seasons.js?v=',
+    '/assets/tools.js?v='
+  )) {
+    if (-not $englishWorkText.Contains($needle)) { Write-Output "FAIL [lang/en/work/] 缺內容、來源或安全邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishWorkText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishWorkText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/work/] 必須只有一個 h1 與 main'
+    $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishWorkText, '<a href="#([^"]+)"')) {
+    if (-not $englishWorkText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/work/] TOC 錨點不存在：$($anchor.Groups[1].Value)"
+      $errors++
+    }
+  }
+  $englishWorkIds = [regex]::Matches($englishWorkText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishWorkIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/work/] 含重複 id'
+    $errors++
+  }
+  $englishWorkAssetVersions = @([regex]::Matches($englishWorkText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|tools\.js|seasons\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishWorkAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishWorkAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/work/] 資產版本與全站不一致：$(($englishWorkAssetVersions) -join ', ')"
+    $errors++
+  }
+  foreach ($link in [regex]::Matches($englishWorkText, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/work/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  $englishWorkJsonText = [regex]::Match($englishWorkText, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+  try {
+    $englishWorkJson = $englishWorkJsonText | ConvertFrom-Json
+    if ($englishWorkJson.'@context' -ne 'https://schema.org' -or -not $englishWorkJson.'@graph') {
+      Write-Output 'FAIL [lang/en/work/] JSON-LD 缺 schema.org context 或 graph'; $errors++
+    }
+  } catch { Write-Output 'FAIL [lang/en/work/] JSON-LD 不是合法 JSON'; $errors++ }
+
+  $traditionalWorkText = [System.IO.File]::ReadAllText((Join-Path $dir 'work.html'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/work/">',
+    '<body data-i18n-topic="work">'
+  )) {
+    if (-not $traditionalWorkText.Contains($needle)) { Write-Output "FAIL [work.html] 缺英文 reciprocal hreflang 或主題標記：$needle"; $errors++ }
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/work/">')) {
+    Write-Output 'FAIL [lang/en/] 工作卡未連到完整英文頁'; $errors++
+  }
+  $seasonToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @('var seasonEnglish =', 'var seasonCropEn =', 'government-published harvest or availability months', 'No state or territory government table')) {
+    if (-not $seasonToolsText.Contains($needle)) { Write-Output "FAIL [tools.js] 採收工具缺英文輸出或誠實 fallback：$needle"; $errors++ }
+  }
+  $i18nWorkText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  if (-not $i18nWorkText.Contains('"work":{"zh-Hant":"/work.html","en":"/lang/en/work/"}')) {
+    Write-Output 'FAIL [i18n.js] 缺工作主題中英文路由'; $errors++
+  }
+  $seasonScriptAt = $englishWorkText.IndexOf('<script src="/assets/seasons.js?v=')
+  $workToolsScriptAt = $englishWorkText.IndexOf('<script src="/assets/tools.js?v=')
+  if ($seasonScriptAt -lt 0 -or $workToolsScriptAt -lt 0 -or $seasonScriptAt -gt $workToolsScriptAt) {
+    Write-Output 'FAIL [lang/en/work/] seasons.js 必須在 tools.js 前載入'; $errors++
+  }
+}
+
 # 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
 $searchBuilder = Join-Path $dir 'scripts\build_search.py'
@@ -486,6 +573,7 @@ if (-not (Test-Path $sitemapPath)) {
     $expectedUrls += "$canonicalOrigin/lang/"
     $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
     $expectedUrls += "$canonicalOrigin/lang/en/visa/"
+    $expectedUrls += "$canonicalOrigin/lang/en/work/"
   }
   if ($sitemapUrls.Count -ne $expectedUrls.Count) {
     Write-Output "FAIL sitemap 頁數=$($sitemapUrls.Count)（應為 $($expectedUrls.Count)）"
@@ -525,7 +613,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/work/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }
