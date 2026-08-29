@@ -128,6 +128,25 @@ if ($uniqueAssetVersions.Count -ne 1) {
   $errors++
 }
 
+# 租屋頁必須提供可直接行動的平台入口；第三方連結不帶追蹤碼，本站不接收訂房資料
+$housingText = [System.IO.File]::ReadAllText((Join-Path $dir 'housing.html'), [System.Text.Encoding]::UTF8)
+foreach ($housingNeedle in @(
+  'id="book"',
+  'https://www.hostelworld.com/hostels/oceania/australia/perth/',
+  'https://www.booking.com/city/au/perth.html',
+  'https://flatmates.com.au/rooms/perth',
+  'https://www.realestate.com.au/rent/in-perth,+wa+6000/list-1',
+  'https://www.domain.com.au/rent/perth-wa-6000/',
+  'https://www.consumerprotection.wa.gov.au/rental-bonds',
+  '本站沒有聯盟分潤、沒有代訂'
+)) {
+  if (-not $housingText.Contains($housingNeedle)) { Write-Output "FAIL [housing.html] 缺租屋行動入口或邊界：$housingNeedle"; $errors++ }
+}
+if ($housingText -match '(?i)(utm_|affiliate|aff_id=)') {
+  Write-Output 'FAIL [housing.html] 住宿平台連結不得含追蹤或聯盟參數'
+  $errors++
+}
+
 # GitHub Pages 自訂網域必須鎖定正式 www 主機名
 $cnamePath = Join-Path $dir 'CNAME'
 if (-not (Test-Path $cnamePath)) {
