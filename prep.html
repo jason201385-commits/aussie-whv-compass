@@ -148,6 +148,25 @@
     <div id="prep-checklist"></div>
     <div class="ws-actions"><button type="button" class="btn ghost" id="prep-reset">清空重來</button></div>
   </div>
+
+  <div class="tool poster-maker" id="prep-poster">
+    <span class="tool-tag">全程留在本機</span>
+    <h3>我的行前海報</h3>
+    <p>把自我釐清重點、清單進度與存錢試算結果排成 A4 直式 PNG。圖片只在這台裝置生成，不會上傳。</p>
+    <div class="poster-source-links">
+      <a href="why.html">補自我釐清</a>
+      <a href="cost.html#math">重算存錢計畫</a>
+    </div>
+    <div class="poster-actions">
+      <button type="button" class="btn" id="poster-download">下載我的 PNG 海報</button>
+      <a class="btn secondary" id="poster-save-link" download="我的澳打行前海報.png" hidden>再次下載 PNG</a>
+    </div>
+    <p class="ws-status" id="poster-status" aria-live="polite"></p>
+    <figure class="poster-preview" id="poster-preview-wrap" hidden>
+      <img id="poster-preview" alt="我的澳洲打工度假行前海報預覽">
+      <figcaption>若手機沒有自動下載，可長按上方預覽圖儲存。</figcaption>
+    </figure>
+  </div>
 </main>
 
 <footer class="site-footer">

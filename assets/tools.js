@@ -158,6 +158,16 @@
     var hours = document.getElementById("calc-hours");
     var city = document.getElementById("calc-city");
     var life = document.getElementById("calc-life");
+    var CALC_KEY = "whv-save-calc-v1";
+    try {
+      var savedCalc = JSON.parse(localStorage.getItem(CALC_KEY) || "null");
+      if (savedCalc) {
+        if (Number(savedCalc.rate) >= 24 && Number(savedCalc.rate) <= 45) rate.value = savedCalc.rate;
+        if (Number(savedCalc.hours) >= 0 && Number(savedCalc.hours) <= 50) hours.value = savedCalc.hours;
+        if (Array.prototype.some.call(city.options, function (o) { return o.value === String(savedCalc.city); })) city.value = savedCalc.city;
+        if (Array.prototype.some.call(life.options, function (o) { return o.value === String(savedCalc.life); })) life.value = savedCalc.life;
+      }
+    } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
     var update = function () {
       var r = parseFloat(rate.value), h = parseFloat(hours.value);
       document.getElementById("calc-rate-out").textContent = "$" + r.toFixed(2);
@@ -181,6 +191,22 @@
       else if (save < 250) { v.textContent = "存得到但很慢——這是體驗優先的過法，錢別指望太多。"; v.className = "result-verdict"; }
       else if (save < 550) { v.textContent = "穩健路線——一年下來是一筆有感的錢。"; v.className = "result-verdict result-ok"; }
       else { v.textContent = "存錢機器模式——記得留一點預算給體驗，別把一年過成只有班表。"; v.className = "result-verdict result-ok"; }
+      try {
+        localStorage.setItem(CALC_KEY, JSON.stringify({
+          rate: r,
+          hours: h,
+          city: city.value,
+          cityLabel: city.selectedOptions[0].textContent,
+          life: life.value,
+          lifeLabel: life.selectedOptions[0].textContent,
+          gross: gross,
+          net: net,
+          expenses: rent + living,
+          weeklySave: save,
+          yearlySave: yearly,
+          updated: new Date().toISOString()
+        }));
+      } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
     };
     [rate, hours, city, life].forEach(function (el) { el.addEventListener("input", update); });
     update();
@@ -252,6 +278,251 @@
       if (!confirm("清空所有勾選？")) return;
       checklist.querySelectorAll("input").forEach(function (c) { c.checked = false; });
       refresh();
+    });
+  }
+
+  /* ================= 我的行前海報（prep.html） ================= */
+  var posterTool = document.getElementById("prep-poster");
+  if (posterTool) {
+    var posterButton = document.getElementById("poster-download");
+    var posterStatus = document.getElementById("poster-status");
+    var posterPreviewWrap = document.getElementById("poster-preview-wrap");
+    var posterPreview = document.getElementById("poster-preview");
+    var posterSaveLink = document.getElementById("poster-save-link");
+    var posterUrl = null;
+
+    var readStored = function (key) {
+      try { return JSON.parse(localStorage.getItem(key) || "null"); }
+      catch (e) { return null; }
+    };
+
+    var roundRect = function (ctx, x, y, width, height, radius) {
+      var r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    };
+
+    var wrapPosterText = function (ctx, value, maxWidth, maxLines) {
+      var chars = Array.from(String(value || "").replace(/\s+/g, " ").trim());
+      if (!chars.length) return ["尚未填寫"];
+      var lines = [], line = "";
+      chars.forEach(function (ch) {
+        var next = line + ch;
+        if (line && ctx.measureText(next).width > maxWidth) {
+          lines.push(line);
+          line = ch;
+        } else {
+          line = next;
+        }
+      });
+      if (line) lines.push(line);
+      if (lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        var last = lines[maxLines - 1];
+        while (last && ctx.measureText(last + "…").width > maxWidth) last = last.slice(0, -1);
+        lines[maxLines - 1] = last + "…";
+      }
+      return lines;
+    };
+
+    var drawWrapped = function (ctx, value, x, y, maxWidth, lineHeight, maxLines) {
+      var lines = wrapPosterText(ctx, value, maxWidth, maxLines);
+      lines.forEach(function (line, index) { ctx.fillText(line, x, y + index * lineHeight); });
+      return y + lines.length * lineHeight;
+    };
+
+    var drawPosterPanel = function (ctx, x, y, width, height, fill) {
+      ctx.save();
+      ctx.fillStyle = "#221d15";
+      roundRect(ctx, x + 10, y + 10, width, height, 28);
+      ctx.fill();
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = "#221d15";
+      ctx.lineWidth = 5;
+      roundRect(ctx, x, y, width, height, 28);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    var makePoster = function (worksheet, prepData, calcData) {
+      var canvas = document.createElement("canvas");
+      canvas.width = 1240;
+      canvas.height = 1754;
+      var ctx = canvas.getContext("2d");
+      var done = Object.keys(prepData || {}).filter(function (key) { return prepData[key] === true; }).length;
+      var total = 21;
+      var pct = Math.round(done / total * 100);
+      var pending = Array.prototype.slice.call(document.querySelectorAll("#prep-checklist input:not(:checked)"), 0, 3).map(function (box) {
+        var text = box.closest("label").querySelector("span");
+        return text ? text.textContent : "待完成項目";
+      });
+
+      ctx.fillStyle = "#f6f1e7";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "#221d15";
+      ctx.lineWidth = 8;
+      ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
+
+      ctx.fillStyle = "#e6b83f";
+      ctx.beginPath();
+      ctx.moveTo(930, 38);
+      ctx.bezierCurveTo(1140, 25, 1240, 105, 1205, 290);
+      ctx.bezierCurveTo(1100, 235, 1000, 300, 900, 215);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#3f7252";
+      ctx.beginPath();
+      ctx.moveTo(34, 1480);
+      ctx.bezierCurveTo(150, 1400, 265, 1490, 250, 1720);
+      ctx.lineTo(34, 1720);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#c44d2b";
+      ctx.font = '900 28px "Noto Sans TC", sans-serif';
+      ctx.fillText("AUSSIE WHV COMPASS", 86, 112);
+      ctx.fillStyle = "#221d15";
+      ctx.font = '900 78px "Noto Serif TC", Georgia, serif';
+      ctx.fillText("我的澳打行前海報", 82, 210);
+      ctx.font = '500 25px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = "#6b6257";
+      ctx.fillText("產生日期 " + new Date().toLocaleDateString("zh-TW") + " ・ 全程在你的裝置上生成", 86, 260);
+
+      drawPosterPanel(ctx, 82, 305, 1076, 215, "#e9d79a");
+      ctx.fillStyle = "#221d15";
+      ctx.font = '900 31px "Noto Sans TC", sans-serif';
+      ctx.fillText("行前清單進度", 120, 360);
+      ctx.font = '900 78px "Noto Serif TC", Georgia, serif';
+      ctx.fillText(done + " / " + total, 120, 452);
+      ctx.textAlign = "right";
+      ctx.font = '900 34px "Noto Sans TC", sans-serif';
+      ctx.fillText(pct + "%", 1110, 420);
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#fffdf8";
+      roundRect(ctx, 580, 438, 530, 30, 15);
+      ctx.fill();
+      if (pct > 0) {
+        ctx.fillStyle = "#c44d2b";
+        roundRect(ctx, 580, 438, 530 * pct / 100, 30, 15);
+        ctx.fill();
+      }
+
+      drawPosterPanel(ctx, 82, 555, 1076, 480, "#fffdf8");
+      ctx.fillStyle = "#c44d2b";
+      ctx.font = '900 29px "Noto Sans TC", sans-serif';
+      ctx.fillText("方向與底線", 120, 612);
+      var answerRows = [
+        ["為什麼出發", worksheet.q1],
+        ["最重要的收穫", worksheet.q4 || worksheet.q5],
+        ["停留與集簽計畫", worksheet.q6],
+        ["我的止損線", worksheet.q7]
+      ];
+      var rowY = 660;
+      answerRows.forEach(function (row) {
+        ctx.fillStyle = "#3f7252";
+        ctx.font = '800 23px "Noto Sans TC", sans-serif';
+        ctx.fillText(row[0], 120, rowY);
+        ctx.fillStyle = row[1] ? "#221d15" : "#8a8175";
+        ctx.font = '600 27px "Noto Sans TC", sans-serif';
+        drawWrapped(ctx, row[1], 330, rowY, 775, 35, 2);
+        rowY += 98;
+      });
+
+      drawPosterPanel(ctx, 82, 1070, 1076, 285, "#dfeae2");
+      ctx.fillStyle = "#221d15";
+      ctx.font = '900 29px "Noto Sans TC", sans-serif';
+      ctx.fillText("接下來三件事", 120, 1128);
+      ctx.font = '600 25px "Noto Sans TC", sans-serif';
+      if (!pending.length) pending = ["行前清單已全部完成，出發前再做最後一次文件確認"];
+      pending.forEach(function (item, index) {
+        ctx.fillStyle = "#c44d2b";
+        ctx.fillText(String(index + 1).padStart(2, "0"), 122, 1185 + index * 57);
+        ctx.fillStyle = "#221d15";
+        drawWrapped(ctx, item, 180, 1185 + index * 57, 900, 31, 1);
+      });
+
+      drawPosterPanel(ctx, 82, 1390, 1076, 230, "#f6c8b9");
+      ctx.fillStyle = "#221d15";
+      ctx.font = '900 29px "Noto Sans TC", sans-serif';
+      ctx.fillText("存錢計畫", 120, 1448);
+      if (calcData && Number.isFinite(Number(calcData.yearlySave))) {
+        ctx.font = '900 58px "Noto Serif TC", Georgia, serif';
+        ctx.fillText("A$" + Math.round(calcData.yearlySave).toLocaleString("en-AU"), 120, 1535);
+        ctx.font = '600 23px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = "#6b3b2c";
+        ctx.fillText("年存款粗估（46 週）", 120, 1580);
+        ctx.fillStyle = "#221d15";
+        ctx.font = '700 25px "Noto Sans TC", sans-serif';
+        ctx.fillText("時薪 A$" + Number(calcData.rate).toFixed(2) + " ・ 每週 " + calcData.hours + " 小時", 650, 1502);
+        ctx.font = '500 21px "Noto Sans TC", sans-serif';
+        drawWrapped(ctx, calcData.cityLabel + " ・ " + calcData.lifeLabel, 650, 1548, 440, 29, 2);
+      } else {
+        ctx.font = '600 28px "Noto Sans TC", sans-serif';
+        ctx.fillText("尚未跑過存錢試算器", 120, 1530);
+      }
+
+      ctx.fillStyle = "#221d15";
+      ctx.font = '700 21px "Noto Sans TC", sans-serif';
+      ctx.fillText("澳打指南針 ・ 永久免費 ・ 資料只留在本機", 420, 1690);
+      return canvas;
+    };
+
+    posterButton.addEventListener("click", function () {
+      var worksheet = readStored("whv-worksheet-v1") || {};
+      var prepData = readStored("whv-prep-check-v1") || {};
+      var calcData = readStored("whv-save-calc-v1");
+      var hasWorksheet = Object.keys(worksheet).some(function (key) { return String(worksheet[key] || "").trim(); });
+      var hasChecklist = Object.keys(prepData).some(function (key) { return prepData[key] === true; });
+      var hasCalc = calcData && Number.isFinite(Number(calcData.yearlySave));
+
+      if (!hasWorksheet && !hasChecklist && !hasCalc) {
+        posterStatus.textContent = "目前沒有可放上海報的內容。先填自我釐清、勾一項清單，或跑一次存錢試算器。";
+        posterPreviewWrap.hidden = true;
+        return;
+      }
+
+      posterButton.disabled = true;
+      posterStatus.textContent = "正在排版 PNG…";
+      var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+      fontsReady.then(function () {
+        var canvas = makePoster(worksheet, prepData, calcData);
+        var finishDownload = function (href) {
+          posterPreview.src = href;
+          posterPreviewWrap.hidden = false;
+          posterSaveLink.href = href;
+          posterSaveLink.hidden = false;
+          posterSaveLink.click();
+          posterStatus.textContent = "PNG 已產生。若手機沒有自動下載，可長按預覽圖儲存。";
+          posterButton.disabled = false;
+        };
+
+        if (canvas.toBlob) {
+          canvas.toBlob(function (blob) {
+            if (!blob) {
+              finishDownload(canvas.toDataURL("image/png"));
+              return;
+            }
+            if (posterUrl) URL.revokeObjectURL(posterUrl);
+            posterUrl = URL.createObjectURL(blob);
+            finishDownload(posterUrl);
+          }, "image/png");
+        } else {
+          finishDownload(canvas.toDataURL("image/png"));
+        }
+      }).catch(function () {
+        posterStatus.textContent = "這個瀏覽器無法產生海報，請更新瀏覽器後再試。";
+        posterButton.disabled = false;
+      });
     });
   }
 

@@ -565,6 +565,28 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 }
 .progress-label { font-size: .88rem; color: var(--ink-soft); text-align: right; font-weight: 700; }
 
+/* ---------- 行前海報 ---------- */
+.poster-maker { margin-top: 24px; }
+.poster-source-links { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 18px; }
+.poster-source-links a {
+  color: var(--ink);
+  font-size: .86rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.poster-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.poster-actions .btn { min-height: 44px; }
+.poster-preview { margin: 20px 0 0; }
+.poster-preview img {
+  display: block;
+  width: min(100%, 420px);
+  height: auto;
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-pop-sm);
+}
+.poster-preview figcaption { margin-top: 10px; color: var(--ink-soft); font-size: .82rem; }
+
 /* 互動清單 */
 .icheck { list-style: none; padding: 0; }
 .icheck li { margin: 0; }
