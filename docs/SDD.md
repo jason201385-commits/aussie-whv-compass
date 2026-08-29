@@ -55,6 +55,7 @@
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化回饋表單（report.yml／idea.yml／thanks.yml／config.yml） |
+| `CNAME`／`sitemap.xml`／`robots.txt` | 正式網域、13 頁搜尋探索清單與 sitemap 宣告 |
 | `docs/` | 本文件與 SPEC |
 
 ### 2.2 頁面共同結構

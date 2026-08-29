@@ -73,6 +73,42 @@ if (-not (Test-Path $cnamePath)) {
   $errors++
 }
 
+# 搜尋探索：sitemap 必須完整列出 13 頁，robots 必須宣告同一份 sitemap
+$sitemapPath = Join-Path $dir 'sitemap.xml'
+if (-not (Test-Path $sitemapPath)) {
+  Write-Output 'FAIL 缺 sitemap.xml'
+  $errors++
+} else {
+  $sitemapText = [System.IO.File]::ReadAllText($sitemapPath, [System.Text.Encoding]::UTF8)
+  $sitemapUrls = @([regex]::Matches($sitemapText, '<loc>([^<]+)</loc>') | ForEach-Object { $_.Groups[1].Value })
+  $expectedUrls = @($pages | ForEach-Object {
+    if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
+  })
+  if ($sitemapUrls.Count -ne $expectedUrls.Count) {
+    Write-Output "FAIL sitemap 頁數=$($sitemapUrls.Count)（應為 $($expectedUrls.Count)）"
+    $errors++
+  }
+  foreach ($url in $expectedUrls) {
+    if ($sitemapUrls -notcontains $url) { Write-Output "FAIL sitemap 缺頁面：$url"; $errors++ }
+  }
+  if (@($sitemapUrls | Select-Object -Unique).Count -ne $sitemapUrls.Count) {
+    Write-Output 'FAIL sitemap 含重複網址'
+    $errors++
+  }
+}
+
+$robotsPath = Join-Path $dir 'robots.txt'
+if (-not (Test-Path $robotsPath)) {
+  Write-Output 'FAIL 缺 robots.txt'
+  $errors++
+} else {
+  $robotsText = [System.IO.File]::ReadAllText($robotsPath, [System.Text.Encoding]::UTF8)
+  if (-not $robotsText.Contains("Sitemap: $canonicalOrigin/sitemap.xml")) {
+    Write-Output 'FAIL robots.txt 未宣告正式 sitemap'
+    $errors++
+  }
+}
+
 # emoji 掃描（HTML + JS；SDD §4.4 禁用 emoji）
 $scanTargets = (Get-ChildItem (Join-Path $dir '*.html')) + (Get-ChildItem (Join-Path $dir 'assets\*.js'))
 foreach ($f in $scanTargets) {
