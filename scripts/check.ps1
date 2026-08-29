@@ -67,7 +67,7 @@ if (-not (Test-Path $notFoundPath)) {
     Write-Output 'FAIL [404.html] 錯誤頁不得宣告 canonical 或 og:url'
     $errors++
   }
-  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output 'FAIL [404.html] 本機資產缺 ?v= 版本'; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -89,6 +89,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains('</html>'))      { Write-Output "FAIL [$p] 缺 </html>"; $errors++ }
   if (-not $t.Contains('site-footer'))  { Write-Output "FAIL [$p] 缺 footer"; $errors++ }
   if (-not $t.Contains('assets/main.js')) { Write-Output "FAIL [$p] 未掛 main.js"; $errors++ }
+  if (-not $t.Contains('assets/i18n.js')) { Write-Output "FAIL [$p] 未掛多國語言切換"; $errors++ }
 
   # 搜尋引擎與 AI 探索：每頁描述自身的 Open Graph 分享圖、crawler 指令與 JSON-LD
   foreach ($seoNeedle in @(
@@ -129,7 +130,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
-  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|tools\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -207,9 +208,40 @@ foreach ($p in $allPages) {
   $analyticsPageText = [System.IO.File]::ReadAllText((Join-Path $dir $p), [System.Text.Encoding]::UTF8)
   $configAt = $analyticsPageText.IndexOf('<script src="assets/analytics-config.js?v=')
   $loaderAt = $analyticsPageText.IndexOf('<script src="assets/analytics.js?v=')
+  $i18nAt = $analyticsPageText.IndexOf('<script src="assets/i18n.js?v=')
   $mainAt = $analyticsPageText.IndexOf('<script src="assets/main.js?v=')
-  if ($configAt -lt 0 -or $loaderAt -lt 0 -or $mainAt -lt 0 -or -not ($configAt -lt $loaderAt -and $loaderAt -lt $mainAt)) {
-    Write-Output "FAIL [$p] GA4 config／loader／main.js 缺少或順序錯誤"
+  if ($configAt -lt 0 -or $loaderAt -lt 0 -or $i18nAt -lt 0 -or $mainAt -lt 0 -or -not ($configAt -lt $loaderAt -and $loaderAt -lt $i18nAt -and $i18nAt -lt $mainAt)) {
+    Write-Output "FAIL [$p] GA4 config／loader／i18n／main.js 缺少或順序錯誤"
+    $errors++
+  }
+}
+
+# 多國語言 Quick Start：來源名單、產物、RTL 與 fallback 狀態必須可重建且誠實標示
+$i18nBuilder = Join-Path $dir 'scripts\build_i18n.py'
+$i18nDataPath = Join-Path $dir 'assets\i18n-locales.json'
+if (-not (Test-Path $i18nBuilder) -or -not (Test-Path $i18nDataPath)) {
+  Write-Output 'FAIL 缺多國語言 builder 或 locale registry'
+  $errors++
+} else {
+  & python $i18nBuilder --check
+  if ($LASTEXITCODE -ne 0) { Write-Output 'FAIL 多國語言產物過期'; $errors++ }
+  $i18nData = Get-Content -Raw $i18nDataPath | ConvertFrom-Json
+  $localeCount = @($i18nData.locales.PSObject.Properties).Count
+  if ($localeCount -ne 38) { Write-Output "FAIL 多國語言數=$localeCount（應為 38）"; $errors++ }
+  if (@($i18nData.countries).Count -ne 49) { Write-Output "FAIL WHM 護照國家／地區數=$(@($i18nData.countries).Count)（應為 49）"; $errors++ }
+  foreach ($locale in $i18nData.locales.PSObject.Properties) {
+    if ($locale.Value.reviewStatus -notin @('source', 'machine-unreviewed', 'english-fallback')) {
+      Write-Output "FAIL locale $($locale.Name) 缺誠實 reviewStatus"
+      $errors++
+    }
+    if ($locale.Name -ne 'zh-Hant') {
+      $localePage = Join-Path $dir "lang\$($locale.Name)\index.html"
+      if (-not (Test-Path $localePage)) { Write-Output "FAIL 缺 locale 頁：$($locale.Name)"; $errors++ }
+    }
+  }
+  $hebrewPage = Join-Path $dir 'lang\he\index.html'
+  if (-not (Test-Path $hebrewPage) -or -not ([System.IO.File]::ReadAllText($hebrewPage, [System.Text.Encoding]::UTF8)).Contains('<html lang="he" dir="rtl">')) {
+    Write-Output 'FAIL 希伯來文頁缺 RTL'
     $errors++
   }
 }
@@ -352,7 +384,7 @@ if (-not (Test-Path $cnamePath)) {
   $errors++
 }
 
-# 搜尋探索：sitemap 必須完整列出 13 頁，robots 必須宣告同一份 sitemap
+# 搜尋探索：sitemap 必須列出 13 個完整繁中頁、語言 hub 與所有非繁中 Quick Start
 $sitemapPath = Join-Path $dir 'sitemap.xml'
 if (-not (Test-Path $sitemapPath)) {
   Write-Output 'FAIL 缺 sitemap.xml'
@@ -363,6 +395,11 @@ if (-not (Test-Path $sitemapPath)) {
   $expectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
   })
+  if (Test-Path (Join-Path $dir 'assets\i18n-locales.json')) {
+    $sitemapI18nData = Get-Content -Raw (Join-Path $dir 'assets\i18n-locales.json') | ConvertFrom-Json
+    $expectedUrls += "$canonicalOrigin/lang/"
+    $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
+  }
   if ($sitemapUrls.Count -ne $expectedUrls.Count) {
     Write-Output "FAIL sitemap 頁數=$($sitemapUrls.Count)（應為 $($expectedUrls.Count)）"
     $errors++
@@ -392,14 +429,17 @@ if (-not (Test-Path $robotsPath)) {
   }
 }
 
-# llms.txt 是輔助 AI 理解的社群提案，不取代 sitemap／robots；仍需完整列出 13 個正式 URL 與事實邊界
+# llms.txt 是輔助 AI 理解的社群提案，不取代 sitemap／robots；需列出 13 個完整頁、語言 hub 與事實邊界
 $llmsPath = Join-Path $dir 'llms.txt'
 if (-not (Test-Path $llmsPath)) {
   Write-Output 'FAIL 缺 llms.txt'
   $errors++
 } else {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
-  foreach ($url in $expectedUrls) {
+  $llmsExpectedUrls = @($pages | ForEach-Object {
+    if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
+  }) + "$canonicalOrigin/lang/"
+  foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }
   foreach ($llmsNeedle in @('CC BY-SA 4.0', '不是澳洲政府、移民代理、法律或醫療服務', '不要把社群經驗、估算值或互動工具輸出描述成官方判定')) {
@@ -417,7 +457,7 @@ if (-not (Test-Path $seoBuilder)) {
 }
 
 # emoji 掃描（HTML + JS；SDD §4.4 禁用 emoji）
-$scanTargets = (Get-ChildItem (Join-Path $dir '*.html')) + (Get-ChildItem (Join-Path $dir 'assets\*.js'))
+$scanTargets = (Get-ChildItem (Join-Path $dir '*.html')) + (Get-ChildItem (Join-Path $dir 'lang\*.html') -Recurse) + (Get-ChildItem (Join-Path $dir 'assets\*.js'))
 foreach ($f in $scanTargets) {
   $t = [System.IO.File]::ReadAllText($f.FullName, [System.Text.Encoding]::UTF8)
   $m = [regex]::Matches($t, '[\uD83C-\uD83E][\uDC00-\uDFFF]|[☀-➿]|️')
@@ -429,7 +469,7 @@ foreach ($f in $scanTargets) {
 }
 
 # 本機資產存在且非空
-foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\tools.js', 'assets\postcodes.js', 'assets\seasons.js', 'assets\lemon-pattern.svg')) {
+foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\i18n.js', 'assets\i18n-locales.json', 'assets\tools.js', 'assets\postcodes.js', 'assets\seasons.js', 'assets\lemon-pattern.svg')) {
   $fp = Join-Path $dir $a
   if (-not (Test-Path $fp) -or (Get-Item $fp).Length -lt 100) { Write-Output "FAIL 資產異常：$a"; $errors++ }
 }
@@ -519,7 +559,7 @@ if ([regex]::Matches($lemonSvg, '<path\b').Count -lt 10 -or -not $lemonSvg.Conta
   Write-Output 'FAIL [lemon-pattern.svg] 檸檬與葉片圖樣不完整'
   $errors++
 }
-if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not $styleText.Contains('main [id] { scroll-margin-top: 82px; }')) {
+if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not $styleText.Contains('main [id] { scroll-margin-top: 132px; }')) {
   Write-Output 'FAIL [style.css] 內容錨點缺 sticky header 安全距離'
   $errors++
 }

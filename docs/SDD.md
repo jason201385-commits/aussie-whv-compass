@@ -58,14 +58,16 @@
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
 | `assets/search-index.js` | 13 頁、109 個頁面／段落的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
+| `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
 | `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
-| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 頁搜尋探索、全 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
+| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 個完整繁中頁＋語言 Quick Start 搜尋探索、全 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
 | `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots 與 llms.txt；`--check` 防止產物過期 |
 | `scripts/build_search.py` | 從 13 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
+| `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
 | `docs/` | 本文件與 SPEC |
 
 ### 2.2 頁面共同結構
@@ -88,6 +90,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
   `/` 開啟、Escape／關閉鈕離開，行動版入口與結果維持至少 44px 可操作高度。
+- **多國語言**：根頁仍以 `zh-Hant` 為唯一完整內容來源；`lang/<locale>/` 是靜態、可索引的
+  Quick Start，連回完整繁中頁與 417／462 官方申請資格。語言切換不保存選擇、不送出資料，
+  只依使用者選擇導向固定同站 URL。機器翻譯不得移除風險聲明或冒充人工／官方翻譯；
+  `english-fallback` 必須直接顯示英文，不可為了湊數生成不可信低資源語言。
 - **GA4 邊界**：`analytics-config.js` 的 ID 未符合 `G-[A-Z0-9]+` 時立即停用；符合時也先等
   `whv-analytics-consent-v1=granted`，才建立 `dataLayer` 與載入 Google tag。廣告儲存、廣告
   使用者資料、廣告個人化與 Google Signals 一律關閉。page location 主動移除 query／hash；

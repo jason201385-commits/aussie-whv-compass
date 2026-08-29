@@ -23,6 +23,14 @@
 - Header 與首頁提供**全站搜尋**：搜尋 13 頁／109 個段落，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
+## 多國語言 Quick Start
+
+[語言入口](https://www.aussiewhvcompass.com/lang/)依澳洲內政部目前列出的 417／462 首簽護照
+國家與地區，提供 38 種主要官方／通行語言的靜態 Quick Start 與全站語言切換。繁體中文與
+英文為來源文案，其他語言標示為未校對機器翻譯或英文 fallback；簽證、法律、稅務與醫療內容
+仍須以頁面所連的澳洲政府官方英文來源為準。完整 13 頁目前仍以繁體中文為主，不能把 Quick
+Start 說成全站人工翻譯完成。
+
 GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連線 Google Analytics。
 站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；
 即使啟用，訪客未同意前仍不載入 Google tag，搜尋字詞與表單內容不會送往 GA。

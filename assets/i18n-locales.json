@@ -1,0 +1,1748 @@
+{
+  "version": "2026-08-29",
+  "scope": "Primary official or widely used languages for current subclass 417/462 passport countries; not every regional language.",
+  "officialSources": {
+    "417": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/first-working-holiday-417",
+    "462": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-462/first-work-holiday-462"
+  },
+  "locales": {
+    "zh-Hant": {
+      "autonym": "繁體中文",
+      "englishName": "Traditional Chinese",
+      "direction": "ltr",
+      "reviewStatus": "source",
+      "strings": {
+        "site_name": "澳打指南針",
+        "page_title": "澳洲打工度假快速開始",
+        "eyebrow": "語言快速開始",
+        "intro": "給正在規劃或已在澳洲打工度假的人，一份永久免費、開源維護的攻略。",
+        "translation_note": "繁體中文是本站原始版本。簽證、法律、稅務與醫療資訊仍須以澳洲政府官方網站為準。",
+        "eligibility_title": "先確認你的簽證",
+        "eligibility_text": "澳洲 Working Holiday Maker 分為 417 與 462 兩種簽證；資格會依護照與其他條件而不同。",
+        "official_417": "417 官方申請資格",
+        "official_462": "462 官方申請資格",
+        "guide_title": "選擇你現在需要的主題",
+        "why": "自我釐清：這趟打工度假適合我嗎",
+        "visa": "簽證與指定工作",
+        "prep": "出發前與抵澳第一週",
+        "cost": "生活費、吃飯、買車與衣服",
+        "housing": "住宿與租屋",
+        "work": "找工作與查核雇主",
+        "scam": "辨認詐騙與求助",
+        "english": "工作與生活實用英文",
+        "health": "保險、就醫、心理與安全",
+        "leave": "報稅、退休金與離澳",
+        "pr": "WHV 之後可能的方向",
+        "collaborate": "聯絡、合作或協助改善攻略",
+        "full_guide_note": "完整攻略目前以繁體中文撰寫；其他語言會逐步擴充並接受社群校對。",
+        "emergency": "在澳洲若有立即生命危險，請撥 000 聯絡警察、消防或救護車。",
+        "community_review": "協助校對這個語言",
+        "chinese_home": "繁體中文首頁",
+        "language_label": "語言",
+        "source_checked": "簽證資格來源查核：2026-08-29"
+      }
+    },
+    "en": {
+      "autonym": "English",
+      "englishName": "English",
+      "direction": "ltr",
+      "reviewStatus": "source",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "English is a source version of this quick-start page, not an official government translation. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "zh-Hans": {
+      "autonym": "简体中文",
+      "englishName": "Simplified Chinese",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "澳大利亚工作假期快速入门",
+        "eyebrow": "语言快速入门",
+        "intro": "一份免费、开源的指南，适用于计划或正在进行澳大利亚工作假期的人士。",
+        "translation_note": "此快速入门页面由机器翻译生成，可能不完美。请在下方链接的官方澳大利亚政府网站上核对签证、法律、税务和医疗细节。",
+        "eligibility_title": "首先检查您的签证",
+        "eligibility_text": "澳大利亚有两种工作假期签证子类：417 和 462。资格取决于您持有的护照以及其他条件。",
+        "official_417": "官方 417 子类资格",
+        "official_462": "官方 462 子类资格",
+        "guide_title": "选择您所需的内容",
+        "why": "决定工作假期是否适合您",
+        "visa": "签证及指定工作",
+        "prep": "出发前及第一周",
+        "cost": "生活成本、食物、汽车和服装",
+        "housing": "住宿和租房",
+        "work": "寻找工作并核实雇主",
+        "scam": "识别诈骗并寻求帮助",
+        "english": "工作和生活中的实用英语",
+        "health": "保险、医生、心理健康和安全",
+        "leave": "税金、超级年金和离开澳大利亚",
+        "pr": "了解工作假期结束后的可能途径",
+        "collaborate": "联系、合作或帮助改进指南",
+        "full_guide_note": "完整指南目前采用繁体中文编写。在待审翻译扩展期间，请使用浏览器内置的翻译功能。",
+        "emergency": "如果在澳大利亚生命受到威胁，请拨打 000 联系警察、消防或救护车。",
+        "community_review": "帮助审阅此语言",
+        "chinese_home": "繁体中文主页",
+        "language_label": "语言",
+        "source_checked": "资格来源已核对：2026年8月29日"
+      }
+    },
+    "es": {
+      "autonym": "Español",
+      "englishName": "Spanish",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Inicio rápido de vacaciones-trabajo en Australia",
+        "eyebrow": "Inicio rápido de idioma",
+        "intro": "Una guía gratuita y de código abierto para personas que planean o viven unas vacaciones-trabajo en Australia.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "Verifica tu visa primero",
+        "eligibility_text": "Australia utiliza dos subclases de visa de Vacaciones-Trabajo: 417 y 462. La elegibilidad depende del pasaporte que posees y otras condiciones.",
+        "official_417": "Elegibilidad oficial de la subclase 417",
+        "official_462": "Elegibilidad oficial de la subclase 462",
+        "guide_title": "Elige lo que necesitas",
+        "why": "Decide si unas vacaciones-trabajo te convienen",
+        "visa": "Visa y trabajo especificado",
+        "prep": "Antes de la salida y la primera semana",
+        "cost": "Costo de vida, comida, autos y ropa",
+        "housing": "Alojamiento y alquiler",
+        "work": "Encuentra trabajo y verifica al empleador",
+        "scam": "Reconoce estafas y consigue ayuda",
+        "english": "Inglés práctico para el trabajo y la vida",
+        "health": "Seguro, médicos, salud mental y seguridad",
+        "leave": "Impuestos, pensiones y salida de Australia",
+        "pr": "Entiende las posibles rutas después del WHV",
+        "collaborate": "Contacta, colabora o ayuda a mejorar la guía",
+        "full_guide_note": "Las guías completas están actualmente escritas en chino tradicional. Usa la traducción incorporada de tu navegador mientras se expanden las traducciones revisadas.",
+        "emergency": "Si tu vida está en peligro en Australia, llama al 000 para policía, fuego o ambulancia.",
+        "community_review": "Ayuda a revisar este idioma",
+        "chinese_home": "Inicio en chino tradicional",
+        "language_label": "Idioma",
+        "source_checked": "Fuentes de elegibilidad verificadas: 29 de agosto de 2026"
+      }
+    },
+    "pt": {
+      "autonym": "Português",
+      "englishName": "Portuguese",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Guia Rápido de Trabalho e Férias na Austrália",
+        "eyebrow": "Início rápido de idioma",
+        "intro": "Um guia gratuito e de código aberto para pessoas que estão planejando ou vivendo um trabalho e férias na Austrália.",
+        "translation_note": "Esta página de início rápido foi traduzida por máquina e pode estar imperfeita. Verifique os detalhes de visto, lei, impostos e saúde nos sites oficiais do governo australiano vinculados abaixo.",
+        "eligibility_title": "Verifique seu visto primeiro",
+        "eligibility_text": "A Austrália utiliza duas subclasses de visto Working Holiday Maker: 417 e 462. A elegibilidade depende do passaporte que você possui e de outras condições.",
+        "official_417": "Elegibilidade oficial da subclasse 417",
+        "official_462": "Elegibilidade oficial da subclasse 462",
+        "guide_title": "Escolha o que você precisa",
+        "why": "Decida se o trabalho e férias combina com você",
+        "visa": "Visto e trabalho especificado",
+        "prep": "Antes da partida e primeira semana",
+        "cost": "Custo de vida, alimentação, carros e roupas",
+        "housing": "Acomodação e aluguel",
+        "work": "Encontre trabalho e verifique um empregador",
+        "scam": "Reconheça golpes e obtenha ajuda",
+        "english": "Inglês prático para trabalho e vida",
+        "health": "Seguro, médicos, saúde mental e segurança",
+        "leave": "Impostos, previdência e saída da Austrália",
+        "pr": "Entenda possíveis caminhos após o WHV",
+        "collaborate": "Contate, colabore ou ajude a melhorar o guia",
+        "full_guide_note": "Os guias completos estão atualmente escritos em chinês tradicional. Use a tradução integrada do seu navegador enquanto as traduções revisadas são expandidas.",
+        "emergency": "Se sua vida estiver em perigo na Austrália, ligue 000 para polícia, bombeiros ou ambulância.",
+        "community_review": "Ajude a revisar este idioma",
+        "chinese_home": "Página inicial em chinês tradicional",
+        "language_label": "Idioma",
+        "source_checked": "Fontes de elegibilidade verificadas: 29 de agosto de 2026"
+      }
+    },
+    "fr": {
+      "autonym": "Français",
+      "englishName": "French",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Guide de démarrage rapide du vacances-travail en Australie",
+        "eyebrow": "LANGUE DÉMARRAGE RAPIDE",
+        "intro": "Un guide gratuit et open-source pour les personnes qui planifient ou vivent un vacances-travail en Australie.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Vérifiez votre visa en premier",
+        "eligibility_text": "L'Australie utilise deux sous-classes de visa Vacances-Travail : 417 et 462. L'éligibilité dépend du passeport que vous détenez et d'autres conditions.",
+        "official_417": "Éligibilité officielle pour la sous-classe 417",
+        "official_462": "Éligibilité officielle pour la sous-classe 462",
+        "guide_title": "Choisissez ce dont vous avez besoin",
+        "why": "Déterminez si un vacances-travail vous convient",
+        "visa": "Visa et travail spécifié",
+        "prep": "Avant le départ et la première semaine",
+        "cost": "Coût de la vie, nourriture, voitures et vêtements",
+        "housing": "Logement et location",
+        "work": "Trouver un travail et vérifier un employeur",
+        "scam": "Reconnaître les arnaques et obtenir de l'aide",
+        "english": "Anglais pratique pour le travail et la vie",
+        "health": "Assurance, médecins, santé mentale et sécurité",
+        "leave": "Impôts, retraite et départ d'Australie",
+        "pr": "Comprendre les parcours possibles après le WHV",
+        "collaborate": "Contacter, collaborer ou aider à améliorer le guide",
+        "full_guide_note": "Les guides complets sont actuellement rédigés en chinois traditionnel. Utilisez la fonction de traduction intégrée de votre navigateur pendant que les traductions revues sont développées.",
+        "emergency": "Si votre vie est en danger en Australie, appelez le 000 pour la police, les pompiers ou une ambulance.",
+        "community_review": "Aidez à revoir cette langue",
+        "chinese_home": "Accueil chinois traditionnel",
+        "language_label": "Langue",
+        "source_checked": "Sources d'éligibilité vérifiées : 29 août 2026"
+      }
+    },
+    "de": {
+      "autonym": "Deutsch",
+      "englishName": "German",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australien Working Holiday Schnellstart",
+        "eyebrow": "Sprache Schnellstart",
+        "intro": "Ein kostenloser, Open-Source-Leitfaden für Personen, die einen Australien Working Holiday planen oder leben.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Prüfe zuerst dein Visum",
+        "eligibility_text": "Australien bietet zwei Working Holiday Maker-Visa-Unterklassen: 417 und 462. Die Berechtigung hängt vom gehaltenen Pass und anderen Bedingungen ab.",
+        "official_417": "Offizielle Berechtigung für Unterklasse 417",
+        "official_462": "Offizielle Berechtigung für Unterklasse 462",
+        "guide_title": "Wähle, was du brauchst",
+        "why": "Entscheide, ob ein Working Holiday zu dir passt",
+        "visa": "Visum und spezifizierte Arbeit",
+        "prep": "Vor der Abreise und in der ersten Woche",
+        "cost": "Lebenshaltungskosten, Nahrung, Autos und Kleidung",
+        "housing": "Unterkunft und Miete",
+        "work": "Arbeit finden und Arbeitgeber prüfen",
+        "scam": "Betrug erkennen und Hilfe suchen",
+        "english": "Praktisches Englisch für Arbeit und Leben",
+        "health": "Versicherung, Ärzte, psychische Gesundheit und Sicherheit",
+        "leave": "Steuern, Altersvorsorge und Australien verlassen",
+        "pr": "Mögliche Wege nach dem WHV verstehen",
+        "collaborate": "Kontakt aufnehmen, mitarbeiten oder beim Verbesserung des Leitfadens helfen",
+        "full_guide_note": "Die vollständigen Leitfäden sind derzeit auf Traditionell Chinesisch verfasst. Nutze die eingebaute Übersetzungsfunktion deines Browsers, während überprüfte Übersetzungen erweitert werden.",
+        "emergency": "Wenn dein Leben in Australien in Gefahr ist, rufe 000 für Polizei, Feuerwehr oder Rettungsdienst an.",
+        "community_review": "Hilf bei der Überprüfung dieser Sprache",
+        "chinese_home": "Traditionell Chinesisch Startseite",
+        "language_label": "Sprache",
+        "source_checked": "Berechtigungsquellen überprüft: 29. August 2026"
+      }
+    },
+    "nl": {
+      "autonym": "Nederlands",
+      "englishName": "Dutch",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australië Werkvakantie Snelle Start",
+        "eyebrow": "TAAL SNELLE START",
+        "intro": "Een gratis, open-source gids voor mensen die een Australische werkvakantie plannen of ermee bezig zijn.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Controleer eerst je visum",
+        "eligibility_text": "Australië gebruikt twee subclasses van het Working Holiday Maker-visum: 417 en 462. Eligibility hangt af van het paspoort dat je hebt en andere voorwaarden.",
+        "official_417": "Officiële eligibility voor subclass 417",
+        "official_462": "Officiële eligibility voor subclass 462",
+        "guide_title": "Kies wat je nodig hebt",
+        "why": "Beslis of een werkvakantie bij je past",
+        "visa": "Visum en gespecificeerd werk",
+        "prep": "Voor vertrek en de eerste week",
+        "cost": "Levensonderhoud, voedsel, auto's en kleding",
+        "housing": "Accommodatie en verhuren",
+        "work": "Werk vinden en een werkgever controleren",
+        "scam": "Oplichting herkennen en hulp krijgen",
+        "english": "Praktisch Engels voor werk en leven",
+        "health": "Verzekering, dokters, geestelijke gezondheid en veiligheid",
+        "leave": "Belasting, pensioen en Australië verlaten",
+        "pr": "Begrijp mogelijke trajecten na WHV",
+        "collaborate": "Neem contact op, samenwerken of help de gids te verbeteren",
+        "full_guide_note": "De volledige gidsen zijn momenteel geschreven in Traditioneel Chinees. Gebruik de ingebouwde vertaling van je browser terwijl de beoordeelde vertalingen worden uitgebreid.",
+        "emergency": "Als je leven in gevaar is in Australië, bel 000 voor politie, brandweer of ambulance.",
+        "community_review": "Help deze taal te controleren",
+        "chinese_home": "Traditioneel Chinees thuis",
+        "language_label": "Taal",
+        "source_checked": "Eligibility bronnen gecontroleerd: 29 augustus 2026"
+      }
+    },
+    "da": {
+      "autonym": "Dansk",
+      "englishName": "Danish",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australien arbejdsferie hurtig start",
+        "eyebrow": "SPROG HURTIG START",
+        "intro": "En gratis, åben kilde guide for personer, der planlægger eller lever en australsk arbejdsferie.",
+        "translation_note": "Denne hurtigstartside blev maskinoversat og kan være ufuldstændig. Tjek visum, lov, skat og medicinske detaljer på de officielle australske regeringswebsteder, der er linket nedenfor.",
+        "eligibility_title": "Tjek dit visum først",
+        "eligibility_text": "Australien bruger to Working Holiday Maker-visumunderkategorier: 417 og 462. Egnethed afhænger af det pas, du har, og andre betingelser.",
+        "official_417": "Officiel egnethed for underkategori 417",
+        "official_462": "Officiel egnethed for underkategori 462",
+        "guide_title": "Vælg, hvad du har brug for",
+        "why": "Afgør, om en arbejdsferie passer til dig",
+        "visa": "Visum og specificeret arbejde",
+        "prep": "Før afrejse og første uge",
+        "cost": "Leveomkostninger, mad, biler og tøj",
+        "housing": "Indkvartering og udlejning",
+        "work": "Find arbejde og tjek en arbejdsgiver",
+        "scam": "Genkend svindel og få hjælp",
+        "english": "Praktisk engelsk til arbejde og liv",
+        "health": "Forsikring, læger, mental sundhed og sikkerhed",
+        "leave": "Skatter, pension og at forlade Australien",
+        "pr": "Forstå mulige veje efter WHV",
+        "collaborate": "Kontakt, samarbejd eller hjælp med at forbedre guiden",
+        "full_guide_note": "De fulde guider er i øjeblikket skrevet på traditionel kinesisk. Brug din browsers indbyggede oversættelse, mens de gennemgåede oversættelser udvides.",
+        "emergency": "Hvis livet er i fare i Australien, ring 000 til politi, brandvæsen eller ambulance.",
+        "community_review": "Hjælp med at gennemgå dette sprog",
+        "chinese_home": "Traditionel kinesisk hjem",
+        "language_label": "Sprog",
+        "source_checked": "Egnethedskilder kontrolleret: 29. august 2026"
+      }
+    },
+    "et": {
+      "autonym": "Eesti",
+      "englishName": "Estonian",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Austraalia tööhõimlemise kiirjuhend",
+        "eyebrow": "KEEL KIIRJUHEND",
+        "intro": "Vaba, avatud lähtekoodiga juhend inimestele, kes planeerivad või elavad austraalia tööhõimlemist.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control. Kontrolli viisumi, seaduse, maksude ja meditsiini üksikasju Austraalia valitsuse ametlikel veebilehtedel.",
+        "eligibility_title": "Kontrolli oma viisumi esimesena",
+        "eligibility_text": "Austraalia kasutab kahte tööhõimlemise viisa alalklassi: 417 ja 462. Sobivus sõltub sinu passist ja muudest tingimustest.",
+        "official_417": "Virne 417 alalklassi sobivus",
+        "official_462": "Virne 462 alalklassi sobivus",
+        "guide_title": "Vali, mida vajad",
+        "why": "Otsusta, kas tööhõimlemine sobib sulle",
+        "visa": "Viis ja määratud töö",
+        "prep": "Enne väljumist ja esimene nädal",
+        "cost": "Elamis-, toit-, auto- ja riidekulud",
+        "housing": "Majutus ja rentimine",
+        "work": "Leia töö ja kontrolli töötuja",
+        "scam": "Tuvasta petted ja hanki abi",
+        "english": "Prügimise ja elu jaoks praktiline inglise keel",
+        "health": "Kindlustus, arstid, mentalne tervis ja ohutus",
+        "leave": "Maksud, pensionikindlustus ja Austraaliast lahkumine",
+        "pr": "Arva, millised tee on võimalikud WHV-pärast",
+        "collaborate": "Kontakt, koostöö või abita juendi parandamisel",
+        "full_guide_note": "Täielikud juhendid on hetkel kirjutatud taidlaste keeles. Kasuta brauseri sisseehitatud tõlket, kuni kontrollitud tõlked laienevad.",
+        "emergency": "Kui elu on ohtus Austraalias, helista 000 politsei, tuleohjukaitse või kiirabi jaoks.",
+        "community_review": "Aidake keele läbivaatamisel",
+        "chinese_home": "Taidlaste kode",
+        "language_label": "Keel",
+        "source_checked": "Sobivuse allikad kontrollitud: 29. august 2026"
+      }
+    },
+    "fi": {
+      "autonym": "Suomi",
+      "englishName": "Finnish",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australian työskentelyloman pikaopas",
+        "eyebrow": "KIELI PIKAOPAS",
+        "intro": "Ilmainen avoimen lähdekoodin opas niille, jotka suunnittelevat tai elävät Australian työskentelylomaa.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Tarkista viisumisi ensin",
+        "eligibility_text": "Australiassa on kaksi Working Holiday Maker -viisumiluokkaa: 417 ja 462. Kelpoisuus riippuu passistasi ja muista ehdoista.",
+        "official_417": "Virallinen 417-luokan kelpoisuus",
+        "official_462": "Virallinen 462-luokan kelpoisuus",
+        "guide_title": "Valitse mitä tarvitset",
+        "why": "Päätä, sopiiko työskentelyloma sinulle",
+        "visa": "Viisumi ja määritelty työ",
+        "prep": "Ennen lähtöä ja ensimmäinen viikko",
+        "cost": "Elinkustannukset, ruoka, autot ja vaatteet",
+        "housing": "Majoitus ja vuokraaminen",
+        "work": "Etsi työtä ja tarkista työnantaja",
+        "scam": "Tunnista huijaukset ja hae apua",
+        "english": "Käytännön englanti työhön ja elämään",
+        "health": "Vakuutus, lääkärit, mielenterveys ja turvallisuus",
+        "leave": "Verot, eläke ja Australian poistuminen",
+        "pr": "Ymmärrä mahdolliset reitit WHV:n jälkeen",
+        "collaborate": "Ota yhteyttä, yhteistyöskentele tai auta parantamaan opasta",
+        "full_guide_note": "Täydelliset oppaat ovat tällä hetkellä kirjoitettu perinteisellä kiinalla. Käytä selaimen sisäänrakennettua käännöstä, kun tarkistetut käännökset laajentuvat.",
+        "emergency": "Jos henkesi on vaarassa Australiassa, soita numeroon 000 poliisia, palokuntaa tai ambulanssia varten.",
+        "community_review": "Auta tarkistamaan tätä kieltä",
+        "chinese_home": "Perinteisen kiinan kotisivu",
+        "language_label": "Kieli",
+        "source_checked": "Kelpoisuuden lähteet tarkistettu: 29 elokuuta 2026"
+      }
+    },
+    "el": {
+      "autonym": "Ελληνικά",
+      "englishName": "Greek",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "it": {
+      "autonym": "Italiano",
+      "englishName": "Italian",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Avvio rapido della vacanza lavoro in Australia",
+        "eyebrow": "Avvio rapido della lingua",
+        "intro": "Una guida gratuita e open source per chi sta pianificando o vivendo una vacanza lavoro in Australia.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "Controlla prima il tuo visto",
+        "eligibility_text": "L'Australia utilizza due sottoclassi di visto Working Holiday Maker: 417 e 462. L'idoneità dipende dal passaporto che possiedi e da altre condizioni.",
+        "official_417": "Idoneità ufficiale per la sottoclasse 417",
+        "official_462": "Idoneità ufficiale per la sottoclasse 462",
+        "guide_title": "Scegli ciò di cui hai bisogno",
+        "why": "Decidi se una vacanza lavoro è adatta a te",
+        "visa": "Visto e lavoro specificato",
+        "prep": "Prima della partenza e prima settimana",
+        "cost": "Costo della vita, cibo, auto e abbigliamento",
+        "housing": "Alloggio e affitto",
+        "work": "Trova lavoro e verifica il datore di lavoro",
+        "scam": "Riconosci le truffe e ottieni aiuto",
+        "english": "Inglese pratico per lavoro e vita",
+        "health": "Assicurazione, medici, salute mentale e sicurezza",
+        "leave": "Tasse, previdenza e lasciare l'Australia",
+        "pr": "Comprendi i possibili percorsi dopo il WHV",
+        "collaborate": "Contatta, collabora o aiuta a migliorare la guida",
+        "full_guide_note": "Le guide complete sono attualmente scritte in cinese tradizionale. Usa la traduzione integrata del browser mentre le traduzioni revisionate vengono ampliate.",
+        "emergency": "Se la vita è in pericolo in Australia, chiama il 000 per polizia, vigili del fuoco o ambulanza.",
+        "community_review": "Aiuta a recensire questa lingua",
+        "chinese_home": "Home cinese tradizionale",
+        "language_label": "Lingua",
+        "source_checked": "Fonti di idoneità verificate: 29 agosto 2026"
+      }
+    },
+    "ja": {
+      "autonym": "日本語",
+      "englishName": "Japanese",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "オーストラリア ワーキングホリデー クイックスタート",
+        "eyebrow": "言語クイックスタート",
+        "intro": "オーストラリアのワーキングホリデーを計画中または滞在中の人々向けの無料オープンソースガイドです。",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "まずビザを確認してください",
+        "eligibility_text": "オーストラリアにはワーキングホリデーメーカーのビザサブクラスが2種類あり、417と462です。資格は保有するパスポートおよびその他の条件によります。",
+        "official_417": "公式のサブクラス417の資格情報",
+        "official_462": "公式のサブクラス462の資格情報",
+        "guide_title": "必要なものを選んでください",
+        "why": "ワーキングホリデーが自分に合っているか判断してください",
+        "visa": "ビザと指定された仕事",
+        "prep": "出発前と最初の1週間",
+        "cost": "生活費、食費、車、衣服の費用",
+        "housing": "宿泊と賃貸",
+        "work": "仕事を見つけて雇用主を確認",
+        "scam": "詐欺を見抜き、助けを求める",
+        "english": "仕事と生活のための実用的な英語",
+        "health": "保険、医師、メンタルヘルスと安全",
+        "leave": "税金、年金、オーストラリアからの出国",
+        "pr": "WHV後の可能な進路を理解する",
+        "collaborate": "連絡を取り、協力したり、ガイドの改善に貢献してください",
+        "full_guide_note": "完全ガイドは現在繁体中国語で書かれています。レビューされた翻訳が拡充されるまで、ブラウザの組み込み翻訳機能をご利用ください。",
+        "emergency": "オーストラリアで生命の危険にさらされた場合は、警察・消防・救急のために000に電話してください。",
+        "community_review": "この言語のレビューを手伝ってください",
+        "chinese_home": "繁体中国語のホーム",
+        "language_label": "言語",
+        "source_checked": "資格の情報源の確認日: 2026年8月29日"
+      }
+    },
+    "ko": {
+      "autonym": "한국어",
+      "englishName": "Korean",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "오스트레일리아 워킹 홀리데이 빠른 시작",
+        "eyebrow": "언어 빠른 시작",
+        "intro": "호주 워킹 홀리데이를 계획하거나 생활 중인 사람들을 위한 무료 오픈소스 가이드입니다.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "먼저 비자를 확인하세요",
+        "eligibility_text": "호주는 워킹 홀리데이 메이커 비자 서브클래스 두 가지, 417과 462를 사용합니다. 자격은 보유한 여권과 기타 조건에 따라 달라집니다.",
+        "official_417": "서브클래스 417 공식 자격 요건",
+        "official_462": "서브클래스 462 공식 자격 요건",
+        "guide_title": "필요한 것을 선택하세요",
+        "why": "워킹 홀리데이가 당신에게 맞는지 결정하세요",
+        "visa": "비자와 지정된 작업",
+        "prep": "출발 전과 첫 주",
+        "cost": "생활비, 음식, 자동차 및 의류",
+        "housing": "숙소 및 임대",
+        "work": "일자리 찾고 고용주 확인하기",
+        "scam": "사기를 인식하고 도움 받기",
+        "english": "일과 생활을 위한 실용 영어",
+        "health": "보험, 의사, 정신 건강 및 안전",
+        "leave": "세금, 슈퍼연금 및 호주 떠나기",
+        "pr": "WHV 이후 가능한 경로 이해하기",
+        "collaborate": "연락, 협업 또는 가이드 개선 도움",
+        "full_guide_note": "전체 가이드는 현재 전통 중국어로 작성되어 있습니다. 검토된 번역이 확장되는 동안 브라우저의 내장 번역 기능을 사용하세요.",
+        "emergency": "호주에서 생명이 위험할 경우 경찰, 소방 또는 구급차를 위해 000에 전화하세요.",
+        "community_review": "이 언어 검토에 도움을 주세요",
+        "chinese_home": "전통 중국어 홈",
+        "language_label": "언어",
+        "source_checked": "자격 요건 출처 확인일: 2026년 8월 29일"
+      }
+    },
+    "mt": {
+      "autonym": "Malti",
+      "englishName": "Maltese",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Start Rapidu għal l-Working Holiday f’Australja",
+        "eyebrow": "LINGWA START RAPIDU",
+        "intro": "Għidda ħlija u maħjūra għal nies li jippjanżu jew jiewħu l-Working Holiday f’Australja.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Jiċċek il-viza tiegħek l-ewwel",
+        "eligibility_text": "Awstralja tistaħdem d-għajnuna tax-Working Holiday Maker: 417 u 462. L-eligibilità tista’ jiddipendi minn il-passaport li tgħand u kondizzjonijiet oħra.",
+        "official_417": "Eligibilità ufficjali tal-subclass 417",
+        "official_462": "Eligibilità ufficjali tal-subclass 462",
+        "guide_title": "Iħtar ma tiċċejk",
+        "why": "Iħassess jekk l-Working Holiday tajjeb għalik",
+        "visa": "Viza u xogħol specificat",
+        "prep": "Qabel il-partenza u l-ewwel ġimgħa",
+        "cost": "Kost ta’ ħajj, ħobż, karozzi u kbiegħ",
+        "housing": "Alloggju u irħiela",
+        "work": "Ħobb xogħol u jiċċek datór",
+        "scam": "Identifika truffi u żied għajnuna",
+        "english": "Ingliz praktiku għal xogħol u ħajj",
+        "health": "Assigurazzjoni, dottori, saħħa mentali u sigurtà",
+        "leave": "Taksi, pensjoni u ħlas minn Awstralja",
+        "pr": "Afahhom tarriq possibbli wara l-WHV",
+        "collaborate": "Ittiżel, kollaboraw jew aħħel għojjegħid il-għidda",
+        "full_guide_note": "Il-gidda completa jikta attwalmenti f’Ċini Tradizzjonali. Uża l-traduzzjoni built-in tal-browser żgħur il-traduzzjonijiet riveduti jitgħallmu.",
+        "emergency": "Jekk il-ħajj f’perikolu f’Australja, żċel 000 għall-pulizija, ħġieg u ambulanza.",
+        "community_review": "Aħħel għall-revizzjoni ta’ dan il-lingwa",
+        "chinese_home": "Dar Ċini Tradizzjonali",
+        "language_label": "Lingwa",
+        "source_checked": "Il-mkällmin tal-eligibilità ċekkati: 29 Awwissu 2026"
+      }
+    },
+    "no": {
+      "autonym": "Norsk",
+      "englishName": "Norwegian",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia arbeidsferie hurtigstart",
+        "eyebrow": "Språk hurtigstart",
+        "intro": "En gratis, åpen kilde-guide for personer som planlegger eller lever en australisk arbeidsferie.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Sjekk visumet ditt først",
+        "eligibility_text": "Australia bruker to Working Holiday Maker-visumunderkategorier: 417 og 462. Tilgjengelighet avhenger av passet du har og andre betingelser.",
+        "official_417": "Offisiell kvalifikasjon for underkategori 417",
+        "official_462": "Offisiell kvalifikasjon for underkategori 462",
+        "guide_title": "Velg hva du trenger",
+        "why": "Bestem om en arbeidsferie passer deg",
+        "visa": "Visum og spesifisert arbeid",
+        "prep": "Før avreise og første uke",
+        "cost": "Levekostnader, mat, biler og klær",
+        "housing": "Innkvartering og leie",
+        "work": "Finn arbeid og sjekk en arbeidsgiver",
+        "scam": "Gjennomsku svindel og få hjelp",
+        "english": "Praktisk engelsk for arbeid og liv",
+        "health": "Forsikring, leger, mental helse og sikkerhet",
+        "leave": "Skatt, pensjon og å forlate Australia",
+        "pr": "Forstå mulige veier etter WHV",
+        "collaborate": "Kontakt, samarbeid eller hjelp til å forbedre guiden",
+        "full_guide_note": "De fulle guidene er for øyeblikket skrevet på tradisjonell kinesisk. Bruk nettleserens innebygde oversettelse mens gjennomgitte oversettelser utvides.",
+        "emergency": "Hvis livet er i fare i Australia, ring 000 for politi, brann eller ambulanse.",
+        "community_review": "Hjelp til å gjennomgå dette språket",
+        "chinese_home": "Tradisjonell kinesisk hjem",
+        "language_label": "Språk",
+        "source_checked": "Tilgjengelighetskilder sjekket: 29. august 2026"
+      }
+    },
+    "sv": {
+      "autonym": "Svenska",
+      "englishName": "Swedish",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Snabbstart för arbetssemester i Australien",
+        "eyebrow": "SPRÅK SNABBSTART",
+        "intro": "En gratis, öppen källkod-guide för personer som planerar eller lever en australisk arbetssemester.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Kontrollera ditt visum först",
+        "eligibility_text": "Australien har två Working Holiday Maker-visumklasser: 417 och 462. Behörighet beror på vilket pass du har och andra villkor.",
+        "official_417": "Officiell behörighet för underklass 417",
+        "official_462": "Officiell behörighet för underklass 462",
+        "guide_title": "Välj vad du behöver",
+        "why": "Bestäm om en arbetssemester passar dig",
+        "visa": "Visum och specificerat arbete",
+        "prep": "Innan avresa och första veckan",
+        "cost": "Levnadskostnad, mat, bilar och kläder",
+        "housing": "Boende och uthyrning",
+        "work": "Hitta arbete och kontrollera en arbetsgivare",
+        "scam": "Känna igen bedrägerier och få hjälp",
+        "english": "Praktisk engelska för arbete och liv",
+        "health": "Försäkring, läkare, psykisk hälsa och säkerhet",
+        "leave": "Skatt, pension och att lämna Australien",
+        "pr": "Förstå möjliga vägar efter WHV",
+        "collaborate": "Kontakta, samarbeta eller hjälp att förbättra guiden",
+        "full_guide_note": "De fullständiga guiderna är för närvarande skrivna på traditionell kinesiska. Använd din webbläsares inbyggda översättning medan de granskade översättningarna utökas.",
+        "emergency": "Om livet är i fara i Australien, ring 000 för polis, brand eller ambulans.",
+        "community_review": "Hjälp till att granska detta språk",
+        "chinese_home": "Traditionell kinesisk startsida",
+        "language_label": "Språk",
+        "source_checked": "Behörighetskällor kontrollerade: 29 augusti 2026"
+      }
+    },
+    "cs": {
+      "autonym": "Čeština",
+      "englishName": "Czech",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Rychlý start: Austrálie – pracovní dovolená",
+        "eyebrow": "JAZYK – RYCHLÝ START",
+        "intro": "Bezplatný otevřený průvodce pro lidi plánující nebo žijící na australské pracovní dovolené.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "Nejprve zkontrolujte své vízum",
+        "eligibility_text": "Austrálie používá dvě podtřídy víza Working Holiday Maker: 417 a 462. Způsobilost závisí na pasu, který držíte, a dalších podmínkách.",
+        "official_417": "Oficiální způsobilost pro podtřídu 417",
+        "official_462": "Oficiální způsobilost pro podtřídu 462",
+        "guide_title": "Vyberte, co potřebujete",
+        "why": "Rozhodněte, zda vám pracovní dovolená vyhovuje",
+        "visa": "Vízum a uvedená práce",
+        "prep": "Před odjezdem a první týden",
+        "cost": "Náklady na život, jídlo, auta a oblečení",
+        "housing": "Ubytování a pronájem",
+        "work": "Najděte práci a prověřte zaměstnavatele",
+        "scam": "Rozpoznejte podvody a získejte pomoc",
+        "english": "Praktická angličtina pro práci a život",
+        "health": "Pojištění, lékaři, duševní zdraví a bezpečnost",
+        "leave": "Daň, důchodové spoření a odjezd z Austrálie",
+        "pr": "Porozumět možným cestám po WHV",
+        "collaborate": "Kontaktujte, spolupracujte nebo pomozte vylepšit průvodce",
+        "full_guide_note": "Úplné průvodce jsou aktuálně napsány v tradiční čínštině. Použijte vestavěný překlad prohlížeče, dokud nebudou rozšířeny kontrolované překlady.",
+        "emergency": "Pokud je v Austrálii ohrožen život, zavolejte 000 pro policii, hasiče nebo záchrannou službu.",
+        "community_review": "Pomozte zkontrolovat tento jazyk",
+        "chinese_home": "Domovská stránka tradiční čínštiny",
+        "language_label": "Jazyk",
+        "source_checked": "Zdroje způsobilosti zkontrolovány: 29. srpna 2026"
+      }
+    },
+    "hu": {
+      "autonym": "Magyar",
+      "englishName": "Hungarian",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "id": {
+      "autonym": "Bahasa Indonesia",
+      "englishName": "Indonesian",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Panduan Cepat Liburan Kerja Australia",
+        "eyebrow": "Bahasa Panduan Cepat",
+        "intro": "Panduan gratis dan open-source untuk orang yang merencanakan atau menjalani liburan kerja di Australia.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Periksa visa Anda terlebih dahulu",
+        "eligibility_text": "Australia menggunakan dua subkelas visa Working Holiday Maker: 417 dan 462. Kelayakan tergantung pada paspor yang Anda miliki dan kondisi lainnya.",
+        "official_417": "Kelayakan resmi subkelas 417",
+        "official_462": "Kelayakan resmi subkelas 462",
+        "guide_title": "Pilih apa yang Anda butuhkan",
+        "why": "Putuskan apakah liburan kerja cocok untuk Anda",
+        "visa": "Visa dan pekerjaan yang ditentukan",
+        "prep": "Sebelum keberangkatan dan minggu pertama",
+        "cost": "Biaya hidup, makanan, mobil dan pakaian",
+        "housing": "Akomodasi dan penyewaan",
+        "work": "Cari pekerjaan dan periksa majikan",
+        "scam": "Kenali penipuan dan dapatkan bantuan",
+        "english": "Bahasa Inggris praktis untuk pekerjaan dan kehidupan",
+        "health": "Asuransi, dokter, kesehatan mental dan keselamatan",
+        "leave": "Pajak, pensiun dan meninggalkan Australia",
+        "pr": "Pahami jalur yang mungkin setelah WHV",
+        "collaborate": "Hubungi, kolaborasi atau bantu meningkatkan panduan",
+        "full_guide_note": "Panduan lengkap saat ini ditulis dalam Bahasa Cina Tradisional. Gunakan terjemahan bawaan browser sementara terjemahan yang direview sedang diperluas.",
+        "emergency": "Jika hidup Anda dalam bahaya di Australia, hubungi 000 untuk polisi, kebakaran atau ambulans.",
+        "community_review": "Bantu tinjau bahasa ini",
+        "chinese_home": "Beranda Bahasa Cina Tradisional",
+        "language_label": "Bahasa",
+        "source_checked": "Sumber kelayakan diperiksa: 29 Agustus 2026"
+      }
+    },
+    "he": {
+      "autonym": "עברית",
+      "englishName": "Hebrew",
+      "direction": "rtl",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "התחלה מהירה לחופשת עבודה באוסטרליה",
+        "eyebrow": "התחלה מהירה של שפה",
+        "intro": "מדריך חינמי וקוד פתוח לאנשים שמתכננים או חיים בחופשת עבודה באוסטרליה.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "בדוק את הוויזה שלך קודם",
+        "eligibility_text": "אוסטרליה משתמשת בשתי תת-סוגי ויזת עובד חופש: 417 ו-462. הזכאות תלויה בדרכון שברשותך ובתנאים נוספים.",
+        "official_417": "זכאות רשמית לתת-סוג 417",
+        "official_462": "זכאות רשמית לתת-סוג 462",
+        "guide_title": "בחר מה שאתה צריך",
+        "why": "החליט אם חופשת עבודה מתאימה לך",
+        "visa": "ויזה ועבודה מוגדרת",
+        "prep": "לפני היציאה והשבוע הראשון",
+        "cost": "עלות המחיה, מזון, מכוניות וביגוד",
+        "housing": "מגורים והשכרה",
+        "work": "מציאת עבודה ובדיקת מעסיק",
+        "scam": "זיהוי הונאות וקבל עזרה",
+        "english": "אנגלית מעשית לעבודה ולחיים",
+        "health": "ביטוח, רופאים, בריאות נפשית ובטיחות",
+        "leave": "מס, פנסיה ויציאה מאוסטרליה",
+        "pr": "הבנת מסלולים אפשריים לאחר WHV",
+        "collaborate": "צור קשר, שיתוף פעולה או עזרה לשפר את המדריך",
+        "full_guide_note": "המדריכים המלאים כתובים כרגע בסינית מסורתית. השתמש בתרגום המובנה של הדפדפן בזמן שהתרגומים הנבדקים מתרחבים.",
+        "emergency": "אם חיים בסכנה באוסטרליה, חייג 000 למשטרה, אש או אמבולנס.",
+        "community_review": "עזור לסקור את השפה",
+        "chinese_home": "בית סינית מסורתית",
+        "language_label": "שפה",
+        "source_checked": "מקורות הזכאות נבדקו: 29 אוגוסט 2026"
+      }
+    },
+    "ar": {
+      "autonym": "العربية",
+      "englishName": "Arabic",
+      "direction": "rtl",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "بدء سريع للعطلة العاملة في أستراليا",
+        "eyebrow": "بدء سريع للغة",
+        "intro": "دليل مجاني ومفتوح المصدر للأشخاص الذين يخططون أو يعيشون عطلة عاملة في أستراليا.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "تحقق من تأشيرتك أولًا",
+        "eligibility_text": "تستخدم أستراليا فئتين فرعيتين لتأشيرة maker للعطلة العاملة: 417 و462. تعتمد الأهلية على الجواز الذي تحمله وشروط أخرى.",
+        "official_417": "الأهلية الرسمية للفئة الفرعية 417",
+        "official_462": "الأهلية الرسمية للفئة الفرعية 462",
+        "guide_title": "اختر ما تحتاجه",
+        "why": "قرر ما إذا كانت العطلة العاملة تناسبك",
+        "visa": "التأشيرة والعمل المحدد",
+        "prep": "قبل المغادرة والأسبوع الأول",
+        "cost": "تكلفة المعيشة، الطعام، السيارات والملابس",
+        "housing": "السكن والإيجار",
+        "work": "ابحث عن عمل وتحقق من صاحب العمل",
+        "scam": "تعرف على الاحتيال واحصل على المساعدة",
+        "english": "الإنجليزية العملية للعمل والحياة",
+        "health": "التأمين، الأطباء، الصحة النفسية والسلامة",
+        "leave": "الضريبة، التقاعد ومغادرة أستراليا",
+        "pr": "افهم المسارات الممكنة بعد WHV",
+        "collaborate": "تواصل، تعاون أو ساعد في تحسين الدليل",
+        "full_guide_note": "الدليل الكامل مكتوب حاليًا بالصينية التقليدية. استخدم ترجمة المدمجة في متصفحك بينما يتم توسيع الترجمات المراجعة.",
+        "emergency": "إذا كان حياتك في خطر في أستراليا، اتصل بـ 000 للشرطة، الإسعاف أو الإطفاء.",
+        "community_review": "ساعد في مراجعة هذه اللغة",
+        "chinese_home": "الصفحة الرئيسية للصينية التقليدية",
+        "language_label": "اللغة",
+        "source_checked": "تم التحقق من مصادر الأهلية: 29 أغسطس 2026"
+      }
+    },
+    "lb": {
+      "autonym": "Lëtzebuergesch",
+      "englishName": "Luxembourgish",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "ms": {
+      "autonym": "Bahasa Melayu",
+      "englishName": "Malay",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Pantas Memulai Cutian Kerja di Australia",
+        "eyebrow": "Bahasa Pantas Memulai",
+        "intro": "Panduan percuma dan sumber terbuka untuk orang yang merancang atau menjalani cutian kerja di Australia.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Semak visa anda terlebih dahulu",
+        "eligibility_text": "Australia menggunakan dua subkelas visa Working Holiday Maker: 417 dan 462. Kelayakan bergantung pada pasport yang anda miliki dan keadaan lain.",
+        "official_417": "Kelayakan rasmi subkelas 417",
+        "official_462": "Kelayakan rasmi subkelas 462",
+        "guide_title": "Pilih yang anda perlukan",
+        "why": "Putuskan sama ada cutian kerja sesuai dengan anda",
+        "visa": "Visa dan kerja yang ditentukan",
+        "prep": "Sebelum berlepas dan minggu pertama",
+        "cost": "Harga hidup, makanan, kereta dan pakaian",
+        "housing": "Penginapan dan penyewaan",
+        "work": "Cari kerja dan semak majikan",
+        "scam": "Kenali penipuan dan dapatkan bantuan",
+        "english": "Inggris praktikal untuk kerja dan kehidupan",
+        "health": "Insuran, doktor, kesihatan mental dan keselamatan",
+        "leave": "Cukai, fund persaraan dan meninggalkan Australia",
+        "pr": "Fahami jalan yang mungkin selepas WHV",
+        "collaborate": "Hubungi, berkolaborasi atau bantu meningkatkan panduan",
+        "full_guide_note": "Panduan penuh kini ditulis dalam Cina Tradicional. Gunakan terjemahan binaan pelayar manakala terjemahan yang telah ditinjau sedang diperluas.",
+        "emergency": "Jika hidup dalam bahaya di Australia, panggil 000 untuk polis, pemadam atau ambulans.",
+        "community_review": "Bantu semak bahasa ini",
+        "chinese_home": "Utama Cina Tradicional",
+        "language_label": "Bahasa",
+        "source_checked": "Sumber kelayakan disemak: 29 Ogos 2026"
+      }
+    },
+    "mn": {
+      "autonym": "Монгол",
+      "englishName": "Mongolian",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "pl": {
+      "autonym": "Polski",
+      "englishName": "Polish",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Szybki start: praca wakacyjna w Australii",
+        "eyebrow": "JĘZYK SZYBKI START",
+        "intro": "Bezpłatny, otwarty przewodnik dla osób planujących lub przebywających na wakacyjnej pracy w Australii.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Najpierw sprawdź swoją wizę",
+        "eligibility_text": "Australia wykorzystuje dwa podklasy wizy Working Holiday Maker: 417 i 462. Uprawnienia zależą od posiadanego paszportu oraz innych warunków.",
+        "official_417": "Oficjalne uprawnienia do podklasy 417",
+        "official_462": "Oficjalne uprawnienia do podklasy 462",
+        "guide_title": "Wybierz, czego potrzebujesz",
+        "why": "Zdecyduj, czy wakacyjna praca jest dla Ciebie",
+        "visa": "Wiza i określona praca",
+        "prep": "Przed wyjazdem i pierwszy tydzień",
+        "cost": "Koszty życia, jedzenia, samochodów i odzieży",
+        "housing": "Zakwaterowanie i wynajem",
+        "work": "Znajdź pracę i sprawdź pracodawcę",
+        "scam": "Rozpoznaj oszustwa i uzyskaj pomoc",
+        "english": "Praktyczny angielski do pracy i życia",
+        "health": "Ubezpieczenie, lekarze, zdrowie psychiczne i bezpieczeństwo",
+        "leave": "Podatek, emerytura i opuszczanie Australii",
+        "pr": "Zrozum możliwe ścieżki po WHV",
+        "collaborate": "Skontaktuj się, współpracuj lub pomóż ulepszyć przewodnik",
+        "full_guide_note": "Pełne przewodniki są obecnie napisane w tradycyjnym chińskim. Użyj wbudowanego tłumaczenia przeglądarki, podczas gdy przetłumaczone wersje są rozwijane.",
+        "emergency": "Jeśli życie jest zagrożone w Australii, zadzwoń pod numer 000, aby wezwać policję, straż pożarną lub karetkę.",
+        "community_review": "Pomóż przejrzeć ten język",
+        "chinese_home": "Tradycyjna chińska strona główna",
+        "language_label": "Język",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "sk": {
+      "autonym": "Slovenčina",
+      "englishName": "Slovak",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Rýchly začiatok pracovnej dovolenky v Austrálii",
+        "eyebrow": "JAZYKOVÝ RÝCHLY ŠTART",
+        "intro": "Bezplatný, otvorený zdroj pre ľudí, ktorí plánujú alebo žijú pracovnú dovolenku v Austrálii.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "Skontrolujte najprv svoju vízu",
+        "eligibility_text": "Austrália používa dve podtriedy vízy Working Holiday Maker: 417 a 462. Zpôsobnosť závisí od pasu, ktorý držíte, a od ďalších podmienok.",
+        "official_417": "Oficiálna způsobilosť podtriedy 417",
+        "official_462": "Oficiálna způsobilosť podtriedy 462",
+        "guide_title": "Zvoľte, čo potrebujete",
+        "why": "Rozhodnite, či je pracovná dovolenka pre vás vhodná",
+        "visa": "Víza a špecifikovaná práca",
+        "prep": "Pred odchodom a prvý týždeň",
+        "cost": "Životné náklady, jedlo, autá a oblečenie",
+        "housing": "Ubytovanie a prenájom",
+        "work": "Nájdenie práce a kontrola zamestnávateľa",
+        "scam": "Rozpoznanie podvodov a získanie pomoci",
+        "english": "Praktická angličtina pre prácu a život",
+        "health": "Poistenie, lekári, duševné zdravie a bezpečnosť",
+        "leave": "Daň, dôchodok a odchod z Austrálie",
+        "pr": "Porozumieť možným cestám po WHV",
+        "collaborate": "Kontakt, spolupráca alebo pomoc pri vylepšení príručky",
+        "full_guide_note": "Úplné príručky sú aktuálne napísané tradičnou čínštinou. Použite vestavčený prehliadač na preklad, kým sa rozširujú kontrolované preklady.",
+        "emergency": "Ak je v Austrálii v ohrození život, zavolajte 000 pre políciu, hasičov alebo záchrannú službu.",
+        "community_review": "Pomôžte skontrolovať tento jazyk",
+        "chinese_home": "Domovská stránka tradičnej čínštiny",
+        "language_label": "Jazyk",
+        "source_checked": "Zdroje spôsobilosti skontrolované: 29. august 2026"
+      }
+    },
+    "sl": {
+      "autonym": "Slovenščina",
+      "englishName": "Slovenian",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Hitri začetek delavnega počitnika v Avstraliji",
+        "eyebrow": "Jezik – hitri začetek",
+        "intro": "Prosti, odprtokodni vodič za ljudi, ki načrtujejo ali živijo avstralski delavni počitnik.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Najprej preverite svojo vizo",
+        "eligibility_text": "Avstralija uporablja dve podvrsti viza Working Holiday Maker: 417 in 462. Pravica do vize je odvisna od vašega potnega listopisa in drugih pogojov.",
+        "official_417": "Službena pravica za podvrsto 417",
+        "official_462": "Službena pravica za podvrsto 462",
+        "guide_title": "Izberite, kaj potrebujete",
+        "why": "Odločite, ali je delavni počitnik primeren za vas",
+        "visa": "Visa in določeno delo",
+        "prep": "Pred odhodom in prvi tedaj",
+        "cost": "Življenjski stroški, hrana, avtomobili in oblačila",
+        "housing": "Nastanitev in najem",
+        "work": "Najdite delo in preverite zaposlenega",
+        "scam": "Prepoznajte varčevanje in pridobite pomož",
+        "english": "Praktični angleški jezik za delo in življenje",
+        "health": "Zavarovanje, doktori, duševno zdravje in varnost",
+        "leave": "Davki, pokojnina in zapuščanje Avstralije",
+        "pr": "Razumite možne poti po WHV",
+        "collaborate": "Stik, sodelovanje ali pomoč pri izboljšanju vodiča",
+        "full_guide_note": "Polni vodiči so trenutno napisani v tradicionalnem kitajščini. Uporabite vgrajen prevajalnik brskalnika, dokler ne bodo na voljo pregledani prevodi.",
+        "emergency": "Če je življenje v nevarnosti v Avstraliji, pokličite 000 za policijo, požarneče ali reševalno službo.",
+        "community_review": "Pomagajte pri pregledu tega jezika",
+        "chinese_home": "Tradicionalna kitajska stran",
+        "language_label": "Jezik",
+        "source_checked": "Virji za pravico preverjeni: 29. avgust 2026"
+      }
+    },
+    "th": {
+      "autonym": "ไทย",
+      "englishName": "Thai",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "คู่มือเริ่มต้นวันหยุดทำงานในออสเตรเลีย",
+        "eyebrow": "ภาษา เริ่มต้นอย่างรวดเร็ว",
+        "intro": "คู่มือฟรีและเปิดแหล่งที่มาสำหรับผู้ที่วางแผนหรือกำลังใช้วันหยุดทำงานในออสเตรเลีย",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "ตรวจสอบวีซ่าของคุณก่อน",
+        "eligibility_text": "ออสเตรเลียมีวีซ่าผู้ทำงานช่วงวันหยุดสองประเภท: 417 และ 462. คุณสมบัติขึ้นอยู่กับพาสปอร์ตที่คุณถือและเงื่อนไขอื่นๆ",
+        "official_417": "คุณสมบัติอย่างเป็นทางการสำหรับซับคลาส 417",
+        "official_462": "คุณสมบัติอย่างเป็นทางการสำหรับซับคลาส 462",
+        "guide_title": "เลือกสิ่งที่คุณต้องการ",
+        "why": "ตัดสินใจว่าวันหยุดทำงานเหมาะกับคุณหรือไม่",
+        "visa": "วีซ่าและงานที่ระบุ",
+        "prep": "ก่อนออกเดินทางและสัปดาห์แรก",
+        "cost": "ค่าครองชีพ อาหาร รถยนต์ และเสื้อผ้า",
+        "housing": "ที่พักและการเช่า",
+        "work": "หางานและตรวจสอบนายจ้าง",
+        "scam": "รู้จักการหลอกลวงและขอความช่วยเหลือ",
+        "english": "ภาษาอังกฤษที่ใช้ได้จริงสำหรับงานและชีวิต",
+        "health": "ประกันสุขภาพ แพทย์ สุขภาพจิต และความปลอดภัย",
+        "leave": "ภาษี กองทุนสำรองเลี้ยงชีพ และการออกจากออสเตรเลีย",
+        "pr": "ทำความเข้าใจเกี่ยวกับเส้นทางที่เป็นไปได้หลัง WHV",
+        "collaborate": "ติดต่อ ร่วมมือ หรือช่วยปรับปรุงคู่มือ",
+        "full_guide_note": "คู่มือฉบับเต็มเขียนอยู่ในภาษาจีนตัวเต็มในขณะนี้ ใช้ฟีเจอร์แปลในตัวของเบราว์เซอร์ขณะที่การแปลที่ตรวจสอบแล้วกำลังขยายเพิ่ม",
+        "emergency": "หากชีวิตของคุณอยู่ในอันตรายในออสเตรเลีย ให้โทร 000 เพื่อติดต่อตำรวจ ดับเพลิง หรือรถพยาบาล",
+        "community_review": "ช่วยตรวจสอบภาษานี้",
+        "chinese_home": "หน้าหลักภาษาจีนตัวเต็ม",
+        "language_label": "ภาษา",
+        "source_checked": "ตรวจสอบแหล่งที่มาของสิทธิประโยชน์: 29 สิงหาคม 2026"
+      }
+    },
+    "tr": {
+      "autonym": "Türkçe",
+      "englishName": "Turkish",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Avustralya Çalışma Tatili Hızlı Başlangıç",
+        "eyebrow": "DİL HIZLI BAŞLANGIÇ",
+        "intro": "Avustralya çalışma tatili planlayan veya yaşayan kişiler için ücretsiz, açık kaynaklı bir rehber.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control.",
+        "eligibility_title": "Önce vizanızı kontrol edin",
+        "eligibility_text": "Avustralya, iki Working Holiday Maker vize alt sınıfı kullanır: 417 ve 462. Uygunluk, sahip olduğunuz pasaport ve diğer koşullara bağlıdır.",
+        "official_417": "Resmi 417 alt sınıfı uygunluğu",
+        "official_462": "Resmi 462 alt sınıfı uygunluğu",
+        "guide_title": "İhtiyacınız olanı seçin",
+        "why": "Bir çalışma tatilinizin size uyup uyup olmadığını karar verin",
+        "visa": "Vize ve belirtilmiş çalışma",
+        "prep": "Kalkıştan önce ve ilk hafta",
+        "cost": "Yaşam maliyeti, gıda, araçlar ve giyim",
+        "housing": "Konaklama ve kira",
+        "work": "İş bul ve işgörmeni kontrol et",
+        "scam": "Dolandırıcılığı tanı ve yardım al",
+        "english": "İş ve yaşam için pratik İngilizce",
+        "health": "Sigorta, doktorlar, ruh sağlığı ve güvenlik",
+        "leave": "Vergi, emeklilik ve Avustralya'dan ayrılma",
+        "pr": "WHV sonrası olası yolları anlayın",
+        "collaborate": "İletişim kurun, iş birliği yapın veya rehberin geliştirilmesine yardımcı olun",
+        "full_guide_note": "Tüm kılavuzlar şu anda geleneksel Çince yazılmıştır. İnceleme çevirileri genişletilirken tarayıcınızın yerleşik çevirisini kullanın.",
+        "emergency": "Avustralya'da hayatınız tehlikeye girerse, polis, ateşçi veya ambulans için 000'i arayın.",
+        "community_review": "Bu dili incelemeye yardımcı olun",
+        "chinese_home": "Geleneksel Çince ana sayfa",
+        "language_label": "Dil",
+        "source_checked": "Uygunluk kaynakları kontrol edildi: 29 Ağustos 2026"
+      }
+    },
+    "vi": {
+      "autonym": "Tiếng Việt",
+      "englishName": "Vietnamese",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Bắt đầu nhanh với kỳ làm việc nghỉ lễ ở Úc",
+        "eyebrow": "Ngôn ngữ - bắt đầu nhanh",
+        "intro": "Hướng dẫn miễn phí, mã nguồn mở cho những người đang lên kế hoạch hoặc đang sống một kỳ làm việc nghỉ lễ ở Úc.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Kiểm tra visa của bạn trước hết",
+        "eligibility_text": "Úc có hai loại visa Làm việc nghỉ lễ phụ lớp: 417 và 462. Quyền lợi phụ thuộc vào hộ chiếu bạn sở hữu và các điều kiện khác.",
+        "official_417": "Quyền lợi phụ lớp 417 chính thức",
+        "official_462": "Quyền lợi phụ lớp 462 chính thức",
+        "guide_title": "Chọn những gì bạn cần",
+        "why": "Định nghĩ xem kỳ làm việc nghỉ lễ có phù hợp với bạn không",
+        "visa": "Visa và công việc được chỉ định",
+        "prep": "Trước khi khởi hành và tuần đầu tiên",
+        "cost": "Chi phí sinh hoạt, ăn uống, xe hơi và quần áo",
+        "housing": "Ở và thuê nhà",
+        "work": "Tìm việc và kiểm tra nhà tuyển dụng",
+        "scam": "Nhận biết gian lận và tìm giúp đỡ",
+        "english": "Tiếng Anh thực tế cho công việc và cuộc sống",
+        "health": "Bảo hiểm, bác sĩ, sức khỏe tinh thần và an toàn",
+        "leave": "Thuế, bảo hiểm xã hội và rời Úc",
+        "pr": "Hiểu các con đường có thể sau WHV",
+        "collaborate": "Liên hệ, hợp tác hoặc giúp cải thiện hướng dẫn",
+        "full_guide_note": "Các hướng dẫn đầy đủ hiện đang được viết bằng tiếng Trung Phồn thể. Sử dụng chức năng dịch tích hợp của trình duyệt khi các bản dịch đã được kiểm tra được mở rộng.",
+        "emergency": "Nếu cuộc sống gặp nguy hiểm ở Úc, gọi 000 để gọi cảnh sát,ดับ xe hoặc xe cứu thương.",
+        "community_review": "Giúp đánh giá ngôn ngữ này",
+        "chinese_home": "Trang chủ tiếng Trung Phồn thể",
+        "language_label": "Ngôn ngữ",
+        "source_checked": "Nguồn đã kiểm tra資格: 29 tháng 8 năm 2026"
+      }
+    },
+    "hi": {
+      "autonym": "हिन्दी",
+      "englishName": "Hindi",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "ऑस्ट्रेलिया वर्किंग हॉलिडे क्विक स्टार्ट",
+        "eyebrow": "भाषा क्विक स्टार्ट",
+        "intro": "एक मुफ्त, ओपन-सोर्स गाइड जो ऑस्ट्रेलियाई वर्किंग हॉलिडे की योजना बनाने या जीने वाले लोगों के लिए है।",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "पहले अपना वीजा जाँचें",
+        "eligibility_text": "ऑस्ट्रेलिया दो वर्किंग हॉलिडे मेकर वीजा उप-वर्गों का उपयोग करता है: 417 और 462. पात्रता आपके पासपोर्ट और अन्य शर्तों पर निर्भर करती है।",
+        "official_417": "आधिकारिक उप-वर्ग 417 पात्रता",
+        "official_462": "आधिकारिक उप-वर्ग 462 पात्रता",
+        "guide_title": "अपनी आवश्यकता चुनें",
+        "why": "निर्णय लें कि क्या वर्किंग हॉलिडे आपके लिए उपयुक्त है",
+        "visa": "वीजा और निर्दिष्ट कार्य",
+        "prep": "प्रस्थान से पहले और पहले सप्ताह",
+        "cost": "जीवन-यापन की लागत, भोजन, कार और कपड़े",
+        "housing": "आवास और किराया",
+        "work": "काम खोजें और नियोक्ता की जाँच करें",
+        "scam": "धोखाधड़ी पहचानें और मदद लें",
+        "english": "काम और जीवन के लिए व्यावहारिक अंग्रेजी",
+        "health": "बीमा, डॉक्टर, मानसिक स्वास्थ्य और सुरक्षा",
+        "leave": "कर, सुपरान्यूशन और ऑस्ट्रेलिया छोड़ना",
+        "pr": "WHV के बाद संभावित मार्गों को समझें",
+        "collaborate": "संपर्क करें, सहयोग करें या गाइड में सुधार करने में मदद करें",
+        "full_guide_note": "पूरे गाइड वर्तमान में पारंपरिक चीनी में लिखे गए हैं। जब तक समीक्षित अनुवाद विस्तारित नहीं हो जाते, अपने ब्राउज़र के अंतर्निहित अनुवाद का उपयोग करें।",
+        "emergency": "यदि ऑस्ट्रेलिया में जीवन खतरे में है, तो पुलिस, अग्निशमन या एम्बुलेंस के लिए 000 पर कॉल करें।",
+        "community_review": "इस भाषा की समीक्षा करने में मदद करें",
+        "chinese_home": "पारंपरिक चीनी होम",
+        "language_label": "भाषा",
+        "source_checked": "पात्रता स्रोतों की जाँच की गई: 29 अगस्त 2026"
+      }
+    },
+    "ta": {
+      "autonym": "தமிழ்",
+      "englishName": "Tamil",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "ஆஸ்திரலியா வேலை விடுமுறை குவிக் ஸ்டார்ட்",
+        "eyebrow": "மொழி குவிக் ஸ்டார்ட்",
+        "intro": "இது ஆஸ்திரலியா வேலை விடுமுறையை পরிகল্পনা செய்கிறோம் அல்லது வாழ்கிறோம் நபர்களுக்காக ஒரு இலவச, திறந்த மூலம் வழிகாட்டி.",
+        "translation_note": "this is an imperfect machine translation and official Australian Government sources control",
+        "eligibility_title": "உங்கள் விசாவை প্রথমে சரிபார்க்கவும்",
+        "eligibility_text": "ஆஸ்திரலியா دو Working Holiday Maker விசா subclasses: 417 மற்றும் 462. தகுதி உங்கள் பاسبोर्ट மற்றும் பிற தகவல்களுக்கு ஏற்ப மாறుతుంది.",
+        "official_417": "அधিকার subclass 417 தகுதி",
+        "official_462": "அधিকার subclass 462 தகுதி",
+        "guide_title": "தங்கள் தேவையைக் கையொப்பவும்",
+        "why": "வேலை விடுமுறை உனக்குச் சரியா என்பதை தீர்மானிக்கவும்",
+        "visa": "விசா மற்றும் குறிப்பிட்ட வேலை",
+        "prep": "விரவணamu לפני மற்றும் முதல் வாரம்",
+        "cost": "வாழ்க்கை खर्च, உணவு, கார் மற்றும் உடை",
+        "housing": "வசதி மற்றும் کرایه",
+        "work": "வேலை தேடு மற்றும் வேட்பாளனை சரிபார்க்கவும்",
+        "scam": "மோசடி들을 அறியவும் மற்றும் உதவி பெறவும்",
+        "english": "வேலaji மற்றும் வாழ்க்கைக்கு பயனுள்ள ஆங்கிலம்",
+        "health": "காப்பீடு, மருத்துவர், மனசுகாதாரம் மற்றும் பாதுகாப்பு",
+        "leave": "வரி, suprannuation மற்றும் ஆஸ்திரலியாவிலிருந்து வெளியேறுதல்",
+        "pr": "WHV பின் சாத்தியமான பாதுகாப்புகளை புரிந்துகொள்ளவும்",
+        "collaborate": "தொடர்பு, همکاری அல்லது வழிகாட்டியை மேம்படுத்த உதவவும்",
+        "full_guide_note": "முழு வழிகாட்டிகள் தற்போது பாரம்பரிய சீனத்தில் எழுதப்பட்டுள்ளன. உங்கள் உலாவியின் உள்ளமைக்கப்பட்ட மொழிபெயர்ப்பைப் பயன்படுத்தி, பார்வை செய்யப்பட்ட மொழிபெயர்ப்புகள் விரிவாக்கப்படும்போது.",
+        "emergency": "ஆஸ்திரலியாவில் ஜீவன் ஆபத்தில் உள்ளதானால், காவல், தீயணை அல்லது அம்புலன்ஸ் માટે 000 அழைக்கவும்.",
+        "community_review": "இந்த மொழியை பார்வை செய்ய உதவவும்",
+        "chinese_home": "பாரம்பரிய சீனம் முகப்பு",
+        "language_label": "மொழி",
+        "source_checked": "தகுதி மூலங்கள் சரிபார்க்கப்பட்டன: 29 August 2026"
+      }
+    },
+    "ga": {
+      "autonym": "Gaeilge",
+      "englishName": "Irish",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "rm": {
+      "autonym": "Rumantsch",
+      "englishName": "Romansh",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "cy": {
+      "autonym": "Cymraeg",
+      "englishName": "Welsh",
+      "direction": "ltr",
+      "reviewStatus": "english-fallback",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Working Holiday Quick Start",
+        "eyebrow": "LANGUAGE QUICK START",
+        "intro": "A free, open-source guide for people planning or living an Australian working holiday.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Check your visa first",
+        "eligibility_text": "Australia uses two Working Holiday Maker visa subclasses: 417 and 462. Eligibility depends on the passport you hold and other conditions.",
+        "official_417": "Official subclass 417 eligibility",
+        "official_462": "Official subclass 462 eligibility",
+        "guide_title": "Choose what you need",
+        "why": "Decide whether a working holiday fits you",
+        "visa": "Visa and specified work",
+        "prep": "Before departure and first week",
+        "cost": "Cost of living, food, cars and clothing",
+        "housing": "Accommodation and renting",
+        "work": "Find work and check an employer",
+        "scam": "Recognise scams and get help",
+        "english": "Practical English for work and life",
+        "health": "Insurance, doctors, mental health and safety",
+        "leave": "Tax, superannuation and leaving Australia",
+        "pr": "Understand possible pathways after WHV",
+        "collaborate": "Contact, collaborate or help improve the guide",
+        "full_guide_note": "The full guides are currently written in Traditional Chinese. Use your browser's built-in translation while reviewed translations are expanded.",
+        "emergency": "If life is in danger in Australia, call 000 for police, fire or ambulance.",
+        "community_review": "Help review this language",
+        "chinese_home": "Traditional Chinese home",
+        "language_label": "Language",
+        "source_checked": "Eligibility sources checked: 29 August 2026"
+      }
+    },
+    "tpi": {
+      "autonym": "Tok Pisin",
+      "englishName": "Tok Pisin",
+      "direction": "ltr",
+      "reviewStatus": "machine-unreviewed",
+      "strings": {
+        "site_name": "Aussie WHV Compass",
+        "page_title": "Australia Wokabaut Holidei Kwik Stot",
+        "eyebrow": "TOK KWIK STOT",
+        "intro": "Wanpela fridop, open-source gud ia long ol man i planim o livim wan Australian wokabaut holidei.",
+        "translation_note": "This quick-start page was machine translated and may be imperfect. Check visa, law, tax and medical details on the official Australian Government websites linked below.",
+        "eligibility_title": "Chek yu visa pinis",
+        "eligibility_text": "Australia i useru tupela subclass bilong Working Holiday Maker visa: 417 na 462. Eligibility i depend long paspota yu holim na kondisen olketa.",
+        "official_417": "Ofisiel subclass 417 eligibility",
+        "official_462": "Ofisiel subclass 462 eligibility",
+        "guide_title": "Choosim yu neding",
+        "why": "Detemait bai wokabaut holidei i stret long yu",
+        "visa": "Visa na wok spesifik",
+        "prep": "Bifo depature na wanpela wan",
+        "cost": "Kost bilong liv, kai, kar na klos",
+        "housing": "Hausik na ren",
+        "work": "Hakim wok na chek wan ploi",
+        "scam": "Rekonaisim skim na kisim halp",
+        "english": "Praktikel Inglis long wok na liv",
+        "health": "Insurens, dok, menetal helf na sefti",
+        "leave": "Teks, superannuation na livim Australia",
+        "pr": "Undastand posibl pas long afta WHV",
+        "collaborate": "Kontakt, kolaborep, o halp improve gud",
+        "full_guide_note": "Ol gud ful i ritim save long Traditional Chinese. Yu save yusim tok bilong bruwara bilong tranesim olketa, sampela tranesin i expand.",
+        "emergency": "Yu lif i danger long Australia, kol 000 long polais, faiya o ambulans.",
+        "community_review": "Halp reviw dispela tok",
+        "chinese_home": "Haus bilong Traditional Chinese",
+        "language_label": "Tok",
+        "source_checked": "Sores bilong eligibility i check: 29 August 2026"
+      }
+    }
+  },
+  "countries": [
+    {
+      "subclass": "417",
+      "country": "Belgium",
+      "locales": [
+        "nl",
+        "fr",
+        "de"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Canada",
+      "locales": [
+        "en",
+        "fr"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Cyprus",
+      "locales": [
+        "el",
+        "tr"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Denmark",
+      "locales": [
+        "da"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Estonia",
+      "locales": [
+        "et"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Finland",
+      "locales": [
+        "fi",
+        "sv"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "France",
+      "locales": [
+        "fr"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Germany",
+      "locales": [
+        "de"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Hong Kong SAR",
+      "locales": [
+        "zh-Hant",
+        "en"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Ireland",
+      "locales": [
+        "en",
+        "ga"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Italy",
+      "locales": [
+        "it"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Japan",
+      "locales": [
+        "ja"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Republic of Korea",
+      "locales": [
+        "ko"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Malta",
+      "locales": [
+        "mt",
+        "en"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Netherlands",
+      "locales": [
+        "nl"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Norway",
+      "locales": [
+        "no"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Sweden",
+      "locales": [
+        "sv"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "Taiwan",
+      "locales": [
+        "zh-Hant"
+      ]
+    },
+    {
+      "subclass": "417",
+      "country": "United Kingdom",
+      "locales": [
+        "en",
+        "cy"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Argentina",
+      "locales": [
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Austria",
+      "locales": [
+        "de"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Brazil",
+      "locales": [
+        "pt"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Chile",
+      "locales": [
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "China",
+      "locales": [
+        "zh-Hans"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Czech Republic",
+      "locales": [
+        "cs"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Ecuador",
+      "locales": [
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Greece",
+      "locales": [
+        "el"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Hungary",
+      "locales": [
+        "hu"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "India",
+      "locales": [
+        "en",
+        "hi",
+        "ta"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Indonesia",
+      "locales": [
+        "id"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Israel",
+      "locales": [
+        "he",
+        "ar"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Luxembourg",
+      "locales": [
+        "lb",
+        "fr",
+        "de"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Malaysia",
+      "locales": [
+        "ms",
+        "en",
+        "zh-Hans",
+        "ta"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Mongolia",
+      "locales": [
+        "mn"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Papua New Guinea",
+      "locales": [
+        "en",
+        "tpi"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Peru",
+      "locales": [
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Poland",
+      "locales": [
+        "pl"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Portugal",
+      "locales": [
+        "pt"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "San Marino",
+      "locales": [
+        "it"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Singapore",
+      "locales": [
+        "en",
+        "ms",
+        "zh-Hans",
+        "ta"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Slovak Republic",
+      "locales": [
+        "sk"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Slovenia",
+      "locales": [
+        "sl"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Spain",
+      "locales": [
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Switzerland",
+      "locales": [
+        "de",
+        "fr",
+        "it",
+        "rm"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Thailand",
+      "locales": [
+        "th"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Türkiye",
+      "locales": [
+        "tr"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Uruguay",
+      "locales": [
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "United States of America",
+      "locales": [
+        "en",
+        "es"
+      ]
+    },
+    {
+      "subclass": "462",
+      "country": "Vietnam",
+      "locales": [
+        "vi"
+      ]
+    }
+  ]
+}

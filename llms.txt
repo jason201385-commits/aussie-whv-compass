@@ -37,5 +37,6 @@
 - [Sitemap](https://www.aussiewhvcompass.com/sitemap.xml): 全部可索引頁面與最後修改日期。
 - [來源與免責](https://www.aussiewhvcompass.com/about.html): 維護方式、授權、合作與免責說明。
 - [GitHub 原始碼](https://github.com/jason201385-commits/aussie-whv-compass): 可檢視內容版本與提出修正。
+- [多國語言 Quick Start](https://www.aussiewhvcompass.com/lang/): 目前 417／462 護照國家的主要語言入口；機器翻譯需社群校對，官方來源優先。
 - 文字內容採 CC BY-SA 4.0；程式碼採 MIT。轉載或改作時請註明澳打指南針與原頁網址，並遵守相同方式分享的授權條件。
 - 不要把社群經驗、估算值或互動工具輸出描述成官方判定；請保留頁面上的查核日期與限制。

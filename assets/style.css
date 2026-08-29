@@ -332,6 +332,48 @@ li { margin: .4em 0; }
 .site-search-home > p:not(.section-eyebrow) { max-width: 760px; color: var(--ink-soft); }
 .site-search-home-form { margin-top: 18px; max-width: 780px; }
 
+/* ---------- 多國語言入口與 Quick Start ---------- */
+.language-picker { flex: 0 0 auto; display: inline-flex; align-items: center; }
+.language-picker select {
+  min-height: 44px;
+  max-width: 170px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 800;
+  padding: 7px 34px 7px 12px;
+  cursor: pointer;
+}
+.language-hub-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 800;
+}
+.i18n-page main { min-height: 65vh; }
+.i18n-hero { max-width: 820px; margin-bottom: 26px; }
+.i18n-translation-note { margin: 18px 0 28px; }
+.language-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin: 24px 0 38px; }
+.language-card { min-height: 132px; display: block; }
+.language-card h3 { margin-top: 0; }
+.language-card p { color: var(--ink-soft); margin: 5px 0; }
+.language-card small { color: var(--ink-soft); font-size: .74rem; }
+.i18n-guide-grid { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: 18px 0 30px; }
+.i18n-guide-card { min-height: 128px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.i18n-guide-card h3 { margin: 0; }
+.i18n-guide-card > span { font-size: 1.4rem; }
+.i18n-review { margin-top: 30px; }
+.i18n-review h2 { margin-top: 0; }
+[dir="rtl"] .i18n-page { text-align: right; }
+[dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 1.4em; }
+[dir="rtl"] .i18n-guide-card > span { transform: scaleX(-1); }
+
 /* ---------- GA4 同意與設定 ---------- */
 .analytics-consent {
   position: fixed;
@@ -1467,19 +1509,30 @@ main [id] { scroll-margin-top: 170px; }
   .page-journey-step.next { align-items: flex-start; text-align: left; }
 }
 
-/* ---------- 行動版：緊湊單列導覽 ---------- */
+/* ---------- 行動版：控制列＋可水平捲動的攻略導覽 ---------- */
 @media (max-width: 768px) {
-  main [id] { scroll-margin-top: 82px; }
+  main [id] { scroll-margin-top: 132px; }
   .nav-inner {
-    flex-wrap: nowrap;
-    padding: 8px 0 8px 14px;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 8px 14px;
+    gap: 8px;
   }
-  .brand { flex-shrink: 0; min-height: 44px; margin-right: 0; }
+  .brand {
+    min-width: 0;
+    min-height: 44px;
+    margin-right: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .language-picker select { max-width: min(150px, 38vw); }
   .site-search-open { flex: 0 0 44px; padding: 8px; }
   .site-search-open span { display: none; }
   .nav-links {
-    flex: 1;
+    grid-column: 1 / -1;
+    min-width: 0;
+    width: 100%;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
