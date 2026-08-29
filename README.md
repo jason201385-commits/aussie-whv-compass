@@ -22,6 +22,12 @@
   **自我釐清工作表**（why.html）。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
+## 開發者／AI agent 從這裡開始
+
+- [docs/SDD.md](docs/SDD.md) — 系統設計文件：架構、設計系統、資料檔、重要教訓
+- [docs/SPEC.md](docs/SPEC.md) — 功能規格：現況基線、待辦 backlog（P0–P2）、驗收程序、例行維護
+- `scripts/check.ps1` — 驗收腳本（結構、連結、錨點、emoji 掃描），push 前必跑
+
 ## 專案原則
 
 1. **每個重要數字都要附官方來源與「最後更新」日期。** 頁面裡用

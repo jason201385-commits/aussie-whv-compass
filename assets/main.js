@@ -114,7 +114,7 @@
   fields.forEach(function (f) {
     f.addEventListener("input", function () {
       clearTimeout(saveTimer);
-      saveTimer = setTimeout(function () { save(); setStatus("已自動儲存在你的瀏覽器 ✓"); }, 600);
+      saveTimer = setTimeout(function () { save(); setStatus("已自動儲存在你的瀏覽器"); }, 600);
     });
   });
 
@@ -138,7 +138,7 @@
       document.body.appendChild(a);
       a.click();
       setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-      setStatus("已匯出 .txt 檔 ✓");
+      setStatus("已匯出 .txt 檔");
     });
   }
 
