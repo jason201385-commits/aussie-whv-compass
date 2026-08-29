@@ -2,7 +2,7 @@
 
 > 版本 1.0｜2026-08-29｜搭配 `docs/SDD.md` 閱讀。
 > 本文件是交給任何後續執行者（codex／其他 agent／人類貢獻者）的工作規格：
-> §1–§3 描述現況（已完成、驗收過），§4–§5 是待辦 backlog（含驗收標準），
+> §1–§3 描述現況（已完成、驗收過），§4 是 P0 人工前置與待辦，§5 記錄 P1 實作狀態與 P2 backlog，
 > §6 是每次改動後必跑的驗收程序，§7 是例行維護。
 
 ## 0. 執行者邊界（先讀這段）
@@ -34,7 +34,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
 | DASP 速算 | leave.html `#dasp-calc` | 金額 number＋4 個金額 chips | take=×0.35、tax=×0.65 | 兩格數據＋台幣評語 |
 | 自我釐清雙模式 | why.html `#quick-quiz`＋`#worksheet` | 快思 8 題 × 5 點自評；慢想 8 題 textarea＋價值／取捨 chips | 快思分成自主動機、價值取捨、現實準備、支持底線四面向，各 2 題且不合計總適合度，白名單存 `whv-why-quick-v1`；慢想沿用 600ms 防抖與 `whv-worksheet-v1`，保留舊答案及行前海報相容 | 快思分面結果＋最低面向下一步；慢想匯出 .txt／列印／清空 |
-| 私人合作需求單 | about.html `#private-contact`＋`#contact-brief` | 需求類型、希望時間、目前卡點、希望結果、服務邊界確認 | 不寫 localStorage、不上傳；通過原生表單驗證後，以固定收件人組合純文字預覽、URL encoded `mailto:` 主旨／內文；clipboard 失敗時選取預覽供手動複製 | 一鍵直接寄信，或預覽後開啟 Email 草稿／複製需求單 |
+| 私人合作需求單 | about.html `#private-contact`＋`#contact-brief` | 需求類型、希望時間、目前卡點、希望結果、服務邊界確認 | 不寫 localStorage、不上傳；通過原生表單驗證後，以固定收件人組合純文字預覽，Gmail web compose 與 `mailto:` 參數皆 URL encoded；clipboard 失敗時選取預覽供手動複製 | 用 Gmail 開啟草稿、交給預設郵件 App，或複製需求單 |
 | 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→`report.yml`；感謝鈕→`thanks.yml`，兩者都自動帶入頁名 | — |
 | 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | localStorage `whv-last-page-v1` 只存 `{path}`；首頁以固定頁名／階段 map 顯示，拒絕未知 path | 續讀連結＋清除紀錄；首次訪問或無效資料時隱藏 |
 | 我的收藏 | 首頁 `#saved-pages`＋內容頁回饋列 | 內容頁單鍵收藏；首頁可開啟、個別移除或確認後清空 | localStorage `whv-saved-pages-v1` 只存白名單 path 陣列；標題／階段由固定 `JOURNEY_PAGES` 產生，拒絕未知與重複 path | 無收藏時首頁隱藏；有收藏時依收藏順序顯示 |
@@ -56,8 +56,9 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 - 合作閉環：首頁／about → 公開 Issue 說明需求與預期結果 → 站長人工評估 →
   只在確認適合後另議下一步。送出不等於委託成立、保證處理或免費服務；不在公開表單
   收集聯絡資料、報價、合約、公司內部資訊，且不處理緊急或專業個案建議。
-- 私人合作：about 可直接寄至站長公開合作信箱，或在頁面本地產生需求單後交給使用者自己的
-  郵件 App；本站不接收、儲存或自動寄出內容。第一封明示不附證件、帳密、第三人個資、
+- 私人合作：about 可直接寄至站長公開合作信箱，或在頁面本地產生需求單後交給使用者選擇的
+  Gmail／郵件 App；本站不接收、儲存或自動寄出內容。使用者點寄信入口後，內容才會交給所選
+  Email 服務建立草稿。第一封明示不附證件、帳密、第三人個資、
   未公開客戶資料及醫療／法律個案，且最後寄出動作由使用者本人完成。
 
 ### 1.4 搜尋引擎與 AI 探索
@@ -103,6 +104,10 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 前置條件：站長本人完成 Buy Me a Coffee 與綠界帳號註冊，提供
 `https://buymeacoffee.com/<帳號>` 與 `https://p.ecpay.com.tw/<代碼>`。
 
+2026-08-29 現況：`https://buymeacoffee.com/easyknowai` 公開頁已驗證 HTTP 200，但後台仍提示
+需設定付款方式才能開始接收支持；綠界公開連結尚未提供。因此雙管道前置尚未完成，下列 repo
+改動不得先以單一網址冒充完整 P0-1。
+
 執行內容：
 1. `about.html`：移除「籌備中」段落與 TODO 註解，換成兩顆按鈕
    （台灣讀者→綠界、海外讀者→BMC），沿用 `.btn` 樣式、無 emoji。
@@ -128,9 +133,9 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 註冊、密碼／OTP、Google 權限或 DNS 驗證碼。部署後由站長同意統計並在 Realtime 確認收件，
 才能把「GA 正式啟用」標為完成；只有程式與空 ID 不算正式量測證據。
 
-## 5. 待辦 Backlog — P1/P2（規格草案，動工前與站長確認優先序）
+## 5. P1 實作狀態／P2 Backlog
 
-### P1-1 採收季節月曆工具（work.html）
+### P1-1 採收季節月曆工具（work.html）— 實作完成
 
 - 資料：各州官方農業廳季節表（VIC 已有官方來源；其餘州需逐一查證，
   查不到的州標「無官方資料」——不得用非官方湊滿）。
@@ -138,17 +143,27 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 - 資料檔獨立 `assets/seasons.js`，附來源與抓取日期，比照 postcodes.js 管理。
 - 驗收：至少 3 個州有官方來源；每筆資料可追溯；§6 通過。
 
-### P1-2 「我的行前海報」一鍵輸出（評審提案 B 精簡版）
+現況：`assets/seasons.js` 已收錄 VIC、TAS、NT 三個官方來源；其他州／領地明示查無可直接
+轉成月份的同級官方表，不以民間資料補空白。月份按鈕、行動版 grid 與來源回鏈均已上線。
+
+### P1-2 「我的行前海報」一鍵輸出（評審提案 B 精簡版）— 程式完成、實機待驗
 
 - 匯集使用者的工作表答案＋清單進度＋試算結果（皆在 localStorage），
   以 Canvas 排版成 A4 直式海報（站內設計語言），輸出 PNG 下載。
 - 隱私：全程本地生成，不上傳。
 - 驗收：iPhone Safari 與 Android Chrome 實測可下載；空資料時有引導文案。
 
-### P1-3 視覺升級：動態剪紙（評審提案 A 完整版）
+現況：Canvas A4 直式 PNG、本機預覽、下載／長按儲存備援與空資料引導都已完成；桌機與 390px
+瀏覽器 E2E 已通過。真正的 iPhone Safari、Android Chrome 實機下載仍屬人工驗收，不得只用
+模擬 viewport 冒充。
+
+### P1-3 視覺升級：動態剪紙（評審提案 A 完整版）— 實作完成
 
 - hero blobs 改 SVG path＋`@keyframes` 頂點微變形；滾動視差。
 - 必須包在 `prefers-reduced-motion` 保護內；行動版可停用。
+
+現況：首頁檸檬／切片 SVG 形變與捲動視差已上線；`prefers-reduced-motion` 或 640px 以下停用，
+桌機載入動畫不循環。
 
 ### P2-1 雙主題「Red Centre／Coast」切換（評審提案 C，不含音效）
 
