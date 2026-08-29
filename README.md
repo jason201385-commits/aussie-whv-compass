@@ -12,7 +12,7 @@
 
 **永久免費・沒有業配・只接受自願贊助。**
 
-## 互動工具（純前端、無後端、不收集資料）
+## 互動工具（純前端、無後端、不上傳填寫內容）
 
 - **集簽資格快查器**（visa.html）：郵遞區號＋工作類型 → 是否可計入二簽/三簽。
   資料檔 `assets/postcodes.js` 抓取自內政部 specified-work 官方頁（2026-08-29），
@@ -20,8 +20,12 @@
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
-- Header 與首頁提供**全站搜尋**：搜尋 13 頁／108 個段落，查詢只在裝置內比對、不保存也不上傳。
+- Header 與首頁提供**全站搜尋**：搜尋 13 頁／109 個段落，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
+
+GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連線 Google Analytics。
+站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；
+即使啟用，訪客未同意前仍不載入 Google tag，搜尋字詞與表單內容不會送往 GA。
 
 ## 搜尋引擎與 AI 探索
 

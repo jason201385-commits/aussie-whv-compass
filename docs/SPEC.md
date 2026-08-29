@@ -39,7 +39,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | localStorage `whv-last-page-v1` 只存 `{path}`；首頁以固定頁名／階段 map 顯示，拒絕未知 path | 續讀連結＋清除紀錄；首次訪問或無效資料時隱藏 |
 | 我的收藏 | 首頁 `#saved-pages`＋內容頁回饋列 | 內容頁單鍵收藏；首頁可開啟、個別移除或確認後清空 | localStorage `whv-saved-pages-v1` 只存白名單 path 陣列；標題／階段由固定 `JOURNEY_PAGES` 產生，拒絕未知與重複 path | 無收藏時首頁隱藏；有收藏時依收藏順序顯示 |
 | 當下需求快導 | 首頁 `#support-hub` | 6 個情境式零打字入口 | 只連向既有內容錨點：找房、工作查核、詐騙救濟、就醫、心理支援、離澳清單；另列緊急聯絡總表 | 直接跳到處理步驟，不複製可能過時的電話或政策數字 |
-| 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 13 頁／108 段落靜態索引；NFKC 正規化、固定同義詞、標題／段落加權；不保存、不送出查詢，動態文字只用 `textContent` | 最多 8 個同站深連結結果；零結果提供縮短關鍵詞與許願入口 |
+| 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 13 頁／109 段落靜態索引；NFKC 正規化、固定同義詞、標題／段落加權；不保存、不送出查詢，動態文字只用 `textContent` | 最多 8 個同站深連結結果；零結果提供縮短關鍵詞與許願入口 |
 | 頁尾旅程導覽 | 12 個內容頁（main.js 注入） | — | 依首頁四階段的 `JOURNEY_ORDER` 單一排序產生上一站／完整旅程／下一站；首頁不注入，首末頁以首頁旅程圖收邊 | 顯示目前階段與第 x/12 頁，不強迫線性閱讀 |
 
 ### 1.3 回饋機制
@@ -71,6 +71,16 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 - 分享圖固定使用 1200×630 `assets/og-cover.png`；可編輯來源為 SVG，不公開使用者提供的生活照片。
 - `scripts/build_seo.py --check` 驗證所有產物與頁面同步；修改 title、description 或頁面清單後
   先重跑 builder，再跑本文件 §6。
+
+### 1.5 GA4 量測架構（程式完成，正式 ID 尚待人工前置）
+
+- `analytics-config.js` 的 Measurement ID 目前為空字串，正式站不會載入 Google Analytics。
+- 設定有效 `G-...` ID 後，仍採 Basic Consent：未選擇或拒絕時不建立 Google tag request；
+  同意後才載入。選擇只存 `whv-analytics-consent-v1`，頁尾可重開設定。
+- 不設定 User-ID；停用廣告儲存／個人化與 Google Signals；page view 移除 URL query／hash。
+  站內搜尋只送 `result_count` 與白名單 `top_result_page`，不送原始查詢。
+- GA 帳戶／Property／Web data stream、Search Console 網域驗證與 sitemap 提交都屬 §0 人工前置；
+  步驟見 `docs/MEASUREMENT_SETUP.md`，不得把帳密、OTP 或驗證碼寫進 repo。
 
 ## 2. 內容規範
 
@@ -108,6 +118,15 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 固定為正式主機名；Cloudflare DNS 依 GitHub Pages 官方配置加入裸網域 A／AAAA，
 `www` CNAME 直接指向 `jason201385-commits.github.io`，不得使用 wildcard DNS。
 Pages 設定 enforce HTTPS；每頁 canonical／`og:url` 與 Issue Template 首頁連結使用正式網域。
+
+### P0-3 GA4 與 Search Console（人工前置：站長登入 Google 後執行）
+
+前置條件：站長本人建立 GA4 Property／Web data stream，提供公開的 `G-...` Measurement ID；
+並由站長本人完成 Search Console Domain property 的 DNS 驗證與 sitemap 提交。
+
+Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、commit／push；不得代辦帳號
+註冊、密碼／OTP、Google 權限或 DNS 驗證碼。部署後由站長同意統計並在 Realtime 確認收件，
+才能把「GA 正式啟用」標為完成；只有程式與空 ID 不算正式量測證據。
 
 ## 5. 待辦 Backlog — P1/P2（規格草案，動工前與站長確認優先序）
 

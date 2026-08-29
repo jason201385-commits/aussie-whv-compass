@@ -16,7 +16,8 @@
    「未查證／以官方為準」，不填看起來自信的舊數字。
 3. **防詐騙頁只講手法不列黑名單**：不點名任何具體公司、農場、仲介、個人。
 4. **禁用 emoji**：所有圖示一律用內嵌 SVG（見 §4.4）。站長明確指示。
-5. **無後端、不收集資料**：純靜態站；使用者資料只存 localStorage；回饋走 GitHub Issues。
+5. **無後端、不收集使用者輸入**：純靜態站；工作表、清單、試算、搜尋與需求單內容
+   不上傳。可選 GA4 只有在正式設定且訪客同意後才載入，僅量測頁面與固定摘要，不接廣告。
 6. **能點選就不打字**：互動工具優先提供快選籤（chips）、滑桿、下拉選單。
 
 ## 2. 系統架構
@@ -31,7 +32,8 @@
 - **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。全站本機 CSS／JS／資料檔
   共用同一個 `?v=` 版本查詢碼；任何這些資產異動時，push 前必須全站同步升版。
   驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
-- **外部依賴**：僅 Google Fonts（Noto Sans TC、Noto Serif TC）。其餘全部自含。
+- **外部依賴**：Google Fonts（Noto Sans TC、Noto Serif TC）；GA4 正式設定且訪客同意後，
+  才會載入 `googletagmanager.com`。其餘全部自含。
 
 ### 2.1 檔案地圖
 
@@ -55,7 +57,9 @@
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
-| `assets/search-index.js` | 13 頁、108 個頁面／段落的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
+| `assets/search-index.js` | 13 頁、109 個頁面／段落的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
+| `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
+| `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
@@ -83,6 +87,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
   `/` 開啟、Escape／關閉鈕離開，行動版入口與結果維持至少 44px 可操作高度。
+- **GA4 邊界**：`analytics-config.js` 的 ID 未符合 `G-[A-Z0-9]+` 時立即停用；符合時也先等
+  `whv-analytics-consent-v1=granted`，才建立 `dataLayer` 與載入 Google tag。廣告儲存、廣告
+  使用者資料、廣告個人化與 Google Signals 一律關閉。page location 主動移除 query／hash；
+  `whv:search` 事件只接收白名單頁名與 0–200 結果數，不得加入原始查詢字詞。
 - **旅程順序單一來源**：`main.js` 的 `JOURNEY_ORDER` 與首頁四階段一致，負責內容頁的
   上一站／下一站與位置顯示；首頁只提供 `#journey-map` 全貌，不注入頁尾導覽。
 - **localStorage keys**（改動＝使用者資料遺失，不得更名）：
@@ -93,6 +101,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   - `whv-save-calc-v1`：存錢試算器輸入與最近一次結果（行前海報使用）
   - `whv-last-page-v1`：最近閱讀的白名單頁名（`{path}`），供首頁續讀卡使用
   - `whv-saved-pages-v1`：收藏頁面的白名單 path 陣列；首頁只用固定 metadata 呈現
+  - `whv-analytics-consent-v1`：僅 `granted`／`denied`；不存使用者內容。名稱或語意變更需同步隱私說明
 - SVG sprite 由 main.js 注入 `<body>` 開頭；頁面以
   `<svg class="icon"><use href="#i-名稱"/></svg>` 引用。**JS 未載入時圖示不顯示**，
   屬已接受的取捨（工具本來就需要 JS）。

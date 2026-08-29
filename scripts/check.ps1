@@ -67,7 +67,7 @@ if (-not (Test-Path $notFoundPath)) {
     Write-Output 'FAIL [404.html] 錯誤頁不得宣告 canonical 或 og:url'
     $errors++
   }
-  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output 'FAIL [404.html] 本機資產缺 ?v= 版本'; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -129,7 +129,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
-  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|tools\.js|postcodes\.js|seasons\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|tools\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -157,6 +157,61 @@ $uniqueAssetVersions = @($assetVersions | Select-Object -Unique)
 if ($uniqueAssetVersions.Count -ne 1) {
   Write-Output "FAIL 全站本機資產版本不一致：$(($uniqueAssetVersions) -join ', ')"
   $errors++
+}
+
+# GA4：空 ID 必須完全停用；有效 ID 也只能在訪客同意後載入，且不得傳搜尋字詞或表單內容
+$analyticsConfigPath = Join-Path $dir 'assets\analytics-config.js'
+$analyticsScriptPath = Join-Path $dir 'assets\analytics.js'
+if (-not (Test-Path $analyticsConfigPath) -or -not (Test-Path $analyticsScriptPath)) {
+  Write-Output 'FAIL 缺 GA4 config 或 consent loader'
+  $errors++
+} else {
+  $analyticsConfig = [System.IO.File]::ReadAllText($analyticsConfigPath, [System.Text.Encoding]::UTF8)
+  $analyticsScript = [System.IO.File]::ReadAllText($analyticsScriptPath, [System.Text.Encoding]::UTF8)
+  $measurementMatch = [regex]::Match($analyticsConfig, 'measurementId:\s*"([^"]*)"')
+  if (-not $measurementMatch.Success) {
+    Write-Output 'FAIL [analytics-config.js] 缺 measurementId'
+    $errors++
+  } else {
+    $measurementId = $measurementMatch.Groups[1].Value
+    if ($measurementId -and $measurementId -notmatch '^G-[A-Z0-9]+$') {
+      Write-Output 'FAIL [analytics-config.js] Measurement ID 必須留空或為合法 G-... 格式'
+      $errors++
+    }
+  }
+  foreach ($analyticsNeedle in @(
+    'whv-analytics-consent-v1',
+    'if (!isConfigured) return;',
+    'showBanner(false)',
+    'analytics_storage: "denied"',
+    'analytics_storage: "granted"',
+    'ad_storage: "denied"',
+    'ad_user_data: "denied"',
+    'ad_personalization: "denied"',
+    'allow_google_signals: false',
+    'allow_ad_personalization_signals: false',
+    'page_location: location.origin + location.pathname',
+    'https://www.googletagmanager.com/gtag/js?id=',
+    'window.addEventListener("whv:search"',
+    'result_count:',
+    'top_result_page:'
+  )) {
+    if (-not $analyticsScript.Contains($analyticsNeedle)) { Write-Output "FAIL [analytics.js] 缺同意／最小化界線：$analyticsNeedle"; $errors++ }
+  }
+  foreach ($analyticsForbidden in @('search_term', 'event.detail.query', 'user_id:', 'briefText', 'worksheet')) {
+    if ($analyticsScript.Contains($analyticsForbidden)) { Write-Output "FAIL [analytics.js] 不得傳送輸入內容或 User-ID：$analyticsForbidden"; $errors++ }
+  }
+}
+
+foreach ($p in $allPages) {
+  $analyticsPageText = [System.IO.File]::ReadAllText((Join-Path $dir $p), [System.Text.Encoding]::UTF8)
+  $configAt = $analyticsPageText.IndexOf('<script src="assets/analytics-config.js?v=')
+  $loaderAt = $analyticsPageText.IndexOf('<script src="assets/analytics.js?v=')
+  $mainAt = $analyticsPageText.IndexOf('<script src="assets/main.js?v=')
+  if ($configAt -lt 0 -or $loaderAt -lt 0 -or $mainAt -lt 0 -or -not ($configAt -lt $loaderAt -and $loaderAt -lt $mainAt)) {
+    Write-Output "FAIL [$p] GA4 config／loader／main.js 缺少或順序錯誤"
+    $errors++
+  }
 }
 
 # 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
