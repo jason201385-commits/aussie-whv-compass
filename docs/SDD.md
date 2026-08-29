@@ -33,7 +33,7 @@
 
 | 檔案 | 角色 |
 |---|---|
-| `index.html` | 首頁：hero、靜態承諾列、最近閱讀、當下需求快導、4 段旅程／12 張頁面卡、主打工具、6 張工具卡、原則 |
+| `index.html` | 首頁：hero、靜態承諾列、最近閱讀、我的收藏、當下需求快導、4 段旅程／12 張頁面卡、主打工具、6 張工具卡、原則 |
 | `why.html` | 自我釐清互動工作表（8 題、chips、localStorage、匯出 txt） |
 | `visa.html` | 簽證與集簽＋**集簽資格快查器** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
@@ -73,6 +73,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   - `whv-leave-check-v1`：離澳收尾清單勾選（{lc-i: bool}）
   - `whv-save-calc-v1`：存錢試算器輸入與最近一次結果（行前海報使用）
   - `whv-last-page-v1`：最近閱讀的白名單頁名（`{path}`），供首頁續讀卡使用
+  - `whv-saved-pages-v1`：收藏頁面的白名單 path 陣列；首頁只用固定 metadata 呈現
 - SVG sprite 由 main.js 注入 `<body>` 開頭；頁面以
   `<svg class="icon"><use href="#i-名稱"/></svg>` 引用。**JS 未載入時圖示不顯示**，
   屬已接受的取捨（工具本來就需要 JS）。
@@ -118,7 +119,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 
 ### 4.4 SVG 圖示系統
 
-25 個 symbol 定義於 main.js 的 `SPRITE` 字串（24×24、stroke 2、round cap）。
+26 個 symbol 定義於 main.js 的 `SPRITE` 字串（24×24、stroke 2、round cap）。
 新增圖示＝在 SPRITE 加 symbol。favicon 為 data-URI 線繪羅盤。**全站禁 emoji**
 （含 HTML 註解與 JS 字串）；驗收有 emoji 掃描（見 SPEC §6）。
 

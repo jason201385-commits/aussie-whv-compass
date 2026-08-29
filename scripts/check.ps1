@@ -86,6 +86,8 @@ if (-not (Test-Path $thanksForm)) {
 }
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
 $toolsJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+$symbolCount = [regex]::Matches($mainJs, '<symbol id=').Count
+if ($symbolCount -ne 26) { Write-Output "FAIL [main.js] SVG symbol 數=$symbolCount（SDD 應為 26）"; $errors++ }
 if (-not $mainJs.Contains('template=thanks.yml')) {
   Write-Output 'FAIL [main.js] 全站回饋列缺感謝入口'
   $errors++
@@ -104,6 +106,12 @@ foreach ($journeyNeedle in @('className = "page-journey-nav"', 'index.html#journ
 foreach ($resumeNeedle in @('whv-last-page-v1', 'JOURNEY_PAGES', 'hasOwnProperty.call(JOURNEY_PAGES', 'JSON.parse(localStorage.getItem(LAST_PAGE_KEY)', 'localStorage.removeItem(LAST_PAGE_KEY)')) {
   if (-not $mainJs.Contains($resumeNeedle)) {
     Write-Output "FAIL [main.js] 最近閱讀缺安全條件：$resumeNeedle"
+    $errors++
+  }
+}
+foreach ($savedNeedle in @('whv-saved-pages-v1', 'Array.isArray(parsed)', 'hasOwnProperty.call(JOURNEY_PAGES, savedPath)', 'all.indexOf(savedPath) === index', 'aria-pressed', 'confirm("清除全部收藏頁面？之後仍可在各頁重新收藏。")')) {
+  if (-not $mainJs.Contains($savedNeedle)) {
+    Write-Output "FAIL [main.js] 我的收藏缺安全條件：$savedNeedle"
     $errors++
   }
 }
@@ -131,6 +139,12 @@ $indexText = [System.IO.File]::ReadAllText((Join-Path $dir 'index.html'), [Syste
 if (-not $indexText.Contains('id="journey-map"')) {
   Write-Output 'FAIL [index.html] 缺完整旅程錨點：journey-map'
   $errors++
+}
+foreach ($savedId in @('saved-pages', 'saved-pages-title', 'saved-pages-list', 'saved-pages-clear')) {
+  if (-not $indexText.Contains("id=`"$savedId`"")) {
+    Write-Output "FAIL [index.html] 缺我的收藏元件：$savedId"
+    $errors++
+  }
 }
 foreach ($resumeId in @('journey-resume', 'journey-resume-link', 'journey-resume-clear')) {
   if (-not $indexText.Contains("id=`"$resumeId`"")) {

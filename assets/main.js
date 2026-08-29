@@ -29,6 +29,7 @@
     + '<symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>'
     + '<symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>'
     + '<symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>'
+    + '<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></symbol>'
     + '</svg>';
   var mount = document.createElement("div");
   mount.innerHTML = SPRITE;
@@ -78,6 +79,94 @@
   JOURNEY_ORDER.forEach(function (item) {
     if (item.remember) JOURNEY_PAGES[item.path] = { title: item.title, stage: item.stage };
   });
+
+  // ---------- 我的收藏：只接受白名單頁名，不保存標題、網址或使用者輸入 ----------
+  var SAVED_PAGES_KEY = "whv-saved-pages-v1";
+  var readSavedPages = function () {
+    try {
+      var parsed = JSON.parse(localStorage.getItem(SAVED_PAGES_KEY) || "[]");
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(function (savedPath, index, all) {
+        return typeof savedPath === "string"
+          && Object.prototype.hasOwnProperty.call(JOURNEY_PAGES, savedPath)
+          && all.indexOf(savedPath) === index;
+      });
+    } catch (e) { return []; }
+  };
+  var writeSavedPages = function (savedPaths) {
+    try {
+      localStorage.setItem(SAVED_PAGES_KEY, JSON.stringify(savedPaths));
+      return true;
+    } catch (e) { return false; }
+  };
+
+  var savedPagesSection = document.getElementById("saved-pages");
+  if (savedPagesSection) {
+    var savedPagesList = document.getElementById("saved-pages-list");
+    var savedPagesClear = document.getElementById("saved-pages-clear");
+    var renderSavedPages = function () {
+      var savedPaths = readSavedPages();
+      savedPagesList.textContent = "";
+      savedPagesSection.hidden = savedPaths.length === 0;
+      if (!savedPaths.length) return;
+
+      savedPaths.forEach(function (savedPath) {
+        var savedMeta = JOURNEY_PAGES[savedPath];
+        var item = document.createElement("div");
+        item.className = "saved-page-item";
+        var link = document.createElement("a");
+        link.href = savedPath;
+        var stage = document.createElement("span");
+        stage.textContent = savedMeta.stage;
+        var title = document.createElement("strong");
+        title.textContent = savedMeta.title;
+        link.appendChild(stage);
+        link.appendChild(title);
+
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "saved-page-remove";
+        remove.setAttribute("data-path", savedPath);
+        remove.setAttribute("aria-label", "從我的收藏移除「" + savedMeta.title + "」");
+        remove.textContent = "移除";
+        remove.addEventListener("click", function () {
+          var current = readSavedPages();
+          var removeIndex = current.indexOf(savedPath);
+          if (removeIndex < 0) return;
+          var nextFocus = current[removeIndex + 1] || current[removeIndex - 1] || null;
+          current.splice(removeIndex, 1);
+          if (!writeSavedPages(current)) return;
+          renderSavedPages();
+          if (nextFocus) {
+            Array.prototype.some.call(savedPagesList.querySelectorAll(".saved-page-remove"), function (button) {
+              if (button.getAttribute("data-path") !== nextFocus) return false;
+              button.focus();
+              return true;
+            });
+          } else {
+            var journeyStart = document.querySelector("#journey-map a");
+            if (journeyStart) journeyStart.focus();
+          }
+        });
+        item.appendChild(link);
+        item.appendChild(remove);
+        savedPagesList.appendChild(item);
+      });
+    };
+
+    renderSavedPages();
+    savedPagesClear.addEventListener("click", function () {
+      if (!confirm("清除全部收藏頁面？之後仍可在各頁重新收藏。")) return;
+      if (!writeSavedPages([])) return;
+      renderSavedPages();
+      var journeyStart = document.querySelector("#journey-map a");
+      if (journeyStart) journeyStart.focus();
+    });
+    window.addEventListener("storage", function (event) {
+      if (event.key === SAVED_PAGES_KEY) renderSavedPages();
+    });
+  }
+
   var resume = document.getElementById("journey-resume");
   if (resume) {
     try {
@@ -196,10 +285,14 @@
     var thanksUrl = "https://github.com/jason201385-commits/aussie-whv-compass/issues/new"
       + "?template=thanks.yml"
       + "&page=" + encodeURIComponent(pageName + "（" + (location.pathname.split("/").pop() || "index.html") + "）");
+    var saveButtonHtml = Object.prototype.hasOwnProperty.call(JOURNEY_PAGES, path)
+      ? '<button type="button" class="btn ghost" id="fb-save" aria-pressed="false">收藏這頁</button>'
+      : '';
     var bar = document.createElement("div");
     bar.className = "feedback-bar";
     bar.innerHTML = '<span class="fb-q">這一頁有幫助嗎？</span>'
       + '<div class="feedback-actions">'
+      + saveButtonHtml
       + '<button type="button" class="btn secondary" id="fb-share">有幫助，複製網址分享</button>'
       + '<a class="btn" target="_blank" rel="noopener noreferrer" href="' + issueUrl + '">回報問題／提建議</a>'
       + '<a class="btn ghost" target="_blank" rel="noopener noreferrer" aria-label="前往 GitHub 公開留下一句感謝（另開新頁）" href="' + thanksUrl + '">留下一句感謝（公開於 GitHub）</a>'
@@ -207,6 +300,34 @@
       + '<p class="feedback-note">回報與感謝會開啟公開的 GitHub Issue，需要登入並會顯示 GitHub 帳號；請勿留下個資或可識別第三人的資訊。</p>';
     footer.parentNode.insertBefore(bar, footer);
     var shareBtn = document.getElementById("fb-share");
+    var saveBtn = document.getElementById("fb-save");
+    if (saveBtn) {
+      var refreshSaveButton = function () {
+        var isSaved = readSavedPages().indexOf(path) >= 0;
+        saveBtn.setAttribute("aria-pressed", String(isSaved));
+        saveBtn.textContent = isSaved ? "已收藏" : "收藏這頁";
+        saveBtn.setAttribute("aria-label", isSaved ? "已收藏這頁；按一下從收藏移除" : "收藏這頁到首頁的我的收藏");
+      };
+      refreshSaveButton();
+      saveBtn.addEventListener("click", function () {
+        var savedPaths = readSavedPages();
+        var savedIndex = savedPaths.indexOf(path);
+        var isRemoving = savedIndex >= 0;
+        if (isRemoving) savedPaths.splice(savedIndex, 1);
+        else savedPaths.unshift(path);
+        if (!writeSavedPages(savedPaths)) {
+          bar.querySelector(".fb-q").textContent = "這個瀏覽器目前無法保存收藏；仍可使用書籤或複製網址。";
+          return;
+        }
+        refreshSaveButton();
+        bar.querySelector(".fb-q").textContent = isRemoving
+          ? "已從收藏移除；之後仍可再收藏。"
+          : "已收藏；回首頁就能從「我的收藏」繼續。";
+      });
+      window.addEventListener("storage", function (event) {
+        if (event.key === SAVED_PAGES_KEY) refreshSaveButton();
+      });
+    }
     shareBtn.addEventListener("click", function () {
       var copied = function () {
         bar.querySelector(".fb-q").innerHTML = '<span class="fb-thanks">已複製連結——分享給下一個要出發的人，就是最好的回饋。</span>';

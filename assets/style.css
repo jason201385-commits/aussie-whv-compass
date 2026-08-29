@@ -387,6 +387,79 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 40px 20px 70px; }
 .journey-resume-actions { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 .journey-resume-actions .btn { min-height: 44px; text-align: center; }
 
+/* ---------- 我的收藏：白名單頁名只存在本機 ---------- */
+.saved-pages {
+  margin: 24px 0 12px;
+  padding: 24px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--gold-soft);
+  box-shadow: var(--shadow-pop);
+}
+.saved-pages[hidden] { display: none; }
+.saved-pages-head { display: flex; align-items: flex-start; gap: 16px; }
+.saved-pages-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--gold);
+}
+.saved-pages-mark .icon { width: 25px; height: 25px; }
+.saved-pages-head h2 { margin: .1em 0 .2em; font-size: clamp(1.35rem, 3vw, 1.8rem); }
+.saved-pages-head p { margin: 0; }
+.saved-pages-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+.saved-page-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.saved-page-item > a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72px;
+  padding: 10px 14px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+.saved-page-item > a:hover { background: var(--blue-soft); text-decoration: none; }
+.saved-page-item > a span { color: var(--green-ink); font-size: .74rem; font-weight: 900; }
+.saved-page-item > a strong { font-family: var(--font-serif); font-size: .98rem; }
+.saved-page-remove {
+  min-width: 68px;
+  border: 0;
+  border-left: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+.saved-page-remove:hover { background: var(--danger-soft); color: var(--danger); }
+.saved-pages-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+.saved-pages-actions p { margin: 0; color: var(--ink-soft); font-size: .8rem; }
+.saved-pages-actions .btn { flex-shrink: 0; min-height: 44px; }
+
 /* ---------- 在澳當下需求：零打字快導 ---------- */
 .support-hub {
   margin: 42px 0 18px;
@@ -1029,6 +1102,12 @@ main [id] { scroll-margin-top: 170px; }
   .feedback-actions { width: 100%; margin-left: 0; }
   .feedback-actions .btn { flex: 1 1 100%; width: 100%; text-align: center; }
   .gratitude-actions .btn { flex: 1 1 100%; text-align: center; }
+  .saved-pages { padding: 18px 16px; }
+  .saved-pages-head { gap: 12px; }
+  .saved-pages-mark { flex-basis: 44px; width: 44px; height: 44px; }
+  .saved-pages-list { grid-template-columns: 1fr; }
+  .saved-pages-actions { align-items: stretch; flex-direction: column; }
+  .saved-pages-actions .btn { width: 100%; }
   .page-journey-nav { margin-top: 46px; padding: 18px 16px; }
   .page-journey-head { align-items: flex-start; }
   .page-journey-head > small { flex-basis: 100%; margin-left: 0; }
@@ -1097,7 +1176,7 @@ main [id] { scroll-margin-top: 170px; }
 }
 
 @media print {
-  .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar, .page-journey-nav { display: none; }
+  .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar, .page-journey-nav, .saved-pages { display: none; }
   body { background: #fff; color: #000; }
   body::after { display: none; }
   .panel, details, .card, .table-wrap, .tool { box-shadow: none; }
