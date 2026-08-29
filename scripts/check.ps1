@@ -147,6 +147,23 @@ if ($housingText -match '(?i)(utm_|affiliate|aff_id=)') {
   $errors++
 }
 
+$costText = [System.IO.File]::ReadAllText((Join-Path $dir 'cost.html'), [System.Text.Encoding]::UTF8)
+foreach ($carNeedle in @(
+  'id="car"',
+  'https://www.carsales.com.au/cars/used/western-australia-state/perth-region/',
+  'https://www.gumtree.com.au/s-cars-vans-utes/perth/c18320l3008303',
+  'https://www.facebook.com/marketplace/perth/vehicles',
+  'https://www.ppsr.gov.au/carcheck',
+  'https://online.transport.wa.gov.au/webExternal/registration/?527=',
+  'https://transport.wa.gov.au/licensing/vehicle/buy-sell-transfer',
+  'https://www.carsales.com.au/sell-my-car/',
+  'https://www.gumtree.com.au/cars/sell-my-car',
+  'https://www.facebook.com/marketplace/create/vehicle',
+  '本站不接收車輛刊登'
+)) {
+  if (-not $costText.Contains($carNeedle)) { Write-Output "FAIL [cost.html] 缺買車行動入口或執行邊界：$carNeedle"; $errors++ }
+}
+
 # GitHub Pages 自訂網域必須鎖定正式 www 主機名
 $cnamePath = Join-Path $dir 'CNAME'
 if (-not (Test-Path $cnamePath)) {
