@@ -1199,6 +1199,43 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .gratitude-note { color: var(--ink-soft); font-size: .88rem; }
 .gratitude-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
 .gratitude-actions .btn { min-height: 44px; }
+.private-contact { margin-top: 22px; background: var(--blue-soft); }
+.private-contact h3, .public-collaboration h3 { margin-top: 0; font-family: var(--font-serif); }
+.contact-route-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.contact-route-actions .btn { min-height: 44px; }
+.contact-brief { margin-top: 24px; padding-top: 22px; border-top: 1px dashed var(--line); }
+.contact-brief-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.contact-field { min-width: 0; }
+.contact-field.full { grid-column: 1 / -1; }
+.contact-field label, .brief-output > label { display: block; margin-bottom: 5px; font-weight: 800; }
+.contact-field input, .contact-field select, .contact-field textarea, .brief-output textarea {
+  width: 100%;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: .92rem;
+  padding: 10px 12px;
+}
+.contact-field textarea, .brief-output textarea { resize: vertical; line-height: 1.65; }
+.brief-privacy { margin: 14px 0; color: var(--ink-soft); font-size: .82rem; }
+.brief-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: .86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.brief-confirm input { flex: 0 0 auto; width: 1.15rem; height: 1.15rem; margin-top: .25em; accent-color: var(--accent); }
+.brief-output { margin-top: 18px; padding: 18px; border: 2px solid var(--green); border-radius: 14px; background: var(--surface); }
+.brief-output[hidden] { display: none; }
+.brief-output textarea { min-height: 260px; }
 
 /* ---------- 內容頁：上一站／全貌／下一站 ---------- */
 .page-journey-nav {
@@ -1255,6 +1292,10 @@ main [id] { scroll-margin-top: 170px; }
   .feedback-actions { width: 100%; margin-left: 0; }
   .feedback-actions .btn { flex: 1 1 100%; width: 100%; text-align: center; }
   .gratitude-actions .btn { flex: 1 1 100%; text-align: center; }
+  .contact-brief-grid { grid-template-columns: 1fr; }
+  .contact-field.full { grid-column: auto; }
+  .contact-route-actions { align-items: stretch; flex-direction: column; }
+  .contact-route-actions .btn { width: 100%; text-align: center; }
   .saved-pages { padding: 18px 16px; }
   .saved-pages-head { gap: 12px; }
   .saved-pages-mark { flex-basis: 44px; width: 44px; height: 44px; }

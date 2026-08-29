@@ -430,6 +430,31 @@ foreach ($collabNeedle in @('id="collaborate"', 'template=collaborate.yml', '提
   $aboutText = [System.IO.File]::ReadAllText((Join-Path $dir 'about.html'), [System.Text.Encoding]::UTF8)
   if (-not $aboutText.Contains($collabNeedle)) { Write-Output "FAIL [about.html] 缺合作入口或邊界：$collabNeedle"; $errors++ }
 }
+$aboutText = [System.IO.File]::ReadAllText((Join-Path $dir 'about.html'), [System.Text.Encoding]::UTF8)
+foreach ($privateId in @('private-contact', 'private-email-direct', 'contact-brief', 'brief-type', 'brief-timing', 'brief-problem', 'brief-outcome', 'brief-boundary', 'brief-status', 'brief-output', 'brief-preview', 'brief-email-link', 'brief-copy')) {
+  if (-not $aboutText.Contains("id=`"$privateId`"")) { Write-Output "FAIL [about.html] 缺私人合作需求單元件：$privateId"; $errors++ }
+}
+foreach ($privateNeedle in @(
+  'mailto:chunaenqiu6@gmail.com',
+  '內容不會送到本站或儲存',
+  '最後仍由你確認並寄出',
+  '送出不代表委託成立、保證處理或承諾免費服務',
+  '第一封請不要附證件、帳密、醫療或法律個案、第三人個資、未公開客戶資料'
+)) {
+  if (-not $aboutText.Contains($privateNeedle)) { Write-Output "FAIL [about.html] 缺私人 Email 或資料邊界：$privateNeedle"; $errors++ }
+}
+$briefScript = [regex]::Match($mainJs, '(?s)// ---------- 私人合作需求單.*?// ---------- 自我釐清工作表')
+if (-not $briefScript.Success) {
+  Write-Output 'FAIL [main.js] 缺私人合作需求單功能塊'
+  $errors++
+} else {
+  foreach ($briefNeedle in @('briefForm.checkValidity()', 'briefForm.reportValidity()', 'encodeURIComponent(subject)', 'encodeURIComponent(briefText)', 'navigator.clipboard.writeText(briefPreview.value)', 'briefPreview.select()')) {
+    if (-not $briefScript.Value.Contains($briefNeedle)) { Write-Output "FAIL [main.js] 私人需求單缺驗證／編碼／複製備援：$briefNeedle"; $errors++ }
+  }
+  foreach ($forbidden in @('localStorage', 'fetch(', 'XMLHttpRequest')) {
+    if ($briefScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 私人需求單不得儲存或上傳：$forbidden"; $errors++ }
+  }
+}
 if (-not $indexText.Contains('href="about.html#collaborate"')) {
   Write-Output 'FAIL [index.html] 缺首頁合作入口'
   $errors++

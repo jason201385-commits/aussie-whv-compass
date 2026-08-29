@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260829-3">
+<link rel="stylesheet" href="assets/style.css?v=20260829-4">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -54,26 +54,83 @@
   </div>
 
   <h2 id="collaborate"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg> 想合作，或想找 Jason 幫忙</h2>
-  <p>不確定該找誰、想一起做對打工度假者有用的內容，或有網站與數位工具需求，都可以先把<strong>可公開、不含個資</strong>的問題說清楚。我會親自看，再判斷是否適合協助或合作。</p>
+  <p>不確定該找誰、想一起做對打工度假者有用的內容，或有網站與數位工具需求，都可以先說明。<strong>私人合作用 Email，適合公開共編的內容用 GitHub</strong>；我會親自看，再判斷是否適合協助或合作。</p>
   <div class="support-grid" aria-label="合作與協助類型">
     <a class="support-link" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml" target="_blank" rel="noopener noreferrer">
       <svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>
       <span><strong>內容、資料與社群合作</strong><small>第一手經驗、官方資料、活動或社群資源，希望一起整理成可查證的公開內容</small></span>
     </a>
-    <a class="support-link" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml" target="_blank" rel="noopener noreferrer">
+    <a class="support-link" href="#private-contact">
       <svg class="icon" aria-hidden="true"><use href="#i-tool"/></svg>
       <span><strong>網站與數位工具協助</strong><small>先描述目前卡點、希望達成的結果與時間，不需要先懂技術術語</small></span>
     </a>
-    <a class="support-link" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml" target="_blank" rel="noopener noreferrer">
+    <a class="support-link" href="#private-contact">
       <svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg>
       <span><strong>打工度假資訊指路</strong><small>可以協助找到正確公開入口；簽證、法律、醫療與稅務個案仍交給合格專業人士</small></span>
     </a>
   </div>
-  <div class="panel">
+
+  <section class="panel private-contact" id="private-contact" aria-labelledby="private-contact-title">
+    <h3 id="private-contact-title">私人合作：直接寄 Email，或先寫一張需求單</h3>
+    <p>最快的方法是直接寄到 <a href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">chunaenqiu6@gmail.com</a>。不知道怎麼開頭，也可以先填下面四格，本站會替你整理成 Email 草稿。</p>
+    <div class="contact-route-actions">
+      <a class="btn" id="private-email-direct" href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">直接寫 Email</a>
+      <a class="btn secondary" href="#contact-brief">先寫需求單</a>
+    </div>
+
+    <form id="contact-brief" class="contact-brief" onsubmit="return false" aria-describedby="brief-privacy" novalidate>
+      <div class="contact-brief-grid">
+        <div class="contact-field">
+          <label for="brief-type">需求類型</label>
+          <select id="brief-type" required>
+            <option value="">請選一種</option>
+            <option value="網站與數位工具">網站與數位工具</option>
+            <option value="內容、資料或社群合作">內容、資料或社群合作</option>
+            <option value="打工度假資訊指路">打工度假資訊指路</option>
+            <option value="其他合作">其他合作</option>
+          </select>
+        </div>
+        <div class="contact-field">
+          <label for="brief-timing">希望時間</label>
+          <input id="brief-timing" type="text" maxlength="120" placeholder="例如：兩週內、先聊方向、不急">
+        </div>
+        <div class="contact-field full">
+          <label for="brief-problem">目前卡在哪裡？</label>
+          <textarea id="brief-problem" required maxlength="800" rows="4" placeholder="用自己的話描述現在的狀況，不需要先懂技術術語。"></textarea>
+        </div>
+        <div class="contact-field full">
+          <label for="brief-outcome">希望最後得到什麼結果？</label>
+          <textarea id="brief-outcome" required maxlength="800" rows="4" placeholder="例如：讓讀者能完成某件事、把流程做簡單、先判斷方向是否可行。"></textarea>
+        </div>
+      </div>
+      <p class="brief-privacy" id="brief-privacy"><strong>內容不會送到本站或儲存。</strong>產生後只會放進你自己的 Email 草稿，最後仍由你確認並寄出。第一封請不要附證件、帳密、醫療或法律個案、第三人個資、未公開客戶資料。</p>
+      <label class="brief-confirm" for="brief-boundary">
+        <input id="brief-boundary" type="checkbox" required>
+        <span>我知道這只是初步需求，送出不代表委託成立、保證處理或承諾免費服務。</span>
+      </label>
+      <div class="contact-route-actions">
+        <button type="submit" class="btn">產生需求單</button>
+      </div>
+      <p class="ws-status" id="brief-status" role="status" aria-live="polite"></p>
+      <div class="brief-output" id="brief-output" hidden>
+        <label for="brief-preview">需求單預覽</label>
+        <textarea id="brief-preview" rows="12" readonly></textarea>
+        <div class="contact-route-actions">
+          <a class="btn" id="brief-email-link" href="mailto:chunaenqiu6@gmail.com">開啟 Email 草稿</a>
+          <button type="button" class="btn secondary" id="brief-copy">複製需求單</button>
+        </div>
+        <p class="brief-privacy">若裝置沒有設定預設郵件 App，請按「複製需求單」，再自行貼到 Gmail、Outlook 或其他信箱寄出。</p>
+      </div>
+      <noscript><p class="warning">需求單產生器需要 JavaScript；你仍可使用上方「直接寫 Email」。</p></noscript>
+    </form>
+  </section>
+
+  <div class="panel public-collaboration">
+    <h3>公開共編：用 GitHub 留下可查證的內容</h3>
     <p><strong>第一步只需說明需求，不用公開聯絡資料。</strong>表單會建立公開 GitHub Issue，也會顯示你的 GitHub 帳號；不要貼姓名、電話、Email、LINE ID、證件、合約、報價、公司內部資訊或第三人資料。如果方向適合，我會先在 Issue 回覆下一步。</p>
     <p>提出需求不代表我已接受委託、保證能處理或承諾免費服務；任何合作範圍、時程與條件，都要在雙方另外確認後才成立。本站公開攻略仍維持永久免費，不會因是否合作而限制內容。</p>
     <div class="gratitude-actions">
-      <a class="btn" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml" target="_blank" rel="noopener noreferrer" aria-label="前往 GitHub 公開提出合作或協助需求（另開新頁）">提出合作／協助需求</a>
+      <a class="btn" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml" target="_blank" rel="noopener noreferrer" aria-label="前往 GitHub 公開提出合作或協助需求（另開新頁）">公開提出合作／協助需求</a>
       <a class="btn secondary" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=idea.yml" target="_blank" rel="noopener noreferrer" aria-label="前往 GitHub 公開提出網站內容許願（另開新頁）">只想許願新內容</a>
     </div>
   </div>
@@ -132,6 +189,6 @@
   </div>
 </footer>
 
-<script src="assets/main.js?v=20260829-3"></script>
+<script src="assets/main.js?v=20260829-4"></script>
 </body>
 </html>

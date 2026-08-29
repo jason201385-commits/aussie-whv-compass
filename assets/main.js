@@ -543,6 +543,78 @@
     renderQuickResult(false);
   }
 
+  // ---------- 私人合作需求單（只在 about.html 生效） ----------
+  var briefForm = document.getElementById("contact-brief");
+  if (briefForm) {
+    var briefType = document.getElementById("brief-type");
+    var briefTiming = document.getElementById("brief-timing");
+    var briefProblem = document.getElementById("brief-problem");
+    var briefOutcome = document.getElementById("brief-outcome");
+    var briefOutput = document.getElementById("brief-output");
+    var briefPreview = document.getElementById("brief-preview");
+    var briefEmailLink = document.getElementById("brief-email-link");
+    var briefCopy = document.getElementById("brief-copy");
+    var briefStatus = document.getElementById("brief-status");
+
+    function setBriefStatus(message) {
+      if (briefStatus) briefStatus.textContent = message;
+    }
+
+    function makeBrief() {
+      var type = briefType.value.trim();
+      var timing = briefTiming.value.trim() || "未特別指定";
+      var problem = briefProblem.value.trim();
+      var outcome = briefOutcome.value.trim();
+      return [
+        "Jason 您好：",
+        "",
+        "需求類型：" + type,
+        "希望時間：" + timing,
+        "",
+        "目前卡點：",
+        problem,
+        "",
+        "希望結果：",
+        outcome,
+        "",
+        "我知道這只是初步需求，送出不代表委託成立、保證處理或承諾免費服務。"
+      ].join("\n");
+    }
+
+    briefForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!briefForm.checkValidity()) {
+        briefForm.reportValidity();
+        setBriefStatus("請先完成必填欄位與服務邊界確認");
+        return;
+      }
+      var briefText = makeBrief();
+      var subject = "[合作詢問] " + briefType.value.trim();
+      briefPreview.value = briefText;
+      briefEmailLink.href = "mailto:chunaenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
+      briefOutput.hidden = false;
+      setBriefStatus("需求單已整理好；請預覽後開啟 Email，最後由你確認寄出");
+      briefEmailLink.focus();
+    });
+
+    if (briefCopy) briefCopy.addEventListener("click", function () {
+      if (!briefPreview.value) {
+        setBriefStatus("請先產生需求單");
+        return;
+      }
+      var copied = function () { setBriefStatus("需求單已複製，可以貼到任何信箱"); };
+      var copyFailed = function () {
+        briefPreview.focus();
+        briefPreview.select();
+        setBriefStatus("無法自動複製，已替你選取文字，請手動複製");
+      };
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) { copyFailed(); return; }
+        navigator.clipboard.writeText(briefPreview.value).then(copied, copyFailed);
+      } catch (e) { copyFailed(); }
+    });
+  }
+
   // ---------- 自我釐清工作表（只在 why.html 生效） ----------
   var form = document.getElementById("worksheet");
   if (!form) return;

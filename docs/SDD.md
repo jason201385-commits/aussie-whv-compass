@@ -72,6 +72,9 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - 兩個 IIFE（`main.js` 全站、`tools.js` 工具頁），無模組系統。
 - **特徵偵測模式**：每個功能塊以 `document.getElementById(...)` 判斷是否在該頁，
   不存在就跳過——tools.js 可安全掛在任何頁。
+- **私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字與 `mailto:`，不建立
+  localStorage key、不呼叫 fetch、不自動寄信；輸入只以 `textContent`／`value` 呈現，寄信參數必須
+  `encodeURIComponent`。clipboard 不可用時只選取預覽文字，不得誤報已複製。
 - **旅程順序單一來源**：`main.js` 的 `JOURNEY_ORDER` 與首頁四階段一致，負責內容頁的
   上一站／下一站與位置顯示；首頁只提供 `#journey-map` 全貌，不注入頁尾導覽。
 - **localStorage keys**（改動＝使用者資料遺失，不得更名）：
