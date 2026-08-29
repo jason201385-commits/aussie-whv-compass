@@ -50,6 +50,7 @@
 | `leave.html` | 報稅退休金離澳＋**DASP 速算**＋**本機離澳收尾清單** |
 | `pr.html` | PR 路徑總覽 |
 | `about.html` | 關於、贊助（按鈕待站長提供連結）、授權、免責 |
+| `404.html` | 自訂錯誤復原頁：保留 noindex，導回最近閱讀、卡關捷徑與四階段旅程 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、工作表 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |

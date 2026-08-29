@@ -9,11 +9,57 @@ $errors = 0
 $assetVersions = @()
 $canonicalOrigin = 'https://www.aussiewhvcompass.com'
 
-$pages = Get-ChildItem (Join-Path $dir '*.html') | Select-Object -ExpandProperty Name
+$allPages = Get-ChildItem (Join-Path $dir '*.html') | Select-Object -ExpandProperty Name
+$pages = @($allPages | Where-Object { $_ -ne '404.html' })
 $anchors = @{}
-foreach ($p in $pages) {
+foreach ($p in $allPages) {
   $t = [System.IO.File]::ReadAllText((Join-Path $dir $p), [System.Text.Encoding]::UTF8)
   $anchors[$p] = [regex]::Matches($t, 'id="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+}
+
+# 404 是錯誤復原頁，不列入 canonical 與 sitemap；仍需維持完整導航與回程入口
+$notFoundPath = Join-Path $dir '404.html'
+if (-not (Test-Path $notFoundPath)) {
+  Write-Output 'FAIL 缺自訂 404.html'
+  $errors++
+} else {
+  $notFoundText = [System.IO.File]::ReadAllText($notFoundPath, [System.Text.Encoding]::UTF8)
+  foreach ($required in @(
+    '<meta name="robots" content="noindex,follow">',
+    '<main id="main-content">',
+    'site-footer',
+    'assets/style.css?v=',
+    'assets/main.js?v=',
+    'href="index.html"',
+    'href="index.html#support-hub"',
+    'href="index.html#considering"',
+    'href="index.html#committed"',
+    'href="index.html#in-australia"',
+    'href="index.html#next-step"'
+  )) {
+    if (-not $notFoundText.Contains($required)) { Write-Output "FAIL [404.html] 缺復原要素：$required"; $errors++ }
+  }
+  $notFoundNav = [regex]::Matches($notFoundText, 'class="nav-links"[\s\S]*?</div>')
+  if ($notFoundNav.Count -ne 1 -or (($notFoundNav[0].Value -split '<a ').Count - 1) -ne 12) {
+    Write-Output 'FAIL [404.html] 主導覽必須維持 12 個連結'
+    $errors++
+  }
+  if ($notFoundText.Contains('rel="canonical"') -or $notFoundText.Contains('property="og:url"')) {
+    Write-Output 'FAIL [404.html] 錯誤頁不得宣告 canonical 或 og:url'
+    $errors++
+  }
+  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js)(?:\?v=([^"]+))?"')) {
+    if (-not $asset.Groups[1].Success) { Write-Output 'FAIL [404.html] 本機資產缺 ?v= 版本'; $errors++ }
+    else { $assetVersions += $asset.Groups[1].Value }
+  }
+  foreach ($m in [regex]::Matches($notFoundText, 'href="([^"#:]+\.html)(#[^"]*)?"')) {
+    $file = $m.Groups[1].Value; $anc = $m.Groups[2].Value
+    if (-not (Test-Path (Join-Path $dir $file))) { Write-Output "FAIL [404.html] 壞連結 → $file"; $errors++; continue }
+    if ($anc -and $anchors[$file] -notcontains $anc.TrimStart('#')) {
+      Write-Output "FAIL [404.html] 壞錨點 → $file$anc"
+      $errors++
+    }
+  }
 }
 
 foreach ($p in $pages) {
