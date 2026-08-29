@@ -15,6 +15,25 @@ $anchors = @{}
 foreach ($p in $allPages) {
   $t = [System.IO.File]::ReadAllText((Join-Path $dir $p), [System.Text.Encoding]::UTF8)
   $anchors[$p] = [regex]::Matches($t, 'id="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+
+  # 全頁語意與鍵盤安全基線（內容頁與 404 都適用）
+  if ([regex]::Matches($t, '<html\s+lang="zh-Hant">').Count -ne 1) { Write-Output "FAIL [$p] html lang 必須是 zh-Hant"; $errors++ }
+  if ([regex]::Matches($t, '<meta name="viewport"').Count -ne 1) { Write-Output "FAIL [$p] viewport 數量錯誤"; $errors++ }
+  if ([regex]::Matches($t, '<main(?:\s|>)').Count -ne 1) { Write-Output "FAIL [$p] main 數量錯誤"; $errors++ }
+  if ([regex]::Matches($t, '<h1(?:\s|>)').Count -ne 1) { Write-Output "FAIL [$p] h1 數量錯誤"; $errors++ }
+
+  $duplicateIds = @($anchors[$p] | Group-Object | Where-Object { $_.Count -gt 1 })
+  foreach ($duplicate in $duplicateIds) {
+    Write-Output "FAIL [$p] 重複 id：$($duplicate.Name)"
+    $errors++
+  }
+  foreach ($link in [regex]::Matches($t, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener') { Write-Output "FAIL [$p] target=_blank 缺 noopener"; $errors++ }
+  }
+  if ([regex]::Matches($t, '<button\b(?![^>]*\btype=)[^>]*>').Count -gt 0) {
+    Write-Output "FAIL [$p] button 缺 type"
+    $errors++
+  }
 }
 
 # 404 是錯誤復原頁，不列入 canonical 與 sitemap；仍需維持完整導航與回程入口

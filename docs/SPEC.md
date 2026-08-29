@@ -129,6 +129,7 @@ Pages 設定 enforce HTTPS；每頁 canonical／`og:url` 與 Issue Template 首�
 #    本機 CSS／JS／資料檔皆有且共用同一個 ?v= 資產版本
 #    CNAME、每頁 canonical/og:url、sitemap.xml、robots.txt 全部鎖定正式網域且頁數一致
 #    404.html 必須 noindex、保留 12 項導覽，並提供首頁與四階段旅程復原入口
+#    每頁唯一 h1/main、zh-Hant、viewport、ID 不重複；新分頁連結需 noopener；button 必須宣告 type
 # 2) emoji 掃描（0 命中才過）：regex [\uD83C-\uD83E][\uDC00-\uDFFF]|️ 於 *.html 與 assets/*.js
 # 3) 集簽快查器測試組（線上或本地開頁跑 JS）：
 #    4880/plant=YES  2000/plant=NO  0870/tourism=YES  7215/tourism=YES
