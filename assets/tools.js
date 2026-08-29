@@ -7,8 +7,23 @@
 
   /* ================= 集簽資格快查器（visa.html） ================= */
   var pcTool = document.getElementById("postcode-tool");
+  var pcStatus = document.getElementById("pc-status");
+  if (pcTool && !window.WHV_POSTCODES) {
+    var pcUnavailable = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0
+      ? "The postcode data could not be loaded. Refresh the page or use the linked Home Affairs postcode tables."
+      : "郵遞區號資料未能載入，請重新整理，或直接查閱頁面連結的 Home Affairs 官方清單。";
+    var pcUnavailableOut = document.getElementById("pc-result");
+    pcUnavailableOut.style.display = "block";
+    pcUnavailableOut.textContent = pcUnavailable;
+    if (pcStatus) pcStatus.textContent = pcUnavailable;
+    pcTool.querySelectorAll("input, select, button").forEach(function (control) { control.disabled = true; });
+  }
   if (pcTool && window.WHV_POSTCODES) {
     var D = window.WHV_POSTCODES;
+    var pcEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+    var announcePcResult = function (out) {
+      if (pcStatus) pcStatus.textContent = out.textContent;
+    };
     var inList = function (pc, list) {
       if (!list) return false;
       for (var i = 0; i < list.length; i++) {
@@ -51,13 +66,19 @@
       var out = document.getElementById("pc-result");
       out.style.display = "block";
       if (!/^\d{4}$/.test(raw)) {
-        out.innerHTML = '<p class="result-verdict">請輸入 4 位數郵遞區號（北領地含前導零，如 0870）</p>';
+        out.innerHTML = '<p class="result-verdict">' + (pcEnglish
+          ? 'Enter a four-digit postcode. Keep the leading zero for Northern Territory postcodes such as 0870.'
+          : '請輸入 4 位數郵遞區號（北領地含前導零，如 0870）') + '</p>';
+        announcePcResult(out);
         return;
       }
       var pc = parseInt(raw, 10);
       var st = stateOf(pc);
       if (!st) {
-        out.innerHTML = '<p class="result-verdict result-no">' + icon("x") + ' 這不像是澳洲的郵遞區號，再確認一下？</p>';
+        out.innerHTML = '<p class="result-verdict result-no">' + icon("x") + (pcEnglish
+          ? ' This does not look like an Australian postcode. Check the four digits and try again.'
+          : ' 這不像是澳洲的郵遞區號，再確認一下？') + '</p>';
+        announcePcResult(out);
         return;
       }
       var ok = false, extraNote = "";
@@ -67,23 +88,38 @@
         var t = D.northern_remote_tourism;
         ok = checkGroup(pc, st, t.remote_very_remote) || checkGroup(pc, st, t.northern_australia)
           || inList(pc, (t.extra_postcodes.QLD || []).concat(t.extra_postcodes.TAS || []));
-        extraNote = "觀光餐旅類：工作須於 2021-06-22 之後進行。";
+        extraNote = pcEnglish
+          ? "Tourism and hospitality work must have been performed after 21 June 2021."
+          : "觀光餐旅類：工作須於 2021-06-22 之後進行。";
       } else if (cat === "bushfire") {
         ok = checkGroup(pc, st, D.bushfire.postcodes);
-        extraNote = "火災復原：限 2019-07-31 之後、於宣告火災區進行的工作（含志工）。宣告區清單官方會更新。";
+        extraNote = pcEnglish
+          ? "Bushfire recovery must have been performed after 31 July 2019 in a declared bushfire-affected area. Eligible volunteer work can count. The official declared-area list can change."
+          : "火災復原：限 2019-07-31 之後、於宣告火災區進行的工作（含志工）。宣告區清單官方會更新。";
       } else {
         ok = checkGroup(pc, st, D.disaster.postcodes);
-        extraNote = "天災復原：限 2021-12-31 之後的工作（含志工）；申請表 Employment type 須選 flood recovery。宣告區清單官方會更新。";
+        extraNote = pcEnglish
+          ? "Natural-disaster recovery must have been performed after 31 December 2021. Eligible volunteer work can count. The official declared-area list can change."
+          : "天災復原：限 2021-12-31 之後的工作（含志工）；申請表 Employment type 須選 flood recovery。宣告區清單官方會更新。";
       }
       var catName = document.getElementById("pc-cat").selectedOptions[0].textContent;
       if (ok) {
-        out.innerHTML = '<p class="result-verdict result-ok">' + icon("check") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>在官方合格清單內</strong></p>'
-          + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '別忘了三個前提：工作內容要真的屬於該產業、必須合法支薪（黑工不算）、payslip 從第一天就要存。</p>';
+        out.innerHTML = pcEnglish
+          ? '<p class="result-verdict result-ok">' + icon("check") + ' Postcode ' + raw + ' (' + st + ') for “' + catName + '” is <strong>on the relevant official subclass 417 postcode list</strong>.</p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + 'A postcode match is only one requirement: your actual duties must fit the category, the work must be lawfully paid unless an official volunteer exception applies, and you should keep payslips from day one.</p>'
+          : '<p class="result-verdict result-ok">' + icon("check") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>在官方合格清單內</strong></p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '別忘了三個前提：工作內容要真的屬於該產業、必須合法支薪（黑工不算）、payslip 從第一天就要存。</p>';
       } else {
-        out.innerHTML = '<p class="result-verdict result-no">' + icon("x") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>不在官方合格清單內</strong></p>'
-          + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '提示：大城市都會區幾乎都不合格；動植物栽培等要在 regional（SA／TAS／NT 全境皆可），觀光餐旅只限北澳與偏遠地區。換個郵遞區號試試，或改查其他工作類型。</p>';
+        out.innerHTML = pcEnglish
+          ? '<p class="result-verdict result-no">' + icon("x") + ' Postcode ' + raw + ' (' + st + ') for “' + catName + '” is <strong>not on the relevant official subclass 417 postcode list</strong>.</p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + 'Most metropolitan areas are excluded. Try the exact work postcode or another category, then check the live official page. This result does not apply to subclass 462.</p>'
+          : '<p class="result-verdict result-no">' + icon("x") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>不在官方合格清單內</strong></p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '提示：大城市都會區幾乎都不合格；動植物栽培等要在 regional（SA／TAS／NT 全境皆可），觀光餐旅只限北澳與偏遠地區。換個郵遞區號試試，或改查其他工作類型。</p>';
       }
-      out.innerHTML += '<p class="fact-meta">依 2026-08-29 抓取的官方清單判定，申請前請以 <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">官方頁面現行清單</a>為準。</p>';
+      out.innerHTML += pcEnglish
+        ? '<p class="fact-meta">Based on the official subclass 417 tables retrieved on 2026-08-29. Before applying, check the <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">current Home Affairs page</a>.</p>'
+        : '<p class="fact-meta">依 2026-08-29 抓取的官方清單判定，申請前請以 <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">官方頁面現行清單</a>為準。</p>';
+      announcePcResult(out);
     };
     document.getElementById("pc-check").addEventListener("click", run);
     document.getElementById("pc-input").addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });

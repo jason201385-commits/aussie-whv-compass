@@ -333,7 +333,7 @@ li { margin: .4em 0; }
 .site-search-home-form { margin-top: 18px; max-width: 780px; }
 
 /* ---------- 多國語言入口與 Quick Start ---------- */
-.language-picker { flex: 0 0 auto; display: inline-flex; align-items: center; }
+.language-picker { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; margin: 0; }
 .language-picker select {
   min-height: 44px;
   max-width: 170px;
@@ -347,6 +347,20 @@ li { margin: .4em 0; }
   padding: 7px 34px 7px 12px;
   cursor: pointer;
 }
+.language-go {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--ink);
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.language-go:hover { filter: brightness(.97); }
+.language-go:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .language-hub-link {
   min-height: 44px;
   display: inline-flex;
@@ -1526,7 +1540,7 @@ main [id] { scroll-margin-top: 170px; }
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .language-picker select { max-width: min(150px, 38vw); }
+  .language-picker select { max-width: min(130px, 32vw); }
   .site-search-open { flex: 0 0 44px; padding: 8px; }
   .site-search-open span { display: none; }
   .nav-links {

@@ -176,7 +176,11 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 - 2026-08-29 已完成第一階段：目錄式 `/lang/<locale>/` Quick Start、38 種主要語言切換、
   49 個現行 417／462 護照國家／地區覆蓋表、SEO `hreflang` 與 RTL；繁中／英文為來源文案，
   其餘明示未校對機器翻譯或英文 fallback。
-- 第二階段 backlog：先把 visa／work／scam 做英文人工校訂版，再依使用量擴充其他語言與頁面。
+- 第二階段現況：`/lang/en/visa/` 已完成可索引的完整英文 editorial beta，將台灣限定 417 內容
+  改寫為護照中立的 417／462 分流；英文郵遞區號快查器在輸入、結果與來源明示只適用 417。
+  已重查 Home Affairs／Fair Work 一手來源，但尚未經母語移民專業人士校對，不得標為 reviewed。
+- 第二階段 backlog：完成 work／scam 英文 editorial beta，並替 visa 找母語或合格專業人士校對；
+  再依使用量擴充其他語言與頁面。
   台灣特定內容（健保核退、台幣、駐外館處）需在地化改寫而非直譯；未經母語者校對不得標為 reviewed。
 
 ## 6. 驗收程序（每次 push 前必跑）

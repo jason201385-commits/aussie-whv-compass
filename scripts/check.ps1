@@ -246,6 +246,92 @@ if (-not (Test-Path $i18nBuilder) -or -not (Test-Path $i18nDataPath)) {
   }
 }
 
+# 完整英文簽證頁：不得把台灣 417 規則直譯成全球通則，且 417 工具邊界與英文輸出不可遺失
+$englishVisaPath = Join-Path $dir 'lang\en\visa\index.html'
+if (-not (Test-Path $englishVisaPath)) {
+  Write-Output 'FAIL 缺完整英文簽證頁：lang/en/visa/'
+  $errors++
+} else {
+  $englishVisaText = [System.IO.File]::ReadAllText($englishVisaPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    'data-i18n-topic="visa"',
+    '<svg class="svg-sprite" style="display:none" aria-hidden="true"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/visa/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/visa.html">',
+    'class="warn"><strong>Editorial status:',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking immigration professional',
+    'id="choose"',
+    'id="postcode-tool"',
+    'SUBCLASS 417 TOOL',
+    'It does <strong>not</strong> decide',
+    'specified-462-work',
+    'status-of-country-caps',
+    'visa-pricing-estimator',
+    'id="pc-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"',
+    '/assets/tools.js?v='
+  )) {
+    if (-not $englishVisaText.Contains($needle)) { Write-Output "FAIL [lang/en/visa/] 缺內容、來源或工具邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishVisaText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishVisaText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/visa/] 必須只有一個 h1 與 main'
+    $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishVisaText, '<a href="#([^"]+)"')) {
+    if (-not $englishVisaText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/visa/] TOC 錨點不存在：$($anchor.Groups[1].Value)"
+      $errors++
+    }
+  }
+  $englishIds = [regex]::Matches($englishVisaText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/visa/] 含重複 id'
+    $errors++
+  }
+  $englishAssetVersions = @([regex]::Matches($englishVisaText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|tools\.js|postcodes\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/visa/] 資產版本與全站不一致：$(($englishAssetVersions) -join ', ')"
+    $errors++
+  }
+  $englishExternalBlanks = [regex]::Matches($englishVisaText, '<a\b[^>]*target="_blank"[^>]*>')
+  foreach ($link in $englishExternalBlanks) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/visa/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  $traditionalVisaText = [System.IO.File]::ReadAllText((Join-Path $dir 'visa.html'), [System.Text.Encoding]::UTF8)
+  if (-not $traditionalVisaText.Contains('<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/visa/">')) {
+    Write-Output 'FAIL [visa.html] 缺英文簽證頁 reciprocal hreflang'
+    $errors++
+  }
+  if (-not $traditionalVisaText.Contains('<body data-i18n-topic="visa">')) {
+    Write-Output 'FAIL [visa.html] 缺語言切換的簽證主題標記'
+    $errors++
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/visa/">')) {
+    Write-Output 'FAIL [lang/en/] 簽證卡未連到完整英文頁'
+    $errors++
+  }
+  $toolsI18nText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @('var pcEnglish =', 'This result does not apply to subclass 462.', 'Based on the official subclass 417 tables', 'if (pcTool && !window.WHV_POSTCODES)', 'pcStatus.textContent =')) {
+    if (-not $toolsI18nText.Contains($needle)) { Write-Output "FAIL [tools.js] 郵遞區號工具缺英文安全文案：$needle"; $errors++ }
+  }
+  $i18nSwitcherText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @('var topicRoutes =', '"visa":{"zh-Hant":"/visa.html","en":"/lang/en/visa/"}', 'data-i18n-topic', 'go.type = "submit"', 'event.preventDefault()')) {
+    if (-not $i18nSwitcherText.Contains($needle)) { Write-Output "FAIL [i18n.js] 缺主題保留切換：$needle"; $errors++ }
+  }
+  if ($i18nSwitcherText.Contains('select.addEventListener("change"')) {
+    Write-Output 'FAIL [i18n.js] 選擇語言不得在 change 時立即切頁，需由明確按鈕確認'
+    $errors++
+  }
+  $postcodeScriptAt = $englishVisaText.IndexOf('<script src="/assets/postcodes.js?v=')
+  $toolsScriptAt = $englishVisaText.IndexOf('<script src="/assets/tools.js?v=')
+  if ($postcodeScriptAt -lt 0 -or $toolsScriptAt -lt 0 -or $postcodeScriptAt -gt $toolsScriptAt) {
+    Write-Output 'FAIL [lang/en/visa/] postcodes.js 必須在 tools.js 前載入'
+    $errors++
+  }
+}
+
 # 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
 $searchBuilder = Join-Path $dir 'scripts\build_search.py'
@@ -384,7 +470,7 @@ if (-not (Test-Path $cnamePath)) {
   $errors++
 }
 
-# 搜尋探索：sitemap 必須列出 13 個完整繁中頁、語言 hub 與所有非繁中 Quick Start
+# 搜尋探索：sitemap 必須列出 13 個完整繁中頁、語言 hub、Quick Start 與完整翻譯頁
 $sitemapPath = Join-Path $dir 'sitemap.xml'
 if (-not (Test-Path $sitemapPath)) {
   Write-Output 'FAIL 缺 sitemap.xml'
@@ -399,6 +485,7 @@ if (-not (Test-Path $sitemapPath)) {
     $sitemapI18nData = Get-Content -Raw (Join-Path $dir 'assets\i18n-locales.json') | ConvertFrom-Json
     $expectedUrls += "$canonicalOrigin/lang/"
     $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
+    $expectedUrls += "$canonicalOrigin/lang/en/visa/"
   }
   if ($sitemapUrls.Count -ne $expectedUrls.Count) {
     Write-Output "FAIL sitemap 頁數=$($sitemapUrls.Count)（應為 $($expectedUrls.Count)）"
@@ -429,7 +516,7 @@ if (-not (Test-Path $robotsPath)) {
   }
 }
 
-# llms.txt 是輔助 AI 理解的社群提案，不取代 sitemap／robots；需列出 13 個完整頁、語言 hub 與事實邊界
+# llms.txt 是輔助 AI 理解的社群提案，不取代 sitemap／robots；需列出完整頁、語言入口與事實邊界
 $llmsPath = Join-Path $dir 'llms.txt'
 if (-not (Test-Path $llmsPath)) {
   Write-Output 'FAIL 缺 llms.txt'
@@ -438,7 +525,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }

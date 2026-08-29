@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260829-8"
+ASSET_VERSION = "20260829-9"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -34,6 +34,12 @@ GUIDES = [
     ("pr", "/pr.html"),
     ("collaborate", "/about.html#collaborate"),
 ]
+FULL_GUIDE_TRANSLATIONS = {
+    "en": {"visa": "/lang/en/visa/"},
+}
+FULL_TOPIC_ROUTES = {
+    "visa": {"zh-Hant": "/visa.html", "en": "/lang/en/visa/"},
+}
 
 
 def esc(value: str) -> str:
@@ -149,7 +155,7 @@ def build_locale_page(code: str, locale: dict, data: dict) -> str:
     canonical = locale_url(code)
     title = f'{strings["page_title"]} | {strings["site_name"]}'
     cards = "\n".join(
-        f'<a class="card i18n-guide-card" href="{href}"><h3>{esc(strings[key])}</h3><span aria-hidden="true">→</span></a>'
+        f'<a class="card i18n-guide-card" href="{FULL_GUIDE_TRANSLATIONS.get(code, {}).get(key, href)}"><h3>{esc(strings[key])}</h3><span aria-hidden="true">→</span></a>'
         for key, href in GUIDES
     )
     review = locale["reviewStatus"]
@@ -264,34 +270,46 @@ def build_switcher(data: dict) -> str:
             "url": "/" if code == "zh-Hant" else f"/lang/{code}/",
         })
     payload = json.dumps(choices, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    topic_routes = json.dumps(FULL_TOPIC_ROUTES, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     return f'''(function () {{
   "use strict";
   var choices = {payload};
+  var topicRoutes = {topic_routes};
   var nav = document.querySelector(".nav-inner");
   if (!nav || nav.querySelector(".language-picker")) return;
-  var label = document.createElement("label");
-  label.className = "language-picker";
+  var picker = document.createElement("form");
+  picker.className = "language-picker";
   var text = document.createElement("span");
   text.className = "sr-only";
   text.textContent = "Language";
   var select = document.createElement("select");
   select.setAttribute("aria-label", "Language");
   var current = document.documentElement.lang || "zh-Hant";
+  var topic = document.body.getAttribute("data-i18n-topic") || "";
   choices.forEach(function (choice) {{
     var option = document.createElement("option");
-    option.value = choice.url;
+    option.value = topicRoutes[topic] && topicRoutes[topic][choice.code]
+      ? topicRoutes[topic][choice.code]
+      : choice.url;
     option.textContent = choice.label;
     option.lang = choice.code;
     option.selected = choice.code === current;
     select.appendChild(option);
   }});
-  select.addEventListener("change", function () {{
+  var go = document.createElement("button");
+  go.type = "submit";
+  go.className = "language-go";
+  go.textContent = "Go";
+  go.setAttribute("aria-label", "Open selected language");
+  picker.addEventListener("submit", function (event) {{
+    event.preventDefault();
     if (select.value) window.location.assign(select.value);
   }});
-  label.appendChild(text);
-  label.appendChild(select);
+  picker.appendChild(text);
+  picker.appendChild(select);
+  picker.appendChild(go);
   var navLinks = nav.querySelector(".nav-links");
-  nav.insertBefore(label, navLinks || null);
+  nav.insertBefore(picker, navLinks || null);
 }})();
 '''
 
