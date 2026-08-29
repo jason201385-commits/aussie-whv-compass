@@ -124,6 +124,28 @@
   </ul>
 
   <h2 id="seasons">五、採收季節與淡旺季</h2>
+  <section class="tool" id="season-calendar" aria-labelledby="season-title">
+    <span class="tool-tag">零打字快查</span>
+    <h3 id="season-title">官方採收季節月曆</h3>
+    <p>選一個月份，看 VIC、TAS、NT 官方表列出的採收項目。其他州／領地若找不到同等級官方月表，會直接標示，不用民間資料補空白。</p>
+    <div class="season-months" role="group" aria-label="選擇月份">
+      <button class="chip" type="button" data-season-month="1">1 月</button>
+      <button class="chip" type="button" data-season-month="2">2 月</button>
+      <button class="chip" type="button" data-season-month="3">3 月</button>
+      <button class="chip" type="button" data-season-month="4">4 月</button>
+      <button class="chip" type="button" data-season-month="5">5 月</button>
+      <button class="chip" type="button" data-season-month="6">6 月</button>
+      <button class="chip" type="button" data-season-month="7">7 月</button>
+      <button class="chip" type="button" data-season-month="8">8 月</button>
+      <button class="chip" type="button" data-season-month="9">9 月</button>
+      <button class="chip" type="button" data-season-month="10">10 月</button>
+      <button class="chip" type="button" data-season-month="11">11 月</button>
+      <button class="chip" type="button" data-season-month="12">12 月</button>
+    </div>
+    <div id="season-results" class="season-results" aria-live="polite"></div>
+    <noscript><p class="warn">開啟 JavaScript 才能使用月份快查；下方仍保留文字版規劃原則。</p></noscript>
+    <p class="fact-meta">來源：<a href="https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest/how-to-get-a-harvest-job" rel="noopener">Agriculture Victoria</a>・<a href="https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs" rel="noopener">NRE Tasmania</a>・<a href="https://nt.gov.au/industry/agriculture/food-crops-plants-and-quarantine/fruit-crops/fruit-availability-and-storage" rel="noopener">NT Government</a>｜2026-08-29 查核</p>
+  </section>
   <ul>
     <li>全國官方採收月曆已隨 Harvest Trail 裁撤停更，<strong>州層級</strong>仍有官方資訊。以維州官方季節表為例：柑橘 5–9 月、莓果 11–4 月、櫻桃 11–1 月、蘋果梨 1–5 月、剪羊毛旺季 9–12 月——同一種作物在不同州的時間不同，把幾個州的季節接起來，理論上全年都有採收工作。</li>
     <li>實務規劃：<strong>採收季開始前 2–4 週抵達該區域最有利</strong>；旺季結束人力過剩時，工時和計件收入都會掉。</li>
@@ -166,5 +188,7 @@
 </footer>
 
 <script src="assets/main.js"></script>
+<script src="assets/seasons.js"></script>
+<script src="assets/tools.js"></script>
 </body>
 </html>

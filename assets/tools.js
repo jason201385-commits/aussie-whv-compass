@@ -95,6 +95,62 @@
     });
   }
 
+  /* ================= 採收季節月曆（work.html） ================= */
+  var seasonTool = document.getElementById("season-calendar");
+  if (seasonTool) {
+    var seasonData = window.WHV_SEASONS;
+    var seasonOut = document.getElementById("season-results");
+
+    var seasonSourceLink = function (source) {
+      return '<a href="' + source.url + '" rel="noopener">官方表</a>';
+    };
+
+    var renderSeason = function (month) {
+      if (!seasonData || !seasonOut) {
+        if (seasonOut) seasonOut.innerHTML = '<p class="warn">採收資料沒有載入，請重新整理後再試。</p>';
+        return;
+      }
+
+      seasonTool.querySelectorAll("[data-season-month]").forEach(function (button) {
+        button.setAttribute("aria-pressed", Number(button.dataset.seasonMonth) === month ? "true" : "false");
+      });
+
+      var verifiedCount = 0;
+      var cards = seasonData.states.map(function (state) {
+        var source = seasonData.sources[state.code];
+        if (!source) {
+          return '<article class="season-state season-state-missing">'
+            + '<h4><span>' + state.code + '</span>' + state.name + '</h4>'
+            + '<p>本次查核未找到可直接轉成採收月份的州政府表格。</p>'
+            + '</article>';
+        }
+
+        var matches = state.entries.filter(function (entry) { return entry.months.indexOf(month) !== -1; });
+        if (matches.length) verifiedCount++;
+        var items = matches.length
+          ? '<ul>' + matches.map(function (entry) {
+              return '<li><strong>' + entry.crop + '</strong><span>' + entry.region + '</span></li>';
+            }).join("") + '</ul>'
+          : '<p>官方表在這個月沒有列出項目。</p>';
+
+        return '<article class="season-state' + (matches.length ? ' is-active' : '') + '">'
+          + '<h4><span>' + state.code + '</span>' + state.name + '</h4>'
+          + items
+          + '<p class="fact-meta">' + seasonSourceLink(source) + '・頁面日期 ' + source.pageDate + '</p>'
+          + '</article>';
+      }).join("");
+
+      seasonOut.innerHTML = '<p class="season-summary"><strong>' + month + ' 月：</strong>有 ' + verifiedCount + ' 個州／領地在官方表中列出項目</p>'
+        + '<div class="season-grid">' + cards + '</div>'
+        + '<p class="season-caveat">這是政府公布的採收／供應月份，不是職缺保證。天候、品種與產區會讓日期前後移動，出發前仍要向雇主確認班次。</p>';
+    };
+
+    seasonTool.querySelectorAll("[data-season-month]").forEach(function (button) {
+      button.addEventListener("click", function () { renderSeason(Number(button.dataset.seasonMonth)); });
+    });
+    renderSeason(new Date().getMonth() + 1);
+  }
+
   /* ================= 存錢試算器（cost.html） ================= */
   var calc = document.getElementById("save-calc");
   if (calc) {

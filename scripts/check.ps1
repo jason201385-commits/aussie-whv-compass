@@ -56,7 +56,7 @@ foreach ($f in $scanTargets) {
 }
 
 # 資料檔存在且非空
-foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\tools.js', 'assets\postcodes.js')) {
+foreach ($a in @('assets\style.css', 'assets\main.js', 'assets\tools.js', 'assets\postcodes.js', 'assets\seasons.js')) {
   $fp = Join-Path $dir $a
   if (-not (Test-Path $fp) -or (Get-Item $fp).Length -lt 100) { Write-Output "FAIL 資產異常：$a"; $errors++ }
 }

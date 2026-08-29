@@ -611,6 +611,60 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .chip:hover { background: var(--gold); color: #221d15; transform: translateY(-1px); }
 .chip:active { transform: translateY(1px); }
 
+/* ---------- 採收季節月曆 ---------- */
+.season-months {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0 18px;
+}
+.season-months .chip { width: 100%; min-height: 42px; padding-inline: 8px; }
+.season-months .chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--ink);
+  color: var(--on-accent);
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: translate(-1px, -1px);
+}
+.season-summary { margin: 0 0 12px; font-size: 1.05rem; }
+.season-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.season-state {
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  padding: 14px;
+}
+.season-state.is-active { border-color: var(--green); background: var(--green-soft); }
+.season-state-missing { border-style: dashed; color: var(--ink-soft); }
+.season-state h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+.season-state h4 span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 3.2em;
+  min-height: 30px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: .76rem;
+  letter-spacing: .06em;
+}
+.season-state ul { list-style: none; margin: 0; padding: 0; }
+.season-state li { padding: 8px 0; border-top: 1px solid var(--line-soft); }
+.season-state li:first-child { border-top: 0; }
+.season-state li strong, .season-state li span { display: block; }
+.season-state li span { margin-top: 2px; color: var(--ink-soft); font-size: .82rem; }
+.season-caveat { margin: 14px 0 0; color: var(--ink-soft); font-size: .85rem; }
+
+@media (max-width: 560px) {
+  .season-months { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .season-grid { grid-template-columns: 1fr; }
+}
+
 /* ---------- 回饋列 ---------- */
 .feedback-bar {
   max-width: var(--maxw);
