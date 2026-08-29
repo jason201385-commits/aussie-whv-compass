@@ -89,6 +89,19 @@ if (-not $mainJs.Contains('template=thanks.yml')) {
   Write-Output 'FAIL [main.js] 全站回饋列缺感謝入口'
   $errors++
 }
+foreach ($resumeNeedle in @('whv-last-page-v1', 'JOURNEY_PAGES', 'hasOwnProperty.call(JOURNEY_PAGES', 'JSON.parse(localStorage.getItem(LAST_PAGE_KEY)', 'localStorage.removeItem(LAST_PAGE_KEY)')) {
+  if (-not $mainJs.Contains($resumeNeedle)) {
+    Write-Output "FAIL [main.js] 最近閱讀缺安全條件：$resumeNeedle"
+    $errors++
+  }
+}
+$indexText = [System.IO.File]::ReadAllText((Join-Path $dir 'index.html'), [System.Text.Encoding]::UTF8)
+foreach ($resumeId in @('journey-resume', 'journey-resume-link', 'journey-resume-clear')) {
+  if (-not $indexText.Contains("id=`"$resumeId`"")) {
+    Write-Output "FAIL [index.html] 缺最近閱讀元件：$resumeId"
+    $errors++
+  }
+}
 foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml')) {
   $formPath = Join-Path $dir ".github\ISSUE_TEMPLATE\$formName"
   if (-not (Test-Path $formPath)) {

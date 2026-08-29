@@ -69,6 +69,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   - `whv-worksheet-v1`：工作表答案（{q1..q8: string}）
   - `whv-prep-check-v1`：行前清單勾選（{pc2-g-i: bool}）
   - `whv-save-calc-v1`：存錢試算器輸入與最近一次結果（行前海報使用）
+  - `whv-last-page-v1`：最近閱讀的白名單頁名（`{path}`），供首頁續讀卡使用
 - SVG sprite 由 main.js 注入 `<body>` 開頭；頁面以
   `<svg class="icon"><use href="#i-名稱"/></svg>` 引用。**JS 未載入時圖示不顯示**，
   屬已接受的取捨（工具本來就需要 JS）。

@@ -356,6 +356,37 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 40px 20px 70px; }
   .community-callout .btn { width: 100%; margin-left: 0; text-align: center; }
 }
 
+/* ---------- 回訪續接：只讀本機最近閱讀 ---------- */
+.journey-resume {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin: 34px 0 12px;
+  padding: 22px 24px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--blue-soft);
+  box-shadow: var(--shadow-pop);
+}
+.journey-resume[hidden] { display: none; }
+.journey-resume-mark {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--blue);
+}
+.journey-resume-mark .icon { width: 28px; height: 28px; }
+.journey-resume h2 { margin: .15em 0 .25em; font-size: clamp(1.35rem, 3vw, 1.8rem); }
+.journey-resume-copy > p { margin: 0; }
+.journey-resume-privacy { color: var(--ink-soft); font-size: .78rem; }
+.journey-resume-actions { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.journey-resume-actions .btn { min-height: 44px; text-align: center; }
+
 /* ---------- 首頁旅程索引 ---------- */
 .journey-directory {
   display: grid;
@@ -939,6 +970,10 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   .journey-directory a + a { border-left: 0; }
   .journey-directory a:nth-child(even) { border-left: 2px solid var(--ink); }
   .journey-directory a:nth-child(n+3) { border-top: 2px solid var(--ink); }
+  .journey-resume { grid-template-columns: 48px minmax(0, 1fr); padding: 18px 16px; }
+  .journey-resume-mark { width: 48px; height: 48px; }
+  .journey-resume-actions { grid-column: 1 / -1; justify-content: stretch; }
+  .journey-resume-actions .btn { flex: 1 1 100%; width: 100%; }
   .home-page .card-grid { grid-template-columns: 1fr; }
   .featured-tool { grid-template-columns: 1fr; padding: 26px 22px 30px; }
   .featured-poster-preview { width: min(210px, 78%); min-height: 200px; justify-self: center; }

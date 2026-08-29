@@ -34,6 +34,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | DASP 速算 | leave.html `#dasp-calc` | 金額 number＋4 個金額 chips | take=×0.35、tax=×0.65 | 兩格數據＋台幣評語 |
 | 自我釐清工作表 | why.html `#worksheet` | 8 題 textarea＋Q4/Q5 快選 chips | 600ms 防抖存 `whv-worksheet-v1`；chips 以頓號接續填入 | 匯出 .txt／列印／清空 |
 | 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→`report.yml`；感謝鈕→`thanks.yml`，兩者都自動帶入頁名 | — |
+| 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | localStorage `whv-last-page-v1` 只存 `{path}`；首頁以固定頁名／階段 map 顯示，拒絕未知 path | 續讀連結＋清除紀錄；首次訪問或無效資料時隱藏 |
 
 ### 1.3 回饋機制
 

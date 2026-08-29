@@ -58,6 +58,48 @@
     }
   });
 
+  // ---------- 最近閱讀：只記錄白名單頁名，作為首頁的回訪續接 ----------
+  var LAST_PAGE_KEY = "whv-last-page-v1";
+  var JOURNEY_PAGES = {
+    "why.html": { title: "自我釐清", stage: "還在考慮" },
+    "cost.html": { title: "物價與薪水", stage: "還在考慮" },
+    "visa.html": { title: "簽證與集簽", stage: "還在考慮" },
+    "prep.html": { title: "行前準備與落地", stage: "準備出發" },
+    "health.html": { title: "健康與安全", stage: "準備出發" },
+    "english.html": { title: "英文資源與策略", stage: "準備出發" },
+    "housing.html": { title: "住宿與租屋", stage: "已在澳洲" },
+    "work.html": { title: "找工作", stage: "已在澳洲" },
+    "scam.html": { title: "防詐騙", stage: "已在澳洲" },
+    "pr.html": { title: "PR 路徑總覽", stage: "規劃留下" },
+    "leave.html": { title: "報稅、退休金與離澳", stage: "準備回程" }
+  };
+  var resume = document.getElementById("journey-resume");
+  if (resume) {
+    try {
+      var lastPage = JSON.parse(localStorage.getItem(LAST_PAGE_KEY) || "null");
+      if (lastPage && Object.prototype.hasOwnProperty.call(JOURNEY_PAGES, lastPage.path)) {
+        var lastMeta = JOURNEY_PAGES[lastPage.path];
+        var resumeLink = document.getElementById("journey-resume-link");
+        var resumeSummary = document.getElementById("journey-resume-summary");
+        var resumeClear = document.getElementById("journey-resume-clear");
+        resumeLink.href = lastPage.path;
+        resumeLink.textContent = "回到「" + lastMeta.title + "」";
+        resumeSummary.textContent = "你上次停在「" + lastMeta.title + "」，目前屬於「" + lastMeta.stage + "」階段。";
+        resume.hidden = false;
+        resumeClear.addEventListener("click", function () {
+          try { localStorage.removeItem(LAST_PAGE_KEY); } catch (e) {}
+          resume.hidden = true;
+          var journeyStart = document.querySelector(".journey-directory a");
+          if (journeyStart) journeyStart.focus();
+        });
+      }
+    } catch (e) {
+      try { localStorage.removeItem(LAST_PAGE_KEY); } catch (storageError) {}
+    }
+  } else if (Object.prototype.hasOwnProperty.call(JOURNEY_PAGES, path)) {
+    try { localStorage.setItem(LAST_PAGE_KEY, JSON.stringify({ path: path })); } catch (e) {}
+  }
+
   // ---------- 首頁 SVG 剪紙視差（減少動態與行動版停用） ----------
   var hero = document.querySelector(".hero");
   if (hero && window.matchMedia) {
