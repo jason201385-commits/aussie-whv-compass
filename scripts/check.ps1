@@ -135,6 +135,10 @@ if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not
   Write-Output 'FAIL [style.css] 內容錨點缺 sticky header 安全距離'
   $errors++
 }
+if ($styleText -notmatch '(?s)\.tool select \{.*?min-width: 0;.*?max-width: 100%;') {
+  Write-Output 'FAIL [style.css] 工具 select 缺行動版防溢出限制'
+  $errors++
+}
 $indexText = [System.IO.File]::ReadAllText((Join-Path $dir 'index.html'), [System.Text.Encoding]::UTF8)
 if (-not $indexText.Contains('id="journey-map"')) {
   Write-Output 'FAIL [index.html] 缺完整旅程錨點：journey-map'
