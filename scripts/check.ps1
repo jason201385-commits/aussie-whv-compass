@@ -185,6 +185,38 @@ foreach ($livingNeedle in @(
   if (-not $costText.Contains($livingNeedle)) { Write-Output "FAIL [cost.html] 缺吃穿省錢入口或安全資訊：$livingNeedle"; $errors++ }
 }
 
+# 自我釐清必須同時提供快思／慢想，且不得包裝成心理診斷或總適合度
+$whyText = [System.IO.File]::ReadAllText((Join-Path $dir 'why.html'), [System.Text.Encoding]::UTF8)
+foreach ($whyId in @('quick-quiz', 'quick-form', 'quick-progress', 'quick-result', 'quick-next-link', 'worksheet', 'framework', 'after-reflection')) {
+  if (-not $whyText.Contains("id=`"$whyId`"")) { Write-Output "FAIL [why.html] 缺自我釐清雙模式元件：$whyId"; $errors++ }
+}
+$quickNames = @([regex]::Matches($whyText, 'data-name="(qq[1-8])"') | ForEach-Object { $_.Groups[1].Value })
+if ($quickNames.Count -ne 8 -or @($quickNames | Select-Object -Unique).Count -ne 8) {
+  Write-Output "FAIL [why.html] 快思題號必須是 qq1..qq8 且各出現一次"
+  $errors++
+}
+foreach ($axis in @('autonomy', 'values', 'reality', 'support')) {
+  $axisCount = [regex]::Matches($whyText, "data-axis=`"$axis`"").Count
+  if ($axisCount -ne 2) { Write-Output "FAIL [why.html] 快思面向 $axis 題數=$axisCount（應為 2）"; $errors++ }
+}
+foreach ($slowId in 1..8) {
+  if (-not $whyText.Contains("id=`"q$slowId`"")) { Write-Output "FAIL [why.html] 慢想版缺舊資料欄位：q$slowId"; $errors++ }
+}
+foreach ($whyNeedle in @(
+  '不是心理測驗或出發許可證',
+  '不是經驗證的心理量表',
+  '不比較別人、不合計總分',
+  'https://selfdeterminationtheory.org/the-theory/',
+  'https://doi.org/10.9707/2307-0919.1116',
+  'https://doi.org/10.1016/j.jesp.2012.02.002'
+)) {
+  if (-not $whyText.Contains($whyNeedle)) { Write-Output "FAIL [why.html] 缺研究來源或非診斷界線：$whyNeedle"; $errors++ }
+}
+$whyMainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
+foreach ($quickNeedle in @('whv-why-quick-v1', 'quickScores', 'lowestAxes', 'whv-worksheet-v1', 'lines.concat(quickExportLines())')) {
+  if (-not $whyMainJs.Contains($quickNeedle)) { Write-Output "FAIL [main.js] 自我釐清儲存／分面／匯出缺必要行為：$quickNeedle"; $errors++ }
+}
+
 # GitHub Pages 自訂網域必須鎖定正式 www 主機名
 $cnamePath = Join-Path $dir 'CNAME'
 if (-not (Test-Path $cnamePath)) {

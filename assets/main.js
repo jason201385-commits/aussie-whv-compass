@@ -354,6 +354,195 @@
     ta.focus();
   });
 
+  // ---------- 自我釐清快思版（只在 why.html 生效） ----------
+  var quickExportLines = function () { return []; };
+  var quickForm = document.getElementById("quick-form");
+  if (quickForm) {
+    var QUICK_KEY = "whv-why-quick-v1";
+    var quickLabels = ["完全不像我", "比較不像我", "還不確定", "大致像我", "很像我"];
+    var quickQuestions = Array.prototype.slice.call(quickForm.querySelectorAll(".quick-question"));
+    var quickStatus = document.getElementById("quick-status");
+    var quickProgress = document.getElementById("quick-progress");
+    var quickProgressBar = document.getElementById("quick-progress-bar");
+    var quickProgressLabel = document.getElementById("quick-progress-label");
+    var quickResult = document.getElementById("quick-result");
+    var quickNextTitle = document.getElementById("quick-next-title");
+    var quickNextCopy = document.getElementById("quick-next-copy");
+    var quickNextLink = document.getElementById("quick-next-link");
+    var quickAxes = [
+      { id: "autonomy", title: "自主動機", questions: ["qq1", "qq2"], href: "#q1", link: "去寫慢想第 1、2 題", copy: "分開寫下你想離開與想靠近的生活，再拿掉別人的期待，看看這仍是不是你願意選的方向。" },
+      { id: "values", title: "價值取捨", questions: ["qq3", "qq4"], href: "#q4", link: "去寫慢想第 4、5 題", copy: "先排前三名，再明寫願意少拿什麼。沒有完美路線，排序會比把全部願望塞進同一趟旅程更有用。" },
+      { id: "reality", title: "現實準備", questions: ["qq5", "qq6"], href: "#q6", link: "去寫慢想第 6 題", copy: "先回官方來源查一項規則，再設計一個 14 天低成本實驗，用真實行動檢查想像與現實的落差。" },
+      { id: "support", title: "支持底線", questions: ["qq7", "qq8"], href: "#q7", link: "去寫慢想第 7 題", copy: "先列出兩個可求助的人或正式管道，再寫清楚遇到哪些紅旗時要換工作、換住處、求助或回家。" }
+    ];
+
+    quickQuestions.forEach(function (question) {
+      var name = question.getAttribute("data-name");
+      var scale = question.querySelector(".quick-scale");
+      if (!scale || !/^qq[1-8]$/.test(name)) return;
+      quickLabels.forEach(function (labelText, index) {
+        var value = String(index + 1);
+        var id = name + "-" + value;
+        var label = document.createElement("label");
+        label.className = "quick-option";
+        label.setAttribute("for", id);
+        var input = document.createElement("input");
+        input.type = "radio";
+        input.name = name;
+        input.id = id;
+        input.value = value;
+        var number = document.createElement("b");
+        number.textContent = value;
+        var words = document.createElement("span");
+        words.textContent = labelText;
+        label.appendChild(input);
+        label.appendChild(number);
+        label.appendChild(words);
+        scale.appendChild(label);
+      });
+    });
+
+    var quickInputs = Array.prototype.slice.call(quickForm.querySelectorAll('input[type="radio"]'));
+
+    function setQuickStatus(message) {
+      if (quickStatus) quickStatus.textContent = message;
+    }
+
+    function getQuickData() {
+      var data = {};
+      quickQuestions.forEach(function (question) {
+        var name = question.getAttribute("data-name");
+        var checked = question.querySelector('input[type="radio"]:checked');
+        if (checked && /^[1-5]$/.test(checked.value)) data[name] = Number(checked.value);
+      });
+      return data;
+    }
+
+    function saveQuick() {
+      try { localStorage.setItem(QUICK_KEY, JSON.stringify(getQuickData())); }
+      catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
+    }
+
+    function refreshQuickProgress() {
+      var answered = Object.keys(getQuickData()).length;
+      var total = quickQuestions.length;
+      var percent = total ? Math.round(answered / total * 100) : 0;
+      if (quickProgressBar) quickProgressBar.style.width = percent + "%";
+      if (quickProgressLabel) quickProgressLabel.textContent = answered + " / " + total + " 題完成";
+      if (quickProgress) quickProgress.setAttribute("aria-valuenow", String(answered));
+      return answered;
+    }
+
+    function quickScores() {
+      var data = getQuickData();
+      if (Object.keys(data).length !== quickQuestions.length) return null;
+      var scores = {};
+      quickAxes.forEach(function (axis) {
+        scores[axis.id] = axis.questions.reduce(function (sum, name) { return sum + data[name]; }, 0);
+      });
+      return scores;
+    }
+
+    function quickLevel(score) {
+      if (score >= 8) return "目前較具體";
+      if (score >= 5) return "值得再寫";
+      return "優先補強";
+    }
+
+    function renderQuickResult(shouldFocus) {
+      var scores = quickScores();
+      if (!scores) return false;
+      var lowestScore = 11;
+      quickAxes.forEach(function (axis) {
+        var score = scores[axis.id];
+        lowestScore = Math.min(lowestScore, score);
+        var scoreEl = document.getElementById("quick-score-" + axis.id);
+        var levelEl = document.getElementById("quick-level-" + axis.id);
+        var barEl = document.getElementById("quick-bar-" + axis.id);
+        var barWrap = barEl ? barEl.parentElement : null;
+        if (scoreEl) scoreEl.textContent = score + " / 10";
+        if (levelEl) levelEl.textContent = quickLevel(score);
+        if (barEl) barEl.style.width = (score * 10) + "%";
+        if (barWrap) barWrap.setAttribute("aria-valuenow", String(score));
+      });
+      var lowestAxes = quickAxes.filter(function (axis) { return scores[axis.id] === lowestScore; });
+      var first = lowestAxes[0];
+      if (quickNextTitle) quickNextTitle.textContent = "優先釐清：" + lowestAxes.map(function (axis) { return axis.title; }).join("、");
+      if (quickNextCopy) quickNextCopy.textContent = first.copy + (lowestAxes.length > 1 ? " 其他同分面向也可以接著處理。" : "");
+      if (quickNextLink) {
+        quickNextLink.href = first.href;
+        quickNextLink.textContent = first.link;
+      }
+      if (quickResult) {
+        quickResult.hidden = false;
+        if (shouldFocus) quickResult.focus();
+      }
+      return true;
+    }
+
+    try {
+      var quickSaved = JSON.parse(localStorage.getItem(QUICK_KEY) || "{}");
+      if (quickSaved && typeof quickSaved === "object" && !Array.isArray(quickSaved)) {
+        quickQuestions.forEach(function (question) {
+          var name = question.getAttribute("data-name");
+          var value = quickSaved[name];
+          if (!Number.isInteger(value) || value < 1 || value > 5) return;
+          var input = question.querySelector('input[value="' + value + '"]');
+          if (input) input.checked = true;
+        });
+      }
+    } catch (e) { /* 無效或無法讀取的資料不套用 */ }
+
+    quickInputs.forEach(function (input) {
+      input.addEventListener("change", function () {
+        saveQuick();
+        refreshQuickProgress();
+        setQuickStatus("已存在這台裝置，不會上傳");
+        if (quickScores()) renderQuickResult(false);
+      });
+    });
+
+    quickForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var answered = refreshQuickProgress();
+      if (answered !== quickQuestions.length) {
+        setQuickStatus("還有 " + (quickQuestions.length - answered) + " 題未作答");
+        var firstMissing = quickQuestions.find(function (question) { return !question.querySelector('input[type="radio"]:checked'); });
+        var firstInput = firstMissing ? firstMissing.querySelector('input[type="radio"]') : null;
+        if (firstInput) firstInput.focus();
+        return;
+      }
+      setQuickStatus("結果只供自我反思，不是心理診斷");
+      renderQuickResult(true);
+    });
+
+    var quickClear = document.getElementById("quick-clear");
+    if (quickClear) quickClear.addEventListener("click", function () {
+      if (!confirm("清除快思版的 8 題答案？此動作無法復原。")) return;
+      quickInputs.forEach(function (input) { input.checked = false; });
+      try { localStorage.removeItem(QUICK_KEY); } catch (e) {}
+      if (quickResult) quickResult.hidden = true;
+      refreshQuickProgress();
+      setQuickStatus("快思答案已清除");
+      quickClear.focus();
+    });
+
+    quickExportLines = function () {
+      var scores = quickScores();
+      var lines = ["快思版四面向（自我反思，非心理診斷）"];
+      if (!scores) {
+        lines.push("尚未完成（" + refreshQuickProgress() + " / " + quickQuestions.length + " 題）", "");
+        return lines;
+      }
+      quickAxes.forEach(function (axis) { lines.push(axis.title + "：" + scores[axis.id] + " / 10（" + quickLevel(scores[axis.id]) + "）"); });
+      lines.push(quickNextTitle ? quickNextTitle.textContent : "", "");
+      return lines;
+    };
+
+    refreshQuickProgress();
+    renderQuickResult(false);
+  }
+
   // ---------- 自我釐清工作表（只在 why.html 生效） ----------
   var form = document.getElementById("worksheet");
   if (!form) return;
@@ -397,6 +586,8 @@
   if (exportBtn) {
     exportBtn.addEventListener("click", function () {
       var lines = ["我的澳洲打工度假自我釐清表", "產生日期：" + new Date().toLocaleDateString("zh-TW"), ""];
+      lines = lines.concat(quickExportLines());
+      lines.push("慢想版工作表", "");
       form.querySelectorAll(".worksheet-q").forEach(function (q) {
         var label = q.querySelector("label");
         var ta = q.querySelector("textarea");
