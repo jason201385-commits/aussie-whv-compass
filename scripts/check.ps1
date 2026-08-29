@@ -208,7 +208,7 @@ foreach ($whyNeedle in @(
   '不比較別人、不合計總分',
   'https://selfdeterminationtheory.org/the-theory/',
   'https://doi.org/10.9707/2307-0919.1116',
-  'https://doi.org/10.1016/j.jesp.2012.02.002'
+  'https://doi.org/10.1007/s11031-012-9288-3'
 )) {
   if (-not $whyText.Contains($whyNeedle)) { Write-Output "FAIL [why.html] 缺研究來源或非診斷界線：$whyNeedle"; $errors++ }
 }
