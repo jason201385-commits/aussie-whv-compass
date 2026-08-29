@@ -40,6 +40,35 @@
     if (a.getAttribute("href") === path) a.classList.add("active");
   });
 
+  // ---------- 首頁 SVG 剪紙視差（減少動態與行動版停用） ----------
+  var hero = document.querySelector(".hero");
+  if (hero && window.matchMedia) {
+    var heroMotion = window.matchMedia("(prefers-reduced-motion: no-preference)");
+    var heroWide = window.matchMedia("(min-width: 641px)");
+    var heroTicking = false;
+    var updateHeroParallax = function () {
+      heroTicking = false;
+      if (!heroMotion.matches || !heroWide.matches) {
+        hero.style.removeProperty("--hero-gold-y");
+        hero.style.removeProperty("--hero-green-y");
+        hero.style.removeProperty("--hero-accent-y");
+        return;
+      }
+      var offset = Math.min(window.scrollY || 0, 650);
+      hero.style.setProperty("--hero-gold-y", (offset * 0.08).toFixed(1) + "px");
+      hero.style.setProperty("--hero-green-y", (offset * 0.14).toFixed(1) + "px");
+      hero.style.setProperty("--hero-accent-y", (offset * 0.2).toFixed(1) + "px");
+    };
+    var queueHeroParallax = function () {
+      if (heroTicking) return;
+      heroTicking = true;
+      window.requestAnimationFrame(updateHeroParallax);
+    };
+    window.addEventListener("scroll", queueHeroParallax, { passive: true });
+    window.addEventListener("resize", queueHeroParallax);
+    updateHeroParallax();
+  }
+
   // ---------- 回饋列（全站注入，讓這套系統有進步的可能） ----------
   var footer = document.querySelector(".site-footer");
   if (footer) {
