@@ -7,6 +7,7 @@ $dir = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Join-Path $dir 'index.html'))) { $dir = (Get-Location).Path }
 $errors = 0
 $assetVersions = @()
+$canonicalOrigin = 'https://www.aussiewhvcompass.com'
 
 $pages = Get-ChildItem (Join-Path $dir '*.html') | Select-Object -ExpandProperty Name
 $anchors = @{}
@@ -23,6 +24,13 @@ foreach ($p in $pages) {
   if (-not $t.Contains('</html>'))      { Write-Output "FAIL [$p] 缺 </html>"; $errors++ }
   if (-not $t.Contains('site-footer'))  { Write-Output "FAIL [$p] 缺 footer"; $errors++ }
   if (-not $t.Contains('assets/main.js')) { Write-Output "FAIL [$p] 未掛 main.js"; $errors++ }
+
+  # 正式網址：每頁 canonical 與 og:url 必須一致，首頁使用網域根路徑
+  $pageUrl = if ($p -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$p" }
+  $canonicalTag = '<link rel="canonical" href="{0}">' -f $pageUrl
+  $ogUrlTag = '<meta property="og:url" content="{0}">' -f $pageUrl
+  if (-not $t.Contains($canonicalTag)) { Write-Output "FAIL [$p] canonical 錯誤或缺少：$pageUrl"; $errors++ }
+  if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
   foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|tools\.js|postcodes\.js|seasons\.js)(?:\?v=([^"]+))?"')) {
@@ -52,6 +60,16 @@ foreach ($p in $pages) {
 $uniqueAssetVersions = @($assetVersions | Select-Object -Unique)
 if ($uniqueAssetVersions.Count -ne 1) {
   Write-Output "FAIL 全站本機資產版本不一致：$(($uniqueAssetVersions) -join ', ')"
+  $errors++
+}
+
+# GitHub Pages 自訂網域必須鎖定正式 www 主機名
+$cnamePath = Join-Path $dir 'CNAME'
+if (-not (Test-Path $cnamePath)) {
+  Write-Output 'FAIL 缺 GitHub Pages CNAME 檔'
+  $errors++
+} elseif (([System.IO.File]::ReadAllText($cnamePath, [System.Text.Encoding]::UTF8)).Trim() -ne 'www.aussiewhvcompass.com') {
+  Write-Output 'FAIL CNAME 必須是 www.aussiewhvcompass.com'
   $errors++
 }
 

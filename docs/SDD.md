@@ -6,7 +6,7 @@
 ## 1. 專案概述
 
 **澳打指南針（Aussie WHV Compass）**：給台灣背包客的澳洲打工度假（subclass 417）
-一站式開源攻略。線上網址 `https://jason201385-commits.github.io/aussie-whv-compass/`，
+一站式開源攻略。正式網址 `https://www.aussiewhvcompass.com/`（裸網域自動導向 `www`），
 儲存庫 `github.com/jason201385-commits/aussie-whv-compass`。
 
 ### 1.1 不可協商的原則（任何後續開發不得違反）
@@ -23,7 +23,10 @@
 
 - **形態**：純靜態 HTML/CSS/JS，**零框架、零建置步驟**——刻意選擇，讓不會寫程式的
   貢獻者也能改內容。不得引入 npm/bundler/framework，除非站長明示改變方針。
-- **部署**：GitHub Pages（main 分支根目錄，legacy build）。
+- **部署**：GitHub Pages（main 分支根目錄，legacy build），`CNAME` 固定為
+  `www.aussiewhvcompass.com`。Cloudflare DNS 的 `www` CNAME 直接指向
+  `jason201385-commits.github.io`，裸網域以 GitHub Pages 官方 A／AAAA 記錄接入並
+  由 Pages 導向 `www`；不得使用 wildcard DNS。
   改檔 → commit → push 即自動部署（1–2 分鐘）。
 - **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。全站本機 CSS／JS／資料檔
   共用 `?v=20260829-1` 版本查詢碼；任何這些資產異動時，push 前必須全站同步升版。

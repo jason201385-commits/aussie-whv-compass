@@ -81,10 +81,12 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 驗收：兩連結 HTTP 200；about.html 無「籌備中」字樣；repo 首頁出現 Sponsor 鈕；
 §6 全套通過。
 
-### P0-2 自訂網域（人工前置：站長購得網域並告知）
+### P0-2 自訂網域（網域已購得：`aussiewhvcompass.com`）
 
-執行：repo 加 `CNAME` 檔＋DNS 指引給站長（CNAME→`jason201385-commits.github.io`）；
-Pages 設定 enforce HTTPS；全站絕對連結（og、issue 連結）換新網域。
+正式主機名使用 `www.aussiewhvcompass.com`，裸網域自動導向 `www`。repo 的 `CNAME`
+固定為正式主機名；Cloudflare DNS 依 GitHub Pages 官方配置加入裸網域 A／AAAA，
+`www` CNAME 直接指向 `jason201385-commits.github.io`，不得使用 wildcard DNS。
+Pages 設定 enforce HTTPS；每頁 canonical／`og:url` 與 Issue Template 首頁連結使用正式網域。
 
 ## 5. 待辦 Backlog — P1/P2（規格草案，動工前與站長確認優先序）
 
