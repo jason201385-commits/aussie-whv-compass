@@ -459,7 +459,7 @@ if (-not (Test-Path $englishVisaPath)) {
     $errors++
   }
   $toolsI18nText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
-  foreach ($needle in @('var pcEnglish =', 'This result does not apply to subclass 462.', 'Based on the official subclass 417 tables', 'if (pcTool && !window.WHV_POSTCODES)', 'pcStatus.textContent =')) {
+  foreach ($needle in @('var pcEnglish =', 'This result does not apply to subclass 462.', 'This comparison uses a local copy of the official subclass 417 tables', 'if (pcTool && !window.WHV_POSTCODES)', 'pcStatus.textContent =')) {
     if (-not $toolsI18nText.Contains($needle)) { Write-Output "FAIL [tools.js] 郵遞區號工具缺英文安全文案：$needle"; $errors++ }
   }
   $i18nSwitcherText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
@@ -1462,7 +1462,7 @@ foreach ($seoClaimPage in $pages) {
   }
 }
 $highRiskCopy = (($pages | ForEach-Object { [System.IO.File]::ReadAllText((Join-Path $dir $_), [System.Text.Encoding]::UTF8) }) -join "`n") + "`n" + ([System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8))
-foreach ($forbiddenHighRiskClaim in @('危及生命才去', '查不到＝無照＝違法', '背包客最常走的路', '做滿 2 年轉 PR', '達所得門檻後轉 191', '肥羊體質', '這筆錢別省')) {
+foreach ($forbiddenHighRiskClaim in @('危及生命才去', '查不到＝無照＝違法', '背包客最常走的路', '做滿 2 年轉 PR', '達所得門檻後轉 191', '肥羊體質', '這筆錢別省', '馬上知道能不能算二簽三簽', '馬上知道能不能計入二簽', '離澳實際能領回多少', '在官方合格清單內', '不在官方合格清單內', '幾乎都是詐騙或違法行為', '依 2026-08-29 抓取的官方清單判定')) {
   if ($highRiskCopy.Contains($forbiddenHighRiskClaim)) { Write-Output "FAIL 高風險絕對語氣回歸：$forbiddenHighRiskClaim"; $errors++ }
 }
 

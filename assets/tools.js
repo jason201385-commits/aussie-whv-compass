@@ -5,7 +5,7 @@
   var fmt = function (n) { return "$" + Math.round(n).toLocaleString("en-AU"); };
   var icon = function (name) { return '<svg class="icon" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; };
 
-  /* ================= 集簽資格快查器（visa.html） ================= */
+  /* ================= 集簽郵遞區號初篩（visa.html） ================= */
   var pcTool = document.getElementById("postcode-tool");
   var pcStatus = document.getElementById("pc-status");
   if (pcTool && !window.WHV_POSTCODES) {
@@ -105,20 +105,20 @@
       var catName = document.getElementById("pc-cat").selectedOptions[0].textContent;
       if (ok) {
         out.innerHTML = pcEnglish
-          ? '<p class="result-verdict result-ok">' + icon("check") + ' Postcode ' + raw + ' (' + st + ') for “' + catName + '” is <strong>on the relevant official subclass 417 postcode list</strong>.</p>'
+          ? '<p class="result-verdict result-ok">' + icon("check") + ' Postcode ' + raw + ' (' + st + ') for “' + catName + '” <strong>matches the archived subclass 417 postcode table retrieved on 29 August 2026</strong>.</p>'
             + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + 'A postcode match is only one requirement: your actual duties must fit the category, the work must be lawfully paid unless an official volunteer exception applies, and you should keep payslips from day one.</p>'
-          : '<p class="result-verdict result-ok">' + icon("check") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>在官方合格清單內</strong></p>'
-            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '別忘了三個前提：工作內容要真的屬於該產業、必須合法支薪（黑工不算）、payslip 從第一天就要存。</p>';
+          : '<p class="result-verdict result-ok">' + icon("check") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>符合本站 2026-08-29 留存清單的郵遞區號</strong></p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '這只完成郵遞區號比對：工作內容仍須符合類別，除官方志工例外外須合法支薪，並從第一天保存 payslip 等證據。</p>';
       } else {
         out.innerHTML = pcEnglish
-          ? '<p class="result-verdict result-no">' + icon("x") + ' Postcode ' + raw + ' (' + st + ') for “' + catName + '” is <strong>not on the relevant official subclass 417 postcode list</strong>.</p>'
-            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + 'Most metropolitan areas are excluded. Try the exact work postcode or another category, then check the live official page. This result does not apply to subclass 462.</p>'
-          : '<p class="result-verdict result-no">' + icon("x") + ' 郵遞區號 ' + raw + '（' + st + '）做「' + catName + '」——<strong>不在官方合格清單內</strong></p>'
-            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '提示：大城市都會區幾乎都不合格；動植物栽培等要在 regional（SA／TAS／NT 全境皆可），觀光餐旅只限北澳與偏遠地區。換個郵遞區號試試，或改查其他工作類型。</p>';
+          ? '<p class="result-verdict result-no">' + icon("x") + ' No match was found for postcode ' + raw + ' (' + st + ') and “' + catName + '” <strong>in the archived table retrieved on 29 August 2026</strong>.</p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + 'This is not a visa decision. Recheck the exact work postcode, category and current Home Affairs page. This result does not apply to subclass 462.</p>'
+          : '<p class="result-verdict result-no">' + icon("x") + ' 郵遞區號 ' + raw + '（' + st + '）與「' + catName + '」——<strong>在本站 2026-08-29 留存清單中沒有找到相符項目</strong></p>'
+            + '<p style="font-size:.9rem">' + (extraNote ? extraNote + " " : "") + '這不是簽證資格判定。請重新核對實際工作郵遞區號、工作類型與 Home Affairs 現行頁面；本工具也不適用 subclass 462。</p>';
       }
       out.innerHTML += pcEnglish
-        ? '<p class="fact-meta">Based on the official subclass 417 tables retrieved on 2026-08-29. Before applying, check the <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">current Home Affairs page</a>.</p>'
-        : '<p class="fact-meta">依 2026-08-29 抓取的官方清單判定，申請前請以 <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">官方頁面現行清單</a>為準。</p>';
+        ? '<p class="fact-meta">This comparison uses a local copy of the official subclass 417 tables retrieved on 2026-08-29. Before applying, check the <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">current Home Affairs page</a>.</p>'
+        : '<p class="fact-meta">本站比對使用 2026-08-29 留存的官方清單；申請前請以 <a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">Home Affairs 現行頁面</a>為準。</p>';
       announcePcResult(out);
     };
     document.getElementById("pc-check").addEventListener("click", run);
@@ -831,7 +831,7 @@
     });
   }
 
-  /* ================= DASP 速算（leave.html） ================= */
+  /* ================= DASP 扣繳粗估（leave.html） ================= */
   var dasp = document.getElementById("dasp-calc");
   if (dasp) {
     var bal = document.getElementById("dasp-balance");

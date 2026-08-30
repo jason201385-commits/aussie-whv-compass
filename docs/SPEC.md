@@ -32,12 +32,12 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 
 | 工具 | 位置 | 輸入 | 邏輯 | 輸出 |
 |---|---|---|---|---|
-| 集簽資格快查器 | visa.html `#postcode-tool` | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描 | 合格/不合格判定＋類型日期條件＋三前提提醒＋官方連結 |
+| 集簽郵遞區號初篩 | visa.html `#postcode-tool` | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描 | 顯示是否符合 2026-08-29 留存清單的郵遞區號＋類型日期條件＋適用限制＋官方現行頁面；不得表述為個人簽證資格判定 |
 | 存錢試算器 | cost.html／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿預算 select、其他生活支出 select | weeklyGross=r×h；annualGross=weeklyGross×46；annualTax 依 2026–27 WHM 15%／30%／37%／45% 累進級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（僅為 OTE 粗估） | 六格數據＋全年稅／super 邊界；繁中顯示台幣示意、英文顯示稅後收入可覆蓋幾個支出週；依全年餘額分四級壓力測試警語 |
 | 行前互動清單 | prep.html `#prep-checklist` | 21 項勾選（3 組，JS 產生） | localStorage `whv-prep-check-v1`、進度條、100% 彩蛋文案、清空需 confirm | 進度 x/21（%） |
 | 離澳收尾清單 | leave.html `#leave-checklist-tool` | 9 項零打字勾選（無 JS 仍可閱讀） | localStorage `whv-leave-check-v1`、進度條、清空需 confirm；100% 時顯示非強迫的感謝銜接 | 進度 x/9（%）＋完成提示 |
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
-| DASP 速算 | leave.html `#dasp-calc` | 金額 number＋4 個金額 chips | take=×0.35、tax=×0.65 | 兩格數據＋台幣評語 |
+| DASP 扣繳粗估 | leave.html `#dasp-calc` | 估計總額 number＋tax-free component number＋4 個總額 chips | taxFree=clamp(input, 0, total)；taxable=total−taxFree；withholding=taxable×0.65；payment=total−withholding | 估算 payment after withholding＋估算 withholding＋component／個案限制警語；不得表述為實際可領款 |
 | 自我釐清雙模式 | why.html `#quick-quiz`＋`#worksheet` | 快思 8 題 × 5 點自評；慢想 8 題 textarea＋價值／取捨 chips | 快思分成自主動機、價值取捨、現實準備、支持底線四面向，各 2 題且不合計總適合度，白名單存 `whv-why-quick-v1`；慢想沿用 600ms 防抖與 `whv-worksheet-v1`，保留舊答案及行前海報相容 | 快思分面結果＋最低面向下一步；慢想匯出 .txt／列印／清空 |
 | 私人合作需求單 | about.html `#private-contact`＋`#contact-brief`＋`#contact-management` | 必填 Email、需求類型、目前卡點、希望結果與邊界確認；姓名／組織、時程、預算選填 | P0-4 前 `api-config.js` 空值，維持不寫 localStorage、不上傳的 Gmail／mailto／複製備援；日後啟用後需 Turnstile、後端 `{ok:true}` 回執，管理 token 只經 fragment 傳遞 | 現況產生 Email／複製備援；程式已支援案件編號、Email sent／queued、查閱、更正、永久刪除 |
 | 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→`report.yml`；感謝鈕→`thanks.yml`，兩者都自動帶入頁名 | — |
