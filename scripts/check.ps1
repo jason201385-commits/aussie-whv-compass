@@ -1018,7 +1018,7 @@ if (-not (Test-Path $englishScamPath)) {
     $errors++
   }
   $scamToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
-  foreach ($needle in @('var quizEnglish =', 'Situation " + (qi + 1)', 'Quiz complete:', 'Strong scam-safety instincts', 'Q[qi].both === true', 'btnNext.focus()', 'sEl.focus()')) {
+  foreach ($needle in @('var quizEnglish =', 'Situation " + (qi + 1)', 'All " + Q.length + " situations reviewed.', 'This exercise does not certify that a person or offer is safe.', 'Q[qi].both === true', 'btnNext.focus()', 'sEl.focus()')) {
     if (-not $scamToolsText.Contains($needle)) { Write-Output "FAIL [tools.js] 防詐測驗缺英文輸出：$needle"; $errors++ }
   }
   $englishQuizBlock = [regex]::Match($scamToolsText, '(?s)var Q = quizEnglish \? \[(.*?)\] : \[').Groups[1].Value

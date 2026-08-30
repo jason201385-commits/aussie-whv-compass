@@ -704,20 +704,20 @@
     ] : [
       { s: "臉書社團有人私訊你：「農場缺工，秒錄取！先轉 $300 保證金，明天就能上工。」", run: true,
         why: "「先付錢才有工作」是頭號紅旗——合法雇主不會向求職者收錢。錢轉出去，工作和人都會消失。" },
-      { s: "咖啡店店長請你現場拉花 1 小時給他看，全程站在旁邊看你操作，沒有付錢。", run: false,
-        why: "這在合法範圍：無薪試工只限「監督下的短時技能展示」。但如果變成排你整天班還不給錢，就違法了。" },
+      { s: "咖啡店店長在開始前說明：請你現場拉花 1 小時展示技能，全程直接監督，也沒有讓你代替正常班次。你同意進行。", run: false, both: true,
+        why: "保持警覺沒有錯，你也可以拒絕。這可能符合無薪技能展示，但只能維持合理必要的最短時間並受直接監督；若變成生產性工作或完整無薪班次，判斷就不同。" },
       { s: "Working hostel：「先繳四週房租排隊等工作，搬走的話 88 天文件就不簽了。」", run: true,
         why: "工作綁住宿＋拿集簽要挾＝經典陷阱。二簽的依據是你的薪資單，不是老闆的簽名恩惠。" },
       { s: "群組裡有人換匯，匯率比銀行好 3%，對方先傳了轉帳成功的截圖給你看。", run: true,
-        why: "截圖可以造假，入帳才算數——而且私下換匯在台澳兩邊都可能觸法。只用銀行或持牌業者。" },
-      { s: "新工作給你書面 offer、要你填 TFN declaration，說第一週發薪就會給 payslip。", run: false,
-        why: "到職三件套齊全（書面約定、TFN 表、payslip）——這正是合法工作該有的樣子。" },
-      { s: "接到中文來電自稱移民局：「你的簽證有問題，今天內繳 $1,000 重審費，否則遣返。」", run: true,
-        why: "政府機關不會在電話上收錢。要求轉帳、保密、給證件號＝直接掛斷，零例外。" },
+        why: "截圖與 pending 狀態可能造假。使用可獨立查驗的受監管服務，並只相信自己從帳戶確認的款項狀態。" },
+      { s: "新工作給你書面 offer、合法的 onboarding 與 TFN declaration，並清楚告知第一次發薪與 payslip 日期。", run: false,
+        why: "這些是合理的就業訊號，但單一文件不能證明整份工作安全；仍要核對公司、薪率、工作條件與第一次付款。" },
+      { s: "接到中文來電自稱移民局：「你的簽證有問題，今天內轉帳 $1,000 重審費，否則遣返。」", run: true,
+        why: "先掛斷，不付款也不提供帳號或證件資料；自己開啟 ImmiAccount，再用獨立找到的官方聯絡方式查證。" },
       { s: "租屋廣告便宜到不可思議，房東說人在海外、房子很搶手，「可以視訊帶看」，先匯押金保留。", run: true,
         why: "沒進室內看過的房，一毛不匯。低於行情＋不能實地看房＋催付款，三面紅旗全插了。" },
-      { s: "老闆說：「你去辦個 ABN 開發票給我，不然不能上工。」但你是被排班、領時薪的。", run: true,
-        why: "假承攬（sham contracting）：被排班＋時薪制＝員工。辦 ABN 等於自己扛掉最低工資、super 和工傷保險。" }
+      { s: "老闆說：「你去辦個 ABN 開發票給我，不然不能上工。」但你會被排班、領時薪並使用公司的設備。", run: true,
+        why: "ABN 不會自動決定你是承包商。排班、時薪與公司設備是 employee-like 指標，仍須依契約和實際工作方式整體判斷；這可能是假承攬。" }
     ];
     var qi = 0, score = 0;
     var sEl = document.getElementById("quiz-scenario");
@@ -743,7 +743,7 @@
       if (correct) score++;
       fEl.className = "quiz-feedback " + (correct ? "good" : "bad");
       fEl.innerHTML = (quizEnglish ? "" : icon(correct ? "check" : "alert")) + " <strong>"
-        + (quizEnglish ? (correct ? "Correct." : "Recheck this one.") : (correct ? "答對了！" : "危險！"))
+        + (quizEnglish ? (correct ? "This matches the safer response." : "Recheck this one.") : (correct ? "符合這題的安全判斷。" : "請重看這題的判斷重點。"))
         + "</strong> " + Q[qi].why;
       btnOk.style.display = btnRun.style.display = "none";
       btnNext.style.display = "";
@@ -753,16 +753,17 @@
       btnNext.focus();
     };
     var finish = function () {
+      var reviewCount = Q.length - score;
       var title = quizEnglish
-        ? (score >= 7 ? "Strong scam-safety instincts. Keep checking independently."
-          : score >= 5 ? "Good start. Review the explanations you missed."
-          : "Review the red flags before sending money or identity documents.")
-        : (score >= 7 ? "【防詐大師】可以出師帶學弟妹了。"
-          : score >= 5 ? "【有 sense】再把紅旗句字典掃一次就穩了。"
-          : "【肥羊體質】出發前把這頁認真讀三遍，會替你省下好幾千。");
+        ? (reviewCount === 0
+          ? "You reviewed every scenario. Keep verifying real offers independently."
+          : "Review " + reviewCount + " explanation" + (reviewCount === 1 ? "" : "s") + " before sending money or identity documents.")
+        : (reviewCount === 0
+          ? "八個情境都已看完；真實交易仍要逐項獨立查證。"
+          : "建議重看 " + reviewCount + " 個判斷重點，再處理匯款、證件或簽約。");
       sEl.innerHTML = quizEnglish
-        ? "Quiz complete: <strong>" + score + " of " + Q.length + "</strong> correct.<br>" + title
-        : "測驗結束！你答對 <strong>" + score + " / " + Q.length + "</strong> 題。<br>" + title;
+        ? "All " + Q.length + " situations reviewed.<br>" + title + " This exercise does not certify that a person or offer is safe."
+        : Q.length + " 個情境已看完。<br>" + title + " 本練習不會認證任何人或交易安全。";
       fEl.className = "quiz-feedback";
       pEl.textContent = "";
       btnNext.textContent = quizEnglish ? "Try again" : "再玩一次";
