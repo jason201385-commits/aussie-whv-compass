@@ -14,6 +14,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
 VERSION = "2026-08-29"
+INACTIVE_UI_SENTINELS = {
+    "情境載入中",
+    "需求已由後端接收",
+    "管理已送出的需求",
+    "繼續上次閱讀",
+}
 PAGES = [
     "index.html",
     "why.html",
@@ -77,8 +83,9 @@ class PageParser(HTMLParser):
             if tag not in self.VOID_TAGS:
                 self.skip_depth += 1
             return
-        if tag in self.SKIP_TAGS or "data-search-ui" in attrs_dict:
-            self.skip_depth = 1
+        if tag in self.SKIP_TAGS or "data-search-ui" in attrs_dict or "hidden" in attrs_dict:
+            if tag not in self.VOID_TAGS:
+                self.skip_depth = 1
             return
         if tag in {"h1", "h2"}:
             if tag == "h2":
@@ -189,6 +196,14 @@ def main() -> int:
         shallow = [entry["href"] for entry in payload["entries"] if entry["title"] != "本頁總覽" and "#" not in entry["href"]]
         if shallow:
             print("SEARCH SECTIONS MISSING ANCHORS: " + ", ".join(shallow), file=sys.stderr)
+            return 1
+        indexed_text = " ".join(
+            f"{entry['pageTitle']} {entry['title']} {entry['text']}"
+            for entry in payload["entries"]
+        )
+        leaked_states = sorted(INACTIVE_UI_SENTINELS.intersection(indexed_text))
+        if leaked_states:
+            print("SEARCH INDEX CONTAINS INACTIVE UI: " + ", ".join(leaked_states), file=sys.stderr)
             return 1
         print(f"SEARCH INDEX CURRENT ({len(payload['entries'])} entries)")
         return 0
