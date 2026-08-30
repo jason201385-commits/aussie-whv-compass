@@ -538,7 +538,7 @@ body:not(.home-page) main {
 .hero p.lede {
   color: var(--ink-soft);
   font-size: 1.1rem;
-  max-width: 580px;
+  max-width: 680px;
   margin: 0 auto;
 }
 .hero .free-badge {
@@ -711,20 +711,20 @@ body:not(.home-page) main {
 .saved-pages-actions p { margin: 0; color: var(--ink-soft); font-size: .8rem; }
 .saved-pages-actions .btn { flex-shrink: 0; min-height: 44px; }
 
-/* ---------- 在澳當下需求：零打字快導 ---------- */
+/* ---------- 緊急安全出口：比一般導覽更早出現 ---------- */
 .support-hub {
-  margin: 42px 0 18px;
+  margin: 28px 0 18px;
   padding: 28px;
-  border: 2px solid var(--ink);
+  border: 2px solid color-mix(in srgb, var(--danger) 76%, var(--ink));
   border-radius: 24px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--danger-soft) 64%, var(--surface));
   box-shadow: var(--shadow-pop);
 }
 .support-hub h2 { margin: .25em 0 .25em; }
 .support-hub-intro { margin: 0; color: var(--ink-soft); }
 .support-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-top: 22px;
 }
@@ -746,6 +746,14 @@ body:not(.home-page) main {
 .support-link strong { line-height: 1.45; }
 .support-link small { margin-top: 3px; color: var(--ink-soft); font-size: .76rem; line-height: 1.45; }
 .support-emergency { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line-soft); font-size: .86rem; }
+
+.problem-directory-intro {
+  max-width: 780px;
+  margin: 48px auto 20px;
+  text-align: center;
+}
+.problem-directory-intro h2 { margin: .32em 0 .35em; }
+.problem-directory-intro p:last-child { margin: 0; color: var(--ink-soft); }
 
 /* ---------- 首頁旅程索引 ---------- */
 .journey-directory {
@@ -785,6 +793,61 @@ body:not(.home-page) main {
 }
 .journey-phase h2 { margin-top: .35em; }
 .journey-phase .card-grid { margin-top: 20px; }
+.problem-category {
+  display: block;
+  margin: 2px 0 8px;
+  color: var(--green-ink);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.card-action {
+  display: block;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--link);
+  font-size: .8rem;
+  font-weight: 900;
+}
+
+.route-guide {
+  margin: 24px 0 38px;
+  border: 1px solid color-mix(in srgb, var(--line) 54%, transparent);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+}
+.route-guide summary {
+  min-height: 56px;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+.route-guide-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--line-soft);
+}
+.route-guide-body h3 { margin: 18px 0 10px; font-size: 1rem; }
+.route-guide-body > p { grid-column: 1 / -1; margin: 0; color: var(--ink-soft); font-size: .84rem; }
+.route-guide-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.route-guide-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 800;
+}
+.route-guide-links a:hover { background: var(--gold-soft); text-decoration: none; }
 
 /* ---------- 卡片：奶油紙張與檸檬色布標 ---------- */
 .card-grid {
@@ -1621,6 +1684,9 @@ main [id] { scroll-margin-top: 170px; }
   .support-hub { padding: 22px 16px; }
   .support-grid { grid-template-columns: 1fr; }
   .support-link { min-height: 72px; }
+  .problem-directory-intro { margin-top: 36px; text-align: left; }
+  .route-guide-body { grid-template-columns: 1fr; padding: 0 16px 18px; }
+  .route-guide-body > p { grid-column: 1; }
   .site-search-home { padding: 22px 16px; }
   .site-search-form,
   .site-search-home-form { grid-template-columns: 1fr; }

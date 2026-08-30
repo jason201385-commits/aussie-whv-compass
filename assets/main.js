@@ -117,6 +117,7 @@
     "醫生": ["看醫生", "gp", "診所", "急診"],
     "看醫生": ["醫生", "gp", "診所", "急診"],
     "買車": ["二手車", "ppsr", "過戶", "車輛"],
+    "買二手車": ["買車", "二手車", "ppsr", "過戶", "車輛"],
     "英文": ["英語", "面試", "口說"],
     "回台": ["離澳", "dasp", "退休金", "報稅"],
     "移民": ["pr", "永居", "雇主擔保", "技術移民"]
@@ -135,7 +136,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260830-18";
+      script.src = "assets/search-index.js?v=20260830-20";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {

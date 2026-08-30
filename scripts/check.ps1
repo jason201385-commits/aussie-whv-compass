@@ -1452,7 +1452,29 @@ if (-not $supportBlock.Success) {
   $errors++
 } else {
   $supportLinks = [regex]::Matches($supportBlock.Value, 'class="support-link"').Count
-  if ($supportLinks -ne 6) { Write-Output "FAIL [index.html] 當下需求入口數=$supportLinks（應為 6）"; $errors++ }
+  if ($supportLinks -ne 4) { Write-Output "FAIL [index.html] 緊急安全出口數=$supportLinks（應為 4）"; $errors++ }
+}
+$problemCategories = [regex]::Matches($indexText, 'class="problem-category"').Count
+$problemActions = [regex]::Matches($indexText, 'class="card-action"').Count
+if ($problemCategories -ne 12 -or $problemActions -ne 12) {
+  Write-Output "FAIL [index.html] 問題卡必須有 12 組類別與第一步（category=$problemCategories action=$problemActions）"
+  $errors++
+}
+$homeRouteOrder = @(
+  'class="support-hub"',
+  'id="journey-map"',
+  'class="site-search-home"',
+  'class="route-guide"',
+  'class="community-callout"'
+)
+$previousHomeRouteIndex = -1
+foreach ($homeRouteNeedle in $homeRouteOrder) {
+  $homeRouteIndex = $indexText.IndexOf($homeRouteNeedle)
+  if ($homeRouteIndex -lt 0 -or $homeRouteIndex -le $previousHomeRouteIndex) {
+    Write-Output "FAIL [index.html] 首頁分流順序錯誤或缺少：$homeRouteNeedle"
+    $errors++
+  }
+  $previousHomeRouteIndex = $homeRouteIndex
 }
 foreach ($formName in @('report.yml', 'idea.yml', 'thanks.yml', 'collaborate.yml')) {
   $formPath = Join-Path $dir ".github\ISSUE_TEMPLATE\$formName"
@@ -1607,7 +1629,7 @@ if (-not $toolsJs.Contains('澳打指南針 ・ 公開攻略免費 ・ 資料只
   Write-Output 'FAIL [tools.js] 行前海報未同步公開攻略免費定位'
   $errors++
 }
-foreach ($entryNeedle in @('先用 2 分鐘快思看見四個準備面向', '快思測驗＋慢想工作表', '私人合作可以直接寄 Email')) {
+foreach ($entryNeedle in @('我們想成為對打工度假者', '不替你草率做決定', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '私人合作可以直接寄 Email')) {
   if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
 }
 if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains('catch (e) { copyFailed(); }')) {
