@@ -171,9 +171,40 @@
       "Swan Hill、Goulburn Valley": "Swan Hill and Goulburn Valley", "Warrnambool 至 Wodonga 一帶": "Warrnambool to Wodonga region",
       "Yarra Valley、Mornington Peninsula": "Yarra Valley and Mornington Peninsula"
     };
+    var seasonChallengesZh = {
+      1: { work: "假期季節職缺常在前一年 11 月前後就開始招募；櫻桃等短產季也可能幾週內結束。", place: "南部正值夏季火災天氣高風險期；北部則在雨季與熱帶氣旋季，戶外班次、道路與交通可能受影響。" },
+      2: { work: "雪季職缺已進入主要投遞窗口；只等到冬天才投可能錯過。部分櫻桃季接近尾聲，不能只看『夏季有採收』。", place: "南部仍須留意高溫與火災天氣；北部仍在雨季／熱帶氣旋季。" },
+      3: { work: "VIC／TAS 有多種秋收訊號，但實際工時與計件收入仍會受果量、品種與天候影響。", place: "北部雨季與熱帶氣旋季尚未結束；偏遠道路與住宿備案要先確認。" },
+      4: { work: "部分短產季陸續收尾，若只押單一作物，可能很快出現無薪空窗；移動前要先排下一站。", place: "北部直到 4 月底仍屬官方熱帶氣旋季，不能把產季表當成道路可通行保證。" },
+      5: { work: "農產工作進入換季，不同地區落差變大；雪季招募多半已比 5 月更早開始。", place: "南部轉冷，偏遠與戶外工作需把保暖、日照和交通納入；北部進入較乾燥季節但不代表一定有職缺。" },
+      6: { work: "雪季開始不等於還在大量招人；沒有 offer 與住宿才到雪鎮，選擇和預算壓力都較大。", place: "南部寒冷、戶外工時受天候影響；北部進入火災天氣較高風險季節。" },
+      7: { work: "雪場進入熱門時段，臨時找住宿與交通更難；農務則集中在特定修剪、加工與棚內工作。", place: "高山天候與道路可能變動；北部乾季燃料變乾，須看當地火災危險評級。" },
+      8: { work: "雪季已到後段，需先規劃合約結束後的工作與住宿；春季產業訊號尚不等於已有職缺。", place: "北部仍處火災天氣高風險期；南部戶外工作仍可能受寒冷與降雨影響。" },
+      9: { work: "雪季尾聲與春季農務交接，兩份工作之間可能有空窗；剪羊毛或穀物職類也可能要求經驗或體力。", place: "北部火災天氣風險持續；跨州移動前要查即時預警與道路狀況。" },
+      10: { work: "初夏採收與節慶前招募開始出現，但職缺開放日不一致；看到產季開始不代表可直接上工。", place: "北部雨季通常從 10 月開始，強降雨可能影響道路與戶外班次；部分地區火災風險仍高。" },
+      11: { work: "購物／假期季節招募較活躍，同時競爭與快速到職需求也可能增加；短產季工作要確認實際結束日。", place: "官方熱帶氣旋季開始；南部植被在晚春轉乾，火災天氣風險逐步上升。" },
+      12: { work: "節慶職缺可能早已完成招募；櫻桃、莓果等作物進入產季，也不代表每個農場仍缺人。", place: "南部進入火災天氣高風險期，北部同時處於雨季與熱帶氣旋季；交通、住宿與撤離資訊要能獨立取得。" }
+    };
+    var seasonChallengesEn = {
+      1: { work: "Holiday-season roles often began recruiting around the previous November, and short crops such as cherries may finish within weeks.", place: "Southern Australia is in a higher-risk summer fire-weather period, while northern Australia is in the wet and tropical-cyclone seasons; outdoor shifts and roads can be disrupted." },
+      2: { work: "Major alpine application windows are open; waiting until winter can be too late. Some cherry seasons are ending, so 'summer harvest' is not specific enough.", place: "Heat and fire weather can still affect the south, while the north remains in the wet and tropical-cyclone seasons." },
+      3: { work: "VIC/TAS tables show several autumn activities, but hours and piece-rate earnings still depend on crop volume, variety and weather.", place: "The northern wet and tropical-cyclone seasons continue; confirm remote-road and accommodation fallbacks." },
+      4: { work: "Some short harvests are ending. Relying on one crop can create an unpaid gap, so confirm the next role before moving.", place: "The official northern tropical-cyclone season runs through the end of April; a crop calendar does not guarantee road access." },
+      5: { work: "Agriculture is changing seasons and regional differences widen; many alpine roles began recruiting earlier than May.", place: "The south is cooling, so plan for cold, daylight and transport; the northern dry season does not itself guarantee work." },
+      6: { work: "The snow season starting does not mean large-scale hiring is still open. Arriving without an offer and housing creates higher budget risk.", place: "Cold and weather affect southern outdoor work, while northern fire-weather risk is increasing." },
+      7: { work: "Alpine areas are busy, making last-minute housing and transport harder; farm work is concentrated in particular pruning, processing or shed roles.", place: "Alpine roads and conditions can change, while dry northern fuels require checking local fire-danger ratings." },
+      8: { work: "The snow season is moving into its later stage, so plan the next job and housing. Spring production signals are not yet live vacancies.", place: "Northern fire-weather risk continues, while cold and rain can still disrupt southern outdoor work." },
+      9: { work: "The snow-season tail and spring agriculture can leave a gap between roles; shearing or grain work may also require experience or physical capacity.", place: "Northern fire-weather risk continues; check current warnings and road conditions before interstate travel." },
+      10: { work: "Early-summer harvest and pre-holiday recruitment begin at different times. A season opening does not mean you can start immediately.", place: "The northern wet season generally begins in October, with heavy rain affecting roads and outdoor shifts; fire risk can remain elevated elsewhere." },
+      11: { work: "Shopping and holiday recruitment is more active, but competition and rapid-start expectations may also rise. Confirm the end date for short harvests.", place: "The official tropical-cyclone season begins, while late-spring drying increases fire-weather risk in southern Australia." },
+      12: { work: "Holiday employers may already have staffed their rosters. Cherries and berries being in season does not mean every farm is still hiring.", place: "Southern fire-weather risk is higher, while the north is in both wet and tropical-cyclone seasons; keep independent transport, accommodation and evacuation information." }
+    };
 
     var seasonSourceLink = function (source) {
-      return '<a href="' + source.url + '" rel="noopener">' + (seasonEnglish ? "Official table" : "官方表") + '</a>';
+      var label = source.evidenceType === "produce-availability"
+        ? (seasonEnglish ? "Government produce-availability table" : "政府果品供應表")
+        : (seasonEnglish ? "Government harvest-jobs table" : "政府採收工作表");
+      return '<a href="' + source.url + '" rel="noopener">' + label + '</a>';
     };
 
     var renderSeason = function (month) {
@@ -217,15 +248,25 @@
           + (seasonEnglish && source.pageDate === '未標示' ? 'not stated' : source.pageDate) + '</p>'
           + '</article>';
       }).join("");
+      var challenge = (seasonEnglish ? seasonChallengesEn : seasonChallengesZh)[month];
+      var challengeCard = challenge
+        ? '<aside class="season-challenge">'
+          + '<h4>' + (seasonEnglish ? 'Possible difficulties in month ' + month : month + ' 月可能遇到的困境') + '</h4>'
+          + '<p><strong>' + (seasonEnglish ? 'Recruitment and hours: ' : '招募與工時：') + '</strong>' + challenge.work + '</p>'
+          + '<p><strong>' + (seasonEnglish ? 'Place and weather: ' : '地點與氣候：') + '</strong>' + challenge.place + '</p>'
+          + '</aside>'
+        : '';
 
       seasonSummary.innerHTML = seasonEnglish
-        ? '<strong>Month ' + month + ':</strong> ' + verifiedCount + ' state or territory government table(s) list an item'
-        : '<strong>' + month + ' 月：</strong>有 ' + verifiedCount + ' 個州／領地在官方表中列出項目';
+        ? '<strong>Month ' + month + ':</strong> ' + verifiedCount + ' government source(s) list a harvest or produce-availability item'
+        : '<strong>' + month + ' 月：</strong>有 ' + verifiedCount + ' 個政府來源列出採收或果品供應項目';
       seasonDetails.innerHTML = seasonEnglish
         ? '<div class="season-grid">' + cards + '</div>'
-          + '<p class="season-caveat">These are government-published harvest or availability months, not a promise of vacancies. Weather, varieties and local growing areas can shift dates. Confirm actual shifts with the employer before travelling.</p>'
+          + challengeCard
+          + '<p class="season-caveat">Victoria and Tasmania publish harvest-work planning tables. The Northern Territory source is a produce-availability table only. None of them promises a vacancy. Confirm a live role, start date, hours, transport and accommodation before travelling.</p>'
         : '<div class="season-grid">' + cards + '</div>'
-          + '<p class="season-caveat">這是政府公布的採收／供應月份，不是職缺保證。天候、品種與產區會讓日期前後移動，出發前仍要向雇主確認班次。</p>';
+          + challengeCard
+          + '<p class="season-caveat">VIC、TAS 是採收工作規劃表；NT 來源只是果品供應月份。三者都不是職缺保證。移動前請先確認仍在招募、開工日、工時、交通與住宿。</p>';
     };
 
     seasonTool.querySelectorAll("[data-season-month]").forEach(function (button) {

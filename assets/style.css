@@ -1707,10 +1707,74 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .season-state li strong, .season-state li span { display: block; }
 .season-state li span { margin-top: 2px; color: var(--ink-soft); font-size: .82rem; }
 .season-caveat { margin: 14px 0 0; color: var(--ink-soft); font-size: .85rem; }
+.season-guide {
+  margin: 24px 0;
+  padding: 20px;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.season-guide-heading h3 { margin: 8px 0 4px; }
+.season-guide-heading > p { margin-top: 0; color: var(--ink-soft); }
+.season-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.season-guide-card {
+  padding: 16px;
+  border: 1.5px solid var(--line-soft);
+  border-radius: 14px;
+  background: var(--bg);
+}
+.season-guide-card h4 { margin: 2px 0 8px; }
+.season-guide-card p { margin: 8px 0; }
+.season-friction {
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  color: var(--ink-soft);
+}
+.season-window {
+  color: var(--green-ink);
+  font-size: .82rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+.season-decision {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.season-decision p {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 5px solid var(--green);
+  border-radius: 8px;
+  background: var(--green-soft);
+}
+.season-decision p:nth-child(2) {
+  border-left-color: var(--accent);
+  background: var(--gold-soft);
+}
+.season-decision p:nth-child(3) {
+  border-left-color: var(--blue);
+  background: var(--blue-soft);
+}
+.season-challenge {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  background: var(--gold-soft);
+}
+.season-challenge h4 { margin: 0 0 6px; }
+.season-challenge p { margin: 6px 0; }
 
 @media (max-width: 560px) {
   .season-months { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .season-grid { grid-template-columns: 1fr; }
+  .season-guide { padding: 14px; }
+  .season-guide-grid { grid-template-columns: 1fr; }
 }
 
 /* ---------- 回饋列 ---------- */

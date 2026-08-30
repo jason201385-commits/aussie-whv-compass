@@ -60,7 +60,7 @@
 | `simulator.html` | **5 分鐘角色設定＋抵澳 30 天模擬器**：固定六情境、同分頁 session 暫存、緊急關卡在選項前提供 `tel:000` 安全中斷、官方出口與第 30 天行動地圖；從攻略返回或重新整理可繼續，重開需確認，不做成功／簽證／醫療預測；無 JavaScript 時隱藏不可操作表單並提供靜態替代入口 |
 | `cost.html` | 物價薪水稅務＋Perth 採買、簡易食譜、二手衣／平價新品＋主要找車／自行刊登平台與官方查核＋**存錢試算器** |
 | `housing.html` | 住宿與租屋：短住訂房、合租／整租原始平台入口、WA 官方租屋權益與安全清單 |
-| `work.html` | 找工作（管道、查核、證照、履歷、季節、工傷） |
+| `work.html` | 找工作（管道、查核、證照、履歷、官方月份工具、四季職類與條件式抵達建議、工傷） |
 | `scam.html` | 防詐騙（三道防線、16 手法、救濟包）＋**防詐測驗** |
 | `english.html` | 英文資源與策略 |
 | `health.html` | 保險就醫心理安全 |
@@ -91,7 +91,7 @@
 | `lang/en/prep/index.html` | 完整英文行前與落地 editorial beta：護照中立的 RHCA／保險、入境申報、藥品、各州駕照、落地住宿、TFN／銀行／myGov／super 與獨立本機進度的 21 項清單；未經母語澳洲 settlement 或 consumer-services 專業人士校對前不得標為 reviewed |
 | `lang/en/cost/index.html` | 完整英文生活成本 editorial beta：2026–27 薪資／WHM 稅／super 邊界、46 收入週／52 支出週本機試算、食衣交通、PPSR 與八州領地車輛過戶；未經母語澳洲 tax、financial-counselling 或 consumer-services 專業人士校對前不得標為 reviewed |
 | `lang/en/housing/index.html` | 完整英文住宿與租屋 editorial beta：護照中立的短住／長租分流、平台與身分查證、合約／bond／condition report、八州領地官方入口、工作綁住宿與離場處理；未經母語澳洲 tenancy、housing 或 homelessness-services 專業人士校對前不得標為 reviewed |
-| `lang/en/work/index.html` | 完整英文工作 editorial beta：求職分流、雇主與薪資查核、職場紅旗、採收月份工具與官方求助路徑；未經母語澳洲職場關係專業人士校對前不得標為 reviewed |
+| `lang/en/work/index.html` | 完整英文工作 editorial beta：求職分流、雇主與薪資查核、職場紅旗、採收月份工具、四季職類與條件式抵達建議、官方求助路徑；未經母語澳洲職場關係專業人士校對前不得標為 reviewed |
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
 | `lang/en/health/index.html` | 完整英文健康安全 editorial beta：跨護照 Medicare／RHCA 分流、訪客保險查核、就醫層級、藥品、職災、心理健康、暴力支援、偏遠工作與緊急聯絡；未經母語澳洲 healthcare、insurance、mental-health、violence-support 或 workplace-safety 專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |

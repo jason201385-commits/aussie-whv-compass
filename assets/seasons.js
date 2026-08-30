@@ -1,6 +1,6 @@
 /*
  * 澳打指南針 — 州／領地官方採收季節資料
- * Retrieved: 2026-08-29
+ * Retrieved: 2026-08-30
  *
  * 只收錄能追溯到州／領地政府逐月資料的項目。這是農產品採收／供應月份，
  * 不等於當下保證有職缺；實際時間仍會受產區、品種與天候影響。
@@ -9,22 +9,25 @@
   "use strict";
 
   window.WHV_SEASONS = {
-    retrieved: "2026-08-29",
+    retrieved: "2026-08-30",
     sources: {
       VIC: {
         name: "Agriculture Victoria — How to get a harvest job",
         url: "https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest/how-to-get-a-harvest-job",
-        pageDate: "2026-07-13"
+        pageDate: "2026-07-13",
+        evidenceType: "harvest-jobs"
       },
       TAS: {
         name: "NRE Tasmania — Harvest Jobs",
         url: "https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs",
-        pageDate: "2025-07-30"
+        pageDate: "2025-07-30",
+        evidenceType: "harvest-jobs"
       },
       NT: {
         name: "NT Government — Fruit availability and storage in NT",
         url: "https://nt.gov.au/industry/agriculture/food-crops-plants-and-quarantine/fruit-crops/fruit-availability-and-storage",
-        pageDate: "未標示"
+        pageDate: "未標示",
+        evidenceType: "produce-availability"
       }
     },
     states: [

@@ -939,8 +939,11 @@ if (-not (Test-Path $englishWorkPath)) {
     Write-Output 'FAIL [lang/en/] 工作卡未連到完整英文頁'; $errors++
   }
   $seasonToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
-  foreach ($needle in @('var seasonEnglish =', 'var seasonCropEn =', 'government-published harvest or availability months', 'No state or territory government table')) {
+  foreach ($needle in @('var seasonEnglish =', 'var seasonCropEn =', 'var seasonChallengesZh =', 'var seasonChallengesEn =', 'Possible difficulties in month ', 'Government produce-availability table', 'Government harvest-jobs table', 'No state or territory government table')) {
     if (-not $seasonToolsText.Contains($needle)) { Write-Output "FAIL [tools.js] 採收工具缺英文輸出或誠實 fallback：$needle"; $errors++ }
+  }
+  foreach ($needle in @('Possible jobs by season and when arrival is higher risk', 'There is no single best or worst month across Australia', 'arriving unprepared in December may leave fewer options', 'reaching a snow town in June without an offer or accommodation is higher risk', 'Possible difficulties:', 'BOM fire-weather seasons')) {
+    if (-not $englishWorkText.Contains($needle)) { Write-Output "FAIL [lang/en/work/] 缺四季職類或條件式抵達邊界：$needle"; $errors++ }
   }
   $i18nWorkText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
   if (-not $i18nWorkText.Contains('"work":{"zh-Hant":"/work.html","en":"/lang/en/work/"}')) {
@@ -1826,6 +1829,13 @@ foreach ($communityNeedle in @('id="perth-community"', '群組非本站營運', 
 $workText = [System.IO.File]::ReadAllText((Join-Path $dir 'work.html'), [System.Text.Encoding]::UTF8)
 foreach ($workCommunityNeedle in @('第三方 Perth 生活社群入口只放在首頁的一般生活交流區', '不列為求職來源')) {
   if (-not $workText.Contains($workCommunityNeedle)) { Write-Output "FAIL [work.html] 缺生活社群非求職入口邊界：$workCommunityNeedle"; $errors++ }
+}
+foreach ($seasonGuideNeedle in @('四季可能職缺與抵達時機', '沒有全澳通用的最好／最差月份', '10–11 月開始看職缺與投遞', '6 月才無 offer、無住宿直接到雪鎮，風險較高', 'NT 來源只是果品供應月份', '可能遇到的困境', 'BOM 各地火災天氣季節')) {
+  if (-not ($workText + "`n" + $toolsJs).Contains($seasonGuideNeedle)) { Write-Output "FAIL [work season guide] 缺季節職類、抵達判斷或 NT 證據邊界：$seasonGuideNeedle"; $errors++ }
+}
+$seasonDataText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\seasons.js'), [System.Text.Encoding]::UTF8)
+foreach ($seasonDataNeedle in @('evidenceType: "harvest-jobs"', 'evidenceType: "produce-availability"')) {
+  if (-not $seasonDataText.Contains($seasonDataNeedle)) { Write-Output "FAIL [seasons.js] 缺來源類型邊界：$seasonDataNeedle"; $errors++ }
 }
 
 $thirdPartyRegisterPath = Join-Path $dir 'third-party-register.json'
