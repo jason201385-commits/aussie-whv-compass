@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260829-12"
+ASSET_VERSION = "20260829-13"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -35,10 +35,11 @@ GUIDES = [
     ("collaborate", "/about.html#collaborate"),
 ]
 FULL_GUIDE_TRANSLATIONS = {
-    "en": {"visa": "/lang/en/visa/", "work": "/lang/en/work/", "scam": "/lang/en/scam/"},
+    "en": {"visa": "/lang/en/visa/", "prep": "/lang/en/prep/", "work": "/lang/en/work/", "scam": "/lang/en/scam/"},
 }
 FULL_TOPIC_ROUTES = {
     "visa": {"zh-Hant": "/visa.html", "en": "/lang/en/visa/"},
+    "prep": {"zh-Hant": "/prep.html", "en": "/lang/en/prep/"},
     "work": {"zh-Hant": "/work.html", "en": "/lang/en/work/"},
     "scam": {"zh-Hant": "/scam.html", "en": "/lang/en/scam/"},
 }
@@ -156,10 +157,16 @@ def build_locale_page(code: str, locale: dict, data: dict) -> str:
     strings = locale["strings"]
     canonical = locale_url(code)
     title = f'{strings["page_title"]} | {strings["site_name"]}'
-    cards = "\n".join(
-        f'<a class="card i18n-guide-card" href="{FULL_GUIDE_TRANSLATIONS.get(code, {}).get(key, href)}"><h3>{esc(strings[key])}</h3><span aria-hidden="true">→</span></a>'
-        for key, href in GUIDES
-    )
+    full_routes = FULL_GUIDE_TRANSLATIONS.get(code, {})
+    card_parts = []
+    for key, href in GUIDES:
+        traditional_target = code == "en" and key not in full_routes
+        language_note = '<small>Traditional Chinese guide</small>' if traditional_target else ""
+        language_attr = ' hreflang="zh-Hant"' if traditional_target else ""
+        card_parts.append(
+            f'<a class="card i18n-guide-card" href="{full_routes.get(key, href)}"{language_attr}><span class="i18n-guide-copy"><h3>{esc(strings[key])}</h3>{language_note}</span><span aria-hidden="true">→</span></a>'
+        )
+    cards = "\n".join(card_parts)
     review = locale["reviewStatus"]
     review_label = "Machine translation — community review needed" if review.startswith("machine") else (
         "English fallback — translation needed" if review == "english-fallback" else "Source language"

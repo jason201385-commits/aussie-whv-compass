@@ -332,6 +332,119 @@ if (-not (Test-Path $englishVisaPath)) {
   }
 }
 
+# 完整英文行前頁：跨護照適用、官方來源、私密清單與無 JavaScript 內容不得遺失
+$englishPrepPath = Join-Path $dir 'lang\en\prep\index.html'
+if (-not (Test-Path $englishPrepPath)) {
+  Write-Output 'FAIL 缺完整英文行前頁：lang/en/prep/'
+  $errors++
+} else {
+  $englishPrepText = [System.IO.File]::ReadAllText($englishPrepPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    '<meta name="viewport"',
+    'data-i18n-topic="prep"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/prep/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/prep.html">',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking Australian settlement or consumer-services professional',
+    'Do not accidentally replace your WHM visa',
+    'eVisitor (subclass 651)',
+    'Transit visa (subclass 771)',
+    'An ETA (subclass 601) is treated differently and does not cease the WHM visa',
+    'do not apply for any other Australian visa while holding a WHM unless you first check',
+    'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601',
+    'Check your current visa and conditions in VEVO before travel',
+    'Australia has Reciprocal Health Care Agreements with 11 countries',
+    'Ordinary visitors covered through New Zealand or Ireland do not enrol in Medicare or receive a Medicare card',
+    'https://www.servicesaustralia.gov.au/reciprocal-health-care-agreements-visiting-from-new-zealand?context=22481',
+    'https://www.servicesaustralia.gov.au/reciprocal-health-care-agreements-visiting-from-ireland?context=22481',
+    'Product Disclosure Statement',
+    'AUD10,000 or more',
+    'three-month supply',
+    'Driving rules change by state or territory',
+    'id="prep-checklist"',
+    'role="progressbar" aria-label="Preparation checklist progress" aria-valuemin="0" aria-valuemax="21" aria-valuenow="0"',
+    'This site does not collect your checklist choices',
+    'https://immi.homeaffairs.gov.au/what-we-do/whm-program/latest-news',
+    'https://www.servicesaustralia.gov.au/reciprocal-health-care-agreements',
+    'https://www.agriculture.gov.au/travelling/to-australia',
+    'https://www.tga.gov.au/resources/consumer-information-and-resources/travelling-medicines-and-medical-devices/entering-australia',
+    'https://www.ato.gov.au/individuals-and-families/tax-file-number/apply-for-a-tfn',
+    '<noscript><p class="warn">JavaScript is required for the private checklist.',
+    '/assets/tools.js?v='
+  )) {
+    if (-not $englishPrepText.Contains($needle)) { Write-Output "FAIL [lang/en/prep/] 缺內容、來源或隱私邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishPrepText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishPrepText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/prep/] 必須只有一個 h1 與 main'; $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishPrepText, '<a href="#([^"]+)"')) {
+    if (-not $englishPrepText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/prep/] TOC 錨點不存在：$($anchor.Groups[1].Value)"; $errors++
+    }
+  }
+  $englishPrepIds = [regex]::Matches($englishPrepText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishPrepIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/prep/] 含重複 id'; $errors++
+  }
+  if ($englishPrepText -match '[\u3400-\u9fff]') {
+    Write-Output 'FAIL [lang/en/prep/] 完整英文頁仍含 CJK 文字'; $errors++
+  }
+  if ($englishPrepText.Contains('/assets/main.js?v=')) {
+    Write-Output 'FAIL [lang/en/prep/] 不得載入會注入中文搜尋、回饋列與 skip link 的 main.js'; $errors++
+  }
+  $englishPrepAssetVersions = @([regex]::Matches($englishPrepText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|main\.js|tools\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishPrepAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishPrepAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/prep/] 資產版本與全站不一致：$(($englishPrepAssetVersions) -join ', ')"; $errors++
+  }
+  foreach ($link in [regex]::Matches($englishPrepText, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/prep/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  $englishPrepJsonText = [regex]::Match($englishPrepText, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+  try {
+    $englishPrepJson = $englishPrepJsonText | ConvertFrom-Json
+    if ($englishPrepJson.'@context' -ne 'https://schema.org' -or -not $englishPrepJson.'@graph') {
+      Write-Output 'FAIL [lang/en/prep/] JSON-LD 缺 schema.org context 或 graph'; $errors++
+    }
+  } catch { Write-Output 'FAIL [lang/en/prep/] JSON-LD 不是合法 JSON'; $errors++ }
+
+  $traditionalPrepText = [System.IO.File]::ReadAllText((Join-Path $dir 'prep.html'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/prep/">',
+    '<body data-i18n-topic="prep">'
+  )) {
+    if (-not $traditionalPrepText.Contains($needle)) { Write-Output "FAIL [prep.html] 缺英文 reciprocal hreflang 或主題標記：$needle"; $errors++ }
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/prep/">')) {
+    Write-Output 'FAIL [lang/en/] 行前卡未連到完整英文頁'; $errors++
+  }
+  $prepToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    'var prepEnglish =',
+    'After the visa grant',
+    'One week before departure',
+    'First week in Australia',
+    'whv-prep-check-en-v1',
+    'Exact medicine and permit requirements checked',
+    'current VEVO record',
+    'prep-check-group',
+    "role='group' aria-labelledby='prep-group-",
+    'done + " of " + total + " complete',
+    'progress.setAttribute("aria-valuenow"'
+  )) {
+    if (-not $prepToolsText.Contains($needle)) { Write-Output "FAIL [tools.js] 行前清單缺英文輸出或相容儲存：$needle"; $errors++ }
+  }
+  $i18nPrepText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  if (-not $i18nPrepText.Contains('"prep":{"zh-Hant":"/prep.html","en":"/lang/en/prep/"}')) {
+    Write-Output 'FAIL [i18n.js] 缺行前主題中英文路由'; $errors++
+  }
+  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/cost\.html|/housing\.html|/english\.html|/health\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
+  if ($englishTraditionalCards.Count -ne 8 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 8) {
+    Write-Output 'FAIL [lang/en/] 8 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
+  }
+}
+
 # 完整英文工作頁：跨護照適用、工資與雇傭邊界、英文採收工具及官方求助路徑不得遺失
 $englishWorkPath = Join-Path $dir 'lang\en\work\index.html'
 if (-not (Test-Path $englishWorkPath)) {
@@ -720,6 +833,7 @@ if (-not (Test-Path $sitemapPath)) {
     $expectedUrls += "$canonicalOrigin/lang/"
     $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
     $expectedUrls += "$canonicalOrigin/lang/en/visa/"
+    $expectedUrls += "$canonicalOrigin/lang/en/prep/"
     $expectedUrls += "$canonicalOrigin/lang/en/work/"
     $expectedUrls += "$canonicalOrigin/lang/en/scam/"
   }
@@ -761,7 +875,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }

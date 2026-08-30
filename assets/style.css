@@ -381,12 +381,14 @@ li { margin: .4em 0; }
 .i18n-guide-grid { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: 18px 0 30px; }
 .i18n-guide-card { min-height: 128px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .i18n-guide-card h3 { margin: 0; }
-.i18n-guide-card > span { font-size: 1.4rem; }
+.i18n-guide-copy { display: block; }
+.i18n-guide-card .i18n-guide-copy small { display: block; margin-top: 8px; color: var(--ink-soft); font-size: .78rem; font-weight: 700; }
+.i18n-guide-card > span[aria-hidden="true"] { font-size: 1.4rem; }
 .i18n-review { margin-top: 30px; }
 .i18n-review h2 { margin-top: 0; }
 [dir="rtl"] .i18n-page { text-align: right; }
 [dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 1.4em; }
-[dir="rtl"] .i18n-guide-card > span { transform: scaleX(-1); }
+[dir="rtl"] .i18n-guide-card > span[aria-hidden="true"] { transform: scaleX(-1); }
 
 /* ---------- GA4 同意與設定 ---------- */
 .analytics-consent {

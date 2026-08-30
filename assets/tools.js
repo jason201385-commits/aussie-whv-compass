@@ -298,7 +298,36 @@
   /* ================= 行前互動清單（prep.html） ================= */
   var checklist = document.getElementById("prep-checklist");
   if (checklist) {
-    var ITEMS = [
+    var prepEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+    var ITEMS = prepEnglish ? [
+      { g: icon("idcard") + " After the visa grant", items: [
+        "Insurance ready and the PDS covers my planned work and activities",
+        "Travel booked only after receiving the written visa grant",
+        "Overseas licence, approved translation or IDP requirements checked",
+        "Dental and medical needs reviewed before departure",
+        "English resume is ready and every claim is accurate",
+        "Qualifications and references translated where useful",
+        "Official account-opening requirements checked with my chosen bank",
+        "Transfer fees checked and a backup payment method tested"
+      ]},
+      { g: icon("luggage") + " One week before departure", items: [
+        "First-night essentials packed in carry-on luggage",
+        "Temporary accommodation booked for 7–14 nights",
+        "A modest cash amount and at least two payment paths are ready",
+        "Exact medicine and permit requirements checked; original labelled packaging, supporting prescription or doctor's letter, and quantity within the official limit are ready",
+        "Passport, grant notice, current VEVO record and policy copies stored in a secure backup",
+        "Contact schedule and emergency plan shared with someone I trust"
+      ]},
+      { g: icon("plane") + " First week in Australia", items: [
+        "Phone service activated and I know 000 is for emergencies only",
+        "Official local transport route and payment method checked",
+        "Free TFN application lodged through the ATO once eligible",
+        "Bank account opened and BSB/account details recorded securely",
+        "If useful, myGov created through the official site and ATO linking started",
+        "Super choice or stapled-fund details checked before onboarding",
+        "Scam, insurer and official help routes saved offline"
+      ]}
+    ] : [
       { g: icon("idcard") + " 下簽之後", items: [
         "保險買好（確認打工/體力勞動有保）",
         "機票訂了（核准信到手才訂）",
@@ -327,27 +356,31 @@
         "把「防詐騙」頁的救濟包電話存進手機"
       ]}
     ];
-    var KEY = "whv-prep-check-v1";
+    var KEY = prepEnglish ? "whv-prep-check-en-v1" : "whv-prep-check-v1";
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
     var total = 0, html = "";
     ITEMS.forEach(function (grp, gi) {
-      html += "<h3>" + grp.g + "</h3><ul class='icheck'>";
+      html += "<section class='prep-check-group' role='group' aria-labelledby='prep-group-" + gi + "'><h3 id='prep-group-" + gi + "'>" + grp.g + "</h3><ul class='icheck'>";
       grp.items.forEach(function (item, ii) {
         var id = "pc2-" + gi + "-" + ii;
         total++;
         html += "<li><label><input type='checkbox' id='" + id + "'" + (saved[id] ? " checked" : "") + "><span>" + item + "</span></label></li>";
       });
-      html += "</ul>";
+      html += "</ul></section>";
     });
     checklist.innerHTML = html;
     var bar = document.getElementById("prep-progress-bar");
     var label = document.getElementById("prep-progress-label");
+    var progress = bar ? bar.parentElement : null;
     var refresh = function () {
       var done = checklist.querySelectorAll("input:checked").length;
       var pct = Math.round(done / total * 100);
       bar.style.width = pct + "%";
-      label.textContent = done + " / " + total + " 完成（" + pct + "%）" + (pct === 100 ? " —— 出發吧！" : "");
+      label.textContent = prepEnglish
+        ? done + " of " + total + " complete (" + pct + "%)" + (pct === 100 ? " — ready for a final document check" : "")
+        : done + " / " + total + " 完成（" + pct + "%）" + (pct === 100 ? " —— 出發吧！" : "");
+      if (progress) progress.setAttribute("aria-valuenow", String(done));
       try {
         var data = {};
         checklist.querySelectorAll("input").forEach(function (c) { data[c.id] = c.checked; });
@@ -358,7 +391,7 @@
     refresh();
     var resetBtn = document.getElementById("prep-reset");
     if (resetBtn) resetBtn.addEventListener("click", function () {
-      if (!confirm("清空所有勾選？")) return;
+      if (!confirm(prepEnglish ? "Clear every checklist tick?" : "清空所有勾選？")) return;
       checklist.querySelectorAll("input").forEach(function (c) { c.checked = false; });
       refresh();
     });

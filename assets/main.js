@@ -132,7 +132,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260829-12";
+      script.src = "assets/search-index.js?v=20260829-13";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {

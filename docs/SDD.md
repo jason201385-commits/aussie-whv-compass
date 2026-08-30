@@ -75,6 +75,7 @@
 | `scripts/build_search.py` | 從 13 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
 | `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
 | `lang/en/visa/index.html` | 第一個完整英文 editorial beta：護照中立的 417／462 分流、官方來源、指定工作與 417-only 郵遞區號快查；未經母語移民專業人士校對前不得標為 reviewed |
+| `lang/en/prep/index.html` | 完整英文行前與落地 editorial beta：護照中立的 RHCA／保險、入境申報、藥品、各州駕照、落地住宿、TFN／銀行／myGov／super 與獨立本機進度的 21 項清單；未經母語澳洲 settlement 或 consumer-services 專業人士校對前不得標為 reviewed |
 | `lang/en/work/index.html` | 完整英文工作 editorial beta：求職分流、雇主與薪資查核、職場紅旗、採收月份工具與官方求助路徑；未經母語澳洲職場關係專業人士校對前不得標為 reviewed |
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |
@@ -115,6 +116,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   - `whv-worksheet-v1`：工作表答案（{q1..q8: string}）
   - `whv-why-quick-v1`：快思版答案（{qq1..qq8: 1..5}）；讀取時只接受固定題號與整數範圍，不儲存或顯示自由文字
   - `whv-prep-check-v1`：行前清單勾選（{pc2-g-i: bool}）
+  - `whv-prep-check-en-v1`：英文行前清單勾選（與繁中分開，避免不同語意的位置式 ID 互相污染）
   - `whv-leave-check-v1`：離澳收尾清單勾選（{lc-i: bool}）
   - `whv-save-calc-v1`：存錢試算器輸入與最近一次結果（行前海報使用）
   - `whv-last-page-v1`：最近閱讀的白名單頁名（`{path}`），供首頁續讀卡使用
