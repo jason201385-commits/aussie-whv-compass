@@ -835,15 +835,23 @@
   var dasp = document.getElementById("dasp-calc");
   if (dasp) {
     var bal = document.getElementById("dasp-balance");
+    var taxFreeInput = document.getElementById("dasp-tax-free");
     var calcDasp = function () {
       var b = parseFloat(bal.value) || 0;
-      var take = b * 0.35, tax = b * 0.65;
+      var requestedTaxFree = parseFloat(taxFreeInput.value) || 0;
+      var taxFree = Math.min(Math.max(requestedTaxFree, 0), b);
+      var taxable = Math.max(0, b - taxFree);
+      var tax = taxable * 0.65;
+      var take = b - tax;
       document.getElementById("dasp-take").textContent = fmt(take);
       document.getElementById("dasp-tax").textContent = fmt(tax);
       document.getElementById("dasp-verdict").textContent =
-        b <= 0 ? "" : "換算約 NT$" + Math.round(take * 22.8).toLocaleString() + "——當作離澳的驚喜獎金，心情會好很多。";
+        b <= 0 ? "" : requestedTaxFree > b
+          ? "tax-free component 不能高於總額；本次先按總額上限估算。請用 fund 的 component 資料再核對。"
+          : "這只是 component-based 粗估；實際款項由每個 fund 依資料與適用規則計算。";
     };
     bal.addEventListener("input", calcDasp);
+    taxFreeInput.addEventListener("input", calcDasp);
     calcDasp();
     dasp.querySelectorAll(".chip[data-amt]").forEach(function (c) {
       c.addEventListener("click", function () { bal.value = c.getAttribute("data-amt"); calcDasp(); });
