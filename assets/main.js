@@ -55,10 +55,12 @@
     var brand = document.querySelector(".brand");
     if (brand) brand.setAttribute("aria-current", "page");
   }
+  var activeNavLink = null;
   document.querySelectorAll(".nav-links a").forEach(function (a) {
     if (a.getAttribute("href") === path) {
       a.classList.add("active");
       a.setAttribute("aria-current", "page");
+      activeNavLink = a;
     }
   });
 
@@ -101,6 +103,21 @@
   if (navInner) {
     var navLinks = navInner.querySelector(".nav-links");
     navInner.insertBefore(searchOpen, navLinks || null);
+    if (navLinks) {
+      var mobileNavQuery = window.matchMedia("(max-width: 768px)");
+      var positionCurrentNavLink = function () {
+        navLinks.setAttribute("aria-label", mobileNavQuery.matches ? "主題導覽，可左右滑動" : "主題導覽");
+        if (!mobileNavQuery.matches || !activeNavLink) return;
+        window.requestAnimationFrame(function () {
+          var targetLeft = activeNavLink.offsetLeft - ((navLinks.clientWidth - activeNavLink.offsetWidth) / 2);
+          navLinks.scrollLeft = Math.max(0, targetLeft);
+        });
+      };
+      positionCurrentNavLink();
+      if (typeof mobileNavQuery.addEventListener === "function") {
+        mobileNavQuery.addEventListener("change", positionCurrentNavLink);
+      }
+    }
   }
 
   var searchInput = document.getElementById("site-search-input");
@@ -136,7 +153,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260830-31";
+      script.src = "assets/search-index.js?v=20260830-32";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {

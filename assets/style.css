@@ -2180,9 +2180,10 @@ main [id] { scroll-margin-top: 170px; }
     padding: 2px 18px 2px 2px;
     mask-image: linear-gradient(90deg, #000 90%, transparent);
     -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
+    scroll-snap-type: x proximity;
   }
   .nav-links::-webkit-scrollbar { display: none; }
-  .nav-links a { display: inline-flex; align-items: center; min-height: 44px; }
+  .nav-links a { display: inline-flex; align-items: center; min-height: 44px; scroll-snap-align: center; }
 }
 
 @media (max-width: 640px) {
