@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260830-17"
+ASSET_VERSION = "20260830-18"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -181,7 +181,7 @@ def build_locale_page(code: str, locale: dict, data: dict) -> str:
 </head>
 <body class="i18n-page" data-locale="{esc(code)}">
 {header(strings["site_name"])}
-<main id="main-content">
+<main id="main-content" tabindex="-1">
   <section class="i18n-hero">
     <p class="section-eyebrow">{esc(strings["eyebrow"])}</p>
     <h1 class="page-title">{esc(strings["page_title"])}</h1>
@@ -253,7 +253,7 @@ def build_hub(data: dict) -> str:
 </head>
 <body class="i18n-page language-hub" data-locale="en">
 {header()}
-<main id="main-content">
+<main id="main-content" tabindex="-1">
   <p class="section-eyebrow">LANGUAGE ACCESS</p>
   <h1 class="page-title">Choose a language</h1>
   <p class="page-sub">Quick-start access for the main official or widely used languages across the passport countries and jurisdictions currently listed for subclass 417 or 462.</p>

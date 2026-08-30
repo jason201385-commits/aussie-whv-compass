@@ -39,11 +39,14 @@
   var main = document.querySelector("main");
   if (main) {
     if (!main.id) main.id = "main-content";
-    var skip = document.createElement("a");
-    skip.className = "skip-link";
-    skip.href = "#" + main.id;
-    skip.textContent = "跳到主要內容";
-    document.body.insertBefore(skip, document.body.firstChild);
+    if (!main.hasAttribute("tabindex")) main.setAttribute("tabindex", "-1");
+    if (!document.querySelector(".skip-link")) {
+      var skip = document.createElement("a");
+      skip.className = "skip-link";
+      skip.href = "#" + main.id;
+      skip.textContent = "跳到主要內容";
+      document.body.insertBefore(skip, document.body.firstChild);
+    }
   }
 
   // 導覽列目前頁面標示
@@ -132,7 +135,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260830-17";
+      script.src = "assets/search-index.js?v=20260830-18";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {

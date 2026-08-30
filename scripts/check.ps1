@@ -21,6 +21,12 @@ foreach ($p in $allPages) {
   if ([regex]::Matches($t, '<meta name="viewport"').Count -ne 1) { Write-Output "FAIL [$p] viewport 數量錯誤"; $errors++ }
   if ([regex]::Matches($t, '<main(?:\s|>)').Count -ne 1) { Write-Output "FAIL [$p] main 數量錯誤"; $errors++ }
   if ([regex]::Matches($t, '<h1(?:\s|>)').Count -ne 1) { Write-Output "FAIL [$p] h1 數量錯誤"; $errors++ }
+  if ([regex]::Matches($t, '<a class="skip-link" href="#main-content">跳到主要內容</a>').Count -ne 1) {
+    Write-Output "FAIL [$p] 必須在靜態 HTML 提供唯一 skip link"; $errors++
+  }
+  if ([regex]::Matches($t, '<main id="main-content" tabindex="-1">').Count -ne 1) {
+    Write-Output "FAIL [$p] 必須在靜態 HTML 提供可聚焦的 main#main-content"; $errors++
+  }
 
   $duplicateIds = @($anchors[$p] | Group-Object | Where-Object { $_.Count -gt 1 })
   foreach ($duplicate in $duplicateIds) {
@@ -45,7 +51,7 @@ if (-not (Test-Path $notFoundPath)) {
   $notFoundText = [System.IO.File]::ReadAllText($notFoundPath, [System.Text.Encoding]::UTF8)
   foreach ($required in @(
     '<meta name="robots" content="noindex,follow">',
-    '<main id="main-content">',
+    '<main id="main-content" tabindex="-1">',
     'site-footer',
     'assets/style.css?v=',
     'assets/main.js?v=',
@@ -65,6 +71,10 @@ if (-not (Test-Path $notFoundPath)) {
   }
   if ($notFoundText.Contains('rel="canonical"') -or $notFoundText.Contains('property="og:url"')) {
     Write-Output 'FAIL [404.html] 錯誤頁不得宣告 canonical 或 og:url'
+    $errors++
+  }
+  if ($notFoundText.Contains('aria-current="page"')) {
+    Write-Output 'FAIL [404.html] 未知路徑不得誤標任何目前頁'
     $errors++
   }
   foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
@@ -143,6 +153,14 @@ foreach ($p in $pages) {
     $links = ($nav -split '<a ').Count - 1
     if ($links -ne 12) { Write-Output "FAIL [$p] nav 連結數=$links（應為 12）"; $errors++ }
   }
+  $currentPageNeedle = if ($p -eq 'index.html') {
+    '<a class="brand" aria-current="page" href="index.html">'
+  } else {
+    '<a class="active" aria-current="page" href="{0}">' -f $p
+  }
+  if (-not $t.Contains($currentPageNeedle) -or [regex]::Matches($t, 'aria-current="page"').Count -ne 1) {
+    Write-Output "FAIL [$p] 靜態目前頁標記缺失或不唯一：$currentPageNeedle"; $errors++
+  }
 
   # 內部連結與錨點
   foreach ($m in [regex]::Matches($t, 'href="([^"#:]+\.html)(#[^"]*)?"')) {
@@ -158,6 +176,18 @@ $uniqueAssetVersions = @($assetVersions | Select-Object -Unique)
 if ($uniqueAssetVersions.Count -ne 1) {
   Write-Output "FAIL 全站本機資產版本不一致：$(($uniqueAssetVersions) -join ', ')"
   $errors++
+}
+
+# 所有語言頁的靜態 skip target 都必須可被片段導航聚焦，不能只靠繁中 main.js 補救
+$allSiteHtmlFiles = Get-ChildItem $dir -Recurse -Filter '*.html' | Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+foreach ($siteHtmlFile in $allSiteHtmlFiles) {
+  $siteHtmlText = [System.IO.File]::ReadAllText($siteHtmlFile.FullName, [System.Text.Encoding]::UTF8)
+  if ($siteHtmlText.Contains('class="skip-link"')) {
+    $relativeHtmlPath = $siteHtmlFile.FullName.Substring($dir.Length).TrimStart('\', '/')
+    if ([regex]::Matches($siteHtmlText, '<main id="main-content" tabindex="-1">').Count -ne 1) {
+      Write-Output "FAIL [$relativeHtmlPath] skip link 目標必須是唯一且可聚焦的 main#main-content"; $errors++
+    }
+  }
 }
 
 # GA4：空 ID 必須完全停用；有效 ID 也只能在訪客同意後載入，且不得傳搜尋字詞或表單內容
@@ -1065,6 +1095,14 @@ if (-not (Test-Path $englishHealthPath)) {
 
 # 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
+$skipFallbackNeedle = 'if (!document.querySelector(".skip-link"))'
+if (-not $mainJs.Contains($skipFallbackNeedle)) {
+  Write-Output 'FAIL [main.js] skip link fallback 必須先檢查靜態連結，避免重複注入'; $errors++
+}
+$mainFocusFallbackNeedle = 'main.setAttribute("tabindex", "-1")'
+if (-not $mainJs.Contains($mainFocusFallbackNeedle)) {
+  Write-Output 'FAIL [main.js] 舊頁 fallback 必須補可聚焦的 main 目標'; $errors++
+}
 $searchBuilder = Join-Path $dir 'scripts\build_search.py'
 $searchIndex = Join-Path $dir 'assets\search-index.js'
 if (-not (Test-Path $searchBuilder) -or -not (Test-Path $searchIndex)) {

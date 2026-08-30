@@ -183,7 +183,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 
 `:focus-visible` 焦點環全站可見；主色與文字連結過 AA；inline link 持續顯示底線，
 不只靠顏色辨識；全域 `prefers-reduced-motion`；
-提供「跳到主要內容」skip link 與 `aria-current="page"`；一般觸控目標 ≥34px，行動版 nav
+全站頁面在靜態 HTML 直接提供「跳到主要內容」skip link、可接受片段跳轉焦點的
+`main#main-content[tabindex="-1"]` 與
+`aria-current="page"`，不得依賴 JavaScript 才成立；`main.js` 只保留舊頁／異常頁的冪等 fallback。
+一般觸控目標 ≥34px，行動版 nav
 目標 ≥44px 且維持單列橫向捲動；所有內容錨點保留 sticky header 安全距離，跳轉後標題
 不得被導覽遮住（見 §6 教訓）。
 
