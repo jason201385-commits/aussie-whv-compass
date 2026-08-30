@@ -1508,6 +1508,14 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     Write-Output 'FAIL [simulator.js] 必須維持 6 個固定事件'
     $errors++
   }
+  if ([regex]::Matches($simulatorText, '<noscript>').Count -ne 1) {
+    Write-Output 'FAIL [simulator.html] 必須只有一份 no-JS 替代入口'
+    $errors++
+  }
+  if (-not [regex]::IsMatch($simulatorScript, 'updateStats\(\);\s*updateProfileNote\(\);\s*showFeedback')) {
+    Write-Output 'FAIL [simulator.js] 作答後必須同步更新角色快照'
+    $errors++
+  }
   foreach ($simulatorScriptNeedle in @('var EVENTS = [', 'critical: true', 'href="tel:000"', 'criticalAction.hidden = !event.critical', 'prefers-reduced-motion: reduce', '確定要放棄本輪嗎', 'simulator-profile-form { display: none; }', '模擬器需要 JavaScript', 'state.riskChoices', 'goalKeys[state.goal]', 'slice(0, 3)', 'new FormData(form)', 'whv-simulator-progress-v1', 'sessionStorage.setItem(progressKey', 'sessionStorage.removeItem(progressKey)', 'isValidState(saved.state)', 'state.selectedChoice !== null', 'showFeedback(event, event.choices[state.selectedChoice], false)', '遊戲進度只在目前分頁暫存', '從攻略回來或重新整理可繼續')) {
     if (-not ($simulatorScript + "`n" + $simulatorText).Contains($simulatorScriptNeedle)) { Write-Output "FAIL [simulator.js] 缺固定事件或結果邊界：$simulatorScriptNeedle"; $errors++ }
   }

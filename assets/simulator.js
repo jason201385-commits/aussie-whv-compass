@@ -345,6 +345,7 @@
     if (choice.tone === "danger") state.riskChoices += 1;
     state.selectedChoice = choiceIndex;
     updateStats();
+    updateProfileNote();
     showFeedback(event, choice, true);
     saveProgress();
   };

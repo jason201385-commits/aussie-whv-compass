@@ -58,6 +58,10 @@ def compact(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
+def find_inactive_states(value: str) -> list[str]:
+    return sorted(sentinel for sentinel in INACTIVE_UI_SENTINELS if sentinel in value)
+
+
 class PageParser(HTMLParser):
     SKIP_TAGS = {"script", "style", "svg", "nav", "footer", "noscript"}
     VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
@@ -201,7 +205,10 @@ def main() -> int:
             f"{entry['pageTitle']} {entry['title']} {entry['text']}"
             for entry in payload["entries"]
         )
-        leaked_states = sorted(INACTIVE_UI_SENTINELS.intersection(indexed_text))
+        if find_inactive_states("prefix 情境載入中 suffix") != ["情境載入中"]:
+            print("SEARCH INACTIVE-STATE SELF-TEST FAILED", file=sys.stderr)
+            return 1
+        leaked_states = find_inactive_states(indexed_text)
         if leaked_states:
             print("SEARCH INDEX CONTAINS INACTIVE UI: " + ", ".join(leaked_states), file=sys.stderr)
             return 1
