@@ -697,6 +697,26 @@ if (-not (Test-Path $englishHousingPath)) {
       }
     }
   }
+  foreach ($fullGuideSlug in @('visa', 'prep', 'cost', 'housing', 'work', 'scam', 'health')) {
+    $traditionalGuidePath = Join-Path $dir "$fullGuideSlug.html"
+    $englishGuidePath = Join-Path $dir "lang\en\$fullGuideSlug\index.html"
+    $traditionalGuideText = [System.IO.File]::ReadAllText($traditionalGuidePath, [System.Text.Encoding]::UTF8)
+    $englishGuideText = [System.IO.File]::ReadAllText($englishGuidePath, [System.Text.Encoding]::UTF8)
+    foreach ($needle in @(
+      "<link rel=`"alternate`" hreflang=`"zh-Hant`" href=`"https://www.aussiewhvcompass.com/$fullGuideSlug.html`">",
+      "<link rel=`"alternate`" hreflang=`"en`" href=`"https://www.aussiewhvcompass.com/lang/en/$fullGuideSlug/`">",
+      "<link rel=`"alternate`" hreflang=`"x-default`" href=`"https://www.aussiewhvcompass.com/lang/en/$fullGuideSlug/`">"
+    )) {
+      if (-not $traditionalGuideText.Contains($needle)) { Write-Output "FAIL [$fullGuideSlug.html] 雙語 hreflang 叢集不完整：$needle"; $errors++ }
+    }
+    foreach ($needle in @(
+      "<link rel=`"alternate`" hreflang=`"zh-Hant`" href=`"https://www.aussiewhvcompass.com/$fullGuideSlug.html`">",
+      "<link rel=`"alternate`" hreflang=`"en`" href=`"https://www.aussiewhvcompass.com/lang/en/$fullGuideSlug/`">",
+      "<link rel=`"alternate`" hreflang=`"x-default`" href=`"https://www.aussiewhvcompass.com/lang/en/$fullGuideSlug/`">"
+    )) {
+      if (-not $englishGuideText.Contains($needle)) { Write-Output "FAIL [lang/en/$fullGuideSlug/] 雙語 hreflang 叢集不完整：$needle"; $errors++ }
+    }
+  }
 }
 
 # 完整英文工作頁：跨護照適用、工資與雇傭邊界、英文採收工具及官方求助路徑不得遺失
