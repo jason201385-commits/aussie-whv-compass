@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "generatedAt": "2026-08-30",
   "canonicalOrigin": "https://www.aussiewhvcompass.com",
   "siteEditorialStatus": "independent-open-source-community-guide",
@@ -14,22 +14,31 @@
     "canonicalLinkRequested": true
   },
   "statusVocabulary": {
-    "checked": "Adjacent high-risk evidence card and official exit were checked on evidenceCheckedAt.",
+    "checked": "Only the adjacent first-action evidence card and its official exit were checked on evidenceCardCheckedAt; this is not a whole-page or professional review.",
     "pending-rollout": "This high-risk page does not yet use the layered evidence-card component.",
     "not-applicable": "No high-risk evidence-card rollout is currently assigned to this page.",
+    "first-action-only": "The evidence status applies only to the visible first-action card, not to every claim on the page.",
+    "no-evidence-card": "No evidence-card scope is claimed for this page.",
+    "human-edited-unreviewed-by-domain-professional": "Human-edited Traditional Chinese page not reviewed by a relevant domain professional.",
+    "editorial-draft-unreviewed-by-native-domain-professional": "English editorial draft not reviewed by a native-speaking relevant domain professional.",
     "source": "Human-authored source-language quick start; not an official translation.",
     "machine-unreviewed": "Machine translation not yet reviewed by a fluent human.",
     "english-fallback": "English fallback is shown because a reviewed translation is not available."
   },
+  "legacyFieldPolicy": "editorialStatus, evidenceStatus and evidenceCheckedAt are retained for compatibility; use pageReviewStatus and evidenceCard* fields for scope-aware status.",
   "primaryPages": [
     {
       "url": "https://www.aussiewhvcompass.com/",
       "language": "zh-Hant",
       "title": "澳打指南針｜澳洲打工度假免費開源攻略",
       "riskLevel": "general",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -39,9 +48,13 @@
       "language": "zh-Hant",
       "title": "自我釐清：我為什麼要去打工度假？",
       "riskLevel": "medium",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -49,11 +62,15 @@
     {
       "url": "https://www.aussiewhvcompass.com/visa.html",
       "language": "zh-Hant",
-      "title": "簽證與集簽：417 一簽二簽三簽完整規則",
+      "title": "簽證與集簽：417 一簽、二簽、三簽官方查核入口",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
@@ -63,9 +80,13 @@
       "language": "zh-Hant",
       "title": "行前準備與落地 SOP",
       "riskLevel": "medium",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -75,9 +96,13 @@
       "language": "zh-Hant",
       "title": "物價與薪水：帶多少錢、賺多少錢？",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
@@ -87,21 +112,29 @@
       "language": "zh-Hant",
       "title": "住宿與租屋：找房、押金、Share House 生存",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
-      "evidenceStatus": "pending-rollout",
-      "evidenceCheckedAt": null,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
     },
     {
       "url": "https://www.aussiewhvcompass.com/work.html",
       "language": "zh-Hant",
-      "title": "工作機會在哪裡？求職管道與證照全攻略",
+      "title": "工作機會在哪裡？求職管道、雇主查核與證照",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
@@ -111,9 +144,13 @@
       "language": "zh-Hant",
       "title": "常見詐騙手法：認手法，不認名字",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
@@ -123,9 +160,13 @@
       "language": "zh-Hant",
       "title": "英文不好怎麼辦？",
       "riskLevel": "general",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -135,9 +176,13 @@
       "language": "zh-Hant",
       "title": "保險、就醫、心理與安全",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
@@ -147,11 +192,15 @@
       "language": "zh-Hant",
       "title": "報稅、退休金與離澳",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
-      "evidenceStatus": "pending-rollout",
-      "evidenceCheckedAt": null,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
     },
     {
@@ -159,11 +208,15 @@
       "language": "zh-Hant",
       "title": "如果想長期留澳：PR 公開路徑與官方查核入口",
       "riskLevel": "high",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
-      "evidenceStatus": "pending-rollout",
-      "evidenceCheckedAt": null,
+      "evidenceCardStatus": "checked",
+      "evidenceCardScope": "first-action-only",
+      "evidenceCardCheckedAt": "2026-08-30",
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
       "lastModified": "2026-08-30"
     },
     {
@@ -171,9 +224,13 @@
       "language": "zh-Hant",
       "title": "關於本站・資料來源・聯絡",
       "riskLevel": "general",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
       "editorialStatus": "human-edited-unreviewed-by-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -185,9 +242,13 @@
       "language": "en",
       "title": "Australian Working Holiday visas: 417, 462 and specified work | Aussie WHV Compass",
       "riskLevel": "high",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "pending-rollout",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "pending-rollout",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -197,9 +258,13 @@
       "language": "en",
       "title": "Prepare for Australia: departure and first-week setup | Aussie WHV Compass",
       "riskLevel": "medium",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -209,9 +274,13 @@
       "language": "en",
       "title": "Cost of living and money plan for an Australian working holiday",
       "riskLevel": "high",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "pending-rollout",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "pending-rollout",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -221,9 +290,13 @@
       "language": "en",
       "title": "Accommodation and renting in Australia | Aussie WHV Compass",
       "riskLevel": "high",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "pending-rollout",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "pending-rollout",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -233,9 +306,13 @@
       "language": "en",
       "title": "Find work in Australia: pay, job checks and workplace rights | Aussie WHV Compass",
       "riskLevel": "high",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "pending-rollout",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "pending-rollout",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -245,9 +322,13 @@
       "language": "en",
       "title": "Avoid scams and exploitation in Australia | Aussie WHV Compass",
       "riskLevel": "high",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "pending-rollout",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "pending-rollout",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -257,9 +338,13 @@
       "language": "en",
       "title": "Healthcare, insurance and personal safety in Australia | Aussie WHV Compass",
       "riskLevel": "high",
-      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "pageReviewStatus": "editorial-draft-unreviewed-by-native-domain-professional",
+      "editorialStatus": "editorial-draft-unreviewed-by-native-domain-professional",
       "reviewedByDomainProfessional": false,
       "officialVerificationRequired": true,
+      "evidenceCardStatus": "pending-rollout",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
       "evidenceStatus": "pending-rollout",
       "evidenceCheckedAt": null,
       "lastModified": "2026-08-30"
@@ -273,6 +358,7 @@
       "autonym": "العربية",
       "englishName": "Arabic",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -282,6 +368,7 @@
       "autonym": "Čeština",
       "englishName": "Czech",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -291,6 +378,7 @@
       "autonym": "Cymraeg",
       "englishName": "Welsh",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -300,6 +388,7 @@
       "autonym": "Dansk",
       "englishName": "Danish",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -309,6 +398,7 @@
       "autonym": "Deutsch",
       "englishName": "German",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -318,6 +408,7 @@
       "autonym": "Ελληνικά",
       "englishName": "Greek",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -327,6 +418,7 @@
       "autonym": "English",
       "englishName": "English",
       "reviewStatus": "source",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -336,6 +428,7 @@
       "autonym": "Español",
       "englishName": "Spanish",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -345,6 +438,7 @@
       "autonym": "Eesti",
       "englishName": "Estonian",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -354,6 +448,7 @@
       "autonym": "Suomi",
       "englishName": "Finnish",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -363,6 +458,7 @@
       "autonym": "Français",
       "englishName": "French",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -372,6 +468,7 @@
       "autonym": "Gaeilge",
       "englishName": "Irish",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -381,6 +478,7 @@
       "autonym": "עברית",
       "englishName": "Hebrew",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -390,6 +488,7 @@
       "autonym": "हिन्दी",
       "englishName": "Hindi",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -399,6 +498,7 @@
       "autonym": "Magyar",
       "englishName": "Hungarian",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -408,6 +508,7 @@
       "autonym": "Bahasa Indonesia",
       "englishName": "Indonesian",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -417,6 +518,7 @@
       "autonym": "Italiano",
       "englishName": "Italian",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -426,6 +528,7 @@
       "autonym": "日本語",
       "englishName": "Japanese",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -435,6 +538,7 @@
       "autonym": "한국어",
       "englishName": "Korean",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -444,6 +548,7 @@
       "autonym": "Lëtzebuergesch",
       "englishName": "Luxembourgish",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -453,6 +558,7 @@
       "autonym": "Монгол",
       "englishName": "Mongolian",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -462,6 +568,7 @@
       "autonym": "Bahasa Melayu",
       "englishName": "Malay",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -471,6 +578,7 @@
       "autonym": "Malti",
       "englishName": "Maltese",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -480,6 +588,7 @@
       "autonym": "Nederlands",
       "englishName": "Dutch",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -489,6 +598,7 @@
       "autonym": "Norsk",
       "englishName": "Norwegian",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -498,6 +608,7 @@
       "autonym": "Polski",
       "englishName": "Polish",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -507,6 +618,7 @@
       "autonym": "Português",
       "englishName": "Portuguese",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -516,6 +628,7 @@
       "autonym": "Rumantsch",
       "englishName": "Romansh",
       "reviewStatus": "english-fallback",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -525,6 +638,7 @@
       "autonym": "Slovenčina",
       "englishName": "Slovak",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -534,6 +648,7 @@
       "autonym": "Slovenščina",
       "englishName": "Slovenian",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -543,6 +658,7 @@
       "autonym": "Svenska",
       "englishName": "Swedish",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -552,6 +668,7 @@
       "autonym": "தமிழ்",
       "englishName": "Tamil",
       "reviewStatus": "english-fallback",
+      "fallbackReason": "known-broken-machine-translation",
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -561,6 +678,7 @@
       "autonym": "ไทย",
       "englishName": "Thai",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -570,6 +688,7 @@
       "autonym": "Tok Pisin",
       "englishName": "Tok Pisin",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -579,6 +698,7 @@
       "autonym": "Türkçe",
       "englishName": "Turkish",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -588,6 +708,7 @@
       "autonym": "Tiếng Việt",
       "englishName": "Vietnamese",
       "reviewStatus": "english-fallback",
+      "fallbackReason": "known-broken-machine-translation",
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -597,6 +718,7 @@
       "autonym": "简体中文",
       "englishName": "Simplified Chinese",
       "reviewStatus": "machine-unreviewed",
+      "fallbackReason": null,
       "scope": "quick-start",
       "officialVerificationRequired": true
     }

@@ -193,7 +193,7 @@ if ($uniqueAssetVersions.Count -eq 1 -and @($contentStatusVersions | Where-Objec
 }
 
 # 高風險主題必須先給安全下一步，再常駐揭露來源、查核日與編輯狀態。
-$evidencePages = @('visa.html', 'cost.html', 'work.html', 'health.html', 'scam.html')
+$evidencePages = @('visa.html', 'cost.html', 'housing.html', 'work.html', 'health.html', 'scam.html', 'leave.html', 'pr.html')
 foreach ($evidencePage in $evidencePages) {
   $evidenceText = [System.IO.File]::ReadAllText((Join-Path $dir $evidencePage), [System.Text.Encoding]::UTF8)
   $evidenceCards = [regex]::Matches($evidenceText, '(?s)<section class="evidence-card" data-evidence-status="(checked|stale)".*?</section>')
@@ -205,13 +205,15 @@ foreach ($evidencePage in $evidencePages) {
   $evidenceCard = $evidenceCards[0].Value
   foreach ($evidenceNeedle in @(
     'class="evidence-card__label">先做這一步',
+    'data-evidence-scope="first-action-only"',
     'class="evidence-card__reason"><strong>為什麼：</strong>',
     'class="evidence-card__meta"',
     '<span>來源機構</span><a href="https://',
     '<span>查核日期</span><time datetime="',
     '<span>編輯狀態</span>繁中人工整理・未經',
+    '<span>查核範圍</span>只查核本卡的第一步；不代表整頁已由專業人士審校',
     'class="evidence-card__basis"',
-    '<summary>查看完整依據與官方'
+    '<summary>查看本卡依據與官方'
   )) {
     if (-not $evidenceCard.Contains($evidenceNeedle)) {
       Write-Output "FAIL [$evidencePage] 證據卡缺欄位：$evidenceNeedle"
@@ -1367,7 +1369,7 @@ if (-not (Test-Path $sitemapPath)) {
   if (Test-Path (Join-Path $dir 'assets\i18n-locales.json')) {
     $sitemapI18nData = Get-Content -Raw (Join-Path $dir 'assets\i18n-locales.json') | ConvertFrom-Json
     $expectedUrls += "$canonicalOrigin/lang/"
-    $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
+    $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' -and $_.Value.reviewStatus -ne 'english-fallback' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
     $expectedUrls += "$canonicalOrigin/lang/en/visa/"
     $expectedUrls += "$canonicalOrigin/lang/en/prep/"
     $expectedUrls += "$canonicalOrigin/lang/en/cost/"
@@ -1433,19 +1435,35 @@ if (-not (Test-Path $contentStatusPath)) {
 } else {
   try {
     $contentStatus = Get-Content -Raw $contentStatusPath | ConvertFrom-Json
-    if ($contentStatus.schemaVersion -ne 1 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
+    if ($contentStatus.schemaVersion -ne 2 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
     if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
     if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
     if (@($contentStatus.primaryPages).Count -ne 13) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 13）"; $errors++ }
     if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
     if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
-    $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceStatus -eq 'checked' })
-    if ($checkedEvidence.Count -ne 5 -or @($checkedEvidence | Where-Object { -not $_.evidenceCheckedAt }).Count -gt 0) { Write-Output 'FAIL content-status.json 已查核證據卡數量或日期錯誤'; $errors++ }
+    $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceCardStatus -eq 'checked' })
+    if ($checkedEvidence.Count -ne 8 -or @($checkedEvidence | Where-Object { -not $_.evidenceCardCheckedAt -or $_.evidenceCardScope -ne 'first-action-only' }).Count -gt 0) { Write-Output 'FAIL content-status.json 已查核證據卡數量、日期或範圍錯誤'; $errors++ }
+    if (@($contentStatus.primaryPages | Where-Object { -not $_.pageReviewStatus }).Count -gt 0 -or @($contentStatus.fullEnglishGuides | Where-Object { $_.pageReviewStatus -ne 'editorial-draft-unreviewed-by-native-domain-professional' }).Count -gt 0) { Write-Output 'FAIL content-status.json 缺整頁 review 狀態或英文草稿誤稱完整'; $errors++ }
+    if (-not $contentStatus.legacyFieldPolicy.Contains('retained for compatibility')) { Write-Output 'FAIL content-status.json 缺舊欄位相容界線'; $errors++ }
     if (@($contentStatus.primaryPages | Where-Object { $_.reviewedByDomainProfessional -eq $true }).Count -gt 0 -or @($contentStatus.fullEnglishGuides | Where-Object { $_.reviewedByDomainProfessional -eq $true }).Count -gt 0) { Write-Output 'FAIL content-status.json 不得假稱已有專業審校'; $errors++ }
   } catch {
     Write-Output 'FAIL content-status.json 不是合法 JSON'
     $errors++
   }
+}
+
+# SEO 標題與描述不得使用無邊界的「最新／完整／全攻略」行銷字眼；內文可在具體語境使用普通詞義。
+foreach ($seoClaimPage in $pages) {
+  $seoClaimText = [System.IO.File]::ReadAllText((Join-Path $dir $seoClaimPage), [System.Text.Encoding]::UTF8)
+  $seoClaimTitle = [regex]::Match($seoClaimText, '(?s)<title>(.*?)</title>').Groups[1].Value
+  $seoClaimDescription = [regex]::Match($seoClaimText, '<meta name="description" content="([^"]*)">').Groups[1].Value
+  if (($seoClaimTitle + $seoClaimDescription) -match '最新|最完整|完整規則|完整官方|全攻略|終極攻略') {
+    Write-Output "FAIL [$seoClaimPage] SEO 標題／描述含無邊界行銷字眼"; $errors++
+  }
+}
+$highRiskCopy = (($pages | ForEach-Object { [System.IO.File]::ReadAllText((Join-Path $dir $_), [System.Text.Encoding]::UTF8) }) -join "`n") + "`n" + ([System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8))
+foreach ($forbiddenHighRiskClaim in @('危及生命才去', '查不到＝無照＝違法', '背包客最常走的路', '做滿 2 年轉 PR', '達所得門檻後轉 191', '肥羊體質', '這筆錢別省')) {
+  if ($highRiskCopy.Contains($forbiddenHighRiskClaim)) { Write-Output "FAIL 高風險絕對語氣回歸：$forbiddenHighRiskClaim"; $errors++ }
 }
 
 $crawlerPolicyPath = Join-Path $dir 'crawler-policy.txt'

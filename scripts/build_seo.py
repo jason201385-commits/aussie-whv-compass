@@ -170,7 +170,11 @@ def i18n_urls() -> list[str]:
     if not I18N_DATA.exists():
         return []
     data = json.loads(I18N_DATA.read_text(encoding="utf-8"))
-    codes = sorted(code for code in data.get("locales", {}) if code != "zh-Hant")
+    codes = sorted(
+        code
+        for code, locale in data.get("locales", {}).items()
+        if code != "zh-Hant" and locale.get("reviewStatus") != "english-fallback"
+    )
     return [f"{ORIGIN}/lang/", *[f"{ORIGIN}/lang/{code}/" for code in codes], *FULL_TRANSLATION_URLS]
 
 
@@ -255,26 +259,34 @@ def build_content_status(page_sources: dict[str, str]) -> str:
     for page in PAGES:
         source = page_sources[page]
         evidence = re.search(
-            r'<section class="evidence-card" data-evidence-status="([^"]+)"[\s\S]*?'
-            r'<time datetime="([^"]+)">',
+            r'<section class="evidence-card" data-evidence-status="([^"]+)" '
+            r'data-evidence-scope="([^"]+)"[\s\S]*?<time datetime="([^"]+)">',
             source,
         )
         risk_level = RISK_LEVELS.get(page, "general")
+        page_review_status = "human-edited-unreviewed-by-domain-professional"
+        evidence_status = (
+            evidence.group(1)
+            if evidence
+            else "pending-rollout" if risk_level == "high" else "not-applicable"
+        )
+        evidence_scope = evidence.group(2) if evidence else "no-evidence-card"
+        evidence_checked_at = evidence.group(3) if evidence else None
         primary_pages.append(
             {
                 "url": page_url(page),
                 "language": "zh-Hant",
                 "title": short_title(extract(r"<title>(.*?)</title>", source, page)),
                 "riskLevel": risk_level,
-                "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+                "pageReviewStatus": page_review_status,
+                "editorialStatus": page_review_status,
                 "reviewedByDomainProfessional": False,
                 "officialVerificationRequired": risk_level == "high",
-                "evidenceStatus": (
-                    evidence.group(1)
-                    if evidence
-                    else "pending-rollout" if risk_level == "high" else "not-applicable"
-                ),
-                "evidenceCheckedAt": evidence.group(2) if evidence else None,
+                "evidenceCardStatus": evidence_status,
+                "evidenceCardScope": evidence_scope,
+                "evidenceCardCheckedAt": evidence_checked_at,
+                "evidenceStatus": evidence_status,
+                "evidenceCheckedAt": evidence_checked_at,
                 "lastModified": LAST_MODIFIED,
             }
         )
@@ -283,16 +295,22 @@ def build_content_status(page_sources: dict[str, str]) -> str:
     for slug in FULL_TRANSLATION_SLUGS:
         relative = f"lang/en/{slug}/index.html"
         source = (ROOT / relative).read_text(encoding="utf-8")
+        page_review_status = "editorial-draft-unreviewed-by-native-domain-professional"
+        evidence_status = "pending-rollout" if slug in {"visa", "cost", "housing", "work", "scam", "health"} else "not-applicable"
         full_english_guides.append(
             {
                 "url": f"{ORIGIN}/lang/en/{slug}/",
                 "language": "en",
                 "title": short_title(extract(r"<title>(.*?)</title>", source, relative)),
                 "riskLevel": RISK_LEVELS.get(f"{slug}.html", "medium"),
-                "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+                "pageReviewStatus": page_review_status,
+                "editorialStatus": page_review_status,
                 "reviewedByDomainProfessional": False,
                 "officialVerificationRequired": slug in {"visa", "cost", "housing", "work", "scam", "health"},
-                "evidenceStatus": "pending-rollout" if slug in {"visa", "cost", "housing", "work", "scam", "health"} else "not-applicable",
+                "evidenceCardStatus": evidence_status,
+                "evidenceCardScope": "no-evidence-card",
+                "evidenceCardCheckedAt": None,
+                "evidenceStatus": evidence_status,
                 "evidenceCheckedAt": None,
                 "lastModified": LAST_MODIFIED,
             }
@@ -309,13 +327,14 @@ def build_content_status(page_sources: dict[str, str]) -> str:
                 "autonym": locale.get("autonym"),
                 "englishName": locale.get("englishName"),
                 "reviewStatus": locale.get("reviewStatus"),
+                "fallbackReason": locale.get("fallbackReason"),
                 "scope": "quick-start",
                 "officialVerificationRequired": True,
             }
         )
 
     manifest = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": LAST_MODIFIED,
         "canonicalOrigin": ORIGIN,
         "siteEditorialStatus": "independent-open-source-community-guide",
@@ -330,13 +349,18 @@ def build_content_status(page_sources: dict[str, str]) -> str:
             "canonicalLinkRequested": True,
         },
         "statusVocabulary": {
-            "checked": "Adjacent high-risk evidence card and official exit were checked on evidenceCheckedAt.",
+            "checked": "Only the adjacent first-action evidence card and its official exit were checked on evidenceCardCheckedAt; this is not a whole-page or professional review.",
             "pending-rollout": "This high-risk page does not yet use the layered evidence-card component.",
             "not-applicable": "No high-risk evidence-card rollout is currently assigned to this page.",
+            "first-action-only": "The evidence status applies only to the visible first-action card, not to every claim on the page.",
+            "no-evidence-card": "No evidence-card scope is claimed for this page.",
+            "human-edited-unreviewed-by-domain-professional": "Human-edited Traditional Chinese page not reviewed by a relevant domain professional.",
+            "editorial-draft-unreviewed-by-native-domain-professional": "English editorial draft not reviewed by a native-speaking relevant domain professional.",
             "source": "Human-authored source-language quick start; not an official translation.",
             "machine-unreviewed": "Machine translation not yet reviewed by a fluent human.",
             "english-fallback": "English fallback is shown because a reviewed translation is not available.",
         },
+        "legacyFieldPolicy": "editorialStatus, evidenceStatus and evidenceCheckedAt are retained for compatibility; use pageReviewStatus and evidenceCard* fields for scope-aware status.",
         "primaryPages": primary_pages,
         "fullEnglishGuides": full_english_guides,
         "quickStartCoverageVersion": data.get("version"),
