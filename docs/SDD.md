@@ -57,6 +57,7 @@
 | `why.html` | 自我釐清雙模式：8 題快思四面向＋8 題慢想工作表、研究／非診斷邊界、localStorage、匯出 txt |
 | `visa.html` | 簽證與集簽＋**集簽郵遞區號初篩** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
+| `simulator.html` | **5 分鐘角色設定＋抵澳 30 天模擬器**：固定六情境、本機記憶體運算、官方安全出口與第 30 天行動地圖；不做成功／簽證／醫療預測 |
 | `cost.html` | 物價薪水稅務＋Perth 採買、簡易食譜、二手衣／平價新品＋主要找車／自行刊登平台與官方查核＋**存錢試算器** |
 | `housing.html` | 住宿與租屋：短住訂房、合租／整租原始平台入口、WA 官方租屋權益與安全清單 |
 | `work.html` | 找工作（管道、查核、證照、履歷、季節、工傷） |
@@ -71,19 +72,20 @@
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、D+ 固定類別彙總、私人需求單的 Email／複製備援與受控 Worker 漸進增強 |
+| `assets/simulator.js` | 模擬器固定情境與狀態機；只處理白名單選項與頁面記憶體，不使用 storage、網路請求或自由文字 |
 | `assets/api-config.js` | 只含共用公開 API origin 與 Turnstile site key；P0-4 未完成時兩者必須留空，使 D+、站內送出與 CRM 管理 fail closed；不得放 secret |
-| `assets/search-index.js` | 13 頁、117 個頁面／段落入口的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
+| `assets/search-index.js` | 14 頁、126 個頁面／段落入口的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
 | `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
-| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 個完整繁中頁＋語言 Quick Start 搜尋探索、公開內容 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
+| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、14 個完整繁中頁＋語言 Quick Start 搜尋探索、公開內容 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
 | `content-status.json`／`crawler-policy.txt` | 機器可讀的頁面風險、編輯／翻譯／審校狀態，以及允許索引引用但禁止表單、API、CRM 與個資爬取的政策 |
 | `third-party-register.json` | 公開第三方入口、關係、補償、查核狀態與更正紀錄；現行付費版位、聯盟連結與佣金轉介皆為 false |
 | `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots、llms、內容狀態與 crawler policy；`--check` 防止產物過期 |
-| `scripts/build_search.py` | 從 13 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
+| `scripts/build_search.py` | 從 14 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
 | `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
 | `lang/en/visa/index.html` | 第一個完整英文 editorial beta：護照中立的 417／462 分流、官方來源、指定工作與 417-only 郵遞區號快查；未經母語移民專業人士校對前不得標為 reviewed |
 | `lang/en/prep/index.html` | 完整英文行前與落地 editorial beta：護照中立的 RHCA／保險、入境申報、藥品、各州駕照、落地住宿、TFN／銀行／myGov／super 與獨立本機進度的 21 項清單；未經母語澳洲 settlement 或 consumer-services 專業人士校對前不得標為 reviewed |
@@ -123,7 +125,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
   `/` 開啟、Escape／關閉鈕離開，行動版入口與結果維持至少 44px 可操作高度。
-- **多國語言**：繁中 13 頁仍是唯一完整內容集與維護基準；`lang/<locale>/` 是靜態、可索引的
+- **多國語言**：繁中 14 頁仍是唯一完整內容集與維護基準；`lang/<locale>/` 是靜態、可索引的
   Quick Start，另以 `lang/<locale>/<topic>/` 漸進增加完整翻譯。語言切換不保存選擇、不送出資料，
   只依使用者選擇導向固定同站 URL。機器翻譯不得移除風險聲明或冒充人工／官方翻譯；
   `english-fallback` 必須直接顯示英文，不可為了湊數生成不可信低資源語言。完整英文頁採

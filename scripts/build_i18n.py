@@ -45,6 +45,7 @@ FULL_TOPIC_ROUTES = {
     "work": {"zh-Hant": "/work.html", "en": "/lang/en/work/"},
     "scam": {"zh-Hant": "/scam.html", "en": "/lang/en/scam/"},
     "health": {"zh-Hant": "/health.html", "en": "/lang/en/health/"},
+    "simulator": {"zh-Hant": "/simulator.html"},
 }
 
 

@@ -22,7 +22,7 @@
 
 ## 1. 已完成功能總表（現況＝驗收基線）
 
-### 1.1 內容頁（13 頁）
+### 1.1 內容頁（14 頁）
 
 依旅程排序：why → visa → prep → cost → housing → work → scam → english →
 health → leave → pr → about（+index）。每頁：toc、來源標註、頁尾免責、回饋列。
@@ -35,6 +35,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 集簽郵遞區號初篩 | visa.html `#postcode-tool` | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描 | 顯示是否符合 2026-08-29 留存清單的郵遞區號＋類型日期條件＋適用限制＋官方現行頁面；不得表述為個人簽證資格判定 |
 | 存錢試算器 | cost.html／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿預算 select、其他生活支出 select | weeklyGross=r×h；annualGross=weeklyGross×46；annualTax 依 2026–27 WHM 15%／30%／37%／45% 累進級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（僅為 OTE 粗估） | 六格數據＋全年稅／super 邊界；繁中顯示台幣示意、英文顯示稅後收入可覆蓋幾個支出週；依全年餘額分四級壓力測試警語 |
 | 行前互動清單 | prep.html `#prep-checklist` | 21 項勾選（3 組，JS 產生） | localStorage `whv-prep-check-v1`、進度條、100% 彩蛋文案、清空需 confirm | 進度 x/21（%） |
+| 抵澳 30 天模擬器 | simulator.html `#simulator-profile-form`＋`#simulator-stage` | 5 組固定單選：預算、短住緩衝、工作準備、支持網、優先目標；6 個固定事件各 3 個白名單選項 | 僅在頁面記憶體建立 cash／housing／work／wellbeing／evidence；不使用 storage、fetch 或自由文字；固定 delta 可重播；緊急就醫事件一律顯示 000 安全中斷；分數不得描述為成功率、適合度、診斷或簽證判定 | 角色快照＋逐關取捨／官方出口＋第 30 天三項弱點行動地圖；重新整理即清除 |
 | 離澳收尾清單 | leave.html `#leave-checklist-tool` | 9 項零打字勾選（無 JS 仍可閱讀） | localStorage `whv-leave-check-v1`、進度條、清空需 confirm；100% 時顯示非強迫的感謝銜接 | 進度 x/9（%）＋完成提示 |
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
 | DASP 扣繳粗估 | leave.html `#dasp-calc` | 估計總額 number＋tax-free component number＋4 個總額 chips | taxFree=clamp(input, 0, total)；taxable=total−taxFree；withholding=taxable×0.65；payment=total−withholding | 估算 payment after withholding＋估算 withholding＋component／個案限制警語；不得表述為實際可領款 |
@@ -46,8 +47,8 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 緊急安全出口 | 首頁 `#support-hub` | 4 個高風險零打字入口 | 只連向既有內容錨點：立即危險、剛匯款／帳號風險、威脅／剝削／扣證件、簽證到期／官方通知 | 先做降低傷害的第一步，不複製可能過時的電話或政策數字 |
 | 旅程問題卡 | 首頁 `#journey-map`＋4 個 `.journey-phase` | 12 張「類別＋真實情境」卡 | 每卡顯示情境、白話說明與第一步；依考慮／準備／在澳／離澳與延續分組 | 直接進入對應完整攻略，不強迫線性閱讀 |
 | 可選兩題引導 | 首頁 `.route-guide` | 階段＋最怕的損失 | 原生 `details`，即使無 JavaScript 仍可用；只連固定同站頁面／錨點 | 在問題卡與搜尋仍無法判斷時縮小範圍，高風險時回到安全出口 |
-| 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 13 頁／117 個頁面與段落入口的靜態索引；NFKC 正規化、固定同義詞、標題／段落加權；不保存、不送出查詢，動態文字只用 `textContent` | 最多 8 個同站深連結結果；零結果提供縮短關鍵詞與許願入口 |
-| 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種主要官方／通行語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；完整 13 頁仍以繁中為主 |
+| 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 14 頁／126 個頁面與段落入口的靜態索引；NFKC 正規化、固定同義詞、標題／段落加權；不保存、不送出查詢，動態文字只用 `textContent` | 最多 8 個同站深連結結果；零結果提供縮短關鍵詞與許願入口 |
+| 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種主要官方／通行語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；完整 14 頁仍以繁中為主 |
 | 頁尾旅程導覽 | 12 個內容頁（main.js 注入） | — | 依首頁四階段的 `JOURNEY_ORDER` 單一排序產生上一站／完整旅程／下一站；首頁不注入，首末頁以首頁旅程圖收邊 | 顯示目前階段與第 x/12 頁，不強迫線性閱讀 |
 
 ### 1.3 回饋機制
@@ -79,9 +80,9 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 
 ### 1.4 搜尋引擎與 AI 探索
 
-- 13 個內容頁各有唯一 title、description、canonical、Open Graph／Twitter 分享資訊，
+- 14 個內容頁各有唯一 title、description、canonical、Open Graph／Twitter 分享資訊，
   並以 JSON-LD 描述 `WebSite`、`WebPage`；內容頁另含 `BreadcrumbList`。
-- `robots.txt` 對 `User-agent: *` 開放，並指向 13 頁 `sitemap.xml`；404 維持
+- `robots.txt` 對 `User-agent: *` 開放，並指向含 14 個繁中內容頁的 `sitemap.xml`；404 維持
   `noindex,follow`，不放 canonical 或結構化資料。
 - `llms.txt` 提供繁體中文站點導覽、正式頁面、授權與事實界線。這是方便 AI 工具理解的
   社群提案，不是 crawler 存取控制，也不保證被任何模型採用或提高排名。

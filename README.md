@@ -25,13 +25,14 @@
 
 ## 現行互動工具（純前端、不上傳填寫內容）
 
+- **澳洲打工度假模擬器**（simulator.html）：5 分鐘角色設定＋抵澳 30 天固定情境；答案只在當次頁面記憶體運算，重新整理即清除，不做成功、簽證或醫療預測。
 - **集簽郵遞區號初篩**（visa.html）：郵遞區號＋工作類型 → 比對留存的 subclass 417 清單；不取代實際職務、日期、支薪與個人資格查核。
   資料檔 `assets/postcodes.js` 抓取自內政部 specified-work 官方頁（2026-08-29），
   官方更新宣告區時請同步更新此檔。
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
-- Header 與首頁提供**全站搜尋**：搜尋 13 頁／117 個頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
+- Header 與首頁提供**全站搜尋**：搜尋 14 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
 ## 多國語言 Quick Start
@@ -39,7 +40,7 @@
 [語言入口](https://www.aussiewhvcompass.com/lang/)依澳洲內政部目前列出的 417／462 首簽護照
 國家與地區，提供 38 種主要官方／通行語言的靜態 Quick Start 與全站語言切換。繁體中文與
 英文為來源文案，其他語言標示為未校對機器翻譯或英文 fallback；簽證、法律、稅務與醫療內容
-仍須以頁面所連的澳洲政府官方英文來源為準。完整 13 頁目前仍以繁體中文為主，不能把 Quick
+仍須以頁面所連的澳洲政府官方英文來源為準。完整 14 頁目前仍以繁體中文為主，不能把 Quick
 Start 說成全站人工翻譯完成。
 
 英文第二階段已上線[417／462 簽證與指定工作指南](https://www.aussiewhvcompass.com/lang/en/visa/)；
@@ -73,7 +74,7 @@ P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空�
 
 ## 搜尋引擎與 AI 探索
 
-- 13 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
+- 14 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
 - `robots.txt` 開放所有公開頁，`sitemap.xml` 列出正式網址；`llms.txt` 提供 AI 可讀導覽、授權與事實界線。
 - 修改頁名、description 或頁面清單後，先跑 `python scripts/build_seo.py`，再跑 `scripts/check.ps1`。
 - `llms.txt` 是輔助理解的社群提案，不保證搜尋排名、收錄或任何 AI 服務採用。

@@ -143,7 +143,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
-  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|simulator\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -154,7 +154,8 @@ foreach ($p in $pages) {
   else {
     $nav = [regex]::Matches($t, 'class="nav-links"[\s\S]*?</div>')[0].Value
     $links = ($nav -split '<a ').Count - 1
-    if ($links -ne 12) { Write-Output "FAIL [$p] nav 連結數=$links（應為 12）"; $errors++ }
+    $expectedNavLinks = if ($p -eq 'simulator.html') { 13 } else { 12 }
+    if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks）"; $errors++ }
   }
   $currentPageNeedle = if ($p -eq 'index.html') {
     '<a class="brand" aria-current="page" href="index.html">'
@@ -1209,7 +1210,7 @@ if (-not (Test-Path $englishHealthPath)) {
   }
 }
 
-# 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
+# 站內搜尋：靜態索引需與全部內容頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
 $skipFallbackNeedle = 'if (!document.querySelector(".skip-link"))'
 if (-not $mainJs.Contains($skipFallbackNeedle)) {
@@ -1355,7 +1356,7 @@ if (-not (Test-Path $cnamePath)) {
   $errors++
 }
 
-# 搜尋探索：sitemap 必須列出 13 個完整繁中頁、語言 hub、Quick Start 與完整翻譯頁
+# 搜尋探索：sitemap 必須列出全部完整繁中頁、語言 hub、Quick Start 與完整翻譯頁
 $sitemapPath = Join-Path $dir 'sitemap.xml'
 if (-not (Test-Path $sitemapPath)) {
   Write-Output 'FAIL 缺 sitemap.xml'
@@ -1438,7 +1439,7 @@ if (-not (Test-Path $contentStatusPath)) {
     if ($contentStatus.schemaVersion -ne 2 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
     if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
     if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
-    if (@($contentStatus.primaryPages).Count -ne 13) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 13）"; $errors++ }
+    if (@($contentStatus.primaryPages).Count -ne 14) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 14）"; $errors++ }
     if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
     if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
     $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceCardStatus -eq 'checked' })
@@ -1464,6 +1465,59 @@ foreach ($seoClaimPage in $pages) {
 $highRiskCopy = (($pages | ForEach-Object { [System.IO.File]::ReadAllText((Join-Path $dir $_), [System.Text.Encoding]::UTF8) }) -join "`n") + "`n" + ([System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8))
 foreach ($forbiddenHighRiskClaim in @('危及生命才去', '查不到＝無照＝違法', '背包客最常走的路', '做滿 2 年轉 PR', '達所得門檻後轉 191', '肥羊體質', '這筆錢別省', '馬上知道能不能算二簽三簽', '馬上知道能不能計入二簽', '離澳實際能領回多少', '在官方合格清單內', '不在官方合格清單內', '幾乎都是詐騙或違法行為', '依 2026-08-29 抓取的官方清單判定')) {
   if ($highRiskCopy.Contains($forbiddenHighRiskClaim)) { Write-Output "FAIL 高風險絕對語氣回歸：$forbiddenHighRiskClaim"; $errors++ }
+}
+
+# 模擬器：只做固定教育情境，不保存或傳送回答，也不把遊戲資源描述成現實判定。
+$simulatorPath = Join-Path $dir 'simulator.html'
+$simulatorScriptPath = Join-Path $dir 'assets\simulator.js'
+if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
+  Write-Output 'FAIL 缺 simulator.html 或 assets/simulator.js'
+  $errors++
+} else {
+  $simulatorText = [System.IO.File]::ReadAllText($simulatorPath, [System.Text.Encoding]::UTF8)
+  $simulatorScript = [System.IO.File]::ReadAllText($simulatorScriptPath, [System.Text.Encoding]::UTF8)
+  foreach ($simulatorNeedle in @(
+    'id="simulator-profile-form"',
+    'id="simulator-stage"',
+    'id="simulator-finish"',
+    'id="simulator-progress"',
+    'id="simulator-profile-note"',
+    '不儲存答案',
+    '不判定簽證資格',
+    '遊戲分數只表示你在這段模擬中保留了多少資源',
+    '若現實中有人嚴重受傷、呼吸困難、失去意識或處於立即危險',
+    '請停止模擬並撥 <strong>000</strong>',
+    'Consumer Protection WA 租屋指南',
+    'Scamwatch 求職詐騙',
+    'Fair Work payslips',
+    'healthdirect 000',
+    'MoneySmart budget planner'
+  )) {
+    if (-not $simulatorText.Contains($simulatorNeedle)) { Write-Output "FAIL [simulator.html] 缺情境、隱私或來源邊界：$simulatorNeedle"; $errors++ }
+  }
+  $simulatorForm = [regex]::Match($simulatorText, '(?s)<form id="simulator-profile-form">(.*?)</form>').Groups[1].Value
+  if (-not $simulatorForm -or [regex]::Matches($simulatorForm, '<fieldset class="simulator-question">').Count -ne 5) {
+    Write-Output 'FAIL [simulator.html] 角色設定必須是 5 組固定題'
+    $errors++
+  }
+  if ([regex]::Matches($simulatorForm, '<input\s+type="(?!radio")').Count -gt 0 -or $simulatorForm.Contains('<textarea') -or $simulatorForm.Contains('type="email"')) {
+    Write-Output 'FAIL [simulator.html] 角色設定不得收自由文字、Email 或非白名單輸入'
+    $errors++
+  }
+  if ([regex]::Matches($simulatorScript, 'day:\s*"DAY').Count -ne 6) {
+    Write-Output 'FAIL [simulator.js] 必須維持 6 個固定事件'
+    $errors++
+  }
+  foreach ($simulatorScriptNeedle in @('var EVENTS = [', 'critical: true', '立即撥 000', 'state.riskChoices', 'goalKeys[state.goal]', 'slice(0, 3)', 'new FormData(form)', '重新整理或關閉分頁即清除')) {
+    if (-not ($simulatorScript + "`n" + $simulatorText).Contains($simulatorScriptNeedle)) { Write-Output "FAIL [simulator.js] 缺固定事件或結果邊界：$simulatorScriptNeedle"; $errors++ }
+  }
+  foreach ($simulatorForbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest', 'navigator.sendBeacon', '成功率：', '簽證資格：')) {
+    if ($simulatorScript.Contains($simulatorForbidden)) { Write-Output "FAIL [simulator.js] 不得保存、傳送或輸出現實判定：$simulatorForbidden"; $errors++ }
+  }
+  if (-not $i18nSwitcherText.Contains('"simulator":{"zh-Hant":"/simulator.html"}')) {
+    Write-Output 'FAIL [i18n.js] 模擬器繁中語言路由未保留原主題'
+    $errors++
+  }
 }
 
 $crawlerPolicyPath = Join-Path $dir 'crawler-policy.txt'

@@ -26,6 +26,7 @@ PAGES = [
     "why.html",
     "visa.html",
     "prep.html",
+    "simulator.html",
     "cost.html",
     "housing.html",
     "work.html",
@@ -50,6 +51,7 @@ RISK_LEVELS = {
     "leave.html": "high",
     "pr.html": "high",
     "prep.html": "medium",
+    "simulator.html": "medium",
     "why.html": "medium",
 }
 
@@ -203,7 +205,7 @@ def build_sitemap() -> str:
 
 def build_llms(page_sources: dict[str, str]) -> str:
     groups = [
-        ("開始前", ["why.html", "visa.html", "prep.html"]),
+        ("開始前", ["why.html", "visa.html", "prep.html", "simulator.html"]),
         ("在澳洲生活與工作", ["cost.html", "housing.html", "work.html", "scam.html", "english.html", "health.html"]),
         ("離開或留下", ["leave.html", "pr.html"]),
         ("關於與合作", ["about.html"]),
