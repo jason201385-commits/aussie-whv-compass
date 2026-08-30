@@ -143,7 +143,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
-  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -1629,7 +1629,7 @@ foreach ($collabNeedle in @('id="collaborate"', 'template=collaborate.yml', '提
   if (-not $aboutText.Contains($collabNeedle)) { Write-Output "FAIL [about.html] 缺合作入口或邊界：$collabNeedle"; $errors++ }
 }
 $aboutText = [System.IO.File]::ReadAllText((Join-Path $dir 'about.html'), [System.Text.Encoding]::UTF8)
-foreach ($privateId in @('private-contact', 'private-email-direct', 'contact-brief', 'brief-type', 'brief-timing', 'brief-problem', 'brief-outcome', 'brief-boundary', 'brief-status', 'brief-output', 'brief-preview', 'brief-gmail-link', 'brief-email-link', 'brief-copy')) {
+foreach ($privateId in @('private-contact', 'private-email-direct', 'contact-brief', 'brief-email', 'brief-type', 'brief-name', 'brief-organization', 'brief-timing', 'brief-budget', 'brief-problem', 'brief-outcome', 'brief-boundary', 'brief-status', 'brief-output', 'brief-preview', 'brief-gmail-link', 'brief-email-link', 'brief-copy', 'brief-submit-online', 'brief-turnstile', 'contact-receipt', 'contact-receipt-id', 'contact-receipt-time', 'contact-receipt-email', 'contact-manage-link', 'contact-management', 'contact-manage-case', 'contact-manage-token', 'manage-turnstile', 'contact-manage-view', 'contact-manage-update', 'contact-manage-delete', 'contact-manage-status')) {
   if (-not $aboutText.Contains("id=`"$privateId`"")) { Write-Output "FAIL [about.html] 缺私人合作需求單元件：$privateId"; $errors++ }
 }
 foreach ($privateNeedle in @(
@@ -1638,7 +1638,11 @@ foreach ($privateNeedle in @(
   '內容不會送到本站或儲存',
   '最後仍由你確認並寄出',
   '是否承接、工作範圍、費用與交付都要另行確認',
-  '不要填入證件、帳密、簽證／移民／醫療／法律／稅務個案、第三人個資或未公開客戶資料',
+  '不要填入護照、簽證文件、健康／醫療、銀行／卡號、帳密、第三人個資或未公開客戶資料',
+  '通常 3–5 個工作天回覆，但不代表已接受委託或契約成立',
+  '一般詢問於結案或最後聯絡後 24 個月刪除',
+  '管理憑證只放在管理連結的 <code>#</code> 片段',
+  '頁面讀取後會立刻從網址移除',
   'aria-describedby="brief-privacy"',
   'id="private-email-boundary"',
   'aria-describedby="private-email-boundary"'
@@ -1722,9 +1726,29 @@ if (-not $briefScript.Success) {
     Write-Output 'FAIL [main.js] 私人需求單預覽未同步收費合作界線'
     $errors++
   }
-  foreach ($forbidden in @('localStorage', 'fetch(', 'XMLHttpRequest')) {
-    if ($briefScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 私人需求單不得儲存或上傳：$forbidden"; $errors++ }
+  foreach ($onlineNeedle in @('window.WHV_API_CONFIG', 'turnstile-spin-v2', 'credentials: "omit"', 'referrerPolicy: "no-referrer"', 'response.ok', 'result.ok !== true', 'emailStatus === "sent"', '收到後端回執前不會顯示完成', 'history.replaceState')) {
+    if (-not $briefScript.Value.Contains($onlineNeedle)) { Write-Output "FAIL [main.js] 站內需求單缺後端回執／隱私界線：$onlineNeedle"; $errors++ }
   }
+  foreach ($forbidden in @('localStorage', 'sessionStorage', 'XMLHttpRequest')) {
+    if ($briefScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 私人需求單不得寫入瀏覽器儲存空間或使用舊式上傳：$forbidden"; $errors++ }
+  }
+}
+$apiConfigPath = Join-Path $dir 'assets\api-config.js'
+if (-not (Test-Path $apiConfigPath)) {
+  Write-Output 'FAIL 缺公開 API 設定檔'
+  $errors++
+} else {
+  $apiConfigText = [System.IO.File]::ReadAllText($apiConfigPath, [System.Text.Encoding]::UTF8)
+  foreach ($apiConfigNeedle in @('contactApiBaseUrl: ""', 'turnstileSiteKey: ""', 'Public values only', 'P0-4')) {
+    if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] P0-4 前必須 fail closed：$apiConfigNeedle"; $errors++ }
+  }
+  foreach ($apiSecretName in @('TURNSTILE_SECRET_KEY', 'RATE_LIMIT_HMAC_KEY', 'API_KEY')) {
+    if ($apiConfigText.Contains($apiSecretName)) { Write-Output "FAIL [api-config.js] 前端不得出現 secret 名稱或值：$apiSecretName"; $errors++ }
+  }
+}
+if (-not $aboutText.Contains('<script src="assets/api-config.js?v=') -or $aboutText.IndexOf('assets/api-config.js?v=') -gt $aboutText.IndexOf('assets/main.js?v=')) {
+  Write-Output 'FAIL [about.html] API 公開設定必須帶版本並在 main.js 前載入'
+  $errors++
 }
 if (-not $indexText.Contains('href="about.html#collaborate"')) {
   Write-Output 'FAIL [index.html] 缺首頁合作入口'
@@ -1771,7 +1795,11 @@ $workerRequired = @(
   'src\rate-limit.ts',
   'src\repository.ts',
   'src\mail.ts',
+  'src\contact.ts',
+  'src\contact-validation.ts',
+  'src\tokens.ts',
   'test\http.test.ts',
+  'test\contact.test.ts',
   'test\security.test.ts',
   'test\repository.test.ts',
   'test\mail.test.ts'

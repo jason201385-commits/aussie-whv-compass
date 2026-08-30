@@ -4,6 +4,7 @@ import {
   enqueueContactReceipt,
   incrementDailyCounter,
   insertContactCase,
+  purgeExpiredContactCases,
 } from "../src/repository";
 
 describe("D1 prepared-statement repositories", () => {
@@ -52,5 +53,30 @@ describe("D1 prepared-statement repositories", () => {
     await expect(
       incrementDailyCounter(env.DB, "2026-08-30", "free_text", now),
     ).rejects.toMatchObject({ status: 400, code: "metric_not_allowed" });
+  });
+
+  it("purges cases only after their retention deadline", async () => {
+    const createdAt = "2024-08-30T00:00:00.000Z";
+    await insertContactCase(env.DB, {
+      caseId: "case-expired-test",
+      email: "expired@example.com",
+      emailNormalized: "expired@example.com",
+      requestType: "other-collaboration",
+      description: "expired test",
+      contactName: null,
+      organization: null,
+      timeline: null,
+      budgetRange: null,
+      locale: "zh-Hant",
+      createdAt,
+      deleteAfter: "2026-08-29T00:00:00.000Z",
+    });
+
+    await expect(purgeExpiredContactCases(env.DB, "2026-08-30T00:00:00.000Z")).resolves.toBe(1);
+    await expect(
+      env.DB.prepare("SELECT COUNT(*) AS count FROM contact_cases WHERE case_id = ?")
+        .bind("case-expired-test")
+        .first<number>("count"),
+    ).resolves.toBe(0);
   });
 });

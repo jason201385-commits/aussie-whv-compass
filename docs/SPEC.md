@@ -39,7 +39,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
 | DASP 速算 | leave.html `#dasp-calc` | 金額 number＋4 個金額 chips | take=×0.35、tax=×0.65 | 兩格數據＋台幣評語 |
 | 自我釐清雙模式 | why.html `#quick-quiz`＋`#worksheet` | 快思 8 題 × 5 點自評；慢想 8 題 textarea＋價值／取捨 chips | 快思分成自主動機、價值取捨、現實準備、支持底線四面向，各 2 題且不合計總適合度，白名單存 `whv-why-quick-v1`；慢想沿用 600ms 防抖與 `whv-worksheet-v1`，保留舊答案及行前海報相容 | 快思分面結果＋最低面向下一步；慢想匯出 .txt／列印／清空 |
-| 私人合作需求單 | about.html `#private-contact`＋`#contact-brief` | 需求類型、希望時間、目前卡點、希望結果、服務邊界確認 | 不寫 localStorage、不上傳；通過原生表單驗證後，以固定收件人組合純文字預覽，Gmail web compose 與 `mailto:` 參數皆 URL encoded；clipboard 失敗時選取預覽供手動複製 | 用 Gmail 開啟草稿、交給預設郵件 App，或複製需求單 |
+| 私人合作需求單 | about.html `#private-contact`＋`#contact-brief`＋`#contact-management` | 必填 Email、需求類型、目前卡點、希望結果與邊界確認；姓名／組織、時程、預算選填 | P0-4 前 `api-config.js` 空值，維持不寫 localStorage、不上傳的 Gmail／mailto／複製備援；日後啟用後需 Turnstile、後端 `{ok:true}` 回執，管理 token 只經 fragment 傳遞 | 現況產生 Email／複製備援；程式已支援案件編號、Email sent／queued、查閱、更正、永久刪除 |
 | 回饋列 | 全站（main.js 注入） | — | 分享鈕→clipboard 複製網址＋致謝文案；回報鈕→`report.yml`；感謝鈕→`thanks.yml`，兩者都自動帶入頁名 | — |
 | 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | localStorage `whv-last-page-v1` 只存 `{path}`；首頁以固定頁名／階段 map 顯示，拒絕未知 path | 續讀連結＋清除紀錄；首次訪問或無效資料時隱藏 |
 | 我的收藏 | 首頁 `#saved-pages`＋內容頁回饋列 | 內容頁單鍵收藏；首頁可開啟、個別移除或確認後清空 | localStorage `whv-saved-pages-v1` 只存白名單 path 陣列；標題／階段由固定 `JOURNEY_PAGES` 產生，拒絕未知與重複 path | 無收藏時首頁隱藏；有收藏時依收藏順序顯示 |
@@ -255,7 +255,7 @@ mock mail。`wrangler d1 migrations apply DB --local` 與 `wrangler deploy --dry
 D1 ID 是不可部署的全零佔位值，`workers_dev`／preview URL 關閉，沒有建立遠端資源、輸入 secret、
 寄信或部署。P1-9 的公開表單端點與前端切換尚未完成，現行 Email／複製流程維持不變。
 
-### P1-9 私人需求單與 CRM — 已批准、待 P1-8
+### P1-9 私人需求單與 CRM — 程式完成／本機驗證，正式仍待 P0-4
 
 - 必填聯絡 Email、需求類型、需求說明；姓名／組織、時程、預算區間選填。
 - 明示不得提交護照、簽證、健康、金融、帳密、第三人或未公開客戶資料。
@@ -263,6 +263,14 @@ D1 ID 是不可部署的全零佔位值，`workers_dev`／preview URL 關閉，�
   通常 3–5 個工作天回覆，但不代表接受委託或契約成立。
 - 一般詢問與未成交需求於結案或最後聯絡後 24 個月刪除；提供查閱、更正、刪除申請。
   正式合約、付款或依法另需保存的資料使用不同分類與規則。
+
+2026-08-30 本機證據：Worker 端建立、管理、更新、刪除四條 POST route；案件編號使用不可預測 UUID，
+管理 token 以 32-byte 隨機值產生且 D1 只存 SHA-256。D1 batch 同時建立案件、管理 token 與 mail outbox；
+mock transport 接受後才回 `sent`，未設定 transport 時案件仍安全建立但回 `queued` 並標記 retry。
+18 項 Workers runtime 測試涵蓋完整建立→查閱→更正→永久刪除、token 不存明文、回應不回顯 Email／
+自由文字、24 個月 purge 與無寄信資源的排隊狀態。前端已具 Turnstile 漸進增強、後端回執判斷、
+管理 fragment 清除、桌機／手機／no-JS 備援；但公開 API origin 與 site key 刻意留空，未建立正式資源、
+未真實寄信或部署。P0-4 完成並通過收件／退信與正式 E2E 前，只能稱程式完成／本機驗證。
 
 ### P1-10 D+ 聚合量測 — 已批准、待 P1-8
 

@@ -59,8 +59,10 @@ GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連�
 
 `worker/` 已有獨立無框架 Worker、本機 D1 migration、CORS 白名單、16 KiB JSON 上限、
 Turnstile server-side validation、HMAC 化限流鍵、prepared statements 與可替換的 mock mail transport。
-這些項目目前只有程式與本機測試證據；Cloudflare Worker、D1、Turnstile、寄信資源及 secrets 尚未完成
-P0-4 人工前置，因此 API 沒有部署，現行私人需求單仍只在瀏覽器內產生 Email／複製備援。
+需求建立、回執、確認信成功／排隊狀態、查閱、更正、永久刪除與 24 個月清除路由也已通過本機測試。
+這些項目目前只有程式與本機證據；Cloudflare Worker、D1、Turnstile、寄信資源及 secrets 尚未完成
+P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空值，現行私人需求單仍只在瀏覽器內
+產生 Email／複製備援，不會冒充站內送出成功。
 
 ## 搜尋引擎與 AI 探索
 

@@ -2,11 +2,16 @@
 
 這個目錄是 GitHub Pages 靜態前端之外的獨立無框架 API。現階段只有程式與本機測試，沒有建立、綁定或部署任何正式 Cloudflare 資源。
 
+本機已實作 `POST /api/contact`、`/api/contact/manage`、`/api/contact/update`、
+`/api/contact/delete` 與每日 retention purge。預設 mail transport 故意停用；測試只使用記憶體 mock，
+所以 `emailStatus=sent` 是本機介面證據，不是外部送達證據。
+
 ## 邊界
 
 - 僅承接需求單、確認信／刪除流程與無個人識別的 D+ 聚合計數。
 - 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY` 或寄信憑證。
 - `wrangler.jsonc` 的 D1 `database_id` 是不可部署的全零佔位值。P0-4 完成後才由站長建立正式資源並在 Cloudflare 受保護設定輸入 secrets。
+- Rate Limit `namespace_id=1001` 也是本機設定範本；正式啟用前要由站長確認帳戶內唯一值。
 - 正式 Turnstile widget 與 site key 仍未建立；`turnstile-spin` 的遠端 wizard 暫停到 P0-4。
 - `workers_dev` 與 preview URL 都關閉；本機 dry-run 不等於已部署。
 

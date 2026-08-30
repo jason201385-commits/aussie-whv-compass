@@ -68,7 +68,8 @@
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
-| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單 |
+| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單的 Email／複製備援與受控 Worker 漸進增強 |
+| `assets/api-config.js` | 只含公開 API origin 與 Turnstile site key；P0-4 未完成時兩者必須留空，使站內送出／CRM 管理 fail closed；不得放 secret |
 | `assets/search-index.js` | 13 頁、109 個頁面／段落的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
@@ -103,13 +104,13 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - 兩個 IIFE（`main.js` 全站、`tools.js` 工具頁），無模組系統。
 - **特徵偵測模式**：每個功能塊以 `document.getElementById(...)` 判斷是否在該頁，
   不存在就跳過——tools.js 可安全掛在任何頁。
-- **現行私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字；使用者可選 Gmail web compose、
-  `mailto:` 或複製文字，不建立 localStorage key、不呼叫 fetch、不自動寄信。產生預覽時內容仍只在本頁，
-  使用者主動點寄信入口後才交給所選服務；所有收件者、主旨與內文參數必須 `encodeURIComponent`。
-  clipboard 不可用時只選取預覽文字，不得誤報已複製。
-- **目標私人需求單**：P1-8／P1-9 完成後改由同站表單送至 Worker；成功必須以後端回執為準，
-  顯示案件編號並寄交易型確認信，同時保留「複製需求單」備援。不得只因前端 `fetch` resolve
-  就誤報寄信成功；寄信、D1 寫入與重試的狀態需可分辨。
+- **現行私人需求單**：`about.html #contact-brief` 保留 Gmail web compose、`mailto:` 與複製文字；
+  所有收件者、主旨與內文參數皆 `encodeURIComponent`，clipboard 不可用時只選取預覽，不誤報已複製。
+  `assets/api-config.js` 目前兩值為空，因此不載入 Turnstile、不呼叫 API，頁面明示站內安全送出尚未啟用。
+- **P1-9 漸進增強**：公開 API origin 與 Turnstile site key 日後完成 P0-4 才填入。啟用後，前端只在
+  原生驗證與 Turnstile 完成後用 `credentials: omit`、`referrerPolicy: no-referrer` POST；成功必須同時
+  滿足 HTTP success 與後端 `{ok:true}`，再顯示案件編號、伺服器時間與 `sent`／`queued` Email 狀態。
+  管理 token 只放同站 URL 的 fragment，讀入欄位後立刻由 `history.replaceState` 清除，不寫 localStorage。
 - **站內搜尋**：`main.js` 注入全站 dialog 與 header 入口，首次開啟才載入
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
@@ -157,8 +158,16 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 HMAC rate-limit key、D1 repository 與 mail transport；`0001_initial.sql` 建立一般詢問、管理 token、
 mail outbox 與日期聚合 counter。原始 IP 不寫入 D1；原始 Email 不拿來當 rate-limit binding key，
 而由只存在 Worker secret 的 HMAC 產生不透明 key。Cloudflare Rate Limiting 是 edge-local、最終一致，
-只作防濫用，不作帳務或完成證據。正式 D1 ID 仍是全零阻擋值，API 目前只提供標示
-`local-scaffold` 的 health route；需求單路由、確認／刪除流程與真實寄信分別留給 P1-9 與 P0-4 gate。
+只作防濫用，不作帳務或完成證據。正式 D1 ID 仍是全零阻擋值；health route 會明示
+`local-scaffold`，需求單路由雖已由 P1-9 實作，也要等 P0-4 才能正式啟用與驗證寄信。
+
+P1-9 本機閉環加入：`POST /api/contact`、`/api/contact/manage`、`/api/contact/update`、
+`/api/contact/delete`。建立時以不可預測的 `WHV-` UUID 作案件編號，管理 token 只以 SHA-256 hash
+存入 D1；回應不回傳 Email 或需求內容，只回傳回執、Email 狀態與 fragment 管理連結。建立案件、
+管理 token 與 mail outbox 以 D1 batch 一起寫入；寄信介面接受才標 `sent`，未設定或失敗只標 `queued`
+並留下固定錯誤碼等待重試，不把 provider 錯誤或使用者內容寫入 log。管理 token 與 Turnstile 同時
+通過才可查閱／更正／永久刪除；每日 cron 以 prepared statement 清除 `delete_after` 到期案件。
+目前預設 mail transport 是 disabled、公開 API 設定為空，因此只證明程式與本機 mock 閉環，沒有真實寄信或部署。
 
 ## 4. 設計系統：「簡約檸檬布紋」
 

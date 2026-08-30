@@ -10,6 +10,9 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
+  "triggers": {
+    "crons": ["17 3 * * *"]
+  },
   "vars": {
     "ENVIRONMENT": "local",
     "ALLOWED_ORIGINS": "https://www.aussiewhvcompass.com,https://aussiewhvcompass.com,http://127.0.0.1:4175,http://localhost:4175",

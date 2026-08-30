@@ -136,7 +136,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260830-23";
+      script.src = "assets/search-index.js?v=20260830-25";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -825,8 +825,12 @@
   // ---------- 私人合作需求單（只在 about.html 生效） ----------
   var briefForm = document.getElementById("contact-brief");
   if (briefForm) {
+    var briefEmail = document.getElementById("brief-email");
     var briefType = document.getElementById("brief-type");
+    var briefName = document.getElementById("brief-name");
+    var briefOrganization = document.getElementById("brief-organization");
     var briefTiming = document.getElementById("brief-timing");
+    var briefBudget = document.getElementById("brief-budget");
     var briefProblem = document.getElementById("brief-problem");
     var briefOutcome = document.getElementById("brief-outcome");
     var briefOutput = document.getElementById("brief-output");
@@ -835,6 +839,43 @@
     var briefEmailLink = document.getElementById("brief-email-link");
     var briefCopy = document.getElementById("brief-copy");
     var briefStatus = document.getElementById("brief-status");
+    var briefSubmitOnline = document.getElementById("brief-submit-online");
+    var contactServiceState = document.getElementById("contact-service-state");
+    var briefStorageBoundary = document.getElementById("brief-storage-boundary");
+    var contactReceipt = document.getElementById("contact-receipt");
+    var contactReceiptId = document.getElementById("contact-receipt-id");
+    var contactReceiptTime = document.getElementById("contact-receipt-time");
+    var contactReceiptEmail = document.getElementById("contact-receipt-email");
+    var contactManageLink = document.getElementById("contact-manage-link");
+    var contactManageCase = document.getElementById("contact-manage-case");
+    var contactManageToken = document.getElementById("contact-manage-token");
+    var contactManageView = document.getElementById("contact-manage-view");
+    var contactManageUpdate = document.getElementById("contact-manage-update");
+    var contactManageDelete = document.getElementById("contact-manage-delete");
+    var contactManageStatus = document.getElementById("contact-manage-status");
+    var briefTurnstile = document.getElementById("brief-turnstile");
+    var manageTurnstile = document.getElementById("manage-turnstile");
+
+    var REQUEST_TYPE_CODES = {
+      "客製課程、講座或工作坊": "course-workshop",
+      "網站與數位工具": "website-digital-tool",
+      "內容、資料或社群合作": "content-data-community",
+      "其他合作": "other-collaboration"
+    };
+    var REQUEST_TYPE_LABELS = {
+      "course-workshop": "客製課程、講座或工作坊",
+      "website-digital-tool": "網站與數位工具",
+      "content-data-community": "內容、資料或社群合作",
+      "other-collaboration": "其他合作"
+    };
+    var BUDGET_LABELS = {
+      "": "未提供",
+      "not-sure": "還不確定，想先談範圍",
+      "under-1000-aud": "AUD 1,000 以下",
+      "1000-3000-aud": "AUD 1,000–3,000",
+      "3000-10000-aud": "AUD 3,000–10,000",
+      "over-10000-aud": "AUD 10,000 以上"
+    };
 
     function setBriefStatus(message) {
       if (briefStatus) briefStatus.textContent = message;
@@ -843,13 +884,20 @@
     function makeBrief() {
       var type = briefType.value.trim();
       var timing = briefTiming.value.trim() || "未特別指定";
+      var name = briefName.value.trim() || "未提供";
+      var organization = briefOrganization.value.trim() || "未提供";
+      var budget = BUDGET_LABELS[briefBudget.value] || "未提供";
       var problem = briefProblem.value.trim();
       var outcome = briefOutcome.value.trim();
       return [
         "Jason 您好：",
         "",
+        "聯絡 Email：" + briefEmail.value.trim(),
+        "姓名或稱呼：" + name,
+        "組織／團隊：" + organization,
         "需求類型：" + type,
         "希望時間：" + timing,
+        "預算區間：" + budget,
         "",
         "目前卡點：",
         problem,
@@ -859,6 +907,31 @@
         "",
         "我知道本站不提供簽證或移民代辦；這只是初步需求，是否承接、工作範圍、費用與交付都要另行確認，送出不代表委託成立或保證處理。"
       ].join("\n");
+    }
+
+    function makeDescription() {
+      return [
+        "目前卡點：",
+        briefProblem.value.trim(),
+        "",
+        "希望結果：",
+        briefOutcome.value.trim()
+      ].join("\n");
+    }
+
+    function makeContactPayload(turnstileToken) {
+      return {
+        email: briefEmail.value.trim(),
+        requestType: REQUEST_TYPE_CODES[briefType.value.trim()] || "",
+        description: makeDescription(),
+        contactName: briefName.value.trim() || null,
+        organization: briefOrganization.value.trim() || null,
+        timeline: briefTiming.value.trim() || null,
+        budgetRange: briefBudget.value || null,
+        locale: "zh-Hant",
+        turnstileToken: turnstileToken,
+        boundaryAccepted: document.getElementById("brief-boundary").checked
+      };
     }
 
     briefForm.addEventListener("submit", function (event) {
@@ -893,6 +966,260 @@
         if (!navigator.clipboard || !navigator.clipboard.writeText) { copyFailed(); return; }
         navigator.clipboard.writeText(briefPreview.value).then(copied, copyFailed);
       } catch (e) { copyFailed(); }
+    });
+
+    function getApiSettings() {
+      var config = window.WHV_API_CONFIG;
+      if (!config || typeof config.contactApiBaseUrl !== "string" || typeof config.turnstileSiteKey !== "string") return null;
+      if (!config.contactApiBaseUrl || !config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
+      try {
+        var url = new URL(config.contactApiBaseUrl);
+        var loopback = (url.hostname === "127.0.0.1" || url.hostname === "localhost") && location.hostname === url.hostname;
+        if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) return null;
+        if (url.username || url.password || url.search || url.hash || (url.pathname && url.pathname !== "/")) return null;
+        return { baseUrl: url.origin, siteKey: config.turnstileSiteKey };
+      } catch (e) { return null; }
+    }
+
+    function loadTurnstile() {
+      if (window.turnstile && window.turnstile.render) return Promise.resolve(window.turnstile);
+      return new Promise(function (resolve, reject) {
+        var existing = document.getElementById("turnstile-api-script");
+        var script = existing || document.createElement("script");
+        function loaded() {
+          if (window.turnstile && window.turnstile.render) resolve(window.turnstile);
+          else reject(new Error("turnstile_not_ready"));
+        }
+        script.addEventListener("load", loaded, { once: true });
+        script.addEventListener("error", function () { reject(new Error("turnstile_load_failed")); }, { once: true });
+        if (!existing) {
+          script.id = "turnstile-api-script";
+          script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+          script.async = true;
+          script.defer = true;
+          script.referrerPolicy = "no-referrer";
+          document.head.appendChild(script);
+        }
+      });
+    }
+
+    function setManageStatus(message) {
+      if (contactManageStatus) contactManageStatus.textContent = message;
+    }
+
+    function safeErrorMessage(result, fallback) {
+      if (result && result.error && typeof result.error.message === "string" && result.error.message.length <= 160) return result.error.message;
+      return fallback;
+    }
+
+    function readJsonResponse(response) {
+      return response.json().catch(function () { return null; }).then(function (result) {
+        if (!response.ok || !result || result.ok !== true) {
+          throw new Error(safeErrorMessage(result, "服務暫時無法處理，請使用 Email／複製備援。"));
+        }
+        return result;
+      });
+    }
+
+    function apiPost(settings, path, payload) {
+      return fetch(settings.baseUrl + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "omit",
+        referrerPolicy: "no-referrer"
+      }).then(readJsonResponse);
+    }
+
+    function parseManagementFragment(fragment) {
+      var prefix = "#contact-management?";
+      if (fragment.indexOf(prefix) !== 0) return null;
+      var params = new URLSearchParams(fragment.slice(prefix.length));
+      var caseId = params.get("case") || "";
+      var token = params.get("token") || "";
+      if (!/^WHV-[0-9A-F]{32}$/.test(caseId) || !/^[A-Za-z0-9_-]{40,100}$/.test(token)) return null;
+      return { caseId: caseId, token: token };
+    }
+
+    function fillManagementCredentials(credentials) {
+      contactManageCase.value = credentials.caseId;
+      contactManageToken.value = credentials.token;
+    }
+
+    var fragmentCredentials = parseManagementFragment(location.hash);
+    if (fragmentCredentials) {
+      fillManagementCredentials(fragmentCredentials);
+      history.replaceState(null, "", location.pathname + location.search + "#contact-management");
+    }
+
+    var apiSettings = getApiSettings();
+    var submitWidgetId = null;
+    var manageWidgetId = null;
+    if (apiSettings) {
+      loadTurnstile().then(function (turnstile) {
+        briefTurnstile.hidden = false;
+        manageTurnstile.hidden = false;
+        submitWidgetId = turnstile.render(briefTurnstile, {
+          sitekey: apiSettings.siteKey,
+          action: "turnstile-spin-v2",
+          appearance: "interaction-only"
+        });
+        manageWidgetId = turnstile.render(manageTurnstile, {
+          sitekey: apiSettings.siteKey,
+          action: "turnstile-spin-v2",
+          appearance: "interaction-only"
+        });
+        briefSubmitOnline.hidden = false;
+        contactManageView.disabled = false;
+        contactManageUpdate.disabled = false;
+        contactManageDelete.disabled = false;
+        contactServiceState.textContent = "站內安全送出已啟用：資料會送到本站 Worker，儲存在私人 CRM；一般詢問於結案或最後聯絡後 24 個月刪除。";
+        briefStorageBoundary.textContent = "選擇站內安全送出時，表單內容會送到本站 Worker 並儲存在私人 CRM；選擇 Email／複製備援時，本站不接收內容。";
+        setManageStatus("可使用案件編號與管理憑證查閱、更正或永久刪除；每次操作都需要重新驗證。");
+      }).catch(function () {
+        setBriefStatus("防濫用驗證載入失敗；站內送出未啟用，仍可使用 Email／複製備援");
+      });
+    }
+
+    function getWidgetToken(widgetId) {
+      if (!window.turnstile || widgetId === null) return "";
+      return window.turnstile.getResponse(widgetId) || "";
+    }
+
+    function resetWidget(widgetId) {
+      if (window.turnstile && widgetId !== null) window.turnstile.reset(widgetId);
+    }
+
+    if (briefSubmitOnline) briefSubmitOnline.addEventListener("click", function () {
+      if (!apiSettings || submitWidgetId === null) {
+        setBriefStatus("站內安全送出尚未啟用，請使用 Email／複製備援");
+        return;
+      }
+      if (!briefForm.checkValidity()) {
+        briefForm.reportValidity();
+        setBriefStatus("請先完成必填欄位與服務邊界確認");
+        return;
+      }
+      var token = getWidgetToken(submitWidgetId);
+      if (!token) {
+        setBriefStatus("請先完成防濫用驗證");
+        return;
+      }
+      briefSubmitOnline.disabled = true;
+      setBriefStatus("正在安全送出；收到後端回執前不會顯示完成");
+      apiPost(apiSettings, "/api/contact", makeContactPayload(token)).then(function (result) {
+        contactReceiptId.textContent = result.caseId;
+        contactReceiptTime.textContent = new Date(result.receivedAt).toLocaleString("zh-TW");
+        contactReceiptEmail.textContent = result.emailStatus === "sent" ? "確認信已由寄信介面接受" : "需求已收件；確認信排程等待重試";
+        var credentials = parseManagementFragment(new URL(result.managementUrl).hash);
+        if (credentials) {
+          fillManagementCredentials(credentials);
+          contactManageLink.href = result.managementUrl;
+        } else {
+          contactManageLink.removeAttribute("href");
+        }
+        contactReceipt.hidden = false;
+        contactReceipt.focus();
+        setBriefStatus("後端已回傳案件編號；請保存回執，通常 3–5 個工作天回覆");
+      }).catch(function (error) {
+        setBriefStatus(error.message + " 需求預覽仍留在本頁，可改用 Email 或複製。");
+      }).then(function () {
+        briefSubmitOnline.disabled = false;
+        resetWidget(submitWidgetId);
+      });
+    });
+
+    function managementPayload(token) {
+      return {
+        caseId: contactManageCase.value.trim(),
+        managementToken: contactManageToken.value.trim(),
+        turnstileToken: token
+      };
+    }
+
+    function requireManagementToken() {
+      var token = getWidgetToken(manageWidgetId);
+      if (!contactManageCase.value.trim() || !contactManageToken.value.trim()) {
+        setManageStatus("請提供案件編號與管理憑證");
+        return "";
+      }
+      if (!token) {
+        setManageStatus("請先完成防濫用驗證");
+        return "";
+      }
+      return token;
+    }
+
+    function fillContactForm(contactCase) {
+      briefEmail.value = contactCase.email || "";
+      briefType.value = REQUEST_TYPE_LABELS[contactCase.requestType] || "";
+      briefName.value = contactCase.contactName || "";
+      briefOrganization.value = contactCase.organization || "";
+      briefTiming.value = contactCase.timeline || "";
+      briefBudget.value = contactCase.budgetRange || "";
+      var parts = String(contactCase.description || "").split("\n\n希望結果：\n");
+      briefProblem.value = parts[0].replace(/^目前卡點：\n/, "");
+      briefOutcome.value = parts.length > 1 ? parts.slice(1).join("\n\n希望結果：\n") : "請在這裡補上希望結果";
+    }
+
+    if (contactManageView) contactManageView.addEventListener("click", function () {
+      if (!apiSettings) return;
+      var token = requireManagementToken();
+      if (!token) return;
+      contactManageView.disabled = true;
+      setManageStatus("正在查閱；資料只會顯示在本頁，不會寫入瀏覽器儲存空間");
+      apiPost(apiSettings, "/api/contact/manage", managementPayload(token)).then(function (result) {
+        fillContactForm(result.case);
+        setManageStatus("已載入需求內容到上方表單；修改後可選擇「用上方內容更正」");
+      }).catch(function (error) {
+        setManageStatus(error.message);
+      }).then(function () {
+        contactManageView.disabled = false;
+        resetWidget(manageWidgetId);
+      });
+    });
+
+    if (contactManageUpdate) contactManageUpdate.addEventListener("click", function () {
+      if (!apiSettings) return;
+      if (!briefForm.checkValidity()) {
+        briefForm.reportValidity();
+        setManageStatus("請先完成上方必填欄位與服務邊界確認");
+        return;
+      }
+      var token = requireManagementToken();
+      if (!token) return;
+      var payload = makeContactPayload(token);
+      payload.caseId = contactManageCase.value.trim();
+      payload.managementToken = contactManageToken.value.trim();
+      contactManageUpdate.disabled = true;
+      setManageStatus("正在更正；收到後端回執前不會顯示完成");
+      apiPost(apiSettings, "/api/contact/update", payload).then(function (result) {
+        setManageStatus("需求已更正；後端更新時間：" + new Date(result.updatedAt).toLocaleString("zh-TW"));
+      }).catch(function (error) {
+        setManageStatus(error.message);
+      }).then(function () {
+        contactManageUpdate.disabled = false;
+        resetWidget(manageWidgetId);
+      });
+    });
+
+    if (contactManageDelete) contactManageDelete.addEventListener("click", function () {
+      if (!apiSettings) return;
+      var token = requireManagementToken();
+      if (!token) return;
+      if (!confirm("確定永久刪除這筆需求嗎？刪除後無法復原，Jason 也無法再從 CRM 查閱。")) return;
+      contactManageDelete.disabled = true;
+      setManageStatus("正在刪除；收到後端回執前不會顯示完成");
+      apiPost(apiSettings, "/api/contact/delete", managementPayload(token)).then(function () {
+        contactManageCase.value = "";
+        contactManageToken.value = "";
+        setManageStatus("後端已確認永久刪除這筆需求");
+      }).catch(function (error) {
+        setManageStatus(error.message);
+      }).then(function () {
+        contactManageDelete.disabled = false;
+        resetWidget(manageWidgetId);
+      });
     });
   }
 

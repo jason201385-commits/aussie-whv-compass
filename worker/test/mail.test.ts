@@ -9,6 +9,9 @@ describe("replaceable mail transport", () => {
       to: "traveller@example.com",
       locale: "zh-Hant",
       submittedAt: "2026-08-30T00:00:00.000Z",
+      requestType: "website-digital-tool",
+      description: "需要網站工具",
+      managementUrl: "https://www.aussiewhvcompass.com/about.html#contact-management?case=test",
     };
 
     await expect(transport.sendContactReceipt(message)).resolves.toEqual({
@@ -26,6 +29,9 @@ describe("replaceable mail transport", () => {
         to: "traveller@example.com",
         locale: "zh-Hant",
         submittedAt: "2026-08-30T00:00:00.000Z",
+        requestType: "website-digital-tool",
+        description: "需要網站工具",
+        managementUrl: "https://www.aussiewhvcompass.com/about.html#contact-management?case=test",
       }),
     ).rejects.toThrow("mail_transport_not_configured");
   });

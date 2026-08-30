@@ -3,6 +3,9 @@ export interface ContactReceiptMessage {
   to: string;
   locale: string;
   submittedAt: string;
+  requestType: string;
+  description: string;
+  managementUrl: string;
 }
 
 export interface MailReceipt {

@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260830-23" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260830-25" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260830-23">
+<link rel="stylesheet" href="assets/style.css?v=20260830-25">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -156,7 +156,7 @@
 
   <section class="panel private-contact" id="private-contact" aria-labelledby="private-contact-title">
     <h3 id="private-contact-title">私人合作：直接寄 Email，或先寫一張需求單</h3>
-    <p>最快的方法是直接寄到 <a href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">chunaenqiu6@gmail.com</a>。不知道怎麼開頭，也可以先填下面四格，本站會替你整理成 Email 草稿。</p>
+    <p>最快的方法是直接寄到 <a href="mailto:chunaenqiu6@gmail.com?subject=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A">chunaenqiu6@gmail.com</a>。不知道怎麼開頭，也可以先填下面的需求單；通常 3–5 個工作天回覆，但不代表已接受委託或契約成立。</p>
     <p class="brief-privacy" id="private-email-boundary"><strong>這個信箱不處理簽證或移民代辦。</strong>第一封請不要附證件、帳密、個案資料或第三人資訊；是否承接、範圍、費用與交付都要另行確認。</p>
     <div class="contact-route-actions">
       <a class="btn" id="private-email-direct" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chunaenqiu6%40gmail.com&amp;su=%5B%E5%90%88%E4%BD%9C%E8%A9%A2%E5%95%8F%5D%20%E6%83%B3%E5%85%88%E8%81%8A%E8%81%8A" target="_blank" rel="noopener noreferrer" aria-describedby="private-email-boundary">用 Gmail 寫信</a>
@@ -165,8 +165,13 @@
     </div>
 
     <form id="contact-brief" class="contact-brief" onsubmit="return false" novalidate>
-      <p class="brief-privacy" id="brief-privacy"><strong>內容不會送到本站或儲存。</strong>產生需求單只在這個頁面內整理文字；你按下 Gmail 或郵件 App 後，內容才會交給所選服務建立草稿，最後仍由你確認並寄出。不要填入證件、帳密、簽證／移民／醫療／法律／稅務個案、第三人個資或未公開客戶資料。</p>
+      <p class="contact-service-state" id="contact-service-state"><strong>站內安全送出尚未啟用。</strong>目前仍使用 Email／複製備援；Cloudflare 正式資源與成功回執完成後，才會開啟站內送出。</p>
+      <p class="brief-privacy" id="brief-privacy"><span id="brief-storage-boundary"><strong>內容不會送到本站或儲存。</strong>產生需求單只在這個頁面內整理文字；你按下 Gmail 或郵件 App 後，內容才會交給所選服務建立草稿，最後仍由你確認並寄出。</span> 不要填入護照、簽證文件、健康／醫療、銀行／卡號、帳密、第三人個資或未公開客戶資料。</p>
       <div class="contact-brief-grid">
+        <div class="contact-field">
+          <label for="brief-email">聯絡 Email <span aria-hidden="true">*</span></label>
+          <input id="brief-email" type="email" required autocomplete="email" maxlength="254" aria-describedby="brief-privacy" placeholder="name@example.com">
+        </div>
         <div class="contact-field">
           <label for="brief-type">需求類型</label>
           <select id="brief-type" required>
@@ -178,8 +183,27 @@
           </select>
         </div>
         <div class="contact-field">
+          <label for="brief-name">姓名或稱呼（選填）</label>
+          <input id="brief-name" type="text" autocomplete="name" maxlength="100" placeholder="方便回覆時稱呼你">
+        </div>
+        <div class="contact-field">
+          <label for="brief-organization">組織／團隊（選填）</label>
+          <input id="brief-organization" type="text" autocomplete="organization" maxlength="160" placeholder="個人可留空">
+        </div>
+        <div class="contact-field">
           <label for="brief-timing">希望時間</label>
           <input id="brief-timing" type="text" maxlength="120" placeholder="例如：兩週內、先聊方向、不急">
+        </div>
+        <div class="contact-field">
+          <label for="brief-budget">預算區間（選填）</label>
+          <select id="brief-budget">
+            <option value="">不提供</option>
+            <option value="not-sure">還不確定，想先談範圍</option>
+            <option value="under-1000-aud">AUD 1,000 以下</option>
+            <option value="1000-3000-aud">AUD 1,000–3,000</option>
+            <option value="3000-10000-aud">AUD 3,000–10,000</option>
+            <option value="over-10000-aud">AUD 10,000 以上</option>
+          </select>
         </div>
         <div class="contact-field full">
           <label for="brief-problem">目前卡在哪裡？</label>
@@ -194,10 +218,22 @@
         <input id="brief-boundary" type="checkbox" required>
         <span>我知道這只是初步需求；是否承接、工作範圍、費用與交付都要另行確認，送出不代表委託成立或保證處理。</span>
       </label>
+      <div id="brief-turnstile" class="turnstile-slot" hidden aria-label="防濫用驗證"></div>
       <div class="contact-route-actions">
-        <button type="submit" class="btn">產生需求單</button>
+        <button type="button" class="btn" id="brief-submit-online" hidden>站內安全送出</button>
+        <button type="submit" class="btn secondary">產生 Email／複製備援</button>
       </div>
       <p class="ws-status" id="brief-status" role="status" aria-live="polite"></p>
+      <div class="contact-receipt" id="contact-receipt" hidden tabindex="-1">
+        <h4>需求已由後端接收</h4>
+        <dl>
+          <div><dt>案件編號</dt><dd id="contact-receipt-id"></dd></div>
+          <div><dt>接收時間</dt><dd id="contact-receipt-time"></dd></div>
+          <div><dt>Email 狀態</dt><dd id="contact-receipt-email"></dd></div>
+        </dl>
+        <p>請保存案件編號與管理連結。送出只代表收到需求，不代表委託成立、保證處理或免費服務。</p>
+        <a class="btn secondary" id="contact-manage-link" href="#contact-management">查閱、更正或刪除這筆需求</a>
+      </div>
       <div class="brief-output" id="brief-output" hidden>
         <label for="brief-preview">需求單預覽</label>
         <textarea id="brief-preview" rows="12" readonly></textarea>
@@ -210,6 +246,28 @@
       </div>
       <noscript><p class="warn">需求單產生器需要 JavaScript；你仍可使用上方 Gmail 或郵件 App 入口。</p></noscript>
     </form>
+
+    <section class="contact-management" id="contact-management" aria-labelledby="contact-management-title">
+      <h4 id="contact-management-title">管理已送出的需求</h4>
+      <p>站內 API 啟用後，可以用回執或確認信中的案件編號與管理憑證查閱、更正或永久刪除；一般詢問於結案或最後聯絡後 24 個月刪除。管理憑證只放在管理連結的 <code>#</code> 片段，不會送到 GitHub Pages，也不會存到這個瀏覽器；頁面讀取後會立刻從網址移除。</p>
+      <div class="contact-brief-grid">
+        <div class="contact-field">
+          <label for="contact-manage-case">案件編號</label>
+          <input id="contact-manage-case" type="text" maxlength="40" autocomplete="off" placeholder="WHV-...">
+        </div>
+        <div class="contact-field">
+          <label for="contact-manage-token">管理憑證</label>
+          <input id="contact-manage-token" type="password" maxlength="100" autocomplete="off">
+        </div>
+      </div>
+      <div id="manage-turnstile" class="turnstile-slot" hidden aria-label="管理需求防濫用驗證"></div>
+      <div class="contact-route-actions">
+        <button type="button" class="btn secondary" id="contact-manage-view" disabled>查閱需求</button>
+        <button type="button" class="btn secondary" id="contact-manage-update" disabled>用上方內容更正</button>
+        <button type="button" class="btn danger" id="contact-manage-delete" disabled>永久刪除</button>
+      </div>
+      <p class="ws-status" id="contact-manage-status" role="status" aria-live="polite">站內 API 尚未啟用；目前如需處理已寄出的 Email，請直接回覆原信。</p>
+    </section>
   </section>
 
   <div class="panel public-collaboration">
@@ -273,9 +331,10 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260830-23"></script>
-<script src="assets/analytics.js?v=20260830-23"></script>
-<script src="assets/i18n.js?v=20260830-23"></script>
-<script src="assets/main.js?v=20260830-23"></script>
+<script src="assets/analytics-config.js?v=20260830-25"></script>
+<script src="assets/analytics.js?v=20260830-25"></script>
+<script src="assets/i18n.js?v=20260830-25"></script>
+<script src="assets/api-config.js?v=20260830-25"></script>
+<script src="assets/main.js?v=20260830-25"></script>
 </body>
 </html>
