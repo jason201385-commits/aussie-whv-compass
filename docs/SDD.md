@@ -76,8 +76,9 @@
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
-| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 個完整繁中頁＋語言 Quick Start 搜尋探索、全 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
-| `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots 與 llms.txt；`--check` 防止產物過期 |
+| `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 個完整繁中頁＋語言 Quick Start 搜尋探索、公開內容 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
+| `content-status.json`／`crawler-policy.txt` | 機器可讀的頁面風險、編輯／翻譯／審校狀態，以及允許索引引用但禁止表單、API、CRM 與個資爬取的政策 |
+| `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots、llms、內容狀態與 crawler policy；`--check` 防止產物過期 |
 | `scripts/build_search.py` | 從 13 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
 | `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
 | `lang/en/visa/index.html` | 第一個完整英文 editorial beta：護照中立的 417／462 分流、官方來源、指定工作與 417-only 郵遞區號快查；未經母語移民專業人士校對前不得標為 reviewed |

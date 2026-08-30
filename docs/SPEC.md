@@ -232,10 +232,15 @@ Agent 可先完成本機 Worker、D1 migrations、Turnstile server-side validati
 保險三問檢核，`scam.html` 提供停／查／護風險圖。四者皆以語意化清單與原生連結承載完整文字，
 檸檬與葉片只由 CSS 作裝飾；桌機、手機與 no-JS 皆不會遺失資訊。
 
-### P1-7 SEO、AI 探索與內容權利 — 已批准、待實作
+### P1-7 SEO、AI 探索與內容權利 — 實作完成
 
 - 開放搜尋引擎與 AI 發現、索引及合理引用；提供 sitemap、JSON-LD、來源與內容狀態。
 - 保留網站內容權利，要求引用標示出處；不允許爬取表單、CRM、個資、管理端或冒名整站重製。
+
+現況：`sitemap.xml` 列出完整繁中、Quick Start 與完整英文頁；每個繁中主頁提供 canonical、Open Graph、
+JSON-LD、`llms.txt` 與帶版本的 `content-status.json` discovery link。`content-status.json` 誠實揭露
+13 個繁中主頁、7 個完整英文頁、37 個 Quick Start locale 的風險、編輯與審校狀態；
+`crawler-policy.txt` 與 `robots.txt` 開放公開內容，同時排除表單 API、CRM、確認、收據與刪除端點。
 
 ### P1-8 Cloudflare Worker／D1 基礎 — 已批准、待 P0-4
 

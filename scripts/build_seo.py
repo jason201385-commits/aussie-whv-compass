@@ -15,10 +15,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
 LAST_MODIFIED = "2026-08-30"
+ASSET_VERSION = "20260830-23"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
-FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/", f"{ORIGIN}/lang/en/prep/", f"{ORIGIN}/lang/en/cost/", f"{ORIGIN}/lang/en/housing/", f"{ORIGIN}/lang/en/work/", f"{ORIGIN}/lang/en/scam/", f"{ORIGIN}/lang/en/health/"]
+FULL_TRANSLATION_SLUGS = ["visa", "prep", "cost", "housing", "work", "scam", "health"]
+FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/{slug}/" for slug in FULL_TRANSLATION_SLUGS]
 PAGES = [
     "index.html",
     "why.html",
@@ -37,6 +39,19 @@ PAGES = [
 
 BEGIN = "<!-- SEO_DISCOVERY_BEGIN -->"
 END = "<!-- SEO_DISCOVERY_END -->"
+
+RISK_LEVELS = {
+    "visa.html": "high",
+    "cost.html": "high",
+    "housing.html": "high",
+    "work.html": "high",
+    "scam.html": "high",
+    "health.html": "high",
+    "leave.html": "high",
+    "pr.html": "high",
+    "prep.html": "medium",
+    "why.html": "medium",
+}
 
 
 def page_url(page: str) -> str:
@@ -68,6 +83,8 @@ def seo_block(page: str, source: str) -> str:
         "isPartOf": {"@id": f"{ORIGIN}/#website"},
         "isAccessibleForFree": True,
         "license": LICENSE_URL,
+        "publishingPrinciples": f"{ORIGIN}/crawler-policy.txt",
+        "subjectOf": f"{ORIGIN}/content-status.json",
         "image": OG_IMAGE,
         "dateModified": LAST_MODIFIED,
     }
@@ -80,6 +97,9 @@ def seo_block(page: str, source: str) -> str:
             "alternateName": "Aussie WHV Compass",
             "description": "給台灣打工度假者的澳洲開源攻略與本地互動工具。",
             "inLanguage": "zh-Hant",
+            "license": LICENSE_URL,
+            "publishingPrinciples": f"{ORIGIN}/crawler-policy.txt",
+            "sameAs": "https://github.com/jason201385-commits/aussie-whv-compass",
         },
         webpage,
     ]
@@ -126,6 +146,7 @@ def seo_block(page: str, source: str) -> str:
             '<meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">',
             f'<link rel="license" href="{LICENSE_URL}">',
             f'<link rel="alternate" type="text/markdown" href="{ORIGIN}/llms.txt" title="澳打指南針 AI 導覽">',
+            f'<link rel="alternate" type="application/json" href="{ORIGIN}/content-status.json?v={ASSET_VERSION}" title="澳打指南針內容狀態">',
             '<script type="application/ld+json">',
             structured,
             "</script>",
@@ -207,6 +228,8 @@ def build_llms(page_sources: dict[str, str]) -> str:
             "## 使用與授權",
             "",
             f"- [Sitemap]({ORIGIN}/sitemap.xml): 全部可索引頁面與最後修改日期。",
+            f"- [內容狀態]({ORIGIN}/content-status.json): 各語言頁的風險級別、編輯狀態、證據卡狀態與專業審校界線。",
+            f"- [Crawler policy]({ORIGIN}/crawler-policy.txt): 允許的公開內容用途，以及表單、API、CRM 與個資端點邊界。",
             f"- [來源與免責]({ORIGIN}/about.html): 維護方式、授權、合作與免責說明。",
             f"- [GitHub 原始碼](https://github.com/jason201385-commits/aussie-whv-compass): 可檢視內容版本與提出修正。",
             f"- [多國語言 Quick Start]({ORIGIN}/lang/): 目前 417／462 護照國家的主要語言入口；機器翻譯需社群校對，官方來源優先。",
@@ -225,17 +248,152 @@ def build_llms(page_sources: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
+def build_content_status(page_sources: dict[str, str]) -> str:
+    data = json.loads(I18N_DATA.read_text(encoding="utf-8"))
+    primary_pages = []
+    for page in PAGES:
+        source = page_sources[page]
+        evidence = re.search(
+            r'<section class="evidence-card" data-evidence-status="([^"]+)"[\s\S]*?'
+            r'<time datetime="([^"]+)">',
+            source,
+        )
+        risk_level = RISK_LEVELS.get(page, "general")
+        primary_pages.append(
+            {
+                "url": page_url(page),
+                "language": "zh-Hant",
+                "title": short_title(extract(r"<title>(.*?)</title>", source, page)),
+                "riskLevel": risk_level,
+                "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+                "reviewedByDomainProfessional": False,
+                "officialVerificationRequired": risk_level == "high",
+                "evidenceStatus": (
+                    evidence.group(1)
+                    if evidence
+                    else "pending-rollout" if risk_level == "high" else "not-applicable"
+                ),
+                "evidenceCheckedAt": evidence.group(2) if evidence else None,
+                "lastModified": LAST_MODIFIED,
+            }
+        )
+
+    full_english_guides = []
+    for slug in FULL_TRANSLATION_SLUGS:
+        relative = f"lang/en/{slug}/index.html"
+        source = (ROOT / relative).read_text(encoding="utf-8")
+        full_english_guides.append(
+            {
+                "url": f"{ORIGIN}/lang/en/{slug}/",
+                "language": "en",
+                "title": short_title(extract(r"<title>(.*?)</title>", source, relative)),
+                "riskLevel": RISK_LEVELS.get(f"{slug}.html", "medium"),
+                "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+                "reviewedByDomainProfessional": False,
+                "officialVerificationRequired": slug in {"visa", "cost", "housing", "work", "scam", "health"},
+                "evidenceStatus": "pending-rollout" if slug in {"visa", "cost", "housing", "work", "scam", "health"} else "not-applicable",
+                "evidenceCheckedAt": None,
+                "lastModified": LAST_MODIFIED,
+            }
+        )
+
+    quick_start_locales = []
+    for code, locale in sorted(data.get("locales", {}).items()):
+        if code == "zh-Hant":
+            continue
+        quick_start_locales.append(
+            {
+                "url": f"{ORIGIN}/lang/{code}/",
+                "language": code,
+                "autonym": locale.get("autonym"),
+                "englishName": locale.get("englishName"),
+                "reviewStatus": locale.get("reviewStatus"),
+                "scope": "quick-start",
+                "officialVerificationRequired": True,
+            }
+        )
+
+    manifest = {
+        "schemaVersion": 1,
+        "generatedAt": LAST_MODIFIED,
+        "canonicalOrigin": ORIGIN,
+        "siteEditorialStatus": "independent-open-source-community-guide",
+        "isOfficialGovernmentService": False,
+        "providesMigrationLegalMedicalOrTaxAdvice": False,
+        "publicContentCrawlable": True,
+        "formsApiCrmAndPersonalDataCrawlable": False,
+        "license": {
+            "content": LICENSE_URL,
+            "code": "https://opensource.org/license/mit",
+            "attributionRequired": True,
+            "canonicalLinkRequested": True,
+        },
+        "statusVocabulary": {
+            "checked": "Adjacent high-risk evidence card and official exit were checked on evidenceCheckedAt.",
+            "pending-rollout": "This high-risk page does not yet use the layered evidence-card component.",
+            "not-applicable": "No high-risk evidence-card rollout is currently assigned to this page.",
+            "source": "Human-authored source-language quick start; not an official translation.",
+            "machine-unreviewed": "Machine translation not yet reviewed by a fluent human.",
+            "english-fallback": "English fallback is shown because a reviewed translation is not available.",
+        },
+        "primaryPages": primary_pages,
+        "fullEnglishGuides": full_english_guides,
+        "quickStartCoverageVersion": data.get("version"),
+        "quickStartLocales": quick_start_locales,
+    }
+    return json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+
+
+def build_crawler_policy() -> str:
+    return "\n".join(
+        [
+            "# Aussie WHV Compass crawler policy",
+            "",
+            f"Canonical site: {ORIGIN}/",
+            f"Machine-readable content status: {ORIGIN}/content-status.json",
+            f"Sitemap: {ORIGIN}/sitemap.xml",
+            "",
+            "## Public guide content",
+            "",
+            "Public HTML guide pages, llms.txt, sitemap.xml and content-status.json may be discovered, indexed, summarised and reasonably cited.",
+            "Keep the canonical page URL, visible source dates, editorial status and uncertainty boundaries with any summary or citation.",
+            "Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.",
+            "Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.",
+            "",
+            "## Non-content and personal-data boundaries",
+            "",
+            "Do not submit or automate forms, create cases, enumerate identifiers, or crawl API, admin, CRM, confirmation, receipt or deletion endpoints.",
+            "Do not collect form-submitted email addresses, form responses, case records, tokens or other personal data even if a future application error exposes them.",
+            "The public robots.txt disallows these route families. Absence of a disallow rule never grants access to authenticated, private or personal data.",
+            "",
+            "## Freshness",
+            "",
+            "For visa, pay, tax, housing, work, health, safety and migration topics, inspect content-status.json and follow the adjacent official source before relying on a claim.",
+            "A stale or pending-rollout status means the official source is the safe current route; it does not mean the old claim remains valid.",
+            "",
+        ]
+    )
+
+
 def expected_files() -> dict[Path, str]:
     sources = {page: (ROOT / page).read_text(encoding="utf-8") for page in PAGES}
     output = {ROOT / page: update_page(page, sources[page]) for page in PAGES}
     output[ROOT / "sitemap.xml"] = build_sitemap()
     output[ROOT / "robots.txt"] = (
-        "# All public content is crawlable. The sitemap is the canonical discovery list.\n"
+        "# Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.\n"
         "User-agent: *\n"
-        "Allow: /\n\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        "Disallow: /admin/\n"
+        "Disallow: /crm/\n"
+        "Disallow: /contact/confirmation/\n"
+        "Disallow: /contact/receipt/\n"
+        "Disallow: /contact/delete/\n\n"
         f"Sitemap: {ORIGIN}/sitemap.xml\n"
     )
     output[ROOT / "llms.txt"] = build_llms(sources)
+    output[ROOT / "content-status.json"] = build_content_status(sources)
+    output[ROOT / "crawler-policy.txt"] = build_crawler_policy()
     return output
 
 

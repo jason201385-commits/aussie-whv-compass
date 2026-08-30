@@ -111,6 +111,9 @@ foreach ($p in $pages) {
     '<meta name="twitter:card" content="summary_large_image">',
     '<link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">',
     '<link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt"',
+    '<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=',
+    '"publishingPrinciples": "https://www.aussiewhvcompass.com/crawler-policy.txt"',
+    '"subjectOf": "https://www.aussiewhvcompass.com/content-status.json"',
     '<script type="application/ld+json">'
   )) {
     if (-not $t.Contains($seoNeedle)) { Write-Output "FAIL [$p] 缺 SEO／AI 探索資訊：$seoNeedle"; $errors++ }
@@ -175,6 +178,17 @@ foreach ($p in $pages) {
 $uniqueAssetVersions = @($assetVersions | Select-Object -Unique)
 if ($uniqueAssetVersions.Count -ne 1) {
   Write-Output "FAIL 全站本機資產版本不一致：$(($uniqueAssetVersions) -join ', ')"
+  $errors++
+}
+$contentStatusVersions = @()
+foreach ($p in $pages) {
+  $statusLinkText = [System.IO.File]::ReadAllText((Join-Path $dir $p), [System.Text.Encoding]::UTF8)
+  $statusLink = [regex]::Match($statusLinkText, 'href="https://www\.aussiewhvcompass\.com/content-status\.json\?v=([^"]+)"')
+  if (-not $statusLink.Success) { Write-Output "FAIL [$p] 缺帶版本的內容狀態 discovery link"; $errors++ }
+  else { $contentStatusVersions += $statusLink.Groups[1].Value }
+}
+if ($uniqueAssetVersions.Count -eq 1 -and @($contentStatusVersions | Where-Object { $_ -ne $uniqueAssetVersions[0] }).Count -gt 0) {
+  Write-Output "FAIL content-status.json discovery 版本必須與全站資產一致：$($uniqueAssetVersions[0])"
   $errors++
 }
 
@@ -1351,9 +1365,12 @@ if (-not (Test-Path $robotsPath)) {
   $errors++
 } else {
   $robotsText = [System.IO.File]::ReadAllText($robotsPath, [System.Text.Encoding]::UTF8)
-  if (-not $robotsText.Contains("User-agent: *") -or -not $robotsText.Contains("Allow: /") -or $robotsText -match '(?im)^\s*Disallow:') {
-    Write-Output 'FAIL robots.txt 必須允許所有 crawler，且不得含 Disallow'
+  if (-not $robotsText.Contains("User-agent: *") -or -not $robotsText.Contains("Allow: /") -or $robotsText -match '(?im)^\s*Disallow:\s*/\s*$') {
+    Write-Output 'FAIL robots.txt 必須允許公開內容，且不得封鎖整站'
     $errors++
+  }
+  foreach ($privateRoute in @('/api/', '/admin/', '/crm/', '/contact/confirmation/', '/contact/receipt/', '/contact/delete/')) {
+    if (-not $robotsText.Contains("Disallow: $privateRoute")) { Write-Output "FAIL robots.txt 未保護非內容／個資路徑：$privateRoute"; $errors++ }
   }
   if (-not $robotsText.Contains("Sitemap: $canonicalOrigin/sitemap.xml")) {
     Write-Output 'FAIL robots.txt 未宣告正式 sitemap'
@@ -1374,8 +1391,41 @@ if (-not (Test-Path $llmsPath)) {
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }
-  foreach ($llmsNeedle in @('CC BY-SA 4.0', '不是澳洲政府、移民代理、法律或醫療服務', '不要把社群經驗、估算值或互動工具輸出描述成官方判定')) {
+  foreach ($llmsNeedle in @('CC BY-SA 4.0', '不是澳洲政府、移民代理、法律或醫療服務', '不要把社群經驗、估算值或互動工具輸出描述成官方判定', "$canonicalOrigin/content-status.json", "$canonicalOrigin/crawler-policy.txt")) {
     if (-not $llmsText.Contains($llmsNeedle)) { Write-Output "FAIL llms.txt 缺授權或事實邊界：$llmsNeedle"; $errors++ }
+  }
+}
+
+$contentStatusPath = Join-Path $dir 'content-status.json'
+if (-not (Test-Path $contentStatusPath)) {
+  Write-Output 'FAIL 缺 content-status.json'
+  $errors++
+} else {
+  try {
+    $contentStatus = Get-Content -Raw $contentStatusPath | ConvertFrom-Json
+    if ($contentStatus.schemaVersion -ne 1 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
+    if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
+    if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
+    if (@($contentStatus.primaryPages).Count -ne 13) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 13）"; $errors++ }
+    if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
+    if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
+    $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceStatus -eq 'checked' })
+    if ($checkedEvidence.Count -ne 5 -or @($checkedEvidence | Where-Object { -not $_.evidenceCheckedAt }).Count -gt 0) { Write-Output 'FAIL content-status.json 已查核證據卡數量或日期錯誤'; $errors++ }
+    if (@($contentStatus.primaryPages | Where-Object { $_.reviewedByDomainProfessional -eq $true }).Count -gt 0 -or @($contentStatus.fullEnglishGuides | Where-Object { $_.reviewedByDomainProfessional -eq $true }).Count -gt 0) { Write-Output 'FAIL content-status.json 不得假稱已有專業審校'; $errors++ }
+  } catch {
+    Write-Output 'FAIL content-status.json 不是合法 JSON'
+    $errors++
+  }
+}
+
+$crawlerPolicyPath = Join-Path $dir 'crawler-policy.txt'
+if (-not (Test-Path $crawlerPolicyPath)) {
+  Write-Output 'FAIL 缺 crawler-policy.txt'
+  $errors++
+} else {
+  $crawlerPolicy = [System.IO.File]::ReadAllText($crawlerPolicyPath, [System.Text.Encoding]::UTF8)
+  foreach ($crawlerNeedle in @('may be discovered, indexed, summarised and reasonably cited', 'Do not submit or automate forms', 'Do not collect form-submitted email addresses', 'CC BY-SA 4.0', 'content-status.json')) {
+    if (-not $crawlerPolicy.Contains($crawlerNeedle)) { Write-Output "FAIL crawler-policy.txt 缺公開／個資／授權邊界：$crawlerNeedle"; $errors++ }
   }
 }
 

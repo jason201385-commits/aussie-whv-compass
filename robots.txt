@@ -1,5 +1,11 @@
-# All public content is crawlable. The sitemap is the canonical discovery list.
+# Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /crm/
+Disallow: /contact/confirmation/
+Disallow: /contact/receipt/
+Disallow: /contact/delete/
 
 Sitemap: https://www.aussiewhvcompass.com/sitemap.xml

@@ -1,0 +1,604 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30",
+  "canonicalOrigin": "https://www.aussiewhvcompass.com",
+  "siteEditorialStatus": "independent-open-source-community-guide",
+  "isOfficialGovernmentService": false,
+  "providesMigrationLegalMedicalOrTaxAdvice": false,
+  "publicContentCrawlable": true,
+  "formsApiCrmAndPersonalDataCrawlable": false,
+  "license": {
+    "content": "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant",
+    "code": "https://opensource.org/license/mit",
+    "attributionRequired": true,
+    "canonicalLinkRequested": true
+  },
+  "statusVocabulary": {
+    "checked": "Adjacent high-risk evidence card and official exit were checked on evidenceCheckedAt.",
+    "pending-rollout": "This high-risk page does not yet use the layered evidence-card component.",
+    "not-applicable": "No high-risk evidence-card rollout is currently assigned to this page.",
+    "source": "Human-authored source-language quick start; not an official translation.",
+    "machine-unreviewed": "Machine translation not yet reviewed by a fluent human.",
+    "english-fallback": "English fallback is shown because a reviewed translation is not available."
+  },
+  "primaryPages": [
+    {
+      "url": "https://www.aussiewhvcompass.com/",
+      "language": "zh-Hant",
+      "title": "澳打指南針｜澳洲打工度假免費開源攻略",
+      "riskLevel": "general",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/why.html",
+      "language": "zh-Hant",
+      "title": "自我釐清：我為什麼要去打工度假？",
+      "riskLevel": "medium",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/visa.html",
+      "language": "zh-Hant",
+      "title": "簽證與集簽：417 一簽二簽三簽完整規則",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/prep.html",
+      "language": "zh-Hant",
+      "title": "行前準備與落地 SOP",
+      "riskLevel": "medium",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/cost.html",
+      "language": "zh-Hant",
+      "title": "物價與薪水：帶多少錢、賺多少錢？",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/housing.html",
+      "language": "zh-Hant",
+      "title": "住宿與租屋：找房、押金、Share House 生存",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/work.html",
+      "language": "zh-Hant",
+      "title": "工作機會在哪裡？求職管道與證照全攻略",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/scam.html",
+      "language": "zh-Hant",
+      "title": "常見詐騙手法：認手法，不認名字",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/english.html",
+      "language": "zh-Hant",
+      "title": "英文不好怎麼辦？",
+      "riskLevel": "general",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/health.html",
+      "language": "zh-Hant",
+      "title": "保險、就醫、心理與安全",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "checked",
+      "evidenceCheckedAt": "2026-08-30",
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/leave.html",
+      "language": "zh-Hant",
+      "title": "報稅、退休金與離澳",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/pr.html",
+      "language": "zh-Hant",
+      "title": "如果想留下來：打工度假轉 PR 的現行路徑",
+      "riskLevel": "high",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/about.html",
+      "language": "zh-Hant",
+      "title": "關於本站・合作・贊助",
+      "riskLevel": "general",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    }
+  ],
+  "fullEnglishGuides": [
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/visa/",
+      "language": "en",
+      "title": "Australian Working Holiday visas: 417, 462 and specified work | Aussie WHV Compass",
+      "riskLevel": "high",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/prep/",
+      "language": "en",
+      "title": "Prepare for Australia: departure and first-week setup | Aussie WHV Compass",
+      "riskLevel": "medium",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/cost/",
+      "language": "en",
+      "title": "Cost of living and money plan for an Australian working holiday",
+      "riskLevel": "high",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/housing/",
+      "language": "en",
+      "title": "Accommodation and renting in Australia | Aussie WHV Compass",
+      "riskLevel": "high",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/work/",
+      "language": "en",
+      "title": "Find work in Australia: pay, job checks and workplace rights | Aussie WHV Compass",
+      "riskLevel": "high",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/scam/",
+      "language": "en",
+      "title": "Avoid scams and exploitation in Australia | Aussie WHV Compass",
+      "riskLevel": "high",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/health/",
+      "language": "en",
+      "title": "Healthcare, insurance and personal safety in Australia | Aussie WHV Compass",
+      "riskLevel": "high",
+      "editorialStatus": "complete-editorial-draft-unreviewed-by-native-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": true,
+      "evidenceStatus": "pending-rollout",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-08-30"
+    }
+  ],
+  "quickStartCoverageVersion": "2026-08-29",
+  "quickStartLocales": [
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/ar/",
+      "language": "ar",
+      "autonym": "العربية",
+      "englishName": "Arabic",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/cs/",
+      "language": "cs",
+      "autonym": "Čeština",
+      "englishName": "Czech",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/cy/",
+      "language": "cy",
+      "autonym": "Cymraeg",
+      "englishName": "Welsh",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/da/",
+      "language": "da",
+      "autonym": "Dansk",
+      "englishName": "Danish",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/de/",
+      "language": "de",
+      "autonym": "Deutsch",
+      "englishName": "German",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/el/",
+      "language": "el",
+      "autonym": "Ελληνικά",
+      "englishName": "Greek",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/en/",
+      "language": "en",
+      "autonym": "English",
+      "englishName": "English",
+      "reviewStatus": "source",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/es/",
+      "language": "es",
+      "autonym": "Español",
+      "englishName": "Spanish",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/et/",
+      "language": "et",
+      "autonym": "Eesti",
+      "englishName": "Estonian",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/fi/",
+      "language": "fi",
+      "autonym": "Suomi",
+      "englishName": "Finnish",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/fr/",
+      "language": "fr",
+      "autonym": "Français",
+      "englishName": "French",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/ga/",
+      "language": "ga",
+      "autonym": "Gaeilge",
+      "englishName": "Irish",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/he/",
+      "language": "he",
+      "autonym": "עברית",
+      "englishName": "Hebrew",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/hi/",
+      "language": "hi",
+      "autonym": "हिन्दी",
+      "englishName": "Hindi",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/hu/",
+      "language": "hu",
+      "autonym": "Magyar",
+      "englishName": "Hungarian",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/id/",
+      "language": "id",
+      "autonym": "Bahasa Indonesia",
+      "englishName": "Indonesian",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/it/",
+      "language": "it",
+      "autonym": "Italiano",
+      "englishName": "Italian",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/ja/",
+      "language": "ja",
+      "autonym": "日本語",
+      "englishName": "Japanese",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/ko/",
+      "language": "ko",
+      "autonym": "한국어",
+      "englishName": "Korean",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/lb/",
+      "language": "lb",
+      "autonym": "Lëtzebuergesch",
+      "englishName": "Luxembourgish",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/mn/",
+      "language": "mn",
+      "autonym": "Монгол",
+      "englishName": "Mongolian",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/ms/",
+      "language": "ms",
+      "autonym": "Bahasa Melayu",
+      "englishName": "Malay",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/mt/",
+      "language": "mt",
+      "autonym": "Malti",
+      "englishName": "Maltese",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/nl/",
+      "language": "nl",
+      "autonym": "Nederlands",
+      "englishName": "Dutch",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/no/",
+      "language": "no",
+      "autonym": "Norsk",
+      "englishName": "Norwegian",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/pl/",
+      "language": "pl",
+      "autonym": "Polski",
+      "englishName": "Polish",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/pt/",
+      "language": "pt",
+      "autonym": "Português",
+      "englishName": "Portuguese",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/rm/",
+      "language": "rm",
+      "autonym": "Rumantsch",
+      "englishName": "Romansh",
+      "reviewStatus": "english-fallback",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/sk/",
+      "language": "sk",
+      "autonym": "Slovenčina",
+      "englishName": "Slovak",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/sl/",
+      "language": "sl",
+      "autonym": "Slovenščina",
+      "englishName": "Slovenian",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/sv/",
+      "language": "sv",
+      "autonym": "Svenska",
+      "englishName": "Swedish",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/ta/",
+      "language": "ta",
+      "autonym": "தமிழ்",
+      "englishName": "Tamil",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/th/",
+      "language": "th",
+      "autonym": "ไทย",
+      "englishName": "Thai",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/tpi/",
+      "language": "tpi",
+      "autonym": "Tok Pisin",
+      "englishName": "Tok Pisin",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/tr/",
+      "language": "tr",
+      "autonym": "Türkçe",
+      "englishName": "Turkish",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/vi/",
+      "language": "vi",
+      "autonym": "Tiếng Việt",
+      "englishName": "Vietnamese",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/lang/zh-Hans/",
+      "language": "zh-Hans",
+      "autonym": "简体中文",
+      "englishName": "Simplified Chinese",
+      "reviewStatus": "machine-unreviewed",
+      "scope": "quick-start",
+      "officialVerificationRequired": true
+    }
+  ]
+}

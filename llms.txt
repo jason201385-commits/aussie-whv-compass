@@ -35,6 +35,8 @@
 ## 使用與授權
 
 - [Sitemap](https://www.aussiewhvcompass.com/sitemap.xml): 全部可索引頁面與最後修改日期。
+- [內容狀態](https://www.aussiewhvcompass.com/content-status.json): 各語言頁的風險級別、編輯狀態、證據卡狀態與專業審校界線。
+- [Crawler policy](https://www.aussiewhvcompass.com/crawler-policy.txt): 允許的公開內容用途，以及表單、API、CRM 與個資端點邊界。
 - [來源與免責](https://www.aussiewhvcompass.com/about.html): 維護方式、授權、合作與免責說明。
 - [GitHub 原始碼](https://github.com/jason201385-commits/aussie-whv-compass): 可檢視內容版本與提出修正。
 - [多國語言 Quick Start](https://www.aussiewhvcompass.com/lang/): 目前 417／462 護照國家的主要語言入口；機器翻譯需社群校對，官方來源優先。
