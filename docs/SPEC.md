@@ -187,7 +187,7 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 - 2026-08-29 已完成第一階段：目錄式 `/lang/<locale>/` Quick Start、38 種主要語言切換、
   49 個現行 417／462 護照國家／地區覆蓋表、SEO `hreflang` 與 RTL；繁中／英文為來源文案，
   其餘明示未校對機器翻譯或英文 fallback。
-- 第二階段現況：`/lang/en/visa/`、`/lang/en/prep/`、`/lang/en/cost/`、`/lang/en/housing/`、`/lang/en/work/` 與 `/lang/en/scam/` 已完成可索引的完整英文 editorial beta。
+- 第二階段現況：`/lang/en/visa/`、`/lang/en/prep/`、`/lang/en/cost/`、`/lang/en/housing/`、`/lang/en/work/`、`/lang/en/scam/` 與 `/lang/en/health/` 已完成可索引的完整英文 editorial beta。
   visa 將台灣限定 417 內容改寫為護照中立的 417／462 分流，郵遞區號快查器明示只適用 417；
   prep 以護照中立方式重寫簽證核准後的文件、RHCA／保險、現金申報、藥品與生物安全、各州駕照、
   落地住宿、TFN／銀行／myGov／super，並提供獨立本機 key `whv-prep-check-en-v1` 的 21 項英文清單，
@@ -197,10 +197,12 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
   housing 以護照中立方式提供不含聯盟參數的短住、合租與整租入口，將看房、合約、bond、condition report、
   工作綁住宿與離場處理拆成可執行步驟，並逐一連到八州領地的官方租屋機關，不把 WA 規則誤寫成全澳通則；
   work 以跨護照適用的求職、薪資、職場紅旗與求助路徑重寫，並提供完整英文採收月份工具；
-  scam 不直譯華人限定敘事，改為跨護照的工作、簽證、租屋、金流、個資與通報分流，測驗亦完整英文。
+  scam 不直譯華人限定敘事，改為跨護照的工作、簽證、租屋、金流、個資與通報分流，測驗亦完整英文；
+  health 以跨護照 Medicare／RHCA 分流重寫，不沿用台灣健保核退與易過期價目表，改提供訪客保險查核、
+  就醫層級、藥品、職災、心理健康、家庭／性暴力支援、偏遠工作安全與可直接撥打的緊急聯絡入口。
   已重查 Home Affairs／Fair Work／ATO／Scamwatch／ACSC／AFP 等一手來源，但尚未經相應母語專業人士
   校對，不得標為 reviewed。
-- 第二階段 backlog：替 visa／prep／cost／housing／work／scam 找母語或合格專業人士校對，再依使用量擴充其他語言與頁面。
+- 第二階段 backlog：替 visa／prep／cost／housing／work／scam／health 找母語或合格專業人士校對，再依使用量擴充其他語言與頁面。
   台灣特定內容（健保核退、台幣、駐外館處）需在地化改寫而非直譯；未經母語者校對不得標為 reviewed。
 
 ## 6. 驗收程序（每次 push 前必跑）

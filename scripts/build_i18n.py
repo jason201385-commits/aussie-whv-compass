@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260830-15"
+ASSET_VERSION = "20260830-17"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -35,7 +35,7 @@ GUIDES = [
     ("collaborate", "/about.html#collaborate"),
 ]
 FULL_GUIDE_TRANSLATIONS = {
-    "en": {"visa": "/lang/en/visa/", "prep": "/lang/en/prep/", "cost": "/lang/en/cost/", "housing": "/lang/en/housing/", "work": "/lang/en/work/", "scam": "/lang/en/scam/"},
+    "en": {"visa": "/lang/en/visa/", "prep": "/lang/en/prep/", "cost": "/lang/en/cost/", "housing": "/lang/en/housing/", "work": "/lang/en/work/", "scam": "/lang/en/scam/", "health": "/lang/en/health/"},
 }
 FULL_TOPIC_ROUTES = {
     "visa": {"zh-Hant": "/visa.html", "en": "/lang/en/visa/"},
@@ -44,6 +44,7 @@ FULL_TOPIC_ROUTES = {
     "housing": {"zh-Hant": "/housing.html", "en": "/lang/en/housing/"},
     "work": {"zh-Hant": "/work.html", "en": "/lang/en/work/"},
     "scam": {"zh-Hant": "/scam.html", "en": "/lang/en/scam/"},
+    "health": {"zh-Hant": "/health.html", "en": "/lang/en/health/"},
 }
 
 

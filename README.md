@@ -47,7 +47,9 @@ Start 說成全站人工翻譯完成。
 八州領地官方租屋機關及工作綁住宿的風險分流；
 [英文找工作與職場權益指南](https://www.aussiewhvcompass.com/lang/en/work/)涵蓋求職、雇主／薪資查核、
 職場紅旗、採收月份工具與官方求助路徑，以及[英文防詐與剝削指南](https://www.aussiewhvcompass.com/lang/en/scam/)，
-提供工作、簽證、租屋、金流與個資風險的辨識及正確通報分流。六頁均尚未經相應母語專業人士校對，不標示為 reviewed。
+提供工作、簽證、租屋、金流與個資風險的辨識及正確通報分流；
+[英文健康、保險與人身安全指南](https://www.aussiewhvcompass.com/lang/en/health/)提供 Medicare／RHCA、
+訪客保險、就醫、藥品、職災、心理健康、暴力支援與緊急聯絡分流。七頁均尚未經相應母語專業人士校對，不標示為 reviewed。
 
 GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連線 Google Analytics。
 站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；

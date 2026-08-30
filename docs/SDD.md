@@ -80,6 +80,7 @@
 | `lang/en/housing/index.html` | 完整英文住宿與租屋 editorial beta：護照中立的短住／長租分流、平台與身分查證、合約／bond／condition report、八州領地官方入口、工作綁住宿與離場處理；未經母語澳洲 tenancy、housing 或 homelessness-services 專業人士校對前不得標為 reviewed |
 | `lang/en/work/index.html` | 完整英文工作 editorial beta：求職分流、雇主與薪資查核、職場紅旗、採收月份工具與官方求助路徑；未經母語澳洲職場關係專業人士校對前不得標為 reviewed |
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
+| `lang/en/health/index.html` | 完整英文健康安全 editorial beta：跨護照 Medicare／RHCA 分流、訪客保險查核、就醫層級、藥品、職災、心理健康、暴力支援、偏遠工作與緊急聯絡；未經母語澳洲 healthcare、insurance、mental-health、violence-support 或 workplace-safety 專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |
 
 ### 2.2 頁面共同結構

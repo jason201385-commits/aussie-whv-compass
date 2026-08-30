@@ -18,7 +18,7 @@ LAST_MODIFIED = "2026-08-30"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
-FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/", f"{ORIGIN}/lang/en/prep/", f"{ORIGIN}/lang/en/cost/", f"{ORIGIN}/lang/en/housing/", f"{ORIGIN}/lang/en/work/", f"{ORIGIN}/lang/en/scam/"]
+FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/", f"{ORIGIN}/lang/en/prep/", f"{ORIGIN}/lang/en/cost/", f"{ORIGIN}/lang/en/housing/", f"{ORIGIN}/lang/en/work/", f"{ORIGIN}/lang/en/scam/", f"{ORIGIN}/lang/en/health/"]
 PAGES = [
     "index.html",
     "why.html",
@@ -216,6 +216,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
             f"- [English accommodation and renting guide]({ORIGIN}/lang/en/housing/): first-stay booking routes, inspection and bond safeguards, all eight state and territory authorities, work-linked housing and dispute preparation; editorial beta, not booking or legal advice.",
             f"- [English work and workplace-rights guide]({ORIGIN}/lang/en/work/): job-search routes, employer and pay checks, harvest timing and official help paths; editorial beta, not legal or tax advice.",
             f"- [English scam-safety and exploitation guide]({ORIGIN}/lang/en/scam/): job, visa, rental, identity and payment red flags, an English practice quiz and official reporting routes; editorial beta, not legal or emergency advice.",
+            f"- [English healthcare, insurance and personal-safety guide]({ORIGIN}/lang/en/health/): Medicare and visitor-cover checks, care routing, medicines, workplace injury, mental-health and violence-support contacts; editorial beta, not medical, insurance, legal or emergency advice.",
             "- 文字內容採 CC BY-SA 4.0；程式碼採 MIT。轉載或改作時請註明澳打指南針與原頁網址，並遵守相同方式分享的授權條件。",
             "- 不要把社群經驗、估算值或互動工具輸出描述成官方判定；請保留頁面上的查核日期與限制。",
             "",

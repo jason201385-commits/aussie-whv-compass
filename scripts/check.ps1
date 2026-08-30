@@ -439,9 +439,9 @@ if (-not (Test-Path $englishPrepPath)) {
   if (-not $i18nPrepText.Contains('"prep":{"zh-Hant":"/prep.html","en":"/lang/en/prep/"}')) {
     Write-Output 'FAIL [i18n.js] 缺行前主題中英文路由'; $errors++
   }
-  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/english\.html|/health\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
-  if ($englishTraditionalCards.Count -ne 6 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 6) {
-    Write-Output 'FAIL [lang/en/] 6 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
+  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/english\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
+  if ($englishTraditionalCards.Count -ne 5 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 5) {
+    Write-Output 'FAIL [lang/en/] 5 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
   }
 }
 
@@ -678,9 +678,9 @@ if (-not (Test-Path $englishHousingPath)) {
   if (-not $i18nHousingText.Contains('"housing":{"zh-Hant":"/housing.html","en":"/lang/en/housing/"}')) {
     Write-Output 'FAIL [i18n.js] 缺住宿主題中英文路由'; $errors++
   }
-  foreach ($fullGuidePath in @('lang\en\visa\index.html', 'lang\en\prep\index.html', 'lang\en\cost\index.html', 'lang\en\housing\index.html', 'lang\en\work\index.html', 'lang\en\scam\index.html')) {
+  foreach ($fullGuidePath in @('lang\en\visa\index.html', 'lang\en\prep\index.html', 'lang\en\cost\index.html', 'lang\en\housing\index.html', 'lang\en\work\index.html', 'lang\en\scam\index.html', 'lang\en\health\index.html')) {
     $fullGuideNavText = [System.IO.File]::ReadAllText((Join-Path $dir $fullGuidePath), [System.Text.Encoding]::UTF8)
-    foreach ($route in @('/lang/en/visa/', '/lang/en/prep/', '/lang/en/cost/', '/lang/en/housing/', '/lang/en/work/', '/lang/en/scam/')) {
+    foreach ($route in @('/lang/en/visa/', '/lang/en/prep/', '/lang/en/cost/', '/lang/en/housing/', '/lang/en/work/', '/lang/en/scam/', '/lang/en/health/')) {
       if (-not $fullGuideNavText.Contains("href=`"$route`"")) { Write-Output "FAIL [$fullGuidePath] 英文旅程導覽缺 $route"; $errors++ }
     }
     foreach ($crossPageAnchor in [regex]::Matches($fullGuideNavText, 'href="/lang/en/([^/#"]+)/#([^"?]+)"')) {
@@ -933,6 +933,116 @@ if (-not (Test-Path $englishScamPath)) {
   }
 }
 
+# 完整英文健康安全頁：跨護照 Medicare 分流、保險查核、就醫層級與緊急求助不得遺失
+$englishHealthPath = Join-Path $dir 'lang\en\health\index.html'
+if (-not (Test-Path $englishHealthPath)) {
+  Write-Output 'FAIL 缺完整英文健康安全頁：lang/en/health/'
+  $errors++
+} else {
+  $englishHealthText = [System.IO.File]::ReadAllText($englishHealthPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    '<meta name="viewport"',
+    'data-i18n-topic="health"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/health/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/health.html">',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking Australian healthcare, insurance, mental-health, violence-support or workplace-safety professional',
+    'If you need help now',
+    'Call 000',
+    'healthdirect 1800 022 222',
+    'Lifeline 13 11 14',
+    '1800RESPECT 1800 737 732',
+    'TIS National 131 450',
+    'Poisons Information Centre',
+    'Most temporary visitors do not have Medicare',
+    'New Zealand and Ireland have different visitor arrangements',
+    'Medicare does not cover ambulance services',
+    'paid manual-work injuries',
+    '"Covered" does not necessarily mean zero out-of-pocket cost',
+    'Do not delay emergency care to check a bill',
+    'The traveller''s exemption commonly limits eligible medicines to a three-month supply',
+    'An employer cannot cancel a visa; only Home Affairs can grant, refuse or cancel one',
+    '1800RESPECT warns that its call or text numbers may appear on an itemised phone bill',
+    'This site does not collect or store it',
+    'https://www.servicesaustralia.gov.au/reciprocal-health-care-agreements',
+    'https://www.privatehealth.gov.au/health_insurance/overseas/overseas_visitors_health_cover.htm',
+    'https://www.healthdirect.gov.au/calling-triple-zero',
+    'https://www.tga.gov.au/resources/consumer-information-and-resources/travelling-medicines-and-medical-devices/entering-australia',
+    'https://www.safeworkaustralia.gov.au/law-and-regulation/whs-regulators-and-workers-compensation-authorities-contact-information',
+    'https://www.fairwork.gov.au/employment-conditions/workplace-sexual-harassment/rules-about-workplace-sexual-harassment',
+    'https://www.lifeline.org.au/chat',
+    'https://www.beyondblue.org.au/get-support/talk-to-a-counsellor',
+    'https://www.1800respect.org.au/accessibility',
+    'https://www.tisnational.gov.au/en/Contact-us'
+  )) {
+    if (-not $englishHealthText.Contains($needle)) { Write-Output "FAIL [lang/en/health/] 缺內容、來源或安全邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishHealthText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishHealthText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/health/] 必須只有一個 h1 與 main'; $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishHealthText, '<a href="#([^"]+)"')) {
+    if (-not $englishHealthText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/health/] TOC 錨點不存在：$($anchor.Groups[1].Value)"; $errors++
+    }
+  }
+  $englishHealthIds = [regex]::Matches($englishHealthText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishHealthIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/health/] 含重複 id'; $errors++
+  }
+  if ($englishHealthText -match '[\u3400-\u9fff]') {
+    Write-Output 'FAIL [lang/en/health/] 完整英文頁仍含 CJK 文字'; $errors++
+  }
+  if ($englishHealthText.Contains('/assets/main.js?v=')) {
+    Write-Output 'FAIL [lang/en/health/] 不得載入會注入中文搜尋、回饋列與 skip link 的 main.js'; $errors++
+  }
+  $englishHealthAssetVersions = @([regex]::Matches($englishHealthText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|main\.js|tools\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishHealthAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishHealthAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/health/] 資產版本與全站不一致：$(($englishHealthAssetVersions) -join ', ')"; $errors++
+  }
+  foreach ($link in [regex]::Matches($englishHealthText, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/health/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  $englishHealthMobileTables = [regex]::Matches($englishHealthText, '(?s)<div class="table-wrap mobile-stack"><table>(.*?)</table></div>')
+  if ($englishHealthMobileTables.Count -ne 3) {
+    Write-Output "FAIL [lang/en/health/] 手機卡片表格數=$($englishHealthMobileTables.Count)（應為 3）"; $errors++
+  }
+  foreach ($mobileTable in $englishHealthMobileTables) {
+    foreach ($cell in [regex]::Matches($mobileTable.Groups[1].Value, '<td(?:\s+[^>]*)?>')) {
+      if ($cell.Value -notmatch '\sdata-label="[^"]+"') {
+        Write-Output 'FAIL [lang/en/health/] 手機卡片表格 td 缺 data-label'; $errors++
+      }
+    }
+  }
+  $styleTextForHealth = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\style.css'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @('.mobile-stack td::before', 'content: attr(data-label)')) {
+    if (-not $styleTextForHealth.Contains($needle)) { Write-Output "FAIL [assets/style.css] 缺手機表格標籤樣式：$needle"; $errors++ }
+  }
+  $englishHealthJsonText = [regex]::Match($englishHealthText, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+  try {
+    $englishHealthJson = $englishHealthJsonText | ConvertFrom-Json
+    if ($englishHealthJson.'@context' -ne 'https://schema.org' -or -not $englishHealthJson.'@graph') {
+      Write-Output 'FAIL [lang/en/health/] JSON-LD 缺 schema.org context 或 graph'; $errors++
+    }
+  } catch { Write-Output 'FAIL [lang/en/health/] JSON-LD 不是合法 JSON'; $errors++ }
+
+  $traditionalHealthText = [System.IO.File]::ReadAllText((Join-Path $dir 'health.html'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/health/">',
+    '<body data-i18n-topic="health">'
+  )) {
+    if (-not $traditionalHealthText.Contains($needle)) { Write-Output "FAIL [health.html] 缺英文 reciprocal hreflang 或主題標記：$needle"; $errors++ }
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/health/">')) {
+    Write-Output 'FAIL [lang/en/] 健康安全卡未連到完整英文頁'; $errors++
+  }
+  $i18nHealthText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  if (-not $i18nHealthText.Contains('"health":{"zh-Hant":"/health.html","en":"/lang/en/health/"}')) {
+    Write-Output 'FAIL [i18n.js] 缺健康主題中英文路由'; $errors++
+  }
+}
+
 # 站內搜尋：靜態索引需與 13 頁同步，查詢不得送出、保存或以 innerHTML 呈現使用者字串
 $mainJs = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\main.js'), [System.Text.Encoding]::UTF8)
 $searchBuilder = Join-Path $dir 'scripts\build_search.py'
@@ -1092,6 +1202,7 @@ if (-not (Test-Path $sitemapPath)) {
     $expectedUrls += "$canonicalOrigin/lang/en/housing/"
     $expectedUrls += "$canonicalOrigin/lang/en/work/"
     $expectedUrls += "$canonicalOrigin/lang/en/scam/"
+    $expectedUrls += "$canonicalOrigin/lang/en/health/"
   }
   if ($sitemapUrls.Count -ne $expectedUrls.Count) {
     Write-Output "FAIL sitemap 頁數=$($sitemapUrls.Count)（應為 $($expectedUrls.Count)）"
@@ -1131,7 +1242,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/cost/" + "$canonicalOrigin/lang/en/housing/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/cost/" + "$canonicalOrigin/lang/en/housing/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/" + "$canonicalOrigin/lang/en/health/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }
