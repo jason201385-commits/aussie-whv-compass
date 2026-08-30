@@ -185,6 +185,8 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - **按鈕**：彈簧曲線 `cubic-bezier(.34,1.56,.64,1)`，active 全壓平（陰影歸零）。
 - **分層證據卡**：先顯示白話下一步，再顯示理由；來源機構、查核日期、翻譯／編輯狀態常駐，
   完整依據可展開。過期高風險內容標「待重新確認」並保留官方出口，不得只隱藏舊內容。
+  第一批實作位於 `visa.html`、`cost.html`、`work.html`、`health.html`、`scam.html`；根節點使用
+  `data-evidence-status="checked|stale"`，展開依據使用原生 `<details>`，不依賴 JavaScript。
 - **圖文**：流程圖、選項圖與風險圖延續檸檬布紋；圖像不能成為唯一資訊來源，裝飾圖使用空 alt，
   資訊圖提供等義文字或可理解的替代文字。
 - **h2**：flex 對齊＋檸檬黃有機色塊 `::before`（以 `nth-of-type(3n)` 微調形狀）。

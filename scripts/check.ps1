@@ -178,6 +178,47 @@ if ($uniqueAssetVersions.Count -ne 1) {
   $errors++
 }
 
+# 高風險主題必須先給安全下一步，再常駐揭露來源、查核日與編輯狀態。
+$evidencePages = @('visa.html', 'cost.html', 'work.html', 'health.html', 'scam.html')
+foreach ($evidencePage in $evidencePages) {
+  $evidenceText = [System.IO.File]::ReadAllText((Join-Path $dir $evidencePage), [System.Text.Encoding]::UTF8)
+  $evidenceCards = [regex]::Matches($evidenceText, '(?s)<section class="evidence-card" data-evidence-status="(checked|stale)".*?</section>')
+  if ($evidenceCards.Count -ne 1) {
+    Write-Output "FAIL [$evidencePage] 必須有唯一分層證據卡"
+    $errors++
+    continue
+  }
+  $evidenceCard = $evidenceCards[0].Value
+  foreach ($evidenceNeedle in @(
+    'class="evidence-card__label">先做這一步',
+    'class="evidence-card__reason"><strong>為什麼：</strong>',
+    'class="evidence-card__meta"',
+    '<span>來源機構</span><a href="https://',
+    '<span>查核日期</span><time datetime="',
+    '<span>編輯狀態</span>繁中人工整理・未經',
+    'class="evidence-card__basis"',
+    '<summary>查看完整依據與官方'
+  )) {
+    if (-not $evidenceCard.Contains($evidenceNeedle)) {
+      Write-Output "FAIL [$evidencePage] 證據卡缺欄位：$evidenceNeedle"
+      $errors++
+    }
+  }
+  if ($evidenceCards[0].Groups[1].Value -eq 'stale' -and -not $evidenceCard.Contains('待重新確認')) {
+    Write-Output "FAIL [$evidencePage] 過期證據卡必須明示待重新確認"
+    $errors++
+  }
+  if ($evidenceText.IndexOf('class="evidence-card"') -gt $evidenceText.IndexOf('class="toc"')) {
+    Write-Output "FAIL [$evidencePage] 證據卡必須在目錄前先提供安全下一步"
+    $errors++
+  }
+}
+$evidenceCss = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\style.css'), [System.Text.Encoding]::UTF8)
+if (-not $evidenceCss.Contains('.evidence-card[data-evidence-status="stale"]')) {
+  Write-Output 'FAIL [style.css] 證據卡缺待重新確認狀態樣式'
+  $errors++
+}
+
 # 所有語言頁的靜態 skip target 都必須可被片段導航聚焦，不能只靠繁中 main.js 補救
 $allSiteHtmlFiles = Get-ChildItem $dir -Recurse -Filter '*.html' | Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
 foreach ($siteHtmlFile in $allSiteHtmlFiles) {

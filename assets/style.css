@@ -980,6 +980,83 @@ body:not(.home-page) main {
   backface-visibility: hidden;
 }
 
+/* ---------- 分層證據卡：先行動，再看依據 ---------- */
+.evidence-card {
+  position: relative;
+  overflow: hidden;
+  margin: 24px 0;
+  border: 2px solid var(--green);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--green-soft) 58%, var(--surface));
+  box-shadow: 6px 7px 0 color-mix(in srgb, var(--green) 24%, transparent);
+}
+.evidence-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 7px;
+  background: var(--gold);
+}
+.evidence-card__body { padding: 22px 24px 18px 30px; }
+.evidence-card__label {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.evidence-card h2 {
+  display: block;
+  margin: 0;
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+}
+.evidence-card h2::before { display: none; }
+.evidence-card__reason { margin: 12px 0 16px; }
+.evidence-card__meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.evidence-card__meta li {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--green) 38%, var(--line-soft));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--ink-soft);
+  font-size: .78rem;
+  overflow-wrap: anywhere;
+}
+.evidence-card__meta li > span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+.evidence-card__meta a { font-weight: 800; }
+.evidence-card__basis {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--green) 38%, var(--line-soft));
+  border-radius: 0;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: none;
+}
+.evidence-card__basis summary { padding: 14px 24px 14px 30px; }
+.evidence-card__basis > p { padding: 0 24px 18px 30px; }
+.evidence-card[data-evidence-status="stale"] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  box-shadow: 6px 7px 0 color-mix(in srgb, var(--danger) 22%, transparent);
+}
+.evidence-card[data-evidence-status="stale"]::before { background: var(--danger); }
+.evidence-card[data-evidence-status="stale"] .evidence-card__label { color: var(--danger); }
+
 /* ---------- 表格 ---------- */
 .table-wrap {
   overflow-x: auto;
@@ -1667,6 +1744,10 @@ main [id] { scroll-margin-top: 170px; }
   body:not(.home-page) main { margin: 12px; border-radius: 24px; }
   .home-page main { margin: 0 auto; }
   .panel { padding: 18px 16px; }
+  .evidence-card__body { padding: 19px 16px 16px 22px; }
+  .evidence-card__meta { grid-template-columns: 1fr; }
+  .evidence-card__basis summary { padding: 14px 16px 14px 22px; }
+  .evidence-card__basis > p { padding: 0 16px 17px 22px; }
   .tool { padding: 18px 16px; }
   .hero { margin-top: 12px; padding: 46px 18px 38px; border-radius: 26px; }
   .hero-cutouts { display: none; }
