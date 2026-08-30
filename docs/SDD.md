@@ -57,7 +57,7 @@
 | `why.html` | 自我釐清雙模式：8 題快思四面向＋8 題慢想工作表、研究／非診斷邊界、localStorage、匯出 txt |
 | `visa.html` | 簽證與集簽＋**集簽郵遞區號初篩** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
-| `simulator.html` | **5 分鐘角色設定＋抵澳 30 天模擬器**：固定六情境、本機記憶體運算、官方安全出口與第 30 天行動地圖；不做成功／簽證／醫療預測 |
+| `simulator.html` | **5 分鐘角色設定＋抵澳 30 天模擬器**：固定六情境、同分頁 session 暫存、官方安全出口與第 30 天行動地圖；從攻略返回或重新整理可繼續，不做成功／簽證／醫療預測 |
 | `cost.html` | 物價薪水稅務＋Perth 採買、簡易食譜、二手衣／平價新品＋主要找車／自行刊登平台與官方查核＋**存錢試算器** |
 | `housing.html` | 住宿與租屋：短住訂房、合租／整租原始平台入口、WA 官方租屋權益與安全清單 |
 | `work.html` | 找工作（管道、查核、證照、履歷、季節、工傷） |
@@ -72,7 +72,7 @@
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、D+ 固定類別彙總、私人需求單的 Email／複製備援與受控 Worker 漸進增強 |
-| `assets/simulator.js` | 模擬器固定情境與狀態機；只處理白名單選項與頁面記憶體，不使用 storage、網路請求或自由文字 |
+| `assets/simulator.js` | 模擬器固定情境與狀態機；只處理白名單選項，使用版本化且嚴格驗證的 `sessionStorage` 保存目前分頁進度；不使用 `localStorage`、網路請求或自由文字，恢復已選關卡時不重複套用 delta |
 | `assets/api-config.js` | 只含共用公開 API origin 與 Turnstile site key；P0-4 未完成時兩者必須留空，使 D+、站內送出與 CRM 管理 fail closed；不得放 secret |
 | `assets/search-index.js` | 14 頁、126 個頁面／段落入口的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |

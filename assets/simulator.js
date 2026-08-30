@@ -27,6 +27,7 @@
   var finishSummary = document.getElementById("finish-summary");
   var finishDashboard = document.getElementById("finish-dashboard");
   var finishActions = document.getElementById("finish-actions");
+  var progressKey = "whv-simulator-progress-v1";
   var state = null;
 
   var EVENTS = [
@@ -247,6 +248,48 @@
   var formatCash = function (value) { return "A$" + Math.max(0, Math.round(value)).toLocaleString("en-AU"); };
   var labelMap = { cash: "資金", housing: "住宿", work: "工作", wellbeing: "身心", evidence: "證據" };
 
+  var isIntegerInRange = function (value, minimum, maximum) {
+    return Number.isInteger(value) && value >= minimum && value <= maximum;
+  };
+
+  var isValidState = function (candidate) {
+    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return false;
+    if (!isIntegerInRange(candidate.cash, 0, 12000)) return false;
+    if (!isIntegerInRange(candidate.housing, 0, 100)) return false;
+    if (!isIntegerInRange(candidate.work, 0, 100)) return false;
+    if (!isIntegerInRange(candidate.wellbeing, 0, 100)) return false;
+    if (!isIntegerInRange(candidate.evidence, 0, 100)) return false;
+    if (["safety", "income", "experience", "evidence"].indexOf(candidate.goal) < 0) return false;
+    if (!isIntegerInRange(candidate.index, 0, EVENTS.length - 1)) return false;
+    if (!isIntegerInRange(candidate.riskChoices, 0, EVENTS.length)) return false;
+    if (candidate.selectedChoice !== null && !isIntegerInRange(candidate.selectedChoice, 0, 2)) return false;
+    if (typeof candidate.finished !== "boolean") return false;
+    return !candidate.finished || candidate.index === EVENTS.length - 1;
+  };
+
+  var clearProgress = function () {
+    try { sessionStorage.removeItem(progressKey); } catch (_error) { /* storage may be unavailable */ }
+  };
+
+  var saveProgress = function () {
+    if (!state) return;
+    try { sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, state: state })); } catch (_error) { /* keep the game usable */ }
+  };
+
+  var readProgress = function () {
+    try {
+      var saved = JSON.parse(sessionStorage.getItem(progressKey));
+      if (!saved || saved.version !== 1 || !isValidState(saved.state)) {
+        clearProgress();
+        return null;
+      }
+      return saved.state;
+    } catch (_error) {
+      clearProgress();
+      return null;
+    }
+  };
+
   var updateStats = function () {
     document.getElementById("stat-cash").textContent = formatCash(state.cash);
     document.getElementById("stat-housing").textContent = state.housing + " / 100";
@@ -274,11 +317,8 @@
     });
   };
 
-  var choose = function (event, choice) {
+  var showFeedback = function (event, choice, shouldFocus) {
     Array.prototype.forEach.call(choicesWrap.querySelectorAll("button"), function (button) { button.disabled = true; });
-    applyDelta(choice.delta);
-    if (choice.tone === "danger") state.riskChoices += 1;
-    updateStats();
     renderDelta(choice.delta);
     feedback.className = "simulator-feedback " + (choice.tone === "danger" ? "is-caution" : "is-safer");
     feedbackTitle.textContent = choice.title;
@@ -289,14 +329,28 @@
     progress.setAttribute("aria-valuenow", String(state.index + 1));
     progressBar.style.width = (((state.index + 1) / EVENTS.length) * 100) + "%";
     nextButton.textContent = event.critical ? "我已記住 000，繼續模擬" : state.index === EVENTS.length - 1 ? "查看第 30 天行動地圖" : "前往下一個情境";
-    feedbackTitle.setAttribute("tabindex", "-1");
-    feedbackTitle.focus();
+    if (shouldFocus) {
+      feedbackTitle.setAttribute("tabindex", "-1");
+      feedbackTitle.focus();
+    }
   };
 
-  var renderEvent = function () {
+  var choose = function (event, choice, choiceIndex) {
+    if (state.selectedChoice !== null) return;
+    applyDelta(choice.delta);
+    if (choice.tone === "danger") state.riskChoices += 1;
+    state.selectedChoice = choiceIndex;
+    updateStats();
+    showFeedback(event, choice, true);
+    saveProgress();
+  };
+
+  var renderEvent = function (shouldFocus) {
     var event = EVENTS[state.index];
     dayLabel.textContent = event.day;
     progressLabel.textContent = "情境 " + (state.index + 1) + " / " + EVENTS.length;
+    progress.setAttribute("aria-valuenow", String(state.index));
+    progressBar.style.width = ((state.index / EVENTS.length) * 100) + "%";
     eventTag.textContent = event.tag;
     eventTitle.textContent = event.title;
     eventStory.textContent = event.story;
@@ -319,11 +373,14 @@
       copy.appendChild(small);
       button.appendChild(marker);
       button.appendChild(copy);
-      button.addEventListener("click", function () { choose(event, choice); });
+      button.addEventListener("click", function () { choose(event, choice, index); });
       choicesWrap.appendChild(button);
     });
-    eventTitle.setAttribute("tabindex", "-1");
-    eventTitle.focus();
+    if (state.selectedChoice !== null) showFeedback(event, event.choices[state.selectedChoice], false);
+    if (shouldFocus !== false && state.selectedChoice === null) {
+      eventTitle.setAttribute("tabindex", "-1");
+      eventTitle.focus();
+    }
   };
 
   var actionCatalog = {
@@ -338,6 +395,23 @@
     income: ["cash", "work"],
     experience: ["wellbeing", "housing"],
     evidence: ["evidence"]
+  };
+  var goalNotes = {
+    safety: "把安全與退路寫成明確止損線",
+    income: "先確認現金跑道與可查證工作來源",
+    experience: "替生活體驗保留不被住宿與收入追著跑的空間",
+    evidence: "把工作證據從第一天就納入流程"
+  };
+
+  var updateProfileNote = function () {
+    var notes = [];
+    if (state.cash <= 3000) notes.push("先算 14 天必要支出");
+    if (state.housing <= 35) notes.push("先確保第一晚與可取消短住");
+    if (state.work <= 25) notes.push("先整理官方手續與工作查核清單");
+    if (state.wellbeing <= 48) notes.push("先設定報平安與緊急聯絡人");
+    if (state.evidence <= 40) notes.push("先建立工時、付款與文件的保存方式");
+    if (notes.length < 2) notes.push(goalNotes[state.goal]);
+    profileNote.textContent = "角色快照：你目前最值得先守住的是「" + notes.slice(0, 2).join("」與「") + "」。接下來的分數只代表模擬資源，不是適合度。";
   };
 
   var renderFinishStat = function (icon, label, value) {
@@ -358,7 +432,7 @@
     finishDashboard.appendChild(item);
   };
 
-  var finishSimulation = function () {
+  var finishSimulation = function (shouldFocus) {
     stage.hidden = true;
     finish.hidden = false;
     var riskText = state.riskChoices === 0
@@ -385,13 +459,16 @@
       li.appendChild(link);
       finishActions.appendChild(li);
     });
-    finish.scrollIntoView({ behavior: "smooth", block: "start" });
-    document.getElementById("finish-title").setAttribute("tabindex", "-1");
-    document.getElementById("finish-title").focus();
+    if (shouldFocus !== false) {
+      finish.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("finish-title").setAttribute("tabindex", "-1");
+      document.getElementById("finish-title").focus();
+    }
   };
 
   var resetSimulation = function () {
     state = null;
+    clearProgress();
     form.reset();
     stage.hidden = true;
     finish.hidden = true;
@@ -421,39 +498,47 @@
       evidence: { start: 20, basic: 40, ready: 68 }[readiness],
       goal: String(data.get("goal")),
       index: 0,
-      riskChoices: 0
+      riskChoices: 0,
+      selectedChoice: null,
+      finished: false
     };
-    var notes = [];
-    if (state.cash <= 3000) notes.push("先算 14 天必要支出");
-    if (state.housing <= 35) notes.push("先確保第一晚與可取消短住");
-    if (state.work <= 25) notes.push("先整理官方手續與工作查核清單");
-    if (state.wellbeing <= 48) notes.push("先設定報平安與緊急聯絡人");
-    if (state.evidence <= 40) notes.push("先建立工時、付款與文件的保存方式");
-    var goalNotes = {
-      safety: "把安全與退路寫成明確止損線",
-      income: "先確認現金跑道與可查證工作來源",
-      experience: "替生活體驗保留不被住宿與收入追著跑的空間",
-      evidence: "把工作證據從第一天就納入流程"
-    };
-    if (notes.length < 2) notes.push(goalNotes[state.goal]);
-    profileNote.textContent = "角色快照：你目前最值得先守住的是「" + notes.slice(0, 2).join("」與「") + "」。接下來的分數只代表模擬資源，不是適合度。";
+    updateProfileNote();
     profileSection.hidden = true;
     finish.hidden = true;
     stage.hidden = false;
     updateStats();
     renderEvent();
+    saveProgress();
     stage.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   nextButton.addEventListener("click", function () {
     if (state.index >= EVENTS.length - 1) {
+      state.finished = true;
+      saveProgress();
       finishSimulation();
       return;
     }
     state.index += 1;
+    state.selectedChoice = null;
+    saveProgress();
     renderEvent();
     document.getElementById("simulator-event").scrollIntoView({ behavior: "smooth", block: "start" });
   });
   document.getElementById("simulator-restart").addEventListener("click", resetSimulation);
   document.getElementById("simulator-restart-top").addEventListener("click", resetSimulation);
+
+  state = readProgress();
+  if (state) {
+    profileSection.hidden = true;
+    updateProfileNote();
+    updateStats();
+    if (state.finished) {
+      finishSimulation(false);
+    } else {
+      finish.hidden = true;
+      stage.hidden = false;
+      renderEvent(false);
+    }
+  }
 })();

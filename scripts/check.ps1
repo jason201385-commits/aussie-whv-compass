@@ -1482,7 +1482,7 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     'id="simulator-finish"',
     'id="simulator-progress"',
     'id="simulator-profile-note"',
-    '不儲存答案',
+    '不傳送答案',
     '不判定簽證資格',
     '遊戲分數只表示你在這段模擬中保留了多少資源',
     '若現實中有人嚴重受傷、呼吸困難、失去意識或處於立即危險',
@@ -1508,10 +1508,10 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     Write-Output 'FAIL [simulator.js] 必須維持 6 個固定事件'
     $errors++
   }
-  foreach ($simulatorScriptNeedle in @('var EVENTS = [', 'critical: true', '立即撥 000', 'state.riskChoices', 'goalKeys[state.goal]', 'slice(0, 3)', 'new FormData(form)', '重新整理或關閉分頁即清除')) {
+  foreach ($simulatorScriptNeedle in @('var EVENTS = [', 'critical: true', '立即撥 000', 'state.riskChoices', 'goalKeys[state.goal]', 'slice(0, 3)', 'new FormData(form)', 'whv-simulator-progress-v1', 'sessionStorage.setItem(progressKey', 'sessionStorage.removeItem(progressKey)', 'isValidState(saved.state)', 'state.selectedChoice !== null', 'showFeedback(event, event.choices[state.selectedChoice], false)', '遊戲進度只在目前分頁暫存', '從攻略回來或重新整理可繼續')) {
     if (-not ($simulatorScript + "`n" + $simulatorText).Contains($simulatorScriptNeedle)) { Write-Output "FAIL [simulator.js] 缺固定事件或結果邊界：$simulatorScriptNeedle"; $errors++ }
   }
-  foreach ($simulatorForbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest', 'navigator.sendBeacon', '成功率：', '簽證資格：')) {
+  foreach ($simulatorForbidden in @('localStorage', 'fetch(', 'XMLHttpRequest', 'navigator.sendBeacon', '成功率：', '簽證資格：')) {
     if ($simulatorScript.Contains($simulatorForbidden)) { Write-Output "FAIL [simulator.js] 不得保存、傳送或輸出現實判定：$simulatorForbidden"; $errors++ }
   }
   if (-not $i18nSwitcherText.Contains('"simulator":{"zh-Hant":"/simulator.html"}')) {
