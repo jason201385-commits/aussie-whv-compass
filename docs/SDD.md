@@ -1,12 +1,14 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 1.0｜2026-08-29｜本文件與 `docs/SPEC.md` 為一組交接文件，
+> 版本 1.1｜2026-08-30｜本文件與 `docs/SPEC.md` 為一組交接文件，
 > 供任何後續開發者（人類或 AI agent）在不遺失設計決策脈絡的前提下繼續開發。
 
 ## 1. 專案概述
 
-**澳打指南針（Aussie WHV Compass）**：給台灣背包客的澳洲打工度假（subclass 417）
-一站式開源攻略。正式網址 `https://www.aussiewhvcompass.com/`（裸網域自動導向 `www`），
+**澳打指南針（Aussie WHV Compass）**：以台灣打工度假者為繁中維護基準，逐步擴充至
+所有目前可申請澳洲 Working Holiday／Work and Holiday 的護照使用者的一站式開源攻略。
+核心定位是：「我們想成為對打工度假者最友善的網站——不替你草率做決定，而是幫你
+看懂選項、查到依據，找到適合自己的下一步。」正式網址 `https://www.aussiewhvcompass.com/`（裸網域自動導向 `www`），
 儲存庫 `github.com/jason201385-commits/aussie-whv-compass`。
 
 ### 1.1 不可協商的原則（任何後續開發不得違反）
@@ -18,18 +20,21 @@
    「未查證／以官方為準」，不填看起來自信的舊數字。
 3. **防詐騙頁只講手法不列黑名單**：不點名任何具體公司、農場、仲介、個人。
 4. **禁用 emoji**：所有圖示一律用內嵌 SVG（見 §4.4）。站長明確指示。
-5. **無後端、不收集使用者輸入**：純靜態站；工作表、清單、試算、搜尋與需求單內容
-   不上傳。可選 GA4 只有在正式設定且訪客同意後才載入，僅量測頁面與固定摘要，不接廣告。
+5. **資料最小化、敏感行為不追蹤**：工作表、清單、試算與搜尋維持只在本機；第一階段
+   不啟用 GA4、第三方 pixel、session replay 或跨頁識別。獲准的最小後端只可處理私人需求單、
+   確認信、刪除申請與無個人識別的 D+ 聚合計數，不得把 CRM 與瀏覽行為連結。
 6. **能點選就不打字**：互動工具優先提供快選籤（chips）、滑桿、下拉選單。
 7. **不做簽證或移民代辦**：站長不是澳洲註冊移民代理或澳洲執業律師；不論是否收費，
    都不得提供個人簽證選項建議、準備或代填申請、代表申請人處理簽證事項。可連到 OMARA
    官方名冊與中立轉介；目前沒有指定合作代理或佣金轉介。若未來有特定商業轉介，必須在連結
    旁明示關係；是否收取轉介費須先完成法律與稅務確認，確認前不得啟用，且未經使用者同意不得傳送其資料。
+8. **先解決問題再談支持**：贊助、Buy Me a Coffee 與合作入口放在使用者取得下一步之後，
+   不影響內容完整度、官方出口、排序或風險揭露。
 
 ## 2. 系統架構
 
-- **形態**：純靜態 HTML/CSS/JS，**零框架、零建置步驟**——刻意選擇，讓不會寫程式的
-  貢獻者也能改內容。不得引入 npm/bundler/framework，除非站長明示改變方針。
+- **公開前端形態**：純靜態 HTML/CSS/JS，**零框架、零建置步驟**——刻意選擇，讓不會寫程式的
+  貢獻者也能改內容。已批准的 Worker 必須放在獨立目錄、保持無框架，不得迫使內容頁經過 bundler。
 - **部署**：GitHub Pages（main 分支根目錄，legacy build），`CNAME` 固定為
   `www.aussiewhvcompass.com`。Cloudflare DNS 的 `www` CNAME 直接指向
   `jason201385-commits.github.io`，裸網域以 GitHub Pages 官方 A／AAAA 記錄接入並
@@ -38,8 +43,9 @@
 - **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。全站本機 CSS／JS／資料檔
   共用同一個 `?v=` 版本查詢碼；任何這些資產異動時，push 前必須全站同步升版。
   驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
-- **外部依賴**：Google Fonts（Noto Sans TC、Noto Serif TC）；GA4 正式設定且訪客同意後，
-  才會載入 `googletagmanager.com`。其餘全部自含。
+- **外部依賴**：現行前端只有 Google Fonts。GA4 程式保留但 ID 為空，第一階段不得啟用。
+  目標後端使用 Cloudflare Worker、D1、Turnstile 與可替換交易信服務；正式資源尚未完成 P0 前，
+  不得把本機 mock 或設定範本描述成已上線。
 
 ### 2.1 檔案地圖
 
@@ -57,7 +63,7 @@
 | `health.html` | 保險就醫心理安全 |
 | `leave.html` | 報稅退休金離澳＋**DASP 速算**＋**本機離澳收尾清單** |
 | `pr.html` | PR 路徑總覽 |
-| `about.html` | 關於、免費公開內容與付費合作界線、私人 Email／本地需求單、公開 GitHub 合作入口、贊助（按鈕待站長提供連結）、授權、免責 |
+| `about.html` | 關於、免費公開內容與付費合作界線、私人 Email／需求單、公開 GitHub 合作入口、贊助（按鈕待站長提供連結）、授權、免責 |
 | `404.html` | 自訂錯誤復原頁：保留 noindex，導回最近閱讀、卡關捷徑與四階段旅程 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
@@ -82,6 +88,7 @@
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
 | `lang/en/health/index.html` | 完整英文健康安全 editorial beta：跨護照 Medicare／RHCA 分流、訪客保險查核、就醫層級、藥品、職災、心理健康、暴力支援、偏遠工作與緊急聯絡；未經母語澳洲 healthcare、insurance、mental-health、violence-support 或 workplace-safety 專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |
+| `worker/`（規劃中） | 獨立無框架 Worker、D1 migrations、Turnstile server-side validation、交易信介面與自動測試；不得包含正式 secret |
 
 ### 2.2 頁面共同結構
 
@@ -95,10 +102,13 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - 兩個 IIFE（`main.js` 全站、`tools.js` 工具頁），無模組系統。
 - **特徵偵測模式**：每個功能塊以 `document.getElementById(...)` 判斷是否在該頁，
   不存在就跳過——tools.js 可安全掛在任何頁。
-- **私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字；使用者可選 Gmail web compose、
+- **現行私人需求單**：`about.html #contact-brief` 只在 DOM 內組合純文字；使用者可選 Gmail web compose、
   `mailto:` 或複製文字，不建立 localStorage key、不呼叫 fetch、不自動寄信。產生預覽時內容仍只在本頁，
   使用者主動點寄信入口後才交給所選服務；所有收件者、主旨與內文參數必須 `encodeURIComponent`。
   clipboard 不可用時只選取預覽文字，不得誤報已複製。
+- **目標私人需求單**：P1-8／P1-9 完成後改由同站表單送至 Worker；成功必須以後端回執為準，
+  顯示案件編號並寄交易型確認信，同時保留「複製需求單」備援。不得只因前端 `fetch` resolve
+  就誤報寄信成功；寄信、D1 寫入與重試的狀態需可分辨。
 - **站內搜尋**：`main.js` 注入全站 dialog 與 header 入口，首次開啟才載入
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
@@ -109,7 +119,8 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `english-fallback` 必須直接顯示英文，不可為了湊數生成不可信低資源語言。完整英文頁採
   `lang/en/<topic>/`；台灣限定內容必須改寫成護照中立分流，且互動工具若只支援單一 subclass，
   必須在輸入前、結果中與官方來源旁重複明示限制。
-- **GA4 邊界**：`analytics-config.js` 的 ID 未符合 `G-[A-Z0-9]+` 時立即停用；符合時也先等
+- **GA4 保留邊界**：第一階段 `analytics-config.js` 必須維持空 ID。若未來重新批准，ID 未符合
+  `G-[A-Z0-9]+` 時立即停用；符合時也先等
   `whv-analytics-consent-v1=granted`，才建立 `dataLayer` 與載入 Google tag。廣告儲存、廣告
   使用者資料、廣告個人化與 Google Signals 一律關閉。page location 主動移除 query／hash；
   `whv:search` 事件只接收白名單頁名與 0–200 結果數，不得加入原始查詢字詞。
@@ -128,6 +139,18 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - SVG sprite 由 main.js 注入 `<body>` 開頭；頁面以
   `<svg class="icon"><use href="#i-名稱"/></svg>` 引用。**JS 未載入時圖示不顯示**，
   屬已接受的取捨（工具本來就需要 JS）。
+
+### 3.1 已批准的最小後端資料契約（尚未實作）
+
+- **邊界**：GitHub Pages 繼續提供內容；Worker 只提供表單、查閱／更正／刪除申請、交易信與 D+。
+- **CRM 必填**：聯絡 Email、需求類型、需求說明；姓名／組織、希望時程、預算區間選填。
+- **禁止欄位**：護照、簽證文件、健康／醫療、銀行／卡號、帳密、第三人個資、未公開客戶資料。
+- **保存**：一般詢問與未成交需求以結案或最後聯絡時間為基準，24 個月後由排程刪除；
+  正式合約、付款或依法另需保存的資料不得混用同一 retention class。
+- **確認**：成功回應包含不可推測的案件編號與伺服器時間；自動信只做交易通知，不訂閱行銷。
+- **D+**：只接受白名單 counter key，以日期彙總；不得建立事件列、client ID、cookie、fingerprint，
+  不得保存 IP、User-Agent、referrer、query、自由文字或精細地理位置。
+- **安全**：Turnstile token 必須 server-side 驗證；輸入長度、CORS origin、rate limit 與 SQL 皆採白名單／prepared statement。
 
 ## 4. 設計系統：「簡約檸檬布紋」
 
@@ -160,6 +183,10 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 
 - **卡片**：1px 柔和線＋擴散陰影＋黃綠頂邊布標；hover 只上移，**本體不旋轉**。
 - **按鈕**：彈簧曲線 `cubic-bezier(.34,1.56,.64,1)`，active 全壓平（陰影歸零）。
+- **分層證據卡**：先顯示白話下一步，再顯示理由；來源機構、查核日期、翻譯／編輯狀態常駐，
+  完整依據可展開。過期高風險內容標「待重新確認」並保留官方出口，不得只隱藏舊內容。
+- **圖文**：流程圖、選項圖與風險圖延續檸檬布紋；圖像不能成為唯一資訊來源，裝飾圖使用空 alt，
+  資訊圖提供等義文字或可理解的替代文字。
 - **h2**：flex 對齊＋檸檬黃有機色塊 `::before`（以 `nth-of-type(3n)` 微調形狀）。
 - **select**：`appearance:none`＋自訂 SVG 箭頭（深淺色各一組 data-URI）。
 - **布紋與圖樣**：`body` 以 CSS 直條紋疊本地 `lemon-pattern.svg`；內容頁再覆一層

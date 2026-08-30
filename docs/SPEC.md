@@ -1,6 +1,6 @@
 # 澳打指南針 — 功能規格與待辦（SPEC）
 
-> 版本 1.0｜2026-08-29｜搭配 `docs/SDD.md` 閱讀。
+> 版本 1.1｜2026-08-30｜搭配 `docs/SDD.md` 閱讀。
 > 本文件是交給任何後續執行者（codex／其他 agent／人類貢獻者）的工作規格：
 > §1–§3 描述現況（已完成、驗收過），§4 是 P0 人工前置與待辦，§5 記錄 P1 實作狀態與 P2 backlog，
 > §6 是每次改動後必跑的驗收程序，§7 是例行維護。
@@ -10,6 +10,9 @@
 - 遵守 SDD §1.1 不可協商原則；違反任一條的 PR 不收。
 - **只有站長本人**能做的事（agent 不得代辦，規格上視為人工前置條件）：
   註冊任何帳號、輸入身分證件／銀行帳戶／密碼／OTP、金流設定、發布社群貼文。
+- Cloudflare Worker／D1／Turnstile／Email Sending 的帳號啟用、方案或付款、網域驗證、
+  secret 輸入與正式資源建立同樣屬人工前置；agent 只能在 repo 內準備程式、migration、
+  設定範本與本機測試，不得把憑證寫入檔案、log 或 commit。
 - Agent 可以做：讀寫此 repo、commit、push（站長已授權此 repo 的部署流程）、
   跑驗收腳本、開 draft 內容。對外部服務的任何寫入操作都要先問站長。
 - 內容修改必須維持語言一致的來源標註格式：根層繁中頁使用
@@ -84,9 +87,13 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 - `scripts/build_seo.py --check` 驗證所有產物與頁面同步；修改 title、description 或頁面清單後
   先重跑 builder，再跑本文件 §6。
 
-### 1.5 GA4 量測架構（程式完成，正式 ID 尚待人工前置）
+### 1.5 量測架構（GA4 程式保留停用；第一階段改採 D+）
 
 - `analytics-config.js` 的 Measurement ID 目前為空字串，正式站不會載入 Google Analytics。
+- 2026-08-30 決策：第一階段不啟用 GA4、第三方 pixel、session replay 或跨頁識別碼；
+  改採 D+ 聚合量測＋自願任務測試。D+ 只允許日期、粗略頁面／出口類別與聚合計數，
+  不保存 IP、User-Agent、referrer、搜尋原文、表單內容或可連結個人的事件列。
+- 詐騙、健康、剝削等敏感頁面即使未來啟用 GA4，也不得做個人層級行為量測。
 - 設定有效 `G-...` ID 後，仍採 Basic Consent：未選擇或拒絕時不建立 Google tag request；
   同意後才載入。選擇只存 `whv-analytics-consent-v1`，頁尾可重開設定。
 - 不設定 User-ID；停用廣告儲存／個人化與 Google Signals；page view 移除 URL query／hash。
@@ -97,17 +104,24 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 ## 2. 內容規範
 
 1. 事實三級標示（SDD §7）；社群經驗必標「社群通報模式／非官方」。
-2. 防詐內容：只描述手法、紅旗、自保、救濟管道；**不點名**任何具體對象。
-3. 語氣：短段落、講人話、誠實優先（「查不到」比假自信好）；比喻與幽默可以，
+2. 網站定位句固定為：「我們想成為對打工度假者最友善的網站——不替你草率做決定，
+   而是幫你看懂選項、查到依據，找到適合自己的下一步。」這是維護目標，不得改寫成
+   已被證明的自我宣稱。
+3. 重要內容採「下一步 → 為什麼 → 官方依據」分層證據卡；顯示來源機構、查核日期、
+   翻譯／編輯狀態與官方連結。圖片只輔助流程、選項與風險，關鍵資訊不得只靠圖片傳達。
+4. 防詐內容：只描述手法、紅旗、自保、救濟管道；**不點名**任何具體對象。
+5. 語氣：短段落、講人話、誠實優先（「查不到」比假自信好）；比喻與幽默可以，
    但嚴肅主題（心理健康、性騷擾、死亡風險）不開玩笑。
-4. 金流用語一律「贊助／支持」，不用「募款／捐款」（台灣公益勸募條例考量）。
-5. 商業內容一律明示關係；不得讓付費影響官方事實、風險揭露、推薦排序或負面資訊的保留。
-6. 新數字必附：官方連結＋查核日期；並評估是否列入 §7 年度更新清單。
+6. 金流用語一律「贊助／支持」，不用「募款／捐款」（台灣公益勸募條例考量）。
+7. 商業內容一律明示關係；不得讓付費影響官方事實、風險揭露、推薦排序或負面資訊的保留。
+8. 新數字必附：官方連結＋查核日期；並評估是否列入 §7 年度更新清單。
 
 ## 3. 相依與整合點
 
-- GitHub Pages（部署）、Google Fonts（唯一外部資產）、GitHub Issues（回饋）。
-- 無任何 API key／secret；repo 內不得出現憑證。
+- 現況：GitHub Pages（公開前端部署）、Google Fonts（唯一前端外部資產）、GitHub Issues（公開回饋）。
+- 已批准的最小後端目標：Cloudflare Worker（API）、D1（CRM 與聚合計數）、Turnstile
+  （表單防濫用）與可替換的交易信服務。Email Sending 正式可用前必須通過 P0-4。
+- repo 內不得出現 API key／secret；前端不得包含 D1、Turnstile secret 或寄信憑證。
 
 ## 4. 待辦 Backlog — P0（下一步就做）
 
@@ -136,14 +150,23 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 `www` CNAME 直接指向 `jason201385-commits.github.io`，不得使用 wildcard DNS。
 Pages 設定 enforce HTTPS；每頁 canonical／`og:url` 與 Issue Template 首頁連結使用正式網域。
 
-### P0-3 GA4 與 Search Console（人工前置：站長登入 Google 後執行）
+### P0-3 Search Console（GA4 第一階段暫不啟用）
 
-前置條件：站長本人建立 GA4 Property／Web data stream，提供公開的 `G-...` Measurement ID；
-並由站長本人完成 Search Console Domain property 的 DNS 驗證與 sitemap 提交。
+前置條件：站長本人完成 Search Console Domain property 的 DNS 驗證與 sitemap 提交。
+GA4 Property／Web data stream 不再是第一階段必要條件；除非未來重新通過資料用途、維護能力、
+流量與敏感頁排除等 gate，`analytics-config.js` 必須維持空 ID。
 
-Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、commit／push；不得代辦帳號
-註冊、密碼／OTP、Google 權限或 DNS 驗證碼。部署後由站長同意統計並在 Realtime 確認收件，
-才能把「GA 正式啟用」標為完成；只有程式與空 ID 不算正式量測證據。
+Agent 不得代辦帳號註冊、密碼／OTP、Google 權限或 DNS 驗證碼。Search Console 完成必須有
+正式 property 與 sitemap 成功狀態證據；只有 repo 內文件或 meta 不算完成。
+
+### P0-4 Cloudflare 最小後端（人工前置）
+
+前置條件：站長本人啟用或建立 Worker、D1、Turnstile 與寄信所需方案／網域資格，並在
+Cloudflare 受保護設定中輸入 secrets。Email Sending 若仍為 Beta 或方案不符，不得假設可用；
+Worker 的寄信介面必須可替換，正式採用前需以受控地址完成 deliverability 與退信測試。
+
+Agent 可先完成本機 Worker、D1 migrations、Turnstile server-side validation、mock mail transport
+與測試；沒有正式資源、綁定與成功回執前只能標為「程式完成／本機驗證」，不得標為已上線。
 
 ## 5. P1 實作狀態／P2 Backlog
 
@@ -176,6 +199,57 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 
 現況：首頁檸檬／切片 SVG 形變與捲動視差已上線；`prefers-reduced-motion` 或 640px 以下停用，
 桌機載入動畫不循環。
+
+### P1-4 友善首頁快速分流 — 已批准、待實作
+
+- hero 緊接定位句；先顯示緊急／安全／期限出口，再以旅程階段分組呈現所有主要問題卡。
+- 問題卡採「類別＋真實情境」；站內搜尋是第二入口，輕量引導問題是第三入口，AI 只可作 fallback。
+- 一般情境先給立即安全行動；只有路徑或風險會改變時才先問 1–2 個必要問題。
+- 主要驗收：新訪客可在 30 秒內找到正確情境與第一個安全下一步；桌機／390px／no-JS 可用。
+
+### P1-5 分層證據卡與內容狀態 — 已批准、待實作
+
+- 元件固定呈現白話下一步、理由、來源機構、查核日期、翻譯／編輯狀態與官方連結。
+- 先套用簽證、薪資稅務、健康、安全、詐騙；過期時明示「待重新確認」且保留官方出口。
+- 不大量複製官方原文；來源連結必須直接支撐相鄰主張。
+
+### P1-6 簡約檸檬圖文系統 — 已批准、待實作
+
+- 延續淡藍條紋、檸檬黃、灰綠葉與簡單手繪感，優先使用流程圖、選項圖與風險提示圖。
+- 實景照片只用於辨識地點、環境或物品；所有資訊圖需有等義文字與適當替代文字。
+
+### P1-7 SEO、AI 探索與內容權利 — 已批准、待實作
+
+- 開放搜尋引擎與 AI 發現、索引及合理引用；提供 sitemap、JSON-LD、來源與內容狀態。
+- 保留網站內容權利，要求引用標示出處；不允許爬取表單、CRM、個資、管理端或冒名整站重製。
+
+### P1-8 Cloudflare Worker／D1 基礎 — 已批准、待 P0-4
+
+- 前端仍由 GitHub Pages 提供；後端獨立為無框架 Worker，僅承接需求單、確認信、刪除申請與 D+。
+- D1 migrations、prepared statements、CORS 白名單、輸入長度限制、Turnstile server-side validation、
+  rate limit 與 mock transport 必須有自動測試；secret 不得進 repo。
+
+### P1-9 私人需求單與 CRM — 已批准、待 P1-8
+
+- 必填聯絡 Email、需求類型、需求說明；姓名／組織、時程、預算區間選填。
+- 明示不得提交護照、簽證、健康、金融、帳密、第三人或未公開客戶資料。
+- 成功時顯示案件編號與時間，寄出不含行銷的需求摘要確認信，並提供複製備援；
+  通常 3–5 個工作天回覆，但不代表接受委託或契約成立。
+- 一般詢問與未成交需求於結案或最後聯絡後 24 個月刪除；提供查閱、更正、刪除申請。
+  正式合約、付款或依法另需保存的資料使用不同分類與規則。
+
+### P1-10 D+ 聚合量測 — 已批准、待 P1-8
+
+- 不建立 client ID、cookie、fingerprint 或跨頁識別；只累加日期＋白名單類別的聚合 counter。
+- 不接收 query、自由文字、表單內容、IP、User-Agent、referrer 或精細地理位置。
+- 搭配自願任務測試評估 30 秒找路、理解依據與正確求助；任務研究資料另做同意、去識別與保存管理。
+
+### P1-11 商業合作與第三方入口治理 — 已批准、待實作
+
+- 一般服務與受監管／高風險服務分級；自然排序依公開標準，贊助版位獨立標示且不能購買第一推薦。
+- 上架前公開查核公司／資格、服務費用、投訴管道、商業關係與查核日期；通過不等於保證品質。
+- 一般爭議標示複查中並暫停推薦；涉及安全、詐騙或資格失效立即下架，保留更正紀錄。
+- LINE 群只出現在生活交流區，標為第三方社群；本站沒有管理權，不作高風險支援或專業轉介。
 
 ### P2-1 雙主題「Red Centre／Coast」切換（評審提案 C，不含音效）
 
