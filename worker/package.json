@@ -1,0 +1,21 @@
+{
+  "name": "aussie-whv-compass-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "types": "wrangler types",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "build:dry-run": "wrangler deploy --dry-run --outdir dist",
+    "check": "npm run types && npm run typecheck && npm test && npm run db:migrate:local && npm run build:dry-run"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.1.2",
+    "@types/node": "latest",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11",
+    "wrangler": "4.127.1"
+  }
+}

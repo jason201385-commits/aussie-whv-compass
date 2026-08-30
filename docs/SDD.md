@@ -89,7 +89,7 @@
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
 | `lang/en/health/index.html` | 完整英文健康安全 editorial beta：跨護照 Medicare／RHCA 分流、訪客保險查核、就醫層級、藥品、職災、心理健康、暴力支援、偏遠工作與緊急聯絡；未經母語澳洲 healthcare、insurance、mental-health、violence-support 或 workplace-safety 專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |
-| `worker/`（規劃中） | 獨立無框架 Worker、D1 migrations、Turnstile server-side validation、交易信介面與自動測試；不得包含正式 secret |
+| `worker/` | 獨立無框架 Worker 本機骨架：D1 migrations、CORS／body 上限、Turnstile server-side validation、HMAC 限流鍵、prepared-statement repositories、可替換交易信介面與 Workers runtime 測試；正式資源與 secret 仍待 P0-4 |
 
 ### 2.2 頁面共同結構
 
@@ -141,7 +141,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `<svg class="icon"><use href="#i-名稱"/></svg>` 引用。**JS 未載入時圖示不顯示**，
   屬已接受的取捨（工具本來就需要 JS）。
 
-### 3.1 已批准的最小後端資料契約（尚未實作）
+### 3.1 已批准的最小後端資料契約（基礎已本機實作）
 
 - **邊界**：GitHub Pages 繼續提供內容；Worker 只提供表單、查閱／更正／刪除申請、交易信與 D+。
 - **CRM 必填**：聯絡 Email、需求類型、需求說明；姓名／組織、希望時程、預算區間選填。
@@ -152,6 +152,13 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - **D+**：只接受白名單 counter key，以日期彙總；不得建立事件列、client ID、cookie、fingerprint，
   不得保存 IP、User-Agent、referrer、query、自由文字或精細地理位置。
 - **安全**：Turnstile token 必須 server-side 驗證；輸入長度、CORS origin、rate limit 與 SQL 皆採白名單／prepared statement。
+
+2026-08-30 的 P1-8 本機基礎：`worker/src/` 已拆分 HTTP/CORS、bounded JSON、Turnstile、
+HMAC rate-limit key、D1 repository 與 mail transport；`0001_initial.sql` 建立一般詢問、管理 token、
+mail outbox 與日期聚合 counter。原始 IP 不寫入 D1；原始 Email 不拿來當 rate-limit binding key，
+而由只存在 Worker secret 的 HMAC 產生不透明 key。Cloudflare Rate Limiting 是 edge-local、最終一致，
+只作防濫用，不作帳務或完成證據。正式 D1 ID 仍是全零阻擋值，API 目前只提供標示
+`local-scaffold` 的 health route；需求單路由、確認／刪除流程與真實寄信分別留給 P1-9 與 P0-4 gate。
 
 ## 4. 設計系統：「簡約檸檬布紋」
 

@@ -18,7 +18,7 @@
 代表處理簽證申請。需要個案協助時，讀者應從 OMARA 官方名冊自行選擇合格專業人士。目前
 沒有指定合作代理或佣金轉介；若未來建立商業轉介，會在連結旁揭露，並在法律與稅務確認前不啟用轉介費。
 
-## 互動工具（純前端、無後端、不上傳填寫內容）
+## 現行互動工具（純前端、不上傳填寫內容）
 
 - **集簽資格快查器**（visa.html）：郵遞區號＋工作類型 → 是否可計入二簽/三簽。
   資料檔 `assets/postcodes.js` 抓取自內政部 specified-work 官方頁（2026-08-29），
@@ -55,6 +55,13 @@ GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連�
 站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；
 即使啟用，訪客未同意前仍不載入 Google tag，搜尋字詞與表單內容不會送往 GA。
 
+## Cloudflare 後端狀態
+
+`worker/` 已有獨立無框架 Worker、本機 D1 migration、CORS 白名單、16 KiB JSON 上限、
+Turnstile server-side validation、HMAC 化限流鍵、prepared statements 與可替換的 mock mail transport。
+這些項目目前只有程式與本機測試證據；Cloudflare Worker、D1、Turnstile、寄信資源及 secrets 尚未完成
+P0-4 人工前置，因此 API 沒有部署，現行私人需求單仍只在瀏覽器內產生 Email／複製備援。
+
 ## 搜尋引擎與 AI 探索
 
 - 13 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
@@ -66,20 +73,23 @@ GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連�
 
 - [docs/SDD.md](docs/SDD.md) — 系統設計文件：架構、設計系統、資料檔、重要教訓
 - [docs/SPEC.md](docs/SPEC.md) — 功能規格：現況基線、待辦 backlog（P0–P2）、驗收程序、例行維護
-- `scripts/check.ps1` — 驗收腳本（結構、連結、錨點、emoji 掃描），push 前必跑
+- `scripts/check.ps1` — 驗收腳本（靜態站結構、連結、錨點、emoji 與 Worker 本機測試），push 前必跑
 - 修改內容標題或段落錨點後，先跑 `python scripts/build_search.py` 更新搜尋索引。
+- 第一次驗證 Worker 前先在 `worker/` 執行 `npm ci`；之後根目錄的 `scripts/check.ps1` 會連同
+  types、Vitest、D1 local migration 與 Wrangler dry-run 一起驗收。
 
 ## 專案原則
 
 1. **每個重要數字都要附官方來源與「最後更新」日期。** 頁面裡用
    `<span class="updated-tag">2026-08 查核</span>` 與 `.fact-meta` 標示。
 2. **誠實優先於完整。** 查不到就寫「請以官方為準」，不填看起來很有自信的舊數字。
-3. **簡單優於華麗。** 純靜態 HTML/CSS/JS，沒有框架、沒有建置步驟，
-   不會寫程式的人也能看懂並修改內容。
+3. **簡單優於華麗。** 公開內容維持純靜態 HTML/CSS/JS、沒有框架或前端建置步驟；
+   安全表單後端放在獨立的無框架 `worker/`，不迫使內容貢獻者安裝工具鏈。
 
 ## 本地預覽
 
 直接用瀏覽器打開 `index.html` 即可，不需要任何安裝。
+後端本機驗證方式與正式啟用 gate 見 [`worker/README.md`](worker/README.md)。
 
 ## 部署（GitHub Pages，免費）
 

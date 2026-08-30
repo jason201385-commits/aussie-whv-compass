@@ -1,3 +1,11 @@
 .playwright-mcp/
 __pycache__/
 *.pyc
+worker/node_modules/
+worker/.wrangler/
+worker/dist/
+worker/worker-configuration.d.ts
+worker/.dev.vars
+worker/.env
+worker/.env.*
+!worker/.dev.vars.example

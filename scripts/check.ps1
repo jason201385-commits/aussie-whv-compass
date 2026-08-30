@@ -1757,6 +1757,74 @@ if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains
   $errors++
 }
 
+# Cloudflare 後端必須維持獨立、本機可重播，而且遠端 P0-4 未完成時要以不可部署佔位值 fail closed。
+$workerDir = Join-Path $dir 'worker'
+$workerRequired = @(
+  'package.json',
+  'package-lock.json',
+  'wrangler.jsonc',
+  'migrations\0001_initial.sql',
+  'src\index.ts',
+  'src\body.ts',
+  'src\cors.ts',
+  'src\turnstile.ts',
+  'src\rate-limit.ts',
+  'src\repository.ts',
+  'src\mail.ts',
+  'test\http.test.ts',
+  'test\security.test.ts',
+  'test\repository.test.ts',
+  'test\mail.test.ts'
+)
+foreach ($workerFile in $workerRequired) {
+  if (-not (Test-Path (Join-Path $workerDir $workerFile))) {
+    Write-Output "FAIL [worker] 缺本機後端檔案：$workerFile"
+    $errors++
+  }
+}
+if (Test-Path (Join-Path $workerDir 'wrangler.jsonc')) {
+  $workerConfig = [System.IO.File]::ReadAllText((Join-Path $workerDir 'wrangler.jsonc'), [System.Text.Encoding]::UTF8)
+  foreach ($workerConfigNeedle in @(
+    '"workers_dev": false',
+    '"preview_urls": false',
+    '"database_id": "00000000-0000-0000-0000-000000000000"',
+    '"name": "CONTACT_RATE_LIMITER"',
+    '"TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2"'
+  )) {
+    if (-not $workerConfig.Contains($workerConfigNeedle)) {
+      Write-Output "FAIL [worker/wrangler.jsonc] 缺本機安全界線：$workerConfigNeedle"
+      $errors++
+    }
+  }
+}
+$trackedSecretFiles = Get-ChildItem $workerDir -Recurse -File | Where-Object {
+  $_.FullName -notmatch '[\\/](node_modules|\.wrangler|dist)[\\/]' -and
+  $_.Name -notin @('.dev.vars.example', 'package-lock.json', 'worker-configuration.d.ts')
+}
+foreach ($trackedSecretFile in $trackedSecretFiles) {
+  $trackedSecretText = [System.IO.File]::ReadAllText($trackedSecretFile.FullName, [System.Text.Encoding]::UTF8)
+  if ($trackedSecretText -match '(?im)^\s*(TURNSTILE_SECRET_KEY|RATE_LIMIT_HMAC_KEY)\s*=\s*\S+') {
+    Write-Output "FAIL [worker] secret 不得寫入 repo：$($trackedSecretFile.Name)"
+    $errors++
+  }
+}
+$workerNodeModules = Join-Path $workerDir 'node_modules'
+if (-not (Test-Path $workerNodeModules)) {
+  Write-Output 'FAIL [worker] 尚未安裝鎖定依賴；請先在 worker 執行 npm ci'
+  $errors++
+} else {
+  Push-Location $workerDir
+  try {
+    & npm.cmd run check
+    if ($LASTEXITCODE -ne 0) {
+      Write-Output 'FAIL [worker] TypeScript／Vitest／D1 local migration／Wrangler dry-run 未通過'
+      $errors++
+    }
+  } finally {
+    Pop-Location
+  }
+}
+
 Write-Output ("-" * 40)
 if ($errors -eq 0) { Write-Output "ALL CHECKS PASSED ($($pages.Count) pages)"; exit 0 }
 else { Write-Output "$errors ERROR(S)"; exit 1 }

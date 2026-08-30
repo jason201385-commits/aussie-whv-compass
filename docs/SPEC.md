@@ -242,11 +242,18 @@ JSON-LD、`llms.txt` 與帶版本的 `content-status.json` discovery link。`con
 13 個繁中主頁、7 個完整英文頁、37 個 Quick Start locale 的風險、編輯與審校狀態；
 `crawler-policy.txt` 與 `robots.txt` 開放公開內容，同時排除表單 API、CRM、確認、收據與刪除端點。
 
-### P1-8 Cloudflare Worker／D1 基礎 — 已批准、待 P0-4
+### P1-8 Cloudflare Worker／D1 基礎 — 程式完成／本機驗證，正式仍待 P0-4
 
 - 前端仍由 GitHub Pages 提供；後端獨立為無框架 Worker，僅承接需求單、確認信、刪除申請與 D+。
 - D1 migrations、prepared statements、CORS 白名單、輸入長度限制、Turnstile server-side validation、
   rate limit 與 mock transport 必須有自動測試；secret 不得進 repo。
+
+2026-08-30 本機證據：獨立 `worker/` 使用 Wrangler 4.127.1、Workers runtime Vitest plugin 與
+TypeScript；14 項測試涵蓋 CORS、16 KiB JSON 上限、Turnstile token／hostname／action、以 server secret
+HMAC 化的 Email 限流鍵、D1 migration／prepared statements、白名單 D+ counter 與不對外寄送的
+mock mail。`wrangler d1 migrations apply DB --local` 與 `wrangler deploy --dry-run` 通過；設定中的
+D1 ID 是不可部署的全零佔位值，`workers_dev`／preview URL 關閉，沒有建立遠端資源、輸入 secret、
+寄信或部署。P1-9 的公開表單端點與前端切換尚未完成，現行 Email／複製流程維持不變。
 
 ### P1-9 私人需求單與 CRM — 已批准、待 P1-8
 
