@@ -241,39 +241,71 @@
     var hours = document.getElementById("calc-hours");
     var city = document.getElementById("calc-city");
     var life = document.getElementById("calc-life");
+    var calcEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+    var incomeWeeks = 46;
+    var expenseWeeks = 52;
     var CALC_KEY = "whv-save-calc-v1";
     try {
       var savedCalc = JSON.parse(localStorage.getItem(CALC_KEY) || "null");
       if (savedCalc) {
-        if (Number(savedCalc.rate) >= 24 && Number(savedCalc.rate) <= 45) rate.value = savedCalc.rate;
-        if (Number(savedCalc.hours) >= 0 && Number(savedCalc.hours) <= 50) hours.value = savedCalc.hours;
+        if (Number(savedCalc.rate) >= Number(rate.min) && Number(savedCalc.rate) <= Number(rate.max)) rate.value = savedCalc.rate;
+        if (Number(savedCalc.hours) >= Number(hours.min) && Number(savedCalc.hours) <= Number(hours.max)) hours.value = savedCalc.hours;
         if (Array.prototype.some.call(city.options, function (o) { return o.value === String(savedCalc.city); })) city.value = savedCalc.city;
         if (Array.prototype.some.call(life.options, function (o) { return o.value === String(savedCalc.life); })) life.value = savedCalc.life;
       }
     } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
+    var whmAnnualTax = function (income) {
+      if (income <= 45000) return income * 0.15;
+      if (income <= 135000) return 6750 + (income - 45000) * 0.30;
+      if (income <= 190000) return 33750 + (income - 135000) * 0.37;
+      return 54100 + (income - 190000) * 0.45;
+    };
     var update = function () {
       var r = parseFloat(rate.value), h = parseFloat(hours.value);
       document.getElementById("calc-rate-out").textContent = "$" + r.toFixed(2);
-      document.getElementById("calc-hours-out").textContent = h + " 小時";
+      document.getElementById("calc-hours-out").textContent = h + (calcEnglish ? " hours" : " 小時");
       var gross = r * h;
-      var net = gross * 0.85; // WHM 15%（$45,000 以下級距）
+      var annualGross = gross * incomeWeeks;
+      var annualTax = whmAnnualTax(annualGross);
+      var annualAfterTax = annualGross - annualTax;
+      var net = annualAfterTax / incomeWeeks;
       var sup = gross * 0.12;
       var rent = parseFloat(city.value);
       var living = parseFloat(life.value);
       var save = net - rent - living;
-      var yearly = save * 46; // 保守估 46 週有班（扣找工空窗與旅行）
+      var yearly = annualAfterTax - (rent + living) * expenseWeeks;
       document.getElementById("calc-gross").textContent = fmt(gross);
       document.getElementById("calc-net").textContent = fmt(net);
       document.getElementById("calc-exp").textContent = fmt(rent + living);
       document.getElementById("calc-save").textContent = fmt(save);
       document.getElementById("calc-super").textContent = fmt(sup);
       document.getElementById("calc-year").textContent = fmt(yearly);
-      document.getElementById("calc-twd").textContent = "約 NT$" + Math.round(yearly * 22.8 / 10000).toLocaleString() + " 萬";
+      document.getElementById("calc-tax").textContent = fmt(annualTax);
+      document.getElementById("calc-twd").textContent = calcEnglish
+        ? (rent + living > 0 ? Math.max(0, annualAfterTax / (rent + living)).toFixed(1) + " weeks" : "Not applicable")
+        : "約 NT$" + (yearly * 22.8 / 10000).toFixed(1) + " 萬";
       var v = document.getElementById("calc-verdict");
-      if (save <= 0) { v.textContent = "入不敷出——換城市、加班或砍支出，先讀「找工作」和「住宿租屋」。"; v.className = "result-verdict result-no"; }
-      else if (save < 250) { v.textContent = "存得到但很慢——這是體驗優先的過法，錢別指望太多。"; v.className = "result-verdict"; }
-      else if (save < 550) { v.textContent = "穩健路線——一年下來是一筆有感的錢。"; v.className = "result-verdict result-ok"; }
-      else { v.textContent = "存錢機器模式——記得留一點預算給體驗，別把一年過成只有班表。"; v.className = "result-verdict result-ok"; }
+      if (yearly <= 0) {
+        v.textContent = calcEnglish
+          ? "This plan runs short over a full 52 weeks. Lower the weekly assumptions, increase verified paid hours, or arrive with a larger buffer."
+          : "全年估算會入不敷出——降低每週支出假設、增加已確認的有薪工時，或準備更大的落地緩衝金。";
+        v.className = "result-verdict result-no";
+      } else if (yearly < 10000) {
+        v.textContent = calcEnglish
+          ? "A narrow annual buffer. Test a bad month, moving costs and a return flight before treating this as spare money."
+          : "全年緩衝偏薄——先把淡季、搬家與回程機票壓力測試算進去，再把餘額當可花的錢。";
+        v.className = "result-verdict";
+      } else if (yearly < 25000) {
+        v.textContent = calcEnglish
+          ? "A workable planning range, provided the paid hours and weekly costs actually hold. Keep an emergency buffer separate."
+          : "規劃上可行——前提是有薪工時與每週支出真的維持住；緊急預備金仍要獨立保留。";
+        v.className = "result-verdict result-ok";
+      } else {
+        v.textContent = calcEnglish
+          ? "A strong modelled surplus, not a promise. Stress-test unpaid gaps, travel, tax differences and one large repair or move."
+          : "模型顯示餘裕充足，但不是保證——再壓力測試無薪空窗、旅行、稅務差異與一次大型維修或搬家。";
+        v.className = "result-verdict result-ok";
+      }
       try {
         localStorage.setItem(CALC_KEY, JSON.stringify({
           rate: r,
@@ -283,10 +315,14 @@
           life: life.value,
           lifeLabel: life.selectedOptions[0].textContent,
           gross: gross,
+          annualGross: annualGross,
+          annualTax: annualTax,
           net: net,
           expenses: rent + living,
           weeklySave: save,
           yearlySave: yearly,
+          incomeWeeks: incomeWeeks,
+          expenseWeeks: expenseWeeks,
           updated: new Date().toISOString()
         }));
       } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }

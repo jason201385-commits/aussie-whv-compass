@@ -439,9 +439,141 @@ if (-not (Test-Path $englishPrepPath)) {
   if (-not $i18nPrepText.Contains('"prep":{"zh-Hant":"/prep.html","en":"/lang/en/prep/"}')) {
     Write-Output 'FAIL [i18n.js] 缺行前主題中英文路由'; $errors++
   }
-  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/cost\.html|/english\.html|/health\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
-  if ($englishTraditionalCards.Count -ne 7 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 7) {
-    Write-Output 'FAIL [lang/en/] 7 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
+  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/english\.html|/health\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
+  if ($englishTraditionalCards.Count -ne 6 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 6) {
+    Write-Output 'FAIL [lang/en/] 6 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
+  }
+}
+
+# 完整英文生活成本頁：累進 WHM 稅、52 週支出、食衣交通與二手車官方分流不得遺失
+$englishCostPath = Join-Path $dir 'lang\en\cost\index.html'
+if (-not (Test-Path $englishCostPath)) {
+  Write-Output 'FAIL 缺完整英文生活成本頁：lang/en/cost/'
+  $errors++
+} else {
+  $englishCostText = [System.IO.File]::ReadAllText($englishCostPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    '<meta name="viewport"',
+    'data-i18n-topic="cost"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/cost/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/cost.html">',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking Australian tax, financial-counselling or consumer-services professional',
+    '46 income weeks and 52 expense weeks',
+    'AUD 26.44 per hour',
+    'AUD 33.05 per hour',
+    '15% to 45,000; 30% to 135,000; 37% to 190,000; 45% above',
+    'id="save-calc"',
+    'id="calc-tax"',
+    'This site does not receive your planner choices',
+    'https://www.legislation.gov.au/F2026L00716/latest/text',
+    'https://www.accc.gov.au/consumers/pricing/unit-prices-for-groceries',
+    'https://www.foodstandards.gov.au/consumer/prevention-of-foodborne-illness/food-safety-basics',
+    'https://www.safeworkaustralia.gov.au/safety-topic/managing-health-and-safety/personal-protective-equipment-ppe/whs-duties',
+    'https://www.ppsr.gov.au/carcheck',
+    'PPSR does not prove',
+    'does not accept vehicle listings, deposits, identity documents or payments',
+    'https://www.service.nsw.gov.au/transaction/transfer-a-vehicle-registration',
+    'https://www.vicroads.vic.gov.au/buy-sell-transfer/buying-car/buying-vehicle',
+    'https://www.qld.gov.au/transport/registration',
+    'https://www.transport.wa.gov.au/licensing/vehicle/buy-sell-transfer/buy',
+    'https://www.sa.gov.au/topics/driving-and-transport/registration/vehicle-registration/transfers/transfer-registration',
+    'https://www.service.tas.gov.au/services/transport/vehicle-registration/transfer-a-vehicle-registration/',
+    'https://www.accesscanberra.act.gov.au/driving-transport-and-parking/registration/vehicle-registration-and-transfer',
+    'https://nt.gov.au/driving/rego/existing-nt-registration/buying-selling-a-used-vehicle-registration',
+    '<noscript><p class="warn">JavaScript is required for the planner.',
+    '/assets/tools.js?v='
+  )) {
+    if (-not $englishCostText.Contains($needle)) { Write-Output "FAIL [lang/en/cost/] 缺內容、來源或服務邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishCostText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishCostText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/cost/] 必須只有一個 h1 與 main'; $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishCostText, '<a href="#([^"]+)"')) {
+    if (-not $englishCostText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/cost/] TOC 錨點不存在：$($anchor.Groups[1].Value)"; $errors++
+    }
+  }
+  $englishCostIds = [regex]::Matches($englishCostText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishCostIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/cost/] 含重複 id'; $errors++
+  }
+  if ($englishCostText -match '[\u3400-\u9fff]') {
+    Write-Output 'FAIL [lang/en/cost/] 完整英文頁仍含 CJK 文字'; $errors++
+  }
+  if ($englishCostText.Contains('/assets/main.js?v=')) {
+    Write-Output 'FAIL [lang/en/cost/] 不得載入會注入中文搜尋、回饋列與 skip link 的 main.js'; $errors++
+  }
+  $englishCostAssetVersions = @([regex]::Matches($englishCostText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|main\.js|tools\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishCostAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishCostAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/cost/] 資產版本與全站不一致：$(($englishCostAssetVersions) -join ', ')"; $errors++
+  }
+  foreach ($link in [regex]::Matches($englishCostText, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/cost/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  foreach ($commercialUrl in @(
+    'https://www.aldi.com.au/store-finder/',
+    'https://www.coles.com.au/on-special',
+    'https://www.woolworths.com.au/shop/browse/specials',
+    'https://www.salvosstores.com.au/stores',
+    'https://www.vinnies.org.au/shops',
+    'https://shop.redcross.org.au/store-locator',
+    'https://www.kmart.com.au/',
+    'https://www.bigw.com.au/',
+    'https://www.carsales.com.au/cars/used/',
+    'https://www.gumtree.com.au/s-cars-vans-utes/c18320',
+    'https://www.facebook.com/marketplace/category/vehicles',
+    'https://www.carsales.com.au/sell-my-car/',
+    'https://www.gumtree.com.au/cars/sell-my-car',
+    'https://www.facebook.com/marketplace/create/vehicle'
+  )) {
+    $commercialLink = @([regex]::Matches($englishCostText, '<a\b[^>]*target="_blank"[^>]*>') | Where-Object { $_.Value.Contains($commercialUrl) })
+    if ($commercialLink.Count -ne 1 -or $commercialLink[0].Value -notmatch 'rel="[^"]*nofollow[^"]*"') {
+      Write-Output "FAIL [lang/en/cost/] 商業平台連結缺 nofollow 或不存在：$commercialUrl"; $errors++
+    }
+  }
+  if ($englishCostText -match '(?i)href="[^"]*(utm_|affiliate|aff_id=)') {
+    Write-Output 'FAIL [lang/en/cost/] 商業平台連結不得含追蹤或聯盟參數'; $errors++
+  }
+  $englishCostJsonText = [regex]::Match($englishCostText, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+  try {
+    $englishCostJson = $englishCostJsonText | ConvertFrom-Json
+    if ($englishCostJson.'@context' -ne 'https://schema.org' -or -not $englishCostJson.'@graph') {
+      Write-Output 'FAIL [lang/en/cost/] JSON-LD 缺 schema.org context 或 graph'; $errors++
+    }
+  } catch { Write-Output 'FAIL [lang/en/cost/] JSON-LD 不是合法 JSON'; $errors++ }
+
+  $traditionalCostText = [System.IO.File]::ReadAllText((Join-Path $dir 'cost.html'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/cost/">',
+    '<body data-i18n-topic="cost">',
+    'id="calc-tax"',
+    '46 個收入週、52 個支出週'
+  )) {
+    if (-not $traditionalCostText.Contains($needle)) { Write-Output "FAIL [cost.html] 缺英文 reciprocal hreflang、主題標記或新公式邊界：$needle"; $errors++ }
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/cost/">')) {
+    Write-Output 'FAIL [lang/en/] 生活成本卡未連到完整英文頁'; $errors++
+  }
+  $i18nCostText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  if (-not $i18nCostText.Contains('"cost":{"zh-Hant":"/cost.html","en":"/lang/en/cost/"}')) {
+    Write-Output 'FAIL [i18n.js] 缺生活成本主題中英文路由'; $errors++
+  }
+  $costToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    'var calcEnglish =',
+    'var incomeWeeks = 46;',
+    'var expenseWeeks = 52;',
+    'if (income <= 45000)',
+    'if (income <= 135000)',
+    'if (income <= 190000)',
+    'annualAfterTax - (rent + living) * expenseWeeks',
+    'annualTax: annualTax',
+    'expenseWeeks: expenseWeeks'
+  )) {
+    if (-not $costToolsText.Contains($needle)) { Write-Output "FAIL [tools.js] 存錢試算器缺累進稅或 52 週支出邏輯：$needle"; $errors++ }
   }
 }
 
@@ -546,9 +678,9 @@ if (-not (Test-Path $englishHousingPath)) {
   if (-not $i18nHousingText.Contains('"housing":{"zh-Hant":"/housing.html","en":"/lang/en/housing/"}')) {
     Write-Output 'FAIL [i18n.js] 缺住宿主題中英文路由'; $errors++
   }
-  foreach ($fullGuidePath in @('lang\en\visa\index.html', 'lang\en\prep\index.html', 'lang\en\housing\index.html', 'lang\en\work\index.html', 'lang\en\scam\index.html')) {
+  foreach ($fullGuidePath in @('lang\en\visa\index.html', 'lang\en\prep\index.html', 'lang\en\cost\index.html', 'lang\en\housing\index.html', 'lang\en\work\index.html', 'lang\en\scam\index.html')) {
     $fullGuideNavText = [System.IO.File]::ReadAllText((Join-Path $dir $fullGuidePath), [System.Text.Encoding]::UTF8)
-    foreach ($route in @('/lang/en/visa/', '/lang/en/prep/', '/lang/en/housing/', '/lang/en/work/', '/lang/en/scam/')) {
+    foreach ($route in @('/lang/en/visa/', '/lang/en/prep/', '/lang/en/cost/', '/lang/en/housing/', '/lang/en/work/', '/lang/en/scam/')) {
       if (-not $fullGuideNavText.Contains("href=`"$route`"")) { Write-Output "FAIL [$fullGuidePath] 英文旅程導覽缺 $route"; $errors++ }
     }
     foreach ($crossPageAnchor in [regex]::Matches($fullGuideNavText, 'href="/lang/en/([^/#"]+)/#([^"?]+)"')) {
@@ -956,6 +1088,7 @@ if (-not (Test-Path $sitemapPath)) {
     $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
     $expectedUrls += "$canonicalOrigin/lang/en/visa/"
     $expectedUrls += "$canonicalOrigin/lang/en/prep/"
+    $expectedUrls += "$canonicalOrigin/lang/en/cost/"
     $expectedUrls += "$canonicalOrigin/lang/en/housing/"
     $expectedUrls += "$canonicalOrigin/lang/en/work/"
     $expectedUrls += "$canonicalOrigin/lang/en/scam/"
@@ -998,7 +1131,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/housing/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/cost/" + "$canonicalOrigin/lang/en/housing/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }

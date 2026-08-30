@@ -30,7 +30,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 工具 | 位置 | 輸入 | 邏輯 | 輸出 |
 |---|---|---|---|---|
 | 集簽資格快查器 | visa.html `#postcode-tool` | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描 | 合格/不合格判定＋類型日期條件＋三前提提醒＋官方連結 |
-| 存錢試算器 | cost.html `#save-calc` | 時薪滑桿 24–45（預設 33.05）、工時 0–50（38）、城市房租 select、生活型態 select | gross=r×h；net=gross×0.85（WHM 15%）；super=×0.12（僅顯示）；save=net−rent−living；year=save×46 週 | 六格數據＋台幣換算（×22.8）＋四級評語（≤0/／<250／<550／≥550） |
+| 存錢試算器 | cost.html／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿預算 select、其他生活支出 select | weeklyGross=r×h；annualGross=weeklyGross×46；annualTax 依 2026–27 WHM 15%／30%／37%／45% 累進級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（僅為 OTE 粗估） | 六格數據＋全年稅／super 邊界；繁中顯示台幣示意、英文顯示稅後收入可覆蓋幾個支出週；依全年餘額分四級壓力測試警語 |
 | 行前互動清單 | prep.html `#prep-checklist` | 21 項勾選（3 組，JS 產生） | localStorage `whv-prep-check-v1`、進度條、100% 彩蛋文案、清空需 confirm | 進度 x/21（%） |
 | 離澳收尾清單 | leave.html `#leave-checklist-tool` | 9 項零打字勾選（無 JS 仍可閱讀） | localStorage `whv-leave-check-v1`、進度條、清空需 confirm；100% 時顯示非強迫的感謝銜接 | 進度 x/9（%）＋完成提示 |
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
@@ -187,18 +187,20 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 - 2026-08-29 已完成第一階段：目錄式 `/lang/<locale>/` Quick Start、38 種主要語言切換、
   49 個現行 417／462 護照國家／地區覆蓋表、SEO `hreflang` 與 RTL；繁中／英文為來源文案，
   其餘明示未校對機器翻譯或英文 fallback。
-- 第二階段現況：`/lang/en/visa/`、`/lang/en/prep/`、`/lang/en/housing/`、`/lang/en/work/` 與 `/lang/en/scam/` 已完成可索引的完整英文 editorial beta。
+- 第二階段現況：`/lang/en/visa/`、`/lang/en/prep/`、`/lang/en/cost/`、`/lang/en/housing/`、`/lang/en/work/` 與 `/lang/en/scam/` 已完成可索引的完整英文 editorial beta。
   visa 將台灣限定 417 內容改寫為護照中立的 417／462 分流，郵遞區號快查器明示只適用 417；
   prep 以護照中立方式重寫簽證核准後的文件、RHCA／保險、現金申報、藥品與生物安全、各州駕照、
   落地住宿、TFN／銀行／myGov／super，並提供獨立本機 key `whv-prep-check-en-v1` 的 21 項英文清單，
   避免英中項目語意不完全相同時誤沿用勾選；
+  cost 以 2026–27 WHM 累進稅率重算 46 個收入週與 52 個支出週，提供跨護照的薪資、食衣交通、
+  二手車 PPSR／八州領地過戶與免費支援入口，不把台幣、Perth 價格或台灣稅務邊界直譯成全球通則；
   housing 以護照中立方式提供不含聯盟參數的短住、合租與整租入口，將看房、合約、bond、condition report、
   工作綁住宿與離場處理拆成可執行步驟，並逐一連到八州領地的官方租屋機關，不把 WA 規則誤寫成全澳通則；
   work 以跨護照適用的求職、薪資、職場紅旗與求助路徑重寫，並提供完整英文採收月份工具；
   scam 不直譯華人限定敘事，改為跨護照的工作、簽證、租屋、金流、個資與通報分流，測驗亦完整英文。
   已重查 Home Affairs／Fair Work／ATO／Scamwatch／ACSC／AFP 等一手來源，但尚未經相應母語專業人士
   校對，不得標為 reviewed。
-- 第二階段 backlog：替 visa／prep／housing／work／scam 找母語或合格專業人士校對，再依使用量擴充其他語言與頁面。
+- 第二階段 backlog：替 visa／prep／cost／housing／work／scam 找母語或合格專業人士校對，再依使用量擴充其他語言與頁面。
   台灣特定內容（健保核退、台幣、駐外館處）需在地化改寫而非直譯；未經母語者校對不得標為 reviewed。
 
 ## 6. 驗收程序（每次 push 前必跑）
@@ -215,7 +217,7 @@ Agent 拿到 ID 後只可：寫入 `assets/analytics-config.js`、跑驗收、co
 # 3) 集簽快查器測試組（線上或本地開頁跑 JS）：
 #    4880/plant=YES  2000/plant=NO  0870/tourism=YES  7215/tourism=YES
 #    3000/tourism=NO 5000/plant=YES 2615/bushfire=YES
-# 4) 試算器基準：33.05×38h → gross $1,256、net $1,068；0 工時 → 負存款＋警語
+# 4) 試算器基準：33.05×38h、住宿 250、其他 240 → gross week $1,256、annual tax $10,581、after-tax work week $1,026、annual remainder $21,710；0 工時 → 負全年餘額＋警語
 # 5) 部署後：cache-bust 開線上站，抽測一個工具＋回饋列存在
 ```
 

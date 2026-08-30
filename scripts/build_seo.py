@@ -18,7 +18,7 @@ LAST_MODIFIED = "2026-08-30"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
-FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/", f"{ORIGIN}/lang/en/prep/", f"{ORIGIN}/lang/en/housing/", f"{ORIGIN}/lang/en/work/", f"{ORIGIN}/lang/en/scam/"]
+FULL_TRANSLATION_URLS = [f"{ORIGIN}/lang/en/visa/", f"{ORIGIN}/lang/en/prep/", f"{ORIGIN}/lang/en/cost/", f"{ORIGIN}/lang/en/housing/", f"{ORIGIN}/lang/en/work/", f"{ORIGIN}/lang/en/scam/"]
 PAGES = [
     "index.html",
     "why.html",
@@ -212,6 +212,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
             f"- [多國語言 Quick Start]({ORIGIN}/lang/): 目前 417／462 護照國家的主要語言入口；機器翻譯需社群校對，官方來源優先。",
             f"- [English visa and specified-work guide]({ORIGIN}/lang/en/visa/): passport-neutral 417／462 guidance, a subclass 417 postcode checker and official source links; editorial beta, not government advice.",
             f"- [English preparation and arrival guide]({ORIGIN}/lang/en/prep/): passport-neutral departure checks, border declarations, first-week setup and a private local checklist; editorial beta, not government or professional advice.",
+            f"- [English cost-of-living and money guide]({ORIGIN}/lang/en/cost/): current wage and WHM tax references, a local savings planner, food, clothing, transport and used-car safety routes; editorial beta, not tax or financial advice.",
             f"- [English accommodation and renting guide]({ORIGIN}/lang/en/housing/): first-stay booking routes, inspection and bond safeguards, all eight state and territory authorities, work-linked housing and dispute preparation; editorial beta, not booking or legal advice.",
             f"- [English work and workplace-rights guide]({ORIGIN}/lang/en/work/): job-search routes, employer and pay checks, harvest timing and official help paths; editorial beta, not legal or tax advice.",
             f"- [English scam-safety and exploitation guide]({ORIGIN}/lang/en/scam/): job, visa, rental, identity and payment red flags, an English practice quiz and official reporting routes; editorial beta, not legal or emergency advice.",

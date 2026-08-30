@@ -11,6 +11,9 @@
 <meta property="og:description" content="澳洲打工度假 2026 最新：最低時薪、背包客稅率、房租交通行情，以及 Perth 省錢採買、簡易食譜、二手衣與安全買車入口。">
 <meta property="og:url" content="https://www.aussiewhvcompass.com/cost.html">
 <link rel="canonical" href="https://www.aussiewhvcompass.com/cost.html">
+<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/cost.html">
+<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/cost/">
+<link rel="alternate" hreflang="x-default" href="https://www.aussiewhvcompass.com/lang/en/cost/">
 <!-- SEO_DISCOVERY_BEGIN -->
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <meta property="og:site_name" content="澳打指南針">
@@ -79,10 +82,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260830-14">
+<link rel="stylesheet" href="assets/style.css?v=20260830-15">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
-<body>
+<body data-i18n-topic="cost">
 
 <header class="site-header">
   <nav class="nav-inner">
@@ -357,47 +360,46 @@
   <div class="tool" id="save-calc">
     <span class="tool-tag">互動工具</span>
     <h3><svg class="icon" aria-hidden="true"><use href="#i-dollar"/></svg> 存錢試算器</h3>
-    <p>調整時薪、工時、城市與生活型態，即時看你的一年能存多少（WHM 稅 15%、以一年實際有班 46 週保守估）。</p>
-    <div class="tool-row"><label for="calc-rate">時薪（稅前）</label><input type="range" id="calc-rate" min="24" max="45" step="0.05" value="33.05"><output id="calc-rate-out">$33.05</output></div>
+    <p>調整時薪、工時、每週住宿與其他生活支出。模型用 46 個有收入週、52 個支出週，並依 2026–27 WHM 累進稅率估算；不是薪資、稅額或存款保證。</p>
+    <div class="tool-row"><label for="calc-rate">時薪（稅前）</label><input type="range" id="calc-rate" min="20" max="60" step="0.05" value="33.05"><output id="calc-rate-out">$33.05</output></div>
     <div class="tool-row"><label for="calc-hours">每週工時</label><input type="range" id="calc-hours" min="0" max="50" step="1" value="38"><output id="calc-hours-out">38 小時</output></div>
-    <div class="tool-row"><label for="calc-city">住哪裡</label>
+    <div class="tool-row"><label for="calc-city">每週住宿預算假設</label>
       <select id="calc-city">
-        <option value="300">雪梨（房租約 $300/週）</option>
-        <option value="280">墨爾本（約 $280/週）</option>
-        <option value="230" selected>布里斯本／柏斯（約 $230/週）</option>
-        <option value="210">阿德雷德（約 $210/週）</option>
-        <option value="180">偏遠小鎮（約 $180/週）</option>
+        <option value="180">$180／週</option>
+        <option value="250" selected>$250／週</option>
+        <option value="350">$350／週</option>
+        <option value="500">$500／週</option>
       </select>
     </div>
     <div class="tool-row"><label for="calc-life">生活型態</label>
       <select id="calc-life">
         <option value="160">省到極致（伙食雜支 $160/週）</option>
-        <option value="220" selected>正常過日子（$220/週）</option>
-        <option value="320">吃好喝好常出遊（$320/週）</option>
+        <option value="240" selected>一般規劃（$240／週）</option>
+        <option value="340">社交與移動較多（$340／週）</option>
       </select>
     </div>
     <div class="result-card">
       <div class="result-grid">
         <div class="stat"><b id="calc-gross">—</b><span>週薪（稅前）</span></div>
-        <div class="stat"><b id="calc-net">—</b><span>稅後實領</span></div>
+        <div class="stat"><b id="calc-net">—</b><span>有收入週稅後均額</span></div>
         <div class="stat"><b id="calc-exp">—</b><span>週支出</span></div>
-        <div class="stat"><b id="calc-save">—</b><span>週存款</span></div>
-        <div class="stat"><b id="calc-year">—</b><span>年存款（46 週）</span></div>
+        <div class="stat"><b id="calc-save">—</b><span>有收入週餘額</span></div>
+        <div class="stat"><b id="calc-year">—</b><span>全年估算餘額</span></div>
         <div class="stat"><b id="calc-twd">—</b><span>換算台幣</span></div>
       </div>
       <p class="result-verdict" id="calc-verdict"></p>
-      <p class="fact-meta">雇主另提撥 super <span id="calc-super">—</span>/週（離澳領回打 3.5 折，見<a href="leave.html#dasp">報稅離澳</a>）。粗估工具，實際依 award 加成與個人狀況而異；匯率以 22.8 計。</p>
+      <p class="fact-meta">估算全年 WHM 稅 <span id="calc-tax">—</span>；符合條件時雇主 super 粗估 <span id="calc-super">—</span>／有收入週。公式採 2026–27 標準 WHM 累進級距與 46 個收入週、52 個支出週；未納入扣除額、其他收入、稅務居民或條約例外、award／penalty rate、實際發薪預扣差異與 DASP。官方來源：<a href="https://www.legislation.gov.au/F2026L00716/latest/text" rel="noopener">2026 WHM withholding schedule</a>、<a href="https://www.ato.gov.au/tax-rates-and-codes/tax-rates-working-holiday-makers" rel="noopener">ATO WHM tax rates</a>。匯率僅以 22.8 示意。</p>
     </div>
   </div>
 
   <div class="panel">
-    <p>以 casual 最低時薪 $33.05、每週工作 38 小時、在中型城市生活為例（2026 數字）：</p>
+    <p>以時薪 $33.05、每個有收入週 38 小時、住宿 $250／週、其他生活支出 $240／週為例：</p>
     <ul>
-      <li>週收入：約 $1,256，預扣 15% 稅後約 <strong>$1,068</strong></li>
-      <li>週支出：房租 $230 + 伙食 $130 + 交通 $30 + 手機雜支 $60 ≈ <strong>$450</strong></li>
-      <li>理論上每週可存 <strong>約 $600</strong>（一年約 $30,000 ≈ 60 幾萬台幣）</li>
+      <li>46 個收入週的稅前總額約 $57,771；依累進級距估算全年 WHM 稅約 <strong>$10,581</strong>。</li>
+      <li>有收入週的稅後均額約 $1,026，扣除每週 $490 支出後，當週餘額約 <strong>$536</strong>。</li>
+      <li>支出全年持續 52 週，因此全年估算餘額約 <strong>$21,710</strong>，不是把 $536 直接乘 46。</li>
     </ul>
-    <p>但現實會打折：找工作的空窗期、淡季工時不穩、旅行花費、聚餐社交。社群普遍經驗是「認真工作的一年存 1 萬–2 萬多澳幣」屬合理範圍，「號稱年存百萬台幣」通常代表極端省吃儉用＋偏遠高薪工作＋幾乎不旅行。<strong>存錢和體驗是取捨，這正是<a href="why.html">自我釐清</a>第 5 題要你先想清楚的。</strong></p>
+    <p>這仍不是預測：找工空窗、淡季工時、搬家、旅行、醫療、車輛維修與實際稅務都會改變結果。先用它做壓力測試，再把銀行入帳與真實支出帶回修正。<strong>存錢和體驗是取捨，這正是<a href="why.html">自我釐清</a>要先想清楚的問題。</strong></p>
   </div>
 
   <p class="fact-meta">匯率參考：1 AUD ≈ 22.8 TWD（2026-08-28，浮動）。</p>
@@ -411,10 +413,10 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260830-14"></script>
-<script src="assets/analytics.js?v=20260830-14"></script>
-<script src="assets/i18n.js?v=20260830-14"></script>
-<script src="assets/main.js?v=20260830-14"></script>
-<script src="assets/tools.js?v=20260830-14"></script>
+<script src="assets/analytics-config.js?v=20260830-15"></script>
+<script src="assets/analytics.js?v=20260830-15"></script>
+<script src="assets/i18n.js?v=20260830-15"></script>
+<script src="assets/main.js?v=20260830-15"></script>
+<script src="assets/tools.js?v=20260830-15"></script>
 </body>
 </html>
