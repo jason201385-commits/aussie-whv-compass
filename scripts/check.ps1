@@ -1541,8 +1541,8 @@ if ([regex]::Matches($lemonSvg, '<path\b').Count -lt 10 -or -not $lemonSvg.Conta
   Write-Output 'FAIL [lemon-pattern.svg] 檸檬與葉片圖樣不完整'
   $errors++
 }
-if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not $styleText.Contains('main [id] { scroll-margin-top: 132px; }')) {
-  Write-Output 'FAIL [style.css] 內容錨點缺 sticky header 安全距離'
+if (-not $styleText.Contains('main [id] { scroll-margin-top: 170px; }') -or -not $styleText.Contains('.site-header { position: static; }') -or -not $styleText.Contains('main [id] { scroll-margin-top: 24px; }')) {
+  Write-Output 'FAIL [style.css] 桌機錨點安全距離或手機 static header 修正缺失'
   $errors++
 }
 if ($styleText -notmatch '(?s)\.tool select \{.*?min-width: 0;.*?max-width: 100%;') {
@@ -1651,8 +1651,12 @@ foreach ($privateNeedle in @(
 }
 foreach ($businessNeedle in @(
   '公開攻略免費',
-  '客製合作可收費',
-  '客製課程、講座與工作坊',
+  'id="editorial-method"',
+  '澳打指南針不是個人遊記，也不把未親歷的內容寫成親身經驗',
+  '1. 官方依據',
+  '2. 本站編輯整理',
+  '3. 社群第一手回報',
+  '查不到來源就標「待查證」',
   '工作範圍、時程、費用、交付方式與取消條件',
   '本站不提供任何形式的簽證或移民代辦',
   '不論是否收費都一樣',
@@ -1663,8 +1667,8 @@ foreach ($businessNeedle in @(
   '未經你明確同意，不會把你的聯絡方式或個案內容交給任何人',
   '你仍直接與該專業人士簽約、付款並自行決定是否採用',
   'https://immi.homeaffairs.gov.au/help-support/who-can-help-with-your-application/overview',
-  'https://www.mara.gov.au/search-the-register-of-migration-agents/',
-  '2026-08-29 查核'
+  'https://portal.mara.gov.au/search-the-register-of-migration-agents/',
+  '2026-08-30 查核'
 )) {
   if (-not $aboutText.Contains($businessNeedle)) { Write-Output "FAIL [about.html] 缺免費／付費合作或受管制服務邊界：$businessNeedle"; $errors++ }
 }
@@ -1731,6 +1735,10 @@ if (-not (Test-Path $thirdPartyRegisterPath)) {
     foreach ($requiredRegisterId in @('perth-line-community', 'commercial-navigation-platforms', 'omara-official-register')) {
       if ($registerIds -notcontains $requiredRegisterId) { Write-Output "FAIL [third-party-register.json] 缺現行第三方關係：$requiredRegisterId"; $errors++ }
     }
+    $omaraRegister = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'omara-official-register' })[0]
+    if ($omaraRegister.destinationHost -ne 'portal.mara.gov.au' -or $omaraRegister.destinationUrl -ne 'https://portal.mara.gov.au/search-the-register-of-migration-agents/' -or $omaraRegister.checkedAt -ne '2026-08-30') {
+      Write-Output 'FAIL [third-party-register.json] OMARA 名冊入口或查核日期未同步目前有效官方網址'; $errors++
+    }
     if (@($thirdPartyRegister.requiredReviewFields).Count -ne 7) { Write-Output 'FAIL [third-party-register.json] 上架前公開欄位數量錯誤'; $errors++ }
     if ($null -eq $thirdPartyRegister.correctionLog -or $thirdPartyRegister.correctionPolicy.changeHistoryRetained -ne $true) {
       Write-Output 'FAIL [third-party-register.json] 缺更正紀錄機制'; $errors++
@@ -1775,16 +1783,16 @@ foreach ($forbiddenPromisePattern in @('不賣課', '不接代辦業配', '唯�
 foreach ($rootPage in $pages + '404.html') {
   $rootPageText = [System.IO.File]::ReadAllText((Join-Path $dir $rootPage), [System.Text.Encoding]::UTF8)
   if (-not $rootPageText.Contains('澳打指南針 — 公開攻略免費・開源維護・')) {
-    Write-Output "FAIL [$rootPage] 頁尾未同步公開內容免費／合作另議定位"
+    Write-Output "FAIL [$rootPage] 頁尾未同步公開內容免費定位"
     $errors++
   }
-  if (-not $rootPageText.Contains('>合作與關於</a>')) {
-    Write-Output "FAIL [$rootPage] 主導覽未同步合作定位"
+  if (-not $rootPageText.Contains('>關於本站</a>')) {
+    Write-Output "FAIL [$rootPage] 主導覽未同步關於本站定位"
     $errors++
   }
 }
 $issueConfigText = [System.IO.File]::ReadAllText((Join-Path $dir '.github\ISSUE_TEMPLATE\config.yml'), [System.Text.Encoding]::UTF8)
-foreach ($issueConfigNeedle in @('blank_issues_enabled: false', 'https://www.aussiewhvcompass.com/about.html#private-contact', 'https://www.mara.gov.au/search-the-register-of-migration-agents/')) {
+foreach ($issueConfigNeedle in @('blank_issues_enabled: false', 'https://www.aussiewhvcompass.com/about.html#private-contact', 'https://portal.mara.gov.au/search-the-register-of-migration-agents/')) {
   if (-not $issueConfigText.Contains($issueConfigNeedle)) { Write-Output "FAIL [config.yml] Issue 分流缺安全入口：$issueConfigNeedle"; $errors++ }
 }
 $briefScript = [regex]::Match($mainJs, '(?s)// ---------- 私人合作需求單.*?// ---------- 自我釐清工作表')
@@ -1871,15 +1879,14 @@ if (-not $dplusScript.Success) {
     $errors++
   }
 }
-if (-not $indexText.Contains('href="about.html#collaborate"')) {
-  Write-Output 'FAIL [index.html] 缺首頁合作入口'
-  $errors++
+foreach ($indexSourceNeedle in @('id="source-model-title"', 'about.html#editorial-method', '官方資料整理・工具化・可回報修正', '不把未親歷的內容寫成親身經驗', '回報與修正', 'about.html#maintain', '資料性質說清楚')) {
+  if (-not $indexText.Contains($indexSourceNeedle)) { Write-Output "FAIL [index.html] 首頁缺資料來源模型或修正入口：$indexSourceNeedle"; $errors++ }
 }
-foreach ($indexBusinessNeedle in @('公開內容免費，客製合作可收費', '本站不提供簽證或移民代辦', 'https://www.mara.gov.au/search-the-register-of-migration-agents/')) {
-  if (-not $indexText.Contains($indexBusinessNeedle)) { Write-Output "FAIL [index.html] 首頁缺免費／付費或移民代辦邊界：$indexBusinessNeedle"; $errors++ }
+foreach ($indexSalesNeedle in @('id="collab-home-title"', '想找 Jason', '私人合作可以直接寄 Email', '公開內容免費，客製合作可收費')) {
+  if ($indexText.Contains($indexSalesNeedle)) { Write-Output "FAIL [index.html] 首頁不應以站長服務或商業合作作為旅程主線：$indexSalesNeedle"; $errors++ }
 }
-if (-not $aboutText.Contains('<nav class="support-grid" aria-label="合作與協助類型">') -or $aboutText.Contains('class="warning"')) {
-  Write-Output 'FAIL [about.html] 合作類型語意或 noscript 警示樣式未修正'
+if (-not $aboutText.Contains('<nav class="support-grid" aria-label="回報與聯絡類型">') -or $aboutText.Contains('class="warning"')) {
+  Write-Output 'FAIL [about.html] 回報與聯絡類型語意或 noscript 警示樣式未修正'
   $errors++
 }
 foreach ($docBoundary in @(
@@ -1894,8 +1901,19 @@ if (-not $toolsJs.Contains('澳打指南針 ・ 公開攻略免費 ・ 資料只
   Write-Output 'FAIL [tools.js] 行前海報未同步公開攻略免費定位'
   $errors++
 }
-foreach ($entryNeedle in @('我們想成為對打工度假者', '不替你草率做決定', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '私人合作可以直接寄 Email')) {
+foreach ($entryNeedle in @('我們想成為對打工度假者', '不替你草率做決定', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
   if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
+}
+
+$legacyOmaraUrl = 'https://www.mara.gov.au/' + 'search-the-register-of-migration-agents/'
+foreach ($legacyOmaraFile in Get-ChildItem $dir -Recurse -File -Include '*.html','*.md','*.yml','*.yaml','*.json','*.js','*.ps1','*.py','*.txt' | Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' -and $_.FullName -notmatch '[\\/]\.codex-remote-attachments[\\/]' -and $_.FullName -notmatch '[\\/]node_modules[\\/]' }) {
+  if ([System.IO.File]::ReadAllText($legacyOmaraFile.FullName, [System.Text.Encoding]::UTF8).Contains($legacyOmaraUrl)) {
+    Write-Output "FAIL [$($legacyOmaraFile.FullName.Substring($dir.Length + 1))] 仍含已失效 OMARA 名冊網址"
+    $errors++
+  }
+}
+foreach ($mobileUxNeedle in @('.site-header { position: static; }', 'main [id] { scroll-margin-top: 24px; }', '.source-model {', '.source-method-grid {', '#considering {', '#committed {', '#in-australia {')) {
+  if (-not $styleText.Contains($mobileUxNeedle)) { Write-Output "FAIL [style.css] 缺行動版遮擋或長文分段修正：$mobileUxNeedle"; $errors++ }
 }
 if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains('catch (e) { copyFailed(); }')) {
   Write-Output 'FAIL [main.js] clipboard 失敗分支不得誤報已複製'

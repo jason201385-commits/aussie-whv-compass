@@ -28,8 +28,10 @@
    都不得提供個人簽證選項建議、準備或代填申請、代表申請人處理簽證事項。可連到 OMARA
    官方名冊與中立轉介；目前沒有指定合作代理或佣金轉介。若未來有特定商業轉介，必須在連結
    旁明示關係；是否收取轉介費須先完成法律與稅務確認，確認前不得啟用，且未經使用者同意不得傳送其資料。
-8. **先解決問題再談支持**：贊助、Buy Me a Coffee 與合作入口放在使用者取得下一步之後，
+8. **先解決問題再談支持**：首頁不放站長服務招攬；贊助與私人合作只在 About 的次要區段，
    不影響內容完整度、官方出口、排序或風險揭露。
+9. **資料性質要能辨認**：官方依據、本站編輯整理與社群第一手回報必須分開標示。本站不是
+   個人遊記，不得把未親歷內容寫成親身經驗；查不到來源就標「待查證」。
 
 ## 2. 系統架構
 
@@ -51,7 +53,7 @@
 
 | 檔案 | 角色 |
 |---|---|
-| `index.html` | 首頁：使命 hero、靜態承諾列、4 個緊急安全出口、4 段旅程／12 張真實情境問題卡、全站搜尋、原生兩題引導、第三方 Perth 生活社群、最近閱讀、收藏、工具與合作入口 |
+| `index.html` | 首頁：使命 hero、資料來源模型、4 個緊急安全出口、4 段旅程／12 張真實情境問題卡、全站搜尋、原生兩題引導、第三方 Perth 生活社群、最近閱讀、收藏、工具與回報修正入口；不放站長服務招攬 |
 | `why.html` | 自我釐清雙模式：8 題快思四面向＋8 題慢想工作表、研究／非診斷邊界、localStorage、匯出 txt |
 | `visa.html` | 簽證與集簽＋**集簽資格快查器** |
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
@@ -63,7 +65,7 @@
 | `health.html` | 保險就醫心理安全 |
 | `leave.html` | 報稅退休金離澳＋**DASP 速算**＋**本機離澳收尾清單** |
 | `pr.html` | PR 路徑總覽 |
-| `about.html` | 關於、免費公開內容與付費合作界線、私人 Email／需求單、公開 GitHub 合作入口、贊助（按鈕待站長提供連結）、授權、免責 |
+| `about.html` | 關於、官方／編輯／社群資料分層、回報修正、私人 Email／需求單、公開 GitHub 共編、合作治理、贊助、授權、免責 |
 | `404.html` | 自訂錯誤復原頁：保留 noindex，導回最近閱讀、卡關捷徑與四階段旅程 |
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
@@ -95,7 +97,7 @@
 
 ### 2.2 頁面共同結構
 
-每頁：`<head>`（description＋canonical＋OG／Twitter 分享圖＋WebSite／WebPage／Breadcrumb JSON-LD＋fonts＋style＋SVG favicon）→ sticky header
+每頁：`<head>`（description＋canonical＋OG／Twitter 分享圖＋WebSite／WebPage／Breadcrumb JSON-LD＋fonts＋style＋SVG favicon）→ 桌機 sticky／手機 static header
 （brand＋12 項 nav）→ `<main>`（page-title → toc → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨架、nav 全站同步加項
 （13 個檔案都要改——用腳本批次替換，別手改）、index 加卡片。

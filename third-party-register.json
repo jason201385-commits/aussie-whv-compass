@@ -62,14 +62,15 @@
       "id": "omara-official-register",
       "type": "official-directory",
       "name": "OMARA Register of Migration Agents",
-      "destinationHost": "mara.gov.au",
+      "destinationHost": "portal.mara.gov.au",
+      "destinationUrl": "https://portal.mara.gov.au/search-the-register-of-migration-agents/",
       "placement": "https://www.aussiewhvcompass.com/about.html#collaborate",
       "purpose": "reader-self-verification-and-self-selection",
       "relationship": "none",
       "compensation": "none",
       "specificAgentRecommended": false,
       "commercialReferral": false,
-      "checkedAt": "2026-08-29",
+      "checkedAt": "2026-08-30",
       "editorialStatus": "official-register-exit"
     }
   ],

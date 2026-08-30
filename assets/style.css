@@ -437,6 +437,22 @@ body:not(.home-page) main {
   border-radius: 32px;
   box-shadow: 0 18px 48px color-mix(in srgb, var(--ink) 11%, transparent);
 }
+body:not(.home-page) main > h2 {
+  margin: 42px -14px 18px;
+  padding: 13px 14px;
+  border-left: 5px solid var(--blue);
+  border-radius: 0 14px 14px 0;
+  background: var(--blue-soft);
+}
+body:not(.home-page) main > h2:nth-of-type(3n + 2) {
+  border-left-color: var(--green);
+  background: var(--green-soft);
+}
+body:not(.home-page) main > h2:nth-of-type(3n) {
+  border-left-color: var(--gold);
+  background: var(--gold-soft);
+}
+body:not(.home-page) main > p { max-width: 76ch; }
 .home-page {
   background-color: var(--bg);
 }
@@ -571,6 +587,42 @@ body:not(.home-page) main {
   padding: 11px 18px;
 }
 .trust-strip span + span::before { content: "/"; margin-right: 24px; }
+
+/* 首頁先交代資料工作，不把站長服務當成主要任務。 */
+.source-model {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  margin: 18px 0 30px;
+  padding: 24px 26px;
+  border: 1.5px solid var(--blue);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--blue-soft) 76%, var(--surface));
+  box-shadow: var(--shadow-pop-sm);
+}
+.source-model h2 { margin: .25em 0 .2em; font-size: clamp(1.3rem, 3vw, 1.75rem); }
+.source-model h2::before { display: none; }
+.source-model p:last-child { max-width: 760px; margin: 0; color: var(--ink-soft); }
+.source-model .btn { min-height: 44px; text-align: center; }
+
+.editorial-method { background: color-mix(in srgb, var(--blue-soft) 70%, var(--surface)); }
+.editorial-method > h2 { margin-top: .3em; }
+.editorial-method > h2::before { display: none; }
+.source-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+.source-method-grid article {
+  padding: 17px;
+  border: 1px solid color-mix(in srgb, var(--line) 54%, transparent);
+  border-radius: 15px;
+  background: var(--surface);
+}
+.source-method-grid strong { display: block; color: var(--green-ink); }
+.source-method-grid p { margin-bottom: 0; color: var(--ink-soft); font-size: .88rem; }
 
 /* ---------- 外部社群入口 ---------- */
 .community-callout {
@@ -782,8 +834,19 @@ body:not(.home-page) main {
   font-family: var(--font-serif);
   font-size: .82rem;
 }
-.journey-phase { scroll-margin-top: 90px; padding-top: 28px; }
-.journey-phase + .journey-phase { border-top: 1px solid var(--line-soft); margin-top: 22px; }
+.journey-phase {
+  scroll-margin-top: 90px;
+  margin-top: 24px;
+  padding: 28px;
+  border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--shadow-pop);
+}
+.journey-phase + .journey-phase { margin-top: 24px; }
+#considering { background: color-mix(in srgb, var(--blue-soft) 68%, var(--surface)); }
+#committed { background: color-mix(in srgb, var(--gold-soft) 62%, var(--surface)); }
+#in-australia { background: color-mix(in srgb, var(--green-soft) 62%, var(--surface)); }
 .section-eyebrow {
   margin: 0 0 -4px;
   color: var(--green-ink);
@@ -1832,6 +1895,10 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 main [id] { scroll-margin-top: 170px; }
 
 @media (max-width: 640px) {
+  .source-model { grid-template-columns: 1fr; gap: 16px; padding: 20px 18px; }
+  .source-model .btn { width: 100%; }
+  .source-method-grid { grid-template-columns: 1fr; }
+  .journey-phase { padding: 22px 16px; border-radius: 20px; }
   .feedback-actions { width: 100%; margin-left: 0; }
   .feedback-actions .btn { flex: 1 1 100%; width: 100%; text-align: center; }
   .gratitude-actions .btn { flex: 1 1 100%; text-align: center; }
@@ -1856,7 +1923,8 @@ main [id] { scroll-margin-top: 170px; }
 
 /* ---------- 行動版：控制列＋可水平捲動的攻略導覽 ---------- */
 @media (max-width: 768px) {
-  main [id] { scroll-margin-top: 132px; }
+  .site-header { position: static; }
+  main [id] { scroll-margin-top: 24px; }
   .lemon-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nav-inner {
     display: grid;
