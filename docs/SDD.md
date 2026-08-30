@@ -70,7 +70,7 @@
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
 | `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、D+ 固定類別彙總、私人需求單的 Email／複製備援與受控 Worker 漸進增強 |
 | `assets/api-config.js` | 只含共用公開 API origin 與 Turnstile site key；P0-4 未完成時兩者必須留空，使 D+、站內送出與 CRM 管理 fail closed；不得放 secret |
-| `assets/search-index.js` | 13 頁、116 個頁面／段落入口的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
+| `assets/search-index.js` | 13 頁、117 個頁面／段落入口的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
 | `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
@@ -79,6 +79,7 @@
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
 | `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、13 個完整繁中頁＋語言 Quick Start 搜尋探索、公開內容 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
 | `content-status.json`／`crawler-policy.txt` | 機器可讀的頁面風險、編輯／翻譯／審校狀態，以及允許索引引用但禁止表單、API、CRM 與個資爬取的政策 |
+| `third-party-register.json` | 公開第三方入口、關係、補償、查核狀態與更正紀錄；現行付費版位、聯盟連結與佣金轉介皆為 false |
 | `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots、llms、內容狀態與 crawler policy；`--check` 防止產物過期 |
 | `scripts/build_search.py` | 從 13 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
 | `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
@@ -182,6 +183,22 @@ metrics route 不建立 application request log，Wrangler observability 預設�
 所有繁中頁都維持零 D+ request；正式啟用、retention／platform logging 再確認與端到端收據仍屬 P0-4 gate。
 測驗開始鍵在 HTML 預設 `hidden`，只由成功執行的 `main.js` 揭露；因此 script 被 CSP 阻擋時不會留下
 無作用控制項，題目、結果與完成狀態也維持隱藏，目的與資料界線仍保留為可讀文字。
+
+### 3.2 商業合作與第三方入口治理
+
+- `about.html#recommendation-policy` 是人類可讀政策，`third-party-register.json` 是機器可讀現況；
+  兩者必須同步。登錄表的 `currentState` 不得在未完成實際合約、揭露與查核前改成 active。
+- 自然排序依任務相關性、官方／可回查依據、安全、費用與條款透明度、申訴出口、涵蓋範圍與更新狀態；
+  商業關係不得改變緊急安全出口、官方依據、風險揭露或第一順位。
+- 第三方分三級：官方／公共出口、一般商業服務與平台、受監管／高風險服務。後兩級上架前至少公開
+  營運者、適用資格、費用／佣金、申訴管道、本站關係、查核日期與編輯狀態；通過不等於品質保證。
+- 未來付費版位只能在獨立區塊顯示「廣告／贊助」、付款方、關係與查核日期，連結加
+  `rel="sponsored nofollow"`；不得混進自然排序。特定專業轉介須另過法律／稅務 gate，且未經使用者
+  明確同意不得傳送聯絡資料或個案內容。
+- 一般爭議標示複查中並暫停推薦；安全、疑似詐騙、資格失效或官方處分先下架。所有恢復、修正與
+  永久移除追加到公開 `correctionLog`，不公開個資或未查證指控。
+- LINE 邀請連結只能出現在首頁一般生活交流區；無付費、無佣金、無本站管理權，不作求職／租屋
+  查核、緊急支援，或簽證、法律、醫療等專業轉介。其他頁只能說明社群資訊也要查證，不得重放邀請連結。
 
 ## 4. 設計系統：「簡約檸檬布紋」
 

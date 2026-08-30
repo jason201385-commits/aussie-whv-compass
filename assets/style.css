@@ -1675,6 +1675,30 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .gratitude-actions .btn { min-height: 44px; }
 .private-contact { margin-top: 22px; background: var(--blue-soft); }
 .private-contact h3, .public-collaboration h3 { margin-top: 0; font-family: var(--font-serif); }
+.recommendation-policy > h3:first-child { margin-top: 0; }
+.governance-current {
+  padding: 14px 16px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--gold-soft);
+}
+.governance-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0 26px;
+}
+.governance-tier-grid article {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.governance-tier-grid h4 { margin: 7px 0 8px; font-family: var(--font-serif); font-size: 1.02rem; }
+.governance-tier-grid p { margin: 0; }
+.governance-checklist li + li { margin-top: 9px; }
+.community-register-link { margin: -10px 0 28px; text-align: right; }
 .contact-route-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
 .contact-route-actions .btn { min-height: 44px; }
 .contact-brief { margin-top: 24px; padding-top: 22px; border-top: 1px dashed var(--line); }
@@ -1813,6 +1837,8 @@ main [id] { scroll-margin-top: 170px; }
   .gratitude-actions .btn { flex: 1 1 100%; text-align: center; }
   .contact-brief-grid { grid-template-columns: 1fr; }
   .contact-field.full { grid-column: auto; }
+  .governance-tier-grid { grid-template-columns: 1fr; }
+  .community-register-link { text-align: left; }
   .contact-route-actions { align-items: stretch; flex-direction: column; }
   .contact-route-actions .btn { width: 100%; text-align: center; }
   .saved-pages { padding: 18px 16px; }

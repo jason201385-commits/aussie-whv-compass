@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
 LAST_MODIFIED = "2026-08-30"
-ASSET_VERSION = "20260830-28"
+ASSET_VERSION = "20260830-29"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -229,6 +229,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
             "",
             f"- [Sitemap]({ORIGIN}/sitemap.xml): 全部可索引頁面與最後修改日期。",
             f"- [內容狀態]({ORIGIN}/content-status.json): 各語言頁的風險級別、編輯狀態、證據卡狀態與專業審校界線。",
+            f"- [第三方關係登錄表]({ORIGIN}/third-party-register.json): 現行第三方入口、商業關係、查核狀態與更正紀錄。",
             f"- [Crawler policy]({ORIGIN}/crawler-policy.txt): 允許的公開內容用途，以及表單、API、CRM 與個資端點邊界。",
             f"- [來源與免責]({ORIGIN}/about.html): 維護方式、授權、合作與免責說明。",
             f"- [GitHub 原始碼](https://github.com/jason201385-commits/aussie-whv-compass): 可檢視內容版本與提出修正。",
@@ -351,11 +352,12 @@ def build_crawler_policy() -> str:
             "",
             f"Canonical site: {ORIGIN}/",
             f"Machine-readable content status: {ORIGIN}/content-status.json",
+            f"Machine-readable third-party register: {ORIGIN}/third-party-register.json",
             f"Sitemap: {ORIGIN}/sitemap.xml",
             "",
             "## Public guide content",
             "",
-            "Public HTML guide pages, llms.txt, sitemap.xml and content-status.json may be discovered, indexed, summarised and reasonably cited.",
+            "Public HTML guide pages, llms.txt, sitemap.xml, content-status.json and third-party-register.json may be discovered, indexed, summarised and reasonably cited.",
             "Keep the canonical page URL, visible source dates, editorial status and uncertainty boundaries with any summary or citation.",
             "Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.",
             "Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.",

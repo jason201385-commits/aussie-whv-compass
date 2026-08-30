@@ -2,11 +2,12 @@
 
 Canonical site: https://www.aussiewhvcompass.com/
 Machine-readable content status: https://www.aussiewhvcompass.com/content-status.json
+Machine-readable third-party register: https://www.aussiewhvcompass.com/third-party-register.json
 Sitemap: https://www.aussiewhvcompass.com/sitemap.xml
 
 ## Public guide content
 
-Public HTML guide pages, llms.txt, sitemap.xml and content-status.json may be discovered, indexed, summarised and reasonably cited.
+Public HTML guide pages, llms.txt, sitemap.xml, content-status.json and third-party-register.json may be discovered, indexed, summarised and reasonably cited.
 Keep the canonical page URL, visible source dates, editorial status and uncertainty boundaries with any summary or citation.
 Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.
 Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.

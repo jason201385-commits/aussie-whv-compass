@@ -1678,6 +1678,79 @@ foreach ($businessOption in @('客製課程、講座或工作坊', '網站與數
     $errors++
   }
 }
+
+# 商業合作與第三方入口必須公開分級、關係、排序與爭議處理，LINE 邀請只留在首頁生活交流區。
+foreach ($governanceNeedle in @(
+  'id="recommendation-policy"',
+  '錢不能買到第一推薦，也不能改寫風險',
+  '沒有付費版位、聯盟連結或佣金轉介',
+  '一般商業服務與平台',
+  '受監管或高風險服務',
+  '法定名稱或營運者',
+  '費用／佣金',
+  'rel="sponsored nofollow"',
+  '一般服務爭議先標示「複查中」並暫停推薦位置',
+  '涉及人身安全、疑似詐騙、資格失效或官方處分時，先下架外部入口',
+  'third-party-register.json?v=',
+  'template=report.yml'
+)) {
+  if (-not $aboutText.Contains($governanceNeedle)) { Write-Output "FAIL [about.html] 缺商業／第三方治理規則：$governanceNeedle"; $errors++ }
+}
+$lineInvitePattern = 'https://line\.me/ti/g2/JKYRJbgvE3vz4oXBazHqRhm67iWO5g3NI7Z0Wg'
+$lineInviteLocations = @()
+foreach ($rootPage in $pages + '404.html') {
+  $rootText = [System.IO.File]::ReadAllText((Join-Path $dir $rootPage), [System.Text.Encoding]::UTF8)
+  if ($rootText -match $lineInvitePattern) { $lineInviteLocations += $rootPage }
+}
+if ($lineInviteLocations.Count -ne 1 -or $lineInviteLocations[0] -ne 'index.html') {
+  Write-Output "FAIL LINE 邀請只能出現在首頁生活交流區；目前：$(($lineInviteLocations) -join ', ')"
+  $errors++
+}
+foreach ($communityNeedle in @('id="perth-community"', '群組非本站營運', '也不是工作、租屋、交易、緊急支援', '簽證、法律、醫療等專業轉介管道', '無付費、無佣金，本站不管理群組')) {
+  if (-not $indexText.Contains($communityNeedle)) { Write-Output "FAIL [index.html] LINE 第三方生活社群缺邊界：$communityNeedle"; $errors++ }
+}
+$workText = [System.IO.File]::ReadAllText((Join-Path $dir 'work.html'), [System.Text.Encoding]::UTF8)
+foreach ($workCommunityNeedle in @('第三方 Perth 生活社群入口只放在首頁的一般生活交流區', '不列為求職來源')) {
+  if (-not $workText.Contains($workCommunityNeedle)) { Write-Output "FAIL [work.html] 缺生活社群非求職入口邊界：$workCommunityNeedle"; $errors++ }
+}
+
+$thirdPartyRegisterPath = Join-Path $dir 'third-party-register.json'
+if (-not (Test-Path $thirdPartyRegisterPath)) {
+  Write-Output 'FAIL 缺 third-party-register.json'
+  $errors++
+} else {
+  try {
+    $thirdPartyRegister = [System.IO.File]::ReadAllText($thirdPartyRegisterPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+    if ($thirdPartyRegister.schemaVersion -ne 1 -or $thirdPartyRegister.generatedAt -ne '2026-08-30') {
+      Write-Output 'FAIL [third-party-register.json] schemaVersion／generatedAt 錯誤'; $errors++
+    }
+    foreach ($inactiveField in @('paidPlacementActive', 'affiliateLinksActive', 'commercialReferralActive', 'sponsoredRankingAllowed')) {
+      if ($thirdPartyRegister.currentState.$inactiveField -ne $false) { Write-Output "FAIL [third-party-register.json] P1-11 現況不得冒充已啟用：$inactiveField"; $errors++ }
+    }
+    $registerIds = @($thirdPartyRegister.entries | ForEach-Object { $_.id })
+    foreach ($requiredRegisterId in @('perth-line-community', 'commercial-navigation-platforms', 'omara-official-register')) {
+      if ($registerIds -notcontains $requiredRegisterId) { Write-Output "FAIL [third-party-register.json] 缺現行第三方關係：$requiredRegisterId"; $errors++ }
+    }
+    if (@($thirdPartyRegister.requiredReviewFields).Count -ne 7) { Write-Output 'FAIL [third-party-register.json] 上架前公開欄位數量錯誤'; $errors++ }
+    if ($null -eq $thirdPartyRegister.correctionLog -or $thirdPartyRegister.correctionPolicy.changeHistoryRetained -ne $true) {
+      Write-Output 'FAIL [third-party-register.json] 缺更正紀錄機制'; $errors++
+    }
+  } catch {
+    Write-Output "FAIL [third-party-register.json] 不是有效 JSON：$($_.Exception.Message)"
+    $errors++
+  }
+}
+$thirdPartyLinkVersions = @([regex]::Matches($aboutText + $indexText, 'third-party-register\.json\?v=([0-9-]+)') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+if ($thirdPartyLinkVersions.Count -ne 1 -or $uniqueAssetVersions.Count -ne 1 -or $thirdPartyLinkVersions[0] -ne $uniqueAssetVersions[0]) {
+  Write-Output "FAIL 第三方登錄表版本必須與全站資產一致：$(($thirdPartyLinkVersions) -join ', ')"
+  $errors++
+}
+$llmsText = [System.IO.File]::ReadAllText((Join-Path $dir 'llms.txt'), [System.Text.Encoding]::UTF8)
+$crawlerPolicyText = [System.IO.File]::ReadAllText((Join-Path $dir 'crawler-policy.txt'), [System.Text.Encoding]::UTF8)
+if (-not $llmsText.Contains('/third-party-register.json') -or -not $crawlerPolicyText.Contains('third-party-register.json')) {
+  Write-Output 'FAIL llms.txt／crawler-policy.txt 未公開第三方關係登錄表'
+  $errors++
+}
 foreach ($forbiddenServiceOption in @('一般行政', '資訊指路', '簽證', '移民', '代辦')) {
   $briefTypeBlock = [regex]::Match($aboutText, '(?s)<select id="brief-type".*?</select>')
   if (-not $briefTypeBlock.Success -or $briefTypeBlock.Value.Contains($forbiddenServiceOption)) {

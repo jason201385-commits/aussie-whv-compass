@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30",
+  "canonicalOrigin": "https://www.aussiewhvcompass.com",
+  "editorialPolicyUrl": "https://www.aussiewhvcompass.com/about.html#recommendation-policy",
+  "currentState": {
+    "paidPlacementActive": false,
+    "affiliateLinksActive": false,
+    "commercialReferralActive": false,
+    "sponsoredRankingAllowed": false
+  },
+  "requiredReviewFields": [
+    "legalEntityOrOperator",
+    "officialRegistrationWhenApplicable",
+    "serviceAndFeeDisclosure",
+    "complaintRoute",
+    "commercialRelationship",
+    "checkedAt",
+    "editorialStatus"
+  ],
+  "entries": [
+    {
+      "id": "perth-line-community",
+      "type": "third-party-community",
+      "name": "西澳 Perth 享受生活互相交流",
+      "destinationHost": "line.me",
+      "placement": "https://www.aussiewhvcompass.com/#perth-community",
+      "purpose": "general-life-and-activity-exchange-only",
+      "relationship": "moderator-approved-link-sharing",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "qualifiedProfessionalReferral": false,
+      "checkedAt": "2026-08-29",
+      "editorialStatus": "listed-with-third-party-boundary"
+    },
+    {
+      "id": "commercial-navigation-platforms",
+      "type": "neutral-navigation-group",
+      "name": "住宿、租屋、二手車與分類廣告平台",
+      "placements": [
+        "https://www.aussiewhvcompass.com/housing.html#book",
+        "https://www.aussiewhvcompass.com/housing.html#find",
+        "https://www.aussiewhvcompass.com/cost.html#car"
+      ],
+      "purpose": "help-readers-compare-options-at-the-provider",
+      "relationship": "none",
+      "compensation": "none",
+      "affiliateTracking": false,
+      "selectionBasis": [
+        "task-relevance",
+        "direct-provider-link",
+        "coverage",
+        "visible-cost-and-terms-reminder",
+        "safety-and-official-check-route"
+      ],
+      "isCertificationOrQualityGuarantee": false,
+      "checkedAt": "2026-08-29",
+      "editorialStatus": "neutral-navigation-not-ranked-by-payment"
+    },
+    {
+      "id": "omara-official-register",
+      "type": "official-directory",
+      "name": "OMARA Register of Migration Agents",
+      "destinationHost": "mara.gov.au",
+      "placement": "https://www.aussiewhvcompass.com/about.html#collaborate",
+      "purpose": "reader-self-verification-and-self-selection",
+      "relationship": "none",
+      "compensation": "none",
+      "specificAgentRecommended": false,
+      "commercialReferral": false,
+      "checkedAt": "2026-08-29",
+      "editorialStatus": "official-register-exit"
+    }
+  ],
+  "correctionPolicy": {
+    "ordinaryDispute": "mark-under-review-and-suspend-recommended-placement",
+    "safetyFraudOrCredentialLoss": "remove-link-immediately-pending-review",
+    "personalOrUnverifiedAllegationsPublished": false,
+    "changeHistoryRetained": true
+  },
+  "correctionLog": []
+}
