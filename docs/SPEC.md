@@ -46,7 +46,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 緊急安全出口 | 首頁 `#support-hub` | 4 個高風險零打字入口 | 只連向既有內容錨點：立即危險、剛匯款／帳號風險、威脅／剝削／扣證件、簽證到期／官方通知 | 先做降低傷害的第一步，不複製可能過時的電話或政策數字 |
 | 旅程問題卡 | 首頁 `#journey-map`＋4 個 `.journey-phase` | 12 張「類別＋真實情境」卡 | 每卡顯示情境、白話說明與第一步；依考慮／準備／在澳／離澳與延續分組 | 直接進入對應完整攻略，不強迫線性閱讀 |
 | 可選兩題引導 | 首頁 `.route-guide` | 階段＋最怕的損失 | 原生 `details`，即使無 JavaScript 仍可用；只連固定同站頁面／錨點 | 在問題卡與搜尋仍無法判斷時縮小範圍，高風險時回到安全出口 |
-| 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 13 頁／109 段落靜態索引；NFKC 正規化、固定同義詞、標題／段落加權；不保存、不送出查詢，動態文字只用 `textContent` | 最多 8 個同站深連結結果；零結果提供縮短關鍵詞與許願入口 |
+| 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 13 頁／116 個頁面與段落入口的靜態索引；NFKC 正規化、固定同義詞、標題／段落加權；不保存、不送出查詢，動態文字只用 `textContent` | 最多 8 個同站深連結結果；零結果提供縮短關鍵詞與許願入口 |
 | 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種主要官方／通行語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；完整 13 頁仍以繁中為主 |
 | 頁尾旅程導覽 | 12 個內容頁（main.js 注入） | — | 依首頁四階段的 `JOURNEY_ORDER` 單一排序產生上一站／完整旅程／下一站；首頁不注入，首末頁以首頁旅程圖收邊 | 顯示目前階段與第 x/12 頁，不強迫線性閱讀 |
 
@@ -93,8 +93,8 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 
 - `analytics-config.js` 的 Measurement ID 目前為空字串，正式站不會載入 Google Analytics。
 - 2026-08-30 決策：第一階段不啟用 GA4、第三方 pixel、session replay 或跨頁識別碼；
-  改採 D+ 聚合量測＋自願任務測試。D+ 只允許日期、粗略頁面／出口類別與聚合計數，
-  不保存 IP、User-Agent、referrer、搜尋原文、表單內容或可連結個人的事件列。
+  改採 D+ 聚合量測＋自願任務測試。D+ 只允許 Perth 日期、固定出口／結果類別與聚合計數；
+  應用程式與 D1 不讀取或保存 IP、User-Agent、referrer、搜尋原文、表單內容或可連結個人的事件列。
 - 詐騙、健康、剝削等敏感頁面即使未來啟用 GA4，也不得做個人層級行為量測。
 - 設定有效 `G-...` ID 後，仍採 Basic Consent：未選擇或拒絕時不建立 Google tag request；
   同意後才載入。選擇只存 `whv-analytics-consent-v1`，頁尾可重開設定。
@@ -253,7 +253,7 @@ TypeScript；14 項測試涵蓋 CORS、16 KiB JSON 上限、Turnstile token／ho
 HMAC 化的 Email 限流鍵、D1 migration／prepared statements、白名單 D+ counter 與不對外寄送的
 mock mail。`wrangler d1 migrations apply DB --local` 與 `wrangler deploy --dry-run` 通過；設定中的
 D1 ID 是不可部署的全零佔位值，`workers_dev`／preview URL 關閉，沒有建立遠端資源、輸入 secret、
-寄信或部署。P1-9 的公開表單端點與前端切換尚未完成，現行 Email／複製流程維持不變。
+寄信或部署。P1-9 與 P1-10 已在後續任務完成本機閉環；正式站仍維持 Email／複製備援與零 D+ request。
 
 ### P1-9 私人需求單與 CRM — 程式完成／本機驗證，正式仍待 P0-4
 
@@ -272,11 +272,24 @@ mock transport 接受後才回 `sent`，未設定 transport 時案件仍安全�
 管理 fragment 清除、桌機／手機／no-JS 備援；但公開 API origin 與 site key 刻意留空，未建立正式資源、
 未真實寄信或部署。P0-4 完成並通過收件／退信與正式 E2E 前，只能稱程式完成／本機驗證。
 
-### P1-10 D+ 聚合量測 — 已批准、待 P1-8
+### P1-10 D+ 聚合量測 — 程式完成／本機驗證，正式仍待 P0-4
 
 - 不建立 client ID、cookie、fingerprint 或跨頁識別；只累加日期＋白名單類別的聚合 counter。
-- 不接收 query、自由文字、表單內容、IP、User-Agent、referrer 或精細地理位置。
-- 搭配自願任務測試評估 30 秒找路、理解依據與正確求助；任務研究資料另做同意、去識別與保存管理。
+- endpoint 拒絕 query 與額外欄位；應用程式不讀取或保存自由文字、表單內容、IP、User-Agent、
+  referrer、精細地理位置或精確作答時間。基礎設施仍會為傳輸與防濫用處理必要的網路連線資料，
+  不得把「應用程式不保存」寫成供應商完全不處理。
+- 搭配自願任務測試評估 30 秒找路、理解依據與正確求助；答案與精確計時只存在當頁記憶體，
+  後端只收到成功與完成的固定類別，沒有研究逐筆資料集。
+
+2026-08-30 本機證據：`POST /api/metrics` 只接受單欄位 `{metricKey}` 與 7 個白名單類別，
+由伺服器依 `Australia/Perth` 產生日期，再以 prepared statement 增加 `daily_counters`；D1 schema
+只有日期、類別、總數與更新時間。固定類別 edge-local rate limit 只作防濫用，不作人數或完成證據；
+該 route 不寫 application request log，Wrangler observability 預設關閉。21 項 Workers runtime 測試包含
+日期邊界、重複累加、額外欄位／query／未知類別拒絕、schema 欄位與無 application log。
+繁中頁先載入公開 API 設定再載入 `main.js`；設定仍為空，所以正式頁不會發出 D+ request。
+自願測試可在本機完成並明示沒有送出計數；公開 API 啟用與正式收據仍待 P0-4。
+桌機、390px 手機與 CSP 阻擋 script 的 E2E 皆無水平溢位；正常模式會顯示測驗控制項，script 未執行時
+控制項保持隱藏而隱私說明仍可讀，不會把未執行誤報為完成。
 
 ### P1-11 商業合作與第三方入口治理 — 已批准、待實作
 

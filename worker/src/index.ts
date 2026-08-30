@@ -7,6 +7,7 @@ import {
   viewManagedContactCase,
 } from "./contact";
 import { errorResponse, jsonResponse } from "./http";
+import { recordAggregateMetric } from "./metrics";
 import { purgeExpiredContactCases } from "./repository";
 
 interface RuntimeSecrets {
@@ -37,19 +38,24 @@ function createFetchHandler(dependencies: AppDependencies) {
     env: AppEnv,
     _ctx: ExecutionContext,
   ): Promise<Response> {
-    const requestId = crypto.randomUUID();
+    const url = new URL(request.url);
+    const isAggregateMetric = url.pathname === "/api/metrics";
+    const requestId = isAggregateMetric ? "" : crypto.randomUUID();
     const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
     let origin: string | null = null;
+
+    function logOperationalResult(status: number): void {
+      if (!isAggregateMetric) logResult(requestId, request, status);
+    }
 
     try {
       origin = requireAllowedOrigin(request, allowedOrigins);
       if (request.method === "OPTIONS") {
         const response = preflightResponse(origin);
-        logResult(requestId, request, response.status);
+        logOperationalResult(response.status);
         return response;
       }
 
-      const url = new URL(request.url);
       let response: Response;
       if (request.method === "GET" && url.pathname === "/api/health") {
         response = jsonResponse({
@@ -67,6 +73,8 @@ function createFetchHandler(dependencies: AppDependencies) {
         response = await updateManagedContact(request, env, dependencies);
       } else if (request.method === "POST" && url.pathname === "/api/contact/delete") {
         response = await deleteManagedContact(request, env, dependencies);
+      } else if (request.method === "POST" && url.pathname === "/api/metrics") {
+        response = await recordAggregateMetric(request, env);
       } else {
         response = jsonResponse(
           {
@@ -79,11 +87,11 @@ function createFetchHandler(dependencies: AppDependencies) {
       }
 
       const corsResponse = withCors(response, origin);
-      logResult(requestId, request, corsResponse.status);
+      logOperationalResult(corsResponse.status);
       return corsResponse;
     } catch (error) {
       const response = withCors(errorResponse(error, requestId), origin);
-      logResult(requestId, request, response.status);
+      logOperationalResult(response.status);
       return response;
     }
   };

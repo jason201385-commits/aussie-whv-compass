@@ -23,19 +23,20 @@ export function jsonResponse(
 }
 
 export function errorResponse(error: unknown, requestId: string): Response {
+  const withRequestId = (body: Record<string, unknown>): Record<string, unknown> =>
+    requestId ? { ...body, requestId } : body;
   if (error instanceof HttpError) {
     return jsonResponse(
-      { ok: false, error: { code: error.code, message: error.message }, requestId },
+      withRequestId({ ok: false, error: { code: error.code, message: error.message } }),
       error.status,
     );
   }
 
   return jsonResponse(
-    {
+    withRequestId({
       ok: false,
       error: { code: "internal_error", message: "服務暫時無法處理，請稍後再試。" },
-      requestId,
-    },
+    }),
     500,
   );
 }

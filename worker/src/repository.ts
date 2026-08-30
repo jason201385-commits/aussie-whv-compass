@@ -11,6 +11,9 @@ export const METRIC_KEYS = [
   "route_opened",
   "official_source_opened",
   "task_test_started",
+  "task_find_route_success_30s",
+  "task_evidence_understood",
+  "task_help_route_correct",
   "task_test_completed",
 ] as const;
 

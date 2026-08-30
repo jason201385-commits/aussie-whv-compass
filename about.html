@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260830-25" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260830-28" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260830-25">
+<link rel="stylesheet" href="assets/style.css?v=20260830-28">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -313,6 +313,40 @@
     <p>GA4 啟用後，你可以從每頁頁尾的「網站統計設定」改變選擇。撤回只能停止之後的載入與量測，無法收回先前已送出的統計資料。Google 如何處理資料請看<a href="https://support.google.com/analytics/answer/6004245?hl=zh-Hant" target="_blank" rel="noopener noreferrer">Google Analytics 資料保護說明</a>。</p>
   </div>
 
+  <details class="panel dplus-task-test" id="dplus-task-test">
+    <summary>自願做一個 30 秒匿名找路測試</summary>
+    <p><strong>目的：</strong>確認大家能不能快速找到安全下一步、看懂依據、找對專業求助。全程不要求姓名、Email 或自由文字；答案與精確秒數只留在本頁。D+ 啟用後，後端只會分開累加日期＋固定結果類別，不建立事件明細、cookie、client ID 或跨頁紀錄。</p>
+    <button type="button" class="btn secondary" id="dplus-task-start" hidden>我願意開始匿名測試</button>
+    <div id="dplus-task-questions" hidden>
+      <fieldset data-task="route">
+        <legend>1. 你今晚突然沒地方住，第一步應該去哪裡？</legend>
+        <label><input type="radio" name="dplus-route" value="social-post"> 到社群發文等陌生人私訊</label>
+        <label><input type="radio" name="dplus-route" value="urgent-housing"> 首頁「今晚沒地方住」安全出口</label>
+        <label><input type="radio" name="dplus-route" value="pr-guide"> PR 路徑總覽</label>
+      </fieldset>
+      <fieldset data-task="evidence">
+        <legend>2. 高風險資訊怎樣才比較值得信任？</legend>
+        <label><input type="radio" name="dplus-evidence" value="confident-tone"> 文案語氣很有自信</label>
+        <label><input type="radio" name="dplus-evidence" value="many-shares"> 社群分享次數很多</label>
+        <label><input type="radio" name="dplus-evidence" value="source-date-status"> 有官方來源、查核日期與編輯狀態</label>
+      </fieldset>
+      <fieldset data-task="help">
+        <legend>3. 需要個人簽證選項建議時，應該找誰？</legend>
+        <label><input type="radio" name="dplus-help" value="site-owner"> 請本站直接替我選</label>
+        <label><input type="radio" name="dplus-help" value="omara"> 從 OMARA 名冊查驗合格專業人士</label>
+        <label><input type="radio" name="dplus-help" value="anonymous-comment"> 相信匿名留言的保證</label>
+      </fieldset>
+      <button type="button" class="btn" id="dplus-task-finish">完成並看本機結果</button>
+    </div>
+    <p class="ws-status" id="dplus-task-status" role="status" aria-live="polite">尚未開始；是否參加完全自願。</p>
+    <ul id="dplus-task-result" class="dplus-task-result" hidden>
+      <li id="dplus-result-route"></li>
+      <li id="dplus-result-evidence"></li>
+      <li id="dplus-result-help"></li>
+    </ul>
+    <noscript><p class="warn">匿名找路測試需要 JavaScript；不參加不影響任何內容。</p></noscript>
+  </details>
+
   <h2 id="license"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg> 授權</h2>
   <p>本站文字內容以 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant" rel="noopener">CC BY-SA 4.0</a> 授權：歡迎轉載、改作，但請註明出處並以相同方式分享。程式碼以 MIT 授權。</p>
 
@@ -331,10 +365,10 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260830-25"></script>
-<script src="assets/analytics.js?v=20260830-25"></script>
-<script src="assets/i18n.js?v=20260830-25"></script>
-<script src="assets/api-config.js?v=20260830-25"></script>
-<script src="assets/main.js?v=20260830-25"></script>
+<script src="assets/analytics-config.js?v=20260830-28"></script>
+<script src="assets/analytics.js?v=20260830-28"></script>
+<script src="assets/i18n.js?v=20260830-28"></script>
+<script src="assets/api-config.js?v=20260830-28"></script>
+<script src="assets/main.js?v=20260830-28"></script>
 </body>
 </html>

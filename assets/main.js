@@ -136,7 +136,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260830-25";
+      script.src = "assets/search-index.js?v=20260830-28";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -822,6 +822,132 @@
     renderQuickResult(false);
   }
 
+  // ---------- D+ 匿名彙總量測（固定類別，不送頁面、識別碼或自由文字） ----------
+  var DPLUS_METRIC_KEYS = [
+    "route_opened",
+    "official_source_opened",
+    "task_test_started",
+    "task_find_route_success_30s",
+    "task_evidence_understood",
+    "task_help_route_correct",
+    "task_test_completed"
+  ];
+
+  function getPublicApiBaseUrl() {
+    var config = window.WHV_API_CONFIG;
+    if (!config || typeof config.apiBaseUrl !== "string" || !config.apiBaseUrl) return "";
+    try {
+      var url = new URL(config.apiBaseUrl);
+      var loopback = (url.hostname === "127.0.0.1" || url.hostname === "localhost") && location.hostname === url.hostname;
+      if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) return "";
+      if (url.username || url.password || url.search || url.hash || (url.pathname && url.pathname !== "/")) return "";
+      return url.origin;
+    } catch (e) { return ""; }
+  }
+
+  function sendDplusMetric(metricKey) {
+    if (DPLUS_METRIC_KEYS.indexOf(metricKey) === -1) return Promise.resolve(false);
+    var apiBaseUrl = getPublicApiBaseUrl();
+    if (!apiBaseUrl) return Promise.resolve(false);
+    return fetch(apiBaseUrl + "/api/metrics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metricKey: metricKey }),
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+      keepalive: true
+    }).then(function (response) {
+      if (!response.ok) return false;
+      return response.json().then(function (result) {
+        return !!(result && result.ok === true && result.accepted === true);
+      }, function () { return false; });
+    }, function () { return false; });
+  }
+
+  document.addEventListener("click", function (event) {
+    var clicked = event.target instanceof Element ? event.target : null;
+    if (!clicked) return;
+    var routeLink = clicked.closest("a.support-link, .home-page a.card");
+    if (routeLink) {
+      sendDplusMetric("route_opened");
+      return;
+    }
+    var sourceLink = clicked.closest(".fact-meta a, .evidence-card__meta a, .evidence-card__basis a");
+    if (sourceLink) sendDplusMetric("official_source_opened");
+  });
+
+  var dplusTaskStart = document.getElementById("dplus-task-start");
+  var dplusTaskQuestions = document.getElementById("dplus-task-questions");
+  var dplusTaskFinish = document.getElementById("dplus-task-finish");
+  var dplusTaskStatus = document.getElementById("dplus-task-status");
+  var dplusTaskResult = document.getElementById("dplus-task-result");
+  var dplusResultRoute = document.getElementById("dplus-result-route");
+  var dplusResultEvidence = document.getElementById("dplus-result-evidence");
+  var dplusResultHelp = document.getElementById("dplus-result-help");
+  var dplusTaskStartedAt = null;
+
+  if (dplusTaskStart && dplusTaskQuestions && dplusTaskFinish && dplusTaskStatus && dplusTaskResult) {
+    dplusTaskStart.hidden = false;
+    dplusTaskStart.addEventListener("click", function () {
+      if (dplusTaskStartedAt !== null) return;
+      dplusTaskStartedAt = performance.now();
+      dplusTaskQuestions.hidden = false;
+      dplusTaskStart.disabled = true;
+      dplusTaskStatus.textContent = "測試進行中；答案與計時只存在這個頁面。";
+      sendDplusMetric("task_test_started");
+      var firstChoice = dplusTaskQuestions.querySelector('input[type="radio"]');
+      if (firstChoice) firstChoice.focus();
+    });
+
+    dplusTaskFinish.addEventListener("click", function () {
+      var routeAnswer = dplusTaskQuestions.querySelector('input[name="dplus-route"]:checked');
+      var evidenceAnswer = dplusTaskQuestions.querySelector('input[name="dplus-evidence"]:checked');
+      var helpAnswer = dplusTaskQuestions.querySelector('input[name="dplus-help"]:checked');
+      if (!routeAnswer || !evidenceAnswer || !helpAnswer) {
+        dplusTaskStatus.textContent = "請先完成三題；不想繼續也可以直接離開。";
+        var firstMissing = !routeAnswer ? 'input[name="dplus-route"]' : (!evidenceAnswer ? 'input[name="dplus-evidence"]' : 'input[name="dplus-help"]');
+        var missingChoice = dplusTaskQuestions.querySelector(firstMissing);
+        if (missingChoice) missingChoice.focus();
+        return;
+      }
+
+      var elapsedMilliseconds = dplusTaskStartedAt === null ? Number.POSITIVE_INFINITY : performance.now() - dplusTaskStartedAt;
+      var routeCorrect = routeAnswer.value === "urgent-housing";
+      var routeWithinThirtySeconds = routeCorrect && elapsedMilliseconds <= 30000;
+      var evidenceCorrect = evidenceAnswer.value === "source-date-status";
+      var helpCorrect = helpAnswer.value === "omara";
+      dplusTaskFinish.disabled = true;
+
+      dplusResultRoute.textContent = routeCorrect
+        ? "找路：正確；你選到首頁的緊急住宿安全出口（本頁計時 " + (elapsedMilliseconds / 1000).toFixed(1) + " 秒）。"
+        : "找路：先回首頁選「今晚沒地方住」的安全出口，不要只等陌生人私訊。";
+      dplusResultEvidence.textContent = evidenceCorrect
+        ? "依據：正確；官方來源、查核日期與編輯狀態都應該能回查。"
+        : "依據：高風險內容不能只看語氣或分享數，要回查來源、日期與編輯狀態。";
+      dplusResultHelp.textContent = helpCorrect
+        ? "求助：正確；個人移民建議應從 OMARA 名冊查驗合格專業人士。"
+        : "求助：本站不替你選個人簽證方案；請從 OMARA 名冊查驗合格專業人士。";
+      dplusTaskResult.hidden = false;
+
+      var metricRequests = [];
+      if (routeWithinThirtySeconds) metricRequests.push(sendDplusMetric("task_find_route_success_30s"));
+      if (evidenceCorrect) metricRequests.push(sendDplusMetric("task_evidence_understood"));
+      if (helpCorrect) metricRequests.push(sendDplusMetric("task_help_route_correct"));
+      metricRequests.push(sendDplusMetric("task_test_completed"));
+
+      if (!getPublicApiBaseUrl()) {
+        dplusTaskStatus.textContent = "本機結果已完成；D+ 尚未啟用，沒有送出計數。";
+      } else {
+        dplusTaskStatus.textContent = "本機結果已完成；正在確認匿名彙總計數是否被後端接受。";
+        Promise.all(metricRequests).then(function (accepted) {
+          dplusTaskStatus.textContent = accepted.every(Boolean)
+            ? "本機結果已完成；後端已接受固定類別的匿名彙總計數。"
+            : "本機結果已完成；部分匿名彙總計數未確認，不影響你的結果或網站使用。";
+        });
+      }
+    });
+  }
+
   // ---------- 私人合作需求單（只在 about.html 生效） ----------
   var briefForm = document.getElementById("contact-brief");
   if (briefForm) {
@@ -970,15 +1096,10 @@
 
     function getApiSettings() {
       var config = window.WHV_API_CONFIG;
-      if (!config || typeof config.contactApiBaseUrl !== "string" || typeof config.turnstileSiteKey !== "string") return null;
-      if (!config.contactApiBaseUrl || !config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
-      try {
-        var url = new URL(config.contactApiBaseUrl);
-        var loopback = (url.hostname === "127.0.0.1" || url.hostname === "localhost") && location.hostname === url.hostname;
-        if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) return null;
-        if (url.username || url.password || url.search || url.hash || (url.pathname && url.pathname !== "/")) return null;
-        return { baseUrl: url.origin, siteKey: config.turnstileSiteKey };
-      } catch (e) { return null; }
+      var apiBaseUrl = getPublicApiBaseUrl();
+      if (!apiBaseUrl || !config || typeof config.turnstileSiteKey !== "string") return null;
+      if (!config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
+      return { baseUrl: apiBaseUrl, siteKey: config.turnstileSiteKey };
     }
 
     function loadTurnstile() {

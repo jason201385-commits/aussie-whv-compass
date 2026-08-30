@@ -68,9 +68,9 @@
 | `assets/style.css` | 全站唯一樣式表（含設計 token，見 §4） |
 | `assets/lemon-pattern.svg` | 參考生活照片重畫的本地裝飾圖樣；淡藍奶油條紋由 CSS 產生，SVG 只含不規則檸檬與灰綠葉 |
 | `assets/og-cover.svg`／`og-cover.png` | 1200×630 社群分享圖的可編輯來源與正式點陣資產；延伸既有檸檬布紋，不使用使用者照片 |
-| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、私人需求單的 Email／複製備援與受控 Worker 漸進增強 |
-| `assets/api-config.js` | 只含公開 API origin 與 Turnstile site key；P0-4 未完成時兩者必須留空，使站內送出／CRM 管理 fail closed；不得放 secret |
-| `assets/search-index.js` | 13 頁、109 個頁面／段落的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
+| `assets/main.js` | 全站共用：SVG sprite 注入、導覽標示、本機站內搜尋、回訪續接、頁尾旅程導覽、回饋列注入、chip 填字、自我釐清雙模式、D+ 固定類別彙總、私人需求單的 Email／複製備援與受控 Worker 漸進增強 |
+| `assets/api-config.js` | 只含共用公開 API origin 與 Turnstile site key；P0-4 未完成時兩者必須留空，使 D+、站內送出與 CRM 管理 fail closed；不得放 secret |
+| `assets/search-index.js` | 13 頁、116 個頁面／段落入口的靜態搜尋索引；首次開啟搜尋才同站載入，不含使用者輸入 |
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
 | `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
@@ -111,6 +111,11 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   原生驗證與 Turnstile 完成後用 `credentials: omit`、`referrerPolicy: no-referrer` POST；成功必須同時
   滿足 HTTP success 與後端 `{ok:true}`，再顯示案件編號、伺服器時間與 `sent`／`queued` Email 狀態。
   管理 token 只放同站 URL 的 fragment，讀入欄位後立刻由 `history.replaceState` 清除，不寫 localStorage。
+- **P1-10 D+ 漸進增強**：每個繁中頁在 `main.js` 前載入同一份 `api-config.js`；公開 API origin 留空時
+  `sendDplusMetric()` 直接回傳 `false`，不建立 request。啟用後，首頁安全出口／問題卡與證據卡官方來源
+  只送白名單 metric key，request body 固定為 `{metricKey}`，使用 `credentials: omit`、
+  `referrerPolicy: no-referrer`。自願任務的答案與 `performance.now()` 計時只留在當頁變數，不寫 storage，
+  後端只收到成功／完成類別；完成畫面會區分本機結果與後端是否接受計數。
 - **站內搜尋**：`main.js` 注入全站 dialog 與 header 入口，首次開啟才載入
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
@@ -150,8 +155,8 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
 - **保存**：一般詢問與未成交需求以結案或最後聯絡時間為基準，24 個月後由排程刪除；
   正式合約、付款或依法另需保存的資料不得混用同一 retention class。
 - **確認**：成功回應包含不可推測的案件編號與伺服器時間；自動信只做交易通知，不訂閱行銷。
-- **D+**：只接受白名單 counter key，以日期彙總；不得建立事件列、client ID、cookie、fingerprint，
-  不得保存 IP、User-Agent、referrer、query、自由文字或精細地理位置。
+- **D+**：只接受白名單 counter key，由伺服器依 Perth 日期彙總；不得建立事件列、client ID、cookie、
+  fingerprint，不得在應用程式或 D1 保存 IP、User-Agent、referrer、query、自由文字或精細地理位置。
 - **安全**：Turnstile token 必須 server-side 驗證；輸入長度、CORS origin、rate limit 與 SQL 皆採白名單／prepared statement。
 
 2026-08-30 的 P1-8 本機基礎：`worker/src/` 已拆分 HTTP/CORS、bounded JSON、Turnstile、
@@ -168,6 +173,15 @@ P1-9 本機閉環加入：`POST /api/contact`、`/api/contact/manage`、`/api/co
 並留下固定錯誤碼等待重試，不把 provider 錯誤或使用者內容寫入 log。管理 token 與 Turnstile 同時
 通過才可查閱／更正／永久刪除；每日 cron 以 prepared statement 清除 `delete_after` 到期案件。
 目前預設 mail transport 是 disabled、公開 API 設定為空，因此只證明程式與本機 mock 閉環，沒有真實寄信或部署。
+
+P1-10 本機閉環加入：`POST /api/metrics` 只接受單欄位 `{metricKey}` 與 7 個固定類別，拒絕 query、
+額外欄位及未知 key；`0002_dplus_task_metrics.sql` 將 D1 約束同步為相同白名單。日期由 Worker 依
+`Australia/Perth` 產生，rate limit 使用每個類別共用的固定 key，因此不是人數估算，也不能當完成證據。
+metrics route 不建立 application request log，Wrangler observability 預設關閉；Cloudflare 作為傳輸與
+防濫用基礎設施仍可能處理必要連線資料，隱私文案不得過度宣稱供應商完全看不到。正式 API origin 留空時，
+所有繁中頁都維持零 D+ request；正式啟用、retention／platform logging 再確認與端到端收據仍屬 P0-4 gate。
+測驗開始鍵在 HTML 預設 `hidden`，只由成功執行的 `main.js` 揭露；因此 script 被 CSP 阻擋時不會留下
+無作用控制項，題目、結果與完成狀態也維持隱藏，目的與資料界線仍保留為可讀文字。
 
 ## 4. 設計系統：「簡約檸檬布紋」
 

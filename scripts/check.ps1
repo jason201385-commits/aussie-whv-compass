@@ -77,7 +77,7 @@ if (-not (Test-Path $notFoundPath)) {
     Write-Output 'FAIL [404.html] 未知路徑不得誤標任何目前頁'
     $errors++
   }
-  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|analytics-config\.js|analytics\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($notFoundText, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output 'FAIL [404.html] 本機資產缺 ?v= 版本'; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -1739,16 +1739,64 @@ if (-not (Test-Path $apiConfigPath)) {
   $errors++
 } else {
   $apiConfigText = [System.IO.File]::ReadAllText($apiConfigPath, [System.Text.Encoding]::UTF8)
-  foreach ($apiConfigNeedle in @('contactApiBaseUrl: ""', 'turnstileSiteKey: ""', 'Public values only', 'P0-4')) {
+  foreach ($apiConfigNeedle in @('apiBaseUrl: ""', 'turnstileSiteKey: ""', 'Public values only', 'P0-4')) {
     if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] P0-4 前必須 fail closed：$apiConfigNeedle"; $errors++ }
   }
   foreach ($apiSecretName in @('TURNSTILE_SECRET_KEY', 'RATE_LIMIT_HMAC_KEY', 'API_KEY')) {
     if ($apiConfigText.Contains($apiSecretName)) { Write-Output "FAIL [api-config.js] 前端不得出現 secret 名稱或值：$apiSecretName"; $errors++ }
   }
 }
-if (-not $aboutText.Contains('<script src="assets/api-config.js?v=') -or $aboutText.IndexOf('assets/api-config.js?v=') -gt $aboutText.IndexOf('assets/main.js?v=')) {
-  Write-Output 'FAIL [about.html] API 公開設定必須帶版本並在 main.js 前載入'
+foreach ($rootPage in $pages + '404.html') {
+  $rootPageText = [System.IO.File]::ReadAllText((Join-Path $dir $rootPage), [System.Text.Encoding]::UTF8)
+  if (-not $rootPageText.Contains('<script src="assets/api-config.js?v=') -or $rootPageText.IndexOf('assets/api-config.js?v=') -gt $rootPageText.IndexOf('assets/main.js?v=')) {
+    Write-Output "FAIL [$rootPage] API 公開設定必須帶版本並在 main.js 前載入"
+    $errors++
+  }
+}
+
+# D+ 只接受固定類別的每日彙總；答案、精確秒數、頁面、查詢與識別資訊不得送出或持久化。
+foreach ($dplusId in @('dplus-task-test', 'dplus-task-start', 'dplus-task-questions', 'dplus-task-finish', 'dplus-task-status', 'dplus-task-result', 'dplus-result-route', 'dplus-result-evidence', 'dplus-result-help')) {
+  if (-not $aboutText.Contains("id=`"$dplusId`"")) { Write-Output "FAIL [about.html] 缺 D+ 自願任務測試元件：$dplusId"; $errors++ }
+}
+foreach ($dplusDisclosure in @('全程不要求姓名、Email 或自由文字', '答案與精確秒數只留在本頁', '日期＋固定結果類別', '不建立事件明細、cookie、client ID 或跨頁紀錄', '是否參加完全自願')) {
+  if (-not $aboutText.Contains($dplusDisclosure)) { Write-Output "FAIL [about.html] 缺 D+ 資料界線：$dplusDisclosure"; $errors++ }
+}
+if (-not $aboutText.Contains('id="dplus-task-start" hidden')) {
+  Write-Output 'FAIL [about.html] D+ 開始鍵必須預設隱藏，避免 no-JS 顯示無作用按鈕'
   $errors++
+}
+$dplusScript = [regex]::Match($mainJs, '(?s)// ---------- D\+ 匿名彙總量測.*?// ---------- 私人合作需求單')
+if (-not $dplusScript.Success) {
+  Write-Output 'FAIL [main.js] 缺 D+ 匿名彙總量測功能塊'
+  $errors++
+} else {
+  foreach ($dplusNeedle in @(
+    '"route_opened"',
+    '"official_source_opened"',
+    '"task_test_started"',
+    '"task_find_route_success_30s"',
+    '"task_evidence_understood"',
+    '"task_help_route_correct"',
+    '"task_test_completed"',
+    'apiBaseUrl + "/api/metrics"',
+    'body: JSON.stringify({ metricKey: metricKey })',
+    'credentials: "omit"',
+    'referrerPolicy: "no-referrer"',
+    'keepalive: true',
+    'performance.now()',
+    'dplusTaskStart.hidden = false',
+    'D+ 尚未啟用，沒有送出計數',
+    'dplusTaskFinish.disabled = true'
+  )) {
+    if (-not $dplusScript.Value.Contains($dplusNeedle)) { Write-Output "FAIL [main.js] D+ 缺固定類別／本機測驗／fail-closed 行為：$dplusNeedle"; $errors++ }
+  }
+  foreach ($dplusForbidden in @('localStorage', 'sessionStorage', 'navigator.userAgent', 'document.referrer', 'clientId', 'userId', 'elapsedMilliseconds:')) {
+    if ($dplusScript.Value.Contains($dplusForbidden)) { Write-Output "FAIL [main.js] D+ 不得持久化或送出識別／精確計時資料：$dplusForbidden"; $errors++ }
+  }
+  if ([regex]::Matches($dplusScript.Value, 'body:\s*JSON\.stringify').Count -ne 1) {
+    Write-Output 'FAIL [main.js] D+ 只能有一種固定 JSON request body'
+    $errors++
+  }
 }
 if (-not $indexText.Contains('href="about.html#collaborate"')) {
   Write-Output 'FAIL [index.html] 缺首頁合作入口'
@@ -1788,6 +1836,7 @@ $workerRequired = @(
   'package-lock.json',
   'wrangler.jsonc',
   'migrations\0001_initial.sql',
+  'migrations\0002_dplus_task_metrics.sql',
   'src\index.ts',
   'src\body.ts',
   'src\cors.ts',
@@ -1798,8 +1847,10 @@ $workerRequired = @(
   'src\contact.ts',
   'src\contact-validation.ts',
   'src\tokens.ts',
+  'src\metrics.ts',
   'test\http.test.ts',
   'test\contact.test.ts',
+  'test\metrics.test.ts',
   'test\security.test.ts',
   'test\repository.test.ts',
   'test\mail.test.ts'
@@ -1815,8 +1866,11 @@ if (Test-Path (Join-Path $workerDir 'wrangler.jsonc')) {
   foreach ($workerConfigNeedle in @(
     '"workers_dev": false',
     '"preview_urls": false',
+    '"observability": {',
+    '"enabled": false',
     '"database_id": "00000000-0000-0000-0000-000000000000"',
     '"name": "CONTACT_RATE_LIMITER"',
+    '"name": "DPLUS_RATE_LIMITER"',
     '"TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2"'
   )) {
     if (-not $workerConfig.Contains($workerConfigNeedle)) {

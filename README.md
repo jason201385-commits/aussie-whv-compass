@@ -26,7 +26,7 @@
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
-- Header 與首頁提供**全站搜尋**：搜尋 13 頁／109 個段落，查詢只在裝置內比對、不保存也不上傳。
+- Header 與首頁提供**全站搜尋**：搜尋 13 頁／116 個頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
 ## 多國語言 Quick Start
@@ -60,9 +60,11 @@ GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連�
 `worker/` 已有獨立無框架 Worker、本機 D1 migration、CORS 白名單、16 KiB JSON 上限、
 Turnstile server-side validation、HMAC 化限流鍵、prepared statements 與可替換的 mock mail transport。
 需求建立、回執、確認信成功／排隊狀態、查閱、更正、永久刪除與 24 個月清除路由也已通過本機測試。
+另有只接受 7 個固定類別的 D+ 每日彙總 endpoint，以及不收姓名、Email 或自由文字的自願找路測試；
+答案與精確計時只留在當頁，D1 不建立個別事件列，metrics route 不寫 application request log。
 這些項目目前只有程式與本機證據；Cloudflare Worker、D1、Turnstile、寄信資源及 secrets 尚未完成
 P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空值，現行私人需求單仍只在瀏覽器內
-產生 Email／複製備援，不會冒充站內送出成功。
+產生 Email／複製備援，D+ 也不發出 request；兩者都不會冒充正式後端成功。
 
 ## 搜尋引擎與 AI 探索
 
