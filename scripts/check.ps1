@@ -219,6 +219,35 @@ if (-not $evidenceCss.Contains('.evidence-card[data-evidence-status="stale"]')) 
   $errors++
 }
 
+# 檸檬圖文必須保留等義文字與原生連結，不能只剩裝飾圖案或 JavaScript 畫面。
+$lemonDiagrams = @(
+  @{ Page = 'why.html'; Class = 'lemon-choice-map'; Items = 2 },
+  @{ Page = 'visa.html'; Class = 'lemon-flow'; Items = 4 },
+  @{ Page = 'health.html'; Class = 'lemon-check-map'; Items = 3 },
+  @{ Page = 'scam.html'; Class = 'lemon-risk-map'; Items = 3 }
+)
+foreach ($lemonDiagram in $lemonDiagrams) {
+  $lemonText = [System.IO.File]::ReadAllText((Join-Path $dir $lemonDiagram.Page), [System.Text.Encoding]::UTF8)
+  $lemonList = [regex]::Match($lemonText, '(?s)<(?:ul|ol) class="' + [regex]::Escape($lemonDiagram.Class) + '">(.*?)</(?:ul|ol)>')
+  if (-not $lemonList.Success) {
+    Write-Output "FAIL [$($lemonDiagram.Page)] 缺檸檬圖文：$($lemonDiagram.Class)"
+    $errors++
+    continue
+  }
+  $lemonItems = [regex]::Matches($lemonList.Groups[1].Value, '<li\b')
+  if ($lemonItems.Count -ne $lemonDiagram.Items) {
+    Write-Output "FAIL [$($lemonDiagram.Page)] $($lemonDiagram.Class) 項目數=$($lemonItems.Count)（應為 $($lemonDiagram.Items)）"
+    $errors++
+  }
+  if ([regex]::Matches($lemonList.Groups[1].Value, '<strong>').Count -ne $lemonDiagram.Items) {
+    Write-Output "FAIL [$($lemonDiagram.Page)] 檸檬圖文每項都必須有可讀文字標題"
+    $errors++
+  }
+}
+foreach ($lemonCssNeedle in @('.lemon-diagram {', '.lemon-flow {', '.lemon-risk-map,', '.lemon-check-map {', '.lemon-choice-map a::before')) {
+  if (-not $evidenceCss.Contains($lemonCssNeedle)) { Write-Output "FAIL [style.css] 缺檸檬圖文樣式：$lemonCssNeedle"; $errors++ }
+}
+
 # 所有語言頁的靜態 skip target 都必須可被片段導航聚焦，不能只靠繁中 main.js 補救
 $allSiteHtmlFiles = Get-ChildItem $dir -Recurse -Filter '*.html' | Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
 foreach ($siteHtmlFile in $allSiteHtmlFiles) {

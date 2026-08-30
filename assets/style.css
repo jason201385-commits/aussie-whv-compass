@@ -1057,6 +1057,123 @@ body:not(.home-page) main {
 .evidence-card[data-evidence-status="stale"]::before { background: var(--danger); }
 .evidence-card[data-evidence-status="stale"] .evidence-card__label { color: var(--danger); }
 
+/* ---------- 檸檬圖文：文字本身就是完整資訊 ---------- */
+.lemon-diagram {
+  margin: 22px 0;
+  padding: 20px;
+  border: 2px solid var(--blue);
+  border-radius: 20px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--blue-soft) 84%, transparent), color-mix(in srgb, var(--surface) 90%, transparent));
+  box-shadow: 5px 6px 0 color-mix(in srgb, var(--blue) 20%, transparent);
+}
+.lemon-diagram__eyebrow {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.lemon-diagram .lemon-diagram__title {
+  display: block;
+  margin: 0 0 15px;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+}
+.lemon-diagram .lemon-diagram__title::before { display: none; }
+.lemon-choice-map,
+.lemon-flow,
+.lemon-risk-map,
+.lemon-check-map {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lemon-choice-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lemon-flow { grid-template-columns: repeat(4, minmax(0, 1fr)); counter-reset: lemon-step; }
+.lemon-risk-map,
+.lemon-check-map { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.lemon-flow > li,
+.lemon-risk-map > li,
+.lemon-check-map > li,
+.lemon-choice-map a {
+  position: relative;
+  min-width: 0;
+  padding: 66px 15px 15px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 42%, var(--line-soft));
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+.lemon-choice-map a {
+  display: block;
+  min-height: 100%;
+  color: var(--ink);
+}
+.lemon-choice-map a:hover { text-decoration: none; transform: translateY(-2px); }
+.lemon-flow > li::before,
+.lemon-risk-map > li::before,
+.lemon-check-map > li::before,
+.lemon-choice-map a::before {
+  position: absolute;
+  top: 13px;
+  left: 15px;
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 40px;
+  border: 1.5px solid var(--ink);
+  border-radius: 54% 46% 52% 48% / 45% 53% 47% 55%;
+  background: var(--gold);
+  color: var(--on-gold);
+  font-family: var(--font-serif);
+  font-weight: 900;
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ink) 22%, transparent);
+  transform: rotate(-5deg);
+}
+.lemon-flow > li { counter-increment: lemon-step; }
+.lemon-flow > li::before { content: counter(lemon-step); }
+.lemon-risk-map > li::before,
+.lemon-check-map > li::before { content: attr(data-mark); }
+.lemon-choice-map a::before { content: ""; }
+.lemon-flow > li::after,
+.lemon-risk-map > li::after,
+.lemon-check-map > li::after,
+.lemon-choice-map a::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 48px;
+  width: 17px;
+  height: 9px;
+  border: 1.5px solid var(--ink);
+  border-radius: 100% 0 100% 0;
+  background: var(--green);
+  transform: rotate(-22deg);
+}
+.lemon-choice-map span,
+.lemon-choice-map strong,
+.lemon-choice-map small,
+.lemon-flow span,
+.lemon-flow strong,
+.lemon-risk-map span,
+.lemon-risk-map strong,
+.lemon-check-map span,
+.lemon-check-map strong { display: block; }
+.lemon-choice-map > li > a > span {
+  margin-bottom: 5px;
+  color: var(--green);
+  font-size: .76rem;
+  font-weight: 900;
+}
+.lemon-choice-map strong,
+.lemon-flow strong,
+.lemon-risk-map strong,
+.lemon-check-map strong { margin-bottom: 5px; font-size: .98rem; }
+.lemon-choice-map small,
+.lemon-flow span,
+.lemon-risk-map span,
+.lemon-check-map span { color: var(--ink-soft); font-size: .84rem; line-height: 1.6; }
+
 /* ---------- 表格 ---------- */
 .table-wrap {
   overflow-x: auto;
@@ -1669,6 +1786,7 @@ main [id] { scroll-margin-top: 170px; }
 /* ---------- 行動版：控制列＋可水平捲動的攻略導覽 ---------- */
 @media (max-width: 768px) {
   main [id] { scroll-margin-top: 132px; }
+  .lemon-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nav-inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
@@ -1744,6 +1862,11 @@ main [id] { scroll-margin-top: 170px; }
   body:not(.home-page) main { margin: 12px; border-radius: 24px; }
   .home-page main { margin: 0 auto; }
   .panel { padding: 18px 16px; }
+  .lemon-diagram { padding: 16px; }
+  .lemon-choice-map,
+  .lemon-flow,
+  .lemon-risk-map,
+  .lemon-check-map { grid-template-columns: 1fr; }
   .evidence-card__body { padding: 19px 16px 16px 22px; }
   .evidence-card__meta { grid-template-columns: 1fr; }
   .evidence-card__basis summary { padding: 14px 16px 14px 22px; }
@@ -1798,5 +1921,5 @@ main [id] { scroll-margin-top: 170px; }
   .site-header, .site-footer, .ws-actions, .trust-strip, .feedback-bar, .page-journey-nav, .saved-pages, .site-search-home, .site-search-dialog, .analytics-consent { display: none; }
   body { background: #fff; color: #000; }
   body::after { display: none; }
-  .panel, details, .card, .table-wrap, .tool { box-shadow: none; }
+  .panel, details, .card, .table-wrap, .tool, .lemon-diagram { box-shadow: none; }
 }

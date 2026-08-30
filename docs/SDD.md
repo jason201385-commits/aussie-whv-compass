@@ -189,6 +189,8 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `data-evidence-status="checked|stale"`，展開依據使用原生 `<details>`，不依賴 JavaScript。
 - **圖文**：流程圖、選項圖與風險圖延續檸檬布紋；圖像不能成為唯一資訊來源，裝飾圖使用空 alt，
   資訊圖提供等義文字或可理解的替代文字。
+  第一批元件為 `.lemon-choice-map`、`.lemon-flow`、`.lemon-check-map`、`.lemon-risk-map`；內容以
+  `<ul>`／`<ol>`、標題與說明文字構成，CSS `::before`／`::after` 只畫檸檬與葉片。
 - **h2**：flex 對齊＋檸檬黃有機色塊 `::before`（以 `nth-of-type(3n)` 微調形狀）。
 - **select**：`appearance:none`＋自訂 SVG 箭頭（深淺色各一組 data-URI）。
 - **布紋與圖樣**：`body` 以 CSS 直條紋疊本地 `lemon-pattern.svg`；內容頁再覆一層
