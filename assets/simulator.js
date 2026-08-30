@@ -16,6 +16,7 @@
   var eventTitle = document.getElementById("event-title");
   var eventStory = document.getElementById("event-story");
   var eventQuestion = document.getElementById("event-question");
+  var criticalAction = document.getElementById("simulator-critical-action");
   var choicesWrap = document.getElementById("simulator-choices");
   var feedback = document.getElementById("simulator-feedback");
   var feedbackTitle = document.getElementById("feedback-title");
@@ -29,6 +30,9 @@
   var finishActions = document.getElementById("finish-actions");
   var progressKey = "whv-simulator-progress-v1";
   var state = null;
+  var scrollBehavior = function () {
+    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  };
 
   var EVENTS = [
     {
@@ -355,6 +359,7 @@
     eventTitle.textContent = event.title;
     eventStory.textContent = event.story;
     eventQuestion.textContent = event.question;
+    criticalAction.hidden = !event.critical;
     choicesWrap.textContent = "";
     feedback.hidden = true;
     event.choices.forEach(function (choice, index) {
@@ -460,7 +465,7 @@
       finishActions.appendChild(li);
     });
     if (shouldFocus !== false) {
-      finish.scrollIntoView({ behavior: "smooth", block: "start" });
+      finish.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
       document.getElementById("finish-title").setAttribute("tabindex", "-1");
       document.getElementById("finish-title").focus();
     }
@@ -475,7 +480,7 @@
     profileSection.hidden = false;
     progress.setAttribute("aria-valuenow", "0");
     progressBar.style.width = "0%";
-    profileSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    profileSection.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     document.getElementById("profile-title").setAttribute("tabindex", "-1");
     document.getElementById("profile-title").focus();
   };
@@ -509,7 +514,7 @@
     updateStats();
     renderEvent();
     saveProgress();
-    stage.scrollIntoView({ behavior: "smooth", block: "start" });
+    stage.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   });
 
   nextButton.addEventListener("click", function () {
@@ -523,10 +528,12 @@
     state.selectedChoice = null;
     saveProgress();
     renderEvent();
-    document.getElementById("simulator-event").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("simulator-event").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   });
   document.getElementById("simulator-restart").addEventListener("click", resetSimulation);
-  document.getElementById("simulator-restart-top").addEventListener("click", resetSimulation);
+  document.getElementById("simulator-restart-top").addEventListener("click", function () {
+    if (window.confirm("這會清除本輪進度並回到角色設定。確定要放棄本輪嗎？")) resetSimulation();
+  });
 
   state = readProgress();
   if (state) {

@@ -2004,6 +2004,21 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .simulator-event-copy h2 { margin-top: .55em; }
 .simulator-event-tag { display: inline-block; padding: 4px 10px; border-radius: 99px; background: var(--green); color: var(--on-green); font-size: .76rem; font-weight: 900; }
 .simulator-event-question { margin-top: 18px; font-weight: 900; }
+.simulator-critical-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 2px solid var(--danger);
+  border-radius: 14px;
+  background: var(--danger-soft);
+}
+.simulator-critical-action[hidden] { display: none; }
+.simulator-critical-action > div:first-child { display: flex; flex-direction: column; gap: 3px; }
+.simulator-critical-action span { color: var(--ink-soft); font-size: .82rem; }
+.simulator-critical-links { display: flex; flex: 0 0 auto; gap: 8px; }
 .simulator-choices { display: grid; gap: 10px; margin-top: 18px; }
 .simulator-choice {
   display: grid;
@@ -2064,6 +2079,8 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   .simulator-options label > span { min-height: 76px; }
   .simulator-stage-head { align-items: flex-start; flex-direction: column; }
   .simulator-stage-head .btn { width: 100%; }
+  .simulator-critical-action, .simulator-critical-links { align-items: stretch; flex-direction: column; }
+  .simulator-critical-links .btn { width: 100%; text-align: center; }
   .simulator-dashboard { grid-template-columns: 1fr 1fr; }
   .simulator-source-actions, .simulator-finish-actions { align-items: stretch; flex-direction: column; }
   .simulator-source-actions .btn, .simulator-finish-actions .btn, .simulator-start-actions .btn { width: 100%; text-align: center; }

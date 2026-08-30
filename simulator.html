@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260830-33" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260830-34" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260830-33">
+<link rel="stylesheet" href="assets/style.css?v=20260830-34">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body data-i18n-topic="simulator">
@@ -133,6 +133,14 @@
     <p class="section-eyebrow">QUICK START・約 5 分鐘</p>
     <h2 id="profile-title">先建立你的落地角色</h2>
     <p>只選最接近目前狀況的答案。沒有好壞分數，也不用填姓名、護照、簽證號碼、健康或銀行資料。</p>
+
+    <noscript>
+      <style>#simulator-profile-form { display: none; }</style>
+      <div class="note simulator-noscript">
+        <strong>模擬器需要 JavaScript 才能記錄選擇。</strong>
+        你仍可直接查看<a href="prep.html">行前落地清單</a>、<a href="housing.html">住宿查核</a>、<a href="scam.html">防詐安全出口</a>與<a href="health.html#emergency">000 緊急就醫指引</a>。
+      </div>
+    </noscript>
 
     <form id="simulator-profile-form">
       <fieldset class="simulator-question">
@@ -196,7 +204,7 @@
         <p class="section-eyebrow" id="simulator-day">DAY 01</p>
         <p class="simulator-progress-label" id="simulator-progress-label">情境 1 / 6</p>
       </div>
-      <button class="btn ghost" id="simulator-restart-top" type="button">重新建立角色</button>
+      <button class="btn ghost" id="simulator-restart-top" type="button">放棄本輪，重選角色</button>
     </div>
     <div class="progress-wrap" role="progressbar" aria-label="30 天模擬進度" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="simulator-progress"><div class="progress-bar" id="simulator-progress-bar"></div></div>
 
@@ -216,6 +224,13 @@
         <p id="event-story"></p>
         <p class="simulator-event-question" id="event-question"></p>
       </div>
+      <aside class="simulator-critical-action" id="simulator-critical-action" role="alert" hidden>
+        <div><strong>真實發生時，不要等遊戲結果。</strong><span>胸痛、呼吸困難或快失去意識時，立即取得緊急協助。</span></div>
+        <div class="simulator-critical-links">
+          <a class="btn" href="tel:000">立即撥 000</a>
+          <a class="btn secondary" href="https://www.healthdirect.gov.au/calling-triple-zero" rel="noopener">查看 healthdirect 指引</a>
+        </div>
+      </aside>
       <div class="simulator-choices" id="simulator-choices" aria-label="可選行動"></div>
     </article>
 
@@ -280,11 +295,11 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260830-33"></script>
-<script src="assets/analytics.js?v=20260830-33"></script>
-<script src="assets/i18n.js?v=20260830-33"></script>
-<script src="assets/api-config.js?v=20260830-33"></script>
-<script src="assets/main.js?v=20260830-33"></script>
-<script src="assets/simulator.js?v=20260830-33"></script>
+<script src="assets/analytics-config.js?v=20260830-34"></script>
+<script src="assets/analytics.js?v=20260830-34"></script>
+<script src="assets/i18n.js?v=20260830-34"></script>
+<script src="assets/api-config.js?v=20260830-34"></script>
+<script src="assets/main.js?v=20260830-34"></script>
+<script src="assets/simulator.js?v=20260830-34"></script>
 </body>
 </html>
