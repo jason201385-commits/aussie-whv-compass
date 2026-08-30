@@ -74,7 +74,11 @@ def sorted_codes(data: dict) -> list[str]:
 
 
 def alternates(data: dict) -> str:
-    links = [f'<link rel="alternate" hreflang="{esc(code)}" href="{esc(locale_url(code))}">' for code in sorted_codes(data)]
+    links = [
+        f'<link rel="alternate" hreflang="{esc(code)}" href="{esc(locale_url(code))}">'
+        for code in sorted_codes(data)
+        if data["locales"][code]["reviewStatus"] != "english-fallback"
+    ]
     links.append(f'<link rel="alternate" hreflang="x-default" href="{ORIGIN}/lang/">')
     return "\n".join(links)
 
@@ -157,9 +161,37 @@ def scripts() -> str:
 
 
 def build_locale_page(code: str, locale: dict, data: dict) -> str:
-    strings = locale["strings"]
+    review = locale["reviewStatus"]
+    is_fallback = review == "english-fallback"
+    strings = data["locales"]["en"]["strings"] if is_fallback else locale["strings"]
+    content_language = "en" if is_fallback else code
+    content_direction = "ltr" if is_fallback else locale["direction"]
     canonical = locale_url(code)
-    title = f'{strings["page_title"]} | {strings["site_name"]}'
+    if is_fallback:
+        page_title = f'{locale["englishName"]} translation unavailable — English safety fallback'
+        intro = "This page intentionally shows the English source until a reviewed translation is available."
+        if locale.get("fallbackReason") == "known-broken-machine-translation":
+            translation_note = (
+                f'The previous {locale["englishName"]} machine translation was removed because it contained '
+                "mixed-language or unsafe-to-rely-on text. This page intentionally shows the English source. "
+                "Visa, law, tax and medical details must be checked on the official Australian Government websites linked below."
+            )
+        else:
+            translation_note = (
+                f'A reviewed {locale["englishName"]} translation is not currently available. This page intentionally '
+                "shows the English source. Visa, law, tax and medical details must be checked on the official "
+                "Australian Government websites linked below."
+            )
+        eyebrow = (
+            f'<span lang="{esc(code)}" dir="{esc(locale["direction"])}">{esc(locale["autonym"])}</span>'
+            " · ENGLISH SAFETY FALLBACK"
+        )
+    else:
+        page_title = strings["page_title"]
+        intro = strings["intro"]
+        translation_note = strings["translation_note"]
+        eyebrow = esc(strings["eyebrow"])
+    title = f'{page_title} | {strings["site_name"]}'
     full_routes = FULL_GUIDE_TRANSLATIONS.get(code, {})
     card_parts = []
     for key, href in GUIDES:
@@ -170,25 +202,24 @@ def build_locale_page(code: str, locale: dict, data: dict) -> str:
             f'<a class="card i18n-guide-card" href="{full_routes.get(key, href)}"{language_attr}><span class="i18n-guide-copy"><h3>{esc(strings[key])}</h3>{language_note}</span><span aria-hidden="true">→</span></a>'
         )
     cards = "\n".join(card_parts)
-    review = locale["reviewStatus"]
     review_label = "Machine translation — community review needed" if review.startswith("machine") else (
-        "English fallback — translation needed" if review == "english-fallback" else "Source language"
+        "English safety fallback — translation unavailable" if review == "english-fallback" else "Source language"
     )
     return f'''<!DOCTYPE html>
-<html lang="{esc(code)}" dir="{esc(locale["direction"])}">
+<html lang="{esc(content_language)}" dir="{esc(content_direction)}">
 <head>
-{head(title, strings["intro"], canonical, code, data)}
+{head(title, intro, canonical, content_language, data, noindex=is_fallback)}
 </head>
 <body class="i18n-page" data-locale="{esc(code)}">
 {header(strings["site_name"])}
 <main id="main-content" tabindex="-1">
   <section class="i18n-hero">
-    <p class="section-eyebrow">{esc(strings["eyebrow"])}</p>
-    <h1 class="page-title">{esc(strings["page_title"])}</h1>
-    <p class="page-sub">{esc(strings["intro"])}</p>
+    <p class="section-eyebrow">{eyebrow}</p>
+    <h1 class="page-title">{esc(page_title)}</h1>
+    <p class="page-sub">{esc(intro)}</p>
     <p class="updated-tag">{esc(review_label)}</p>
   </section>
-  <div class="warning i18n-translation-note"><strong>{esc(strings["translation_note"])}</strong></div>
+  <div class="warning i18n-translation-note"><strong>{esc(translation_note)}</strong></div>
   <section aria-labelledby="official-title">
     <h2 id="official-title">{esc(strings["eligibility_title"])}</h2>
     <p>{esc(strings["eligibility_text"])}</p>
@@ -296,7 +327,7 @@ def build_switcher(data: dict) -> str:
   text.textContent = "Language";
   var select = document.createElement("select");
   select.setAttribute("aria-label", "Language");
-  var current = document.documentElement.lang || "zh-Hant";
+  var current = document.body.getAttribute("data-locale") || document.documentElement.lang || "zh-Hant";
   var topic = document.body.getAttribute("data-i18n-topic") || "";
   choices.forEach(function (choice) {{
     var option = document.createElement("option");

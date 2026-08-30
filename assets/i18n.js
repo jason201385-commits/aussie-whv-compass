@@ -11,7 +11,7 @@
   text.textContent = "Language";
   var select = document.createElement("select");
   select.setAttribute("aria-label", "Language");
-  var current = document.documentElement.lang || "zh-Hant";
+  var current = document.body.getAttribute("data-locale") || document.documentElement.lang || "zh-Hant";
   var topic = document.body.getAttribute("data-i18n-topic") || "";
   choices.forEach(function (choice) {
     var option = document.createElement("option");

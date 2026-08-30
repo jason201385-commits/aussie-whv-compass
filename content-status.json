@@ -551,7 +551,7 @@
       "language": "ta",
       "autonym": "தமிழ்",
       "englishName": "Tamil",
-      "reviewStatus": "machine-unreviewed",
+      "reviewStatus": "english-fallback",
       "scope": "quick-start",
       "officialVerificationRequired": true
     },
@@ -587,7 +587,7 @@
       "language": "vi",
       "autonym": "Tiếng Việt",
       "englishName": "Vietnamese",
-      "reviewStatus": "machine-unreviewed",
+      "reviewStatus": "english-fallback",
       "scope": "quick-start",
       "officialVerificationRequired": true
     },

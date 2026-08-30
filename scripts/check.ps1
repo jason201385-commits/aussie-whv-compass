@@ -351,6 +351,36 @@ if (-not (Test-Path $i18nBuilder) -or -not (Test-Path $i18nDataPath)) {
     if ($locale.Name -ne 'zh-Hant') {
       $localePage = Join-Path $dir "lang\$($locale.Name)\index.html"
       if (-not (Test-Path $localePage)) { Write-Output "FAIL 缺 locale 頁：$($locale.Name)"; $errors++ }
+      elseif ($locale.Value.reviewStatus -eq 'english-fallback') {
+        $fallbackText = [System.IO.File]::ReadAllText($localePage, [System.Text.Encoding]::UTF8)
+        foreach ($fallbackNeedle in @(
+          '<html lang="en" dir="ltr">',
+          '<meta name="robots" content="noindex,follow">',
+          'English safety fallback — translation unavailable',
+          'This page intentionally shows the English source until a reviewed translation is available.',
+          'If life is in danger in Australia, call 000 for police, fire or ambulance.'
+        )) {
+          if (-not $fallbackText.Contains($fallbackNeedle)) {
+            Write-Output "FAIL locale $($locale.Name) 的 English fallback 未隔離高風險翻譯：$fallbackNeedle"; $errors++
+          }
+        }
+      }
+    }
+  }
+  foreach ($quarantinedCode in @('vi', 'ta')) {
+    $quarantinedLocale = $i18nData.locales.$quarantinedCode
+    if ($quarantinedLocale.reviewStatus -ne 'english-fallback' -or $quarantinedLocale.fallbackReason -ne 'known-broken-machine-translation') {
+      Write-Output "FAIL locale $quarantinedCode 的已知破損翻譯必須維持 English fallback"; $errors++
+    }
+    $quarantinedPage = [System.IO.File]::ReadAllText((Join-Path $dir "lang\$quarantinedCode\index.html"), [System.Text.Encoding]::UTF8)
+    if (-not $quarantinedPage.Contains("The previous $($quarantinedLocale.englishName) machine translation was removed because it contained mixed-language or unsafe-to-rely-on text.")) {
+      Write-Output "FAIL locale $quarantinedCode 缺已知破損翻譯隔離原因"; $errors++
+    }
+  }
+  $baseI18nText = [System.IO.File]::ReadAllText((Join-Path $dir 'index.html'), [System.Text.Encoding]::UTF8)
+  foreach ($fallbackLocale in $i18nData.locales.PSObject.Properties | Where-Object { $_.Value.reviewStatus -eq 'english-fallback' }) {
+    if ($baseI18nText.Contains("hreflang=`"$($fallbackLocale.Name)`"")) {
+      Write-Output "FAIL English fallback locale $($fallbackLocale.Name) 不得宣告為已完成 hreflang 翻譯"; $errors++
     }
   }
   $hebrewPage = Join-Path $dir 'lang\he\index.html'
@@ -431,7 +461,7 @@ if (-not (Test-Path $englishVisaPath)) {
     if (-not $toolsI18nText.Contains($needle)) { Write-Output "FAIL [tools.js] 郵遞區號工具缺英文安全文案：$needle"; $errors++ }
   }
   $i18nSwitcherText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
-  foreach ($needle in @('var topicRoutes =', '"visa":{"zh-Hant":"/visa.html","en":"/lang/en/visa/"}', 'data-i18n-topic', 'go.type = "submit"', 'event.preventDefault()')) {
+  foreach ($needle in @('var topicRoutes =', '"visa":{"zh-Hant":"/visa.html","en":"/lang/en/visa/"}', 'data-i18n-topic', 'document.body.getAttribute("data-locale")', 'go.type = "submit"', 'event.preventDefault()')) {
     if (-not $i18nSwitcherText.Contains($needle)) { Write-Output "FAIL [i18n.js] 缺主題保留切換：$needle"; $errors++ }
   }
   if ($i18nSwitcherText.Contains('select.addEventListener("change"')) {

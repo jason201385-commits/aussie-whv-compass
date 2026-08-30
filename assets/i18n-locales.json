@@ -1126,7 +1126,8 @@
       "autonym": "Tiếng Việt",
       "englishName": "Vietnamese",
       "direction": "ltr",
-      "reviewStatus": "machine-unreviewed",
+      "reviewStatus": "english-fallback",
+      "fallbackReason": "known-broken-machine-translation",
       "strings": {
         "site_name": "Aussie WHV Compass",
         "page_title": "Bắt đầu nhanh với kỳ làm việc nghỉ lễ ở Úc",
@@ -1198,7 +1199,8 @@
       "autonym": "தமிழ்",
       "englishName": "Tamil",
       "direction": "ltr",
-      "reviewStatus": "machine-unreviewed",
+      "reviewStatus": "english-fallback",
+      "fallbackReason": "known-broken-machine-translation",
       "strings": {
         "site_name": "Aussie WHV Compass",
         "page_title": "ஆஸ்திரலியா வேலை விடுமுறை குவிக் ஸ்டார்ட்",
