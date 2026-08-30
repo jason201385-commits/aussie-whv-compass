@@ -40,6 +40,7 @@
 - [多國語言 Quick Start](https://www.aussiewhvcompass.com/lang/): 目前 417／462 護照國家的主要語言入口；機器翻譯需社群校對，官方來源優先。
 - [English visa and specified-work guide](https://www.aussiewhvcompass.com/lang/en/visa/): passport-neutral 417／462 guidance, a subclass 417 postcode checker and official source links; editorial beta, not government advice.
 - [English preparation and arrival guide](https://www.aussiewhvcompass.com/lang/en/prep/): passport-neutral departure checks, border declarations, first-week setup and a private local checklist; editorial beta, not government or professional advice.
+- [English accommodation and renting guide](https://www.aussiewhvcompass.com/lang/en/housing/): first-stay booking routes, inspection and bond safeguards, all eight state and territory authorities, work-linked housing and dispute preparation; editorial beta, not booking or legal advice.
 - [English work and workplace-rights guide](https://www.aussiewhvcompass.com/lang/en/work/): job-search routes, employer and pay checks, harvest timing and official help paths; editorial beta, not legal or tax advice.
 - [English scam-safety and exploitation guide](https://www.aussiewhvcompass.com/lang/en/scam/): job, visa, rental, identity and payment red flags, an English practice quiz and official reporting routes; editorial beta, not legal or emergency advice.
 - 文字內容採 CC BY-SA 4.0；程式碼採 MIT。轉載或改作時請註明澳打指南針與原頁網址，並遵守相同方式分享的授權條件。

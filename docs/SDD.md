@@ -76,6 +76,7 @@
 | `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
 | `lang/en/visa/index.html` | 第一個完整英文 editorial beta：護照中立的 417／462 分流、官方來源、指定工作與 417-only 郵遞區號快查；未經母語移民專業人士校對前不得標為 reviewed |
 | `lang/en/prep/index.html` | 完整英文行前與落地 editorial beta：護照中立的 RHCA／保險、入境申報、藥品、各州駕照、落地住宿、TFN／銀行／myGov／super 與獨立本機進度的 21 項清單；未經母語澳洲 settlement 或 consumer-services 專業人士校對前不得標為 reviewed |
+| `lang/en/housing/index.html` | 完整英文住宿與租屋 editorial beta：護照中立的短住／長租分流、平台與身分查證、合約／bond／condition report、八州領地官方入口、工作綁住宿與離場處理；未經母語澳洲 tenancy、housing 或 homelessness-services 專業人士校對前不得標為 reviewed |
 | `lang/en/work/index.html` | 完整英文工作 editorial beta：求職分流、雇主與薪資查核、職場紅旗、採收月份工具與官方求助路徑；未經母語澳洲職場關係專業人士校對前不得標為 reviewed |
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |

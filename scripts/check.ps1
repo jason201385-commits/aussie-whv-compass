@@ -439,9 +439,131 @@ if (-not (Test-Path $englishPrepPath)) {
   if (-not $i18nPrepText.Contains('"prep":{"zh-Hant":"/prep.html","en":"/lang/en/prep/"}')) {
     Write-Output 'FAIL [i18n.js] 缺行前主題中英文路由'; $errors++
   }
-  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/cost\.html|/housing\.html|/english\.html|/health\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
-  if ($englishTraditionalCards.Count -ne 8 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 8) {
-    Write-Output 'FAIL [lang/en/] 8 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
+  $englishTraditionalCards = [regex]::Matches($englishQuickText, '<a class="card i18n-guide-card" href="(?:/why\.html|/cost\.html|/english\.html|/health\.html|/leave\.html|/pr\.html|/about\.html#collaborate)" hreflang="zh-Hant">')
+  if ($englishTraditionalCards.Count -ne 7 -or [regex]::Matches($englishQuickText, '<small>Traditional Chinese guide</small>').Count -ne 7) {
+    Write-Output 'FAIL [lang/en/] 7 張繁中目的卡必須逐張顯示語言並標 hreflang'; $errors++
+  }
+}
+
+# 完整英文住宿頁：跨州規則邊界、平台透明、看房／押金／condition report 與八州領地官方分流不得遺失
+$englishHousingPath = Join-Path $dir 'lang\en\housing\index.html'
+if (-not (Test-Path $englishHousingPath)) {
+  Write-Output 'FAIL 缺完整英文住宿頁：lang/en/housing/'
+  $errors++
+} else {
+  $englishHousingText = [System.IO.File]::ReadAllText($englishHousingPath, [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<html lang="en">',
+    '<meta name="viewport"',
+    'data-i18n-topic="housing"',
+    '<link rel="canonical" href="https://www.aussiewhvcompass.com/lang/en/housing/">',
+    '<link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/housing.html">',
+    'complete English editorial draft',
+    'not yet reviewed by a native-speaking Australian tenancy, housing or homelessness-services professional',
+    'Rental law, bond processes and the legal status of a room differ by state or territory and by agreement type',
+    'Book a short, recoverable stay first',
+    'Do not wire a long-term deposit from overseas',
+    'https://askizzy.org.au/',
+    'Aussie WHV Compass has no affiliate relationship with them',
+    'does not receive your dates, budget, account details or search history',
+    'The label in an advertisement is not the legal test',
+    'A price far below comparable current listings is a scam warning',
+    'Leave first if fire escape looks unsafe',
+    'https://www.fire.qld.gov.au/compliance-and-planning/budget-accommodation-buildings',
+    'Confirm the official bond process for your state or territory',
+    'Condition-report deadlines are not the same across Australia',
+    'Separate your job decision from your housing decision',
+    'Fair Work pay deductions',
+    'https://1800respect.org.au/',
+    'https://www.tisnational.gov.au/en/Contact-us',
+    'https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live',
+    'https://www.consumer.vic.gov.au/housing/renting',
+    'https://www.rta.qld.gov.au/starting-a-tenancy',
+    'https://www.consumerprotection.wa.gov.au/publications/looking-rental-home-tenants-guide-1',
+    'https://www.sa.gov.au/topics/housing/renting-and-letting/renting-privately',
+    'https://cbos.tas.gov.au/topics/housing/renting',
+    'https://www.act.gov.au/housing-planning-and-property/renting',
+    'https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies',
+    'This site does not receive your accommodation searches or applications',
+    '/assets/i18n.js?v='
+  )) {
+    if (-not $englishHousingText.Contains($needle)) { Write-Output "FAIL [lang/en/housing/] 缺內容、來源或服務邊界：$needle"; $errors++ }
+  }
+  if ([regex]::Matches($englishHousingText, '<h1\b').Count -ne 1 -or [regex]::Matches($englishHousingText, '<main\b').Count -ne 1) {
+    Write-Output 'FAIL [lang/en/housing/] 必須只有一個 h1 與 main'; $errors++
+  }
+  foreach ($anchor in [regex]::Matches($englishHousingText, '<a href="#([^"]+)"')) {
+    if (-not $englishHousingText.Contains("id=`"$($anchor.Groups[1].Value)`"")) {
+      Write-Output "FAIL [lang/en/housing/] TOC 錨點不存在：$($anchor.Groups[1].Value)"; $errors++
+    }
+  }
+  $englishHousingIds = [regex]::Matches($englishHousingText, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+  if ($englishHousingIds | Group-Object | Where-Object { $_.Count -gt 1 }) {
+    Write-Output 'FAIL [lang/en/housing/] 含重複 id'; $errors++
+  }
+  if ($englishHousingText -match '[\u3400-\u9fff]') {
+    Write-Output 'FAIL [lang/en/housing/] 完整英文頁仍含 CJK 文字'; $errors++
+  }
+  if ($englishHousingText.Contains('/assets/main.js?v=')) {
+    Write-Output 'FAIL [lang/en/housing/] 不得載入會注入中文搜尋、回饋列與 skip link 的 main.js'; $errors++
+  }
+  $englishHousingAssetVersions = @([regex]::Matches($englishHousingText, '(?:href|src)="/assets/(?:style\.css|i18n\.js|main\.js|tools\.js|analytics-config\.js|analytics\.js)\?v=([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  if ($englishHousingAssetVersions.Count -ne 1 -or ($uniqueAssetVersions.Count -eq 1 -and $englishHousingAssetVersions[0] -ne $uniqueAssetVersions[0])) {
+    Write-Output "FAIL [lang/en/housing/] 資產版本與全站不一致：$(($englishHousingAssetVersions) -join ', ')"; $errors++
+  }
+  foreach ($link in [regex]::Matches($englishHousingText, '<a\b[^>]*target="_blank"[^>]*>')) {
+    if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/housing/] 新分頁連結缺 noopener'; $errors++ }
+  }
+  foreach ($commercialHost in @('hostelworld.com', 'booking.com', 'flatmates.com.au', 'realestate.com.au', 'domain.com.au')) {
+    $commercialLink = @([regex]::Matches($englishHousingText, '<a\b[^>]*target="_blank"[^>]*>') | Where-Object { $_.Value.Contains($commercialHost) })
+    if ($commercialLink.Count -ne 1 -or $commercialLink[0].Value -notmatch 'rel="[^"]*nofollow[^"]*"') {
+      Write-Output "FAIL [lang/en/housing/] 商業平台連結缺 nofollow 或不存在：$commercialHost"; $errors++
+    }
+  }
+  if ($englishHousingText -match '(?i)href="[^"]*(utm_|affiliate|aff_id=)') {
+    Write-Output 'FAIL [lang/en/housing/] 住宿平台連結不得含追蹤或聯盟參數'; $errors++
+  }
+  $englishHousingJsonText = [regex]::Match($englishHousingText, '(?s)<script type="application/ld\+json">\s*(.*?)\s*</script>').Groups[1].Value
+  try {
+    $englishHousingJson = $englishHousingJsonText | ConvertFrom-Json
+    if ($englishHousingJson.'@context' -ne 'https://schema.org' -or -not $englishHousingJson.'@graph') {
+      Write-Output 'FAIL [lang/en/housing/] JSON-LD 缺 schema.org context 或 graph'; $errors++
+    }
+  } catch { Write-Output 'FAIL [lang/en/housing/] JSON-LD 不是合法 JSON'; $errors++ }
+
+  $traditionalHousingText = [System.IO.File]::ReadAllText((Join-Path $dir 'housing.html'), [System.Text.Encoding]::UTF8)
+  foreach ($needle in @(
+    '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/housing/">',
+    '<body data-i18n-topic="housing">'
+  )) {
+    if (-not $traditionalHousingText.Contains($needle)) { Write-Output "FAIL [housing.html] 缺英文 reciprocal hreflang 或主題標記：$needle"; $errors++ }
+  }
+  $englishQuickText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\index.html'), [System.Text.Encoding]::UTF8)
+  if (-not $englishQuickText.Contains('<a class="card i18n-guide-card" href="/lang/en/housing/">')) {
+    Write-Output 'FAIL [lang/en/] 住宿卡未連到完整英文頁'; $errors++
+  }
+  $i18nHousingText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\i18n.js'), [System.Text.Encoding]::UTF8)
+  if (-not $i18nHousingText.Contains('"housing":{"zh-Hant":"/housing.html","en":"/lang/en/housing/"}')) {
+    Write-Output 'FAIL [i18n.js] 缺住宿主題中英文路由'; $errors++
+  }
+  foreach ($fullGuidePath in @('lang\en\visa\index.html', 'lang\en\prep\index.html', 'lang\en\housing\index.html', 'lang\en\work\index.html', 'lang\en\scam\index.html')) {
+    $fullGuideNavText = [System.IO.File]::ReadAllText((Join-Path $dir $fullGuidePath), [System.Text.Encoding]::UTF8)
+    foreach ($route in @('/lang/en/visa/', '/lang/en/prep/', '/lang/en/housing/', '/lang/en/work/', '/lang/en/scam/')) {
+      if (-not $fullGuideNavText.Contains("href=`"$route`"")) { Write-Output "FAIL [$fullGuidePath] 英文旅程導覽缺 $route"; $errors++ }
+    }
+    foreach ($crossPageAnchor in [regex]::Matches($fullGuideNavText, 'href="/lang/en/([^/#"]+)/#([^"?]+)"')) {
+      $targetSlug = $crossPageAnchor.Groups[1].Value
+      $targetId = [System.Uri]::UnescapeDataString($crossPageAnchor.Groups[2].Value)
+      $targetPath = Join-Path $dir "lang\en\$targetSlug\index.html"
+      if (-not (Test-Path $targetPath)) {
+        Write-Output "FAIL [$fullGuidePath] 英文跨頁連結目標不存在：/lang/en/$targetSlug/#$targetId"; $errors++
+        continue
+      }
+      $targetText = [System.IO.File]::ReadAllText($targetPath, [System.Text.Encoding]::UTF8)
+      if (-not $targetText.Contains("id=`"$targetId`"")) {
+        Write-Output "FAIL [$fullGuidePath] 英文跨頁錨點不存在：/lang/en/$targetSlug/#$targetId"; $errors++
+      }
+    }
   }
 }
 
@@ -834,6 +956,7 @@ if (-not (Test-Path $sitemapPath)) {
     $expectedUrls += @($sitemapI18nData.locales.PSObject.Properties | Where-Object { $_.Name -ne 'zh-Hant' } | ForEach-Object { "$canonicalOrigin/lang/$($_.Name)/" })
     $expectedUrls += "$canonicalOrigin/lang/en/visa/"
     $expectedUrls += "$canonicalOrigin/lang/en/prep/"
+    $expectedUrls += "$canonicalOrigin/lang/en/housing/"
     $expectedUrls += "$canonicalOrigin/lang/en/work/"
     $expectedUrls += "$canonicalOrigin/lang/en/scam/"
   }
@@ -875,7 +998,7 @@ if (-not (Test-Path $llmsPath)) {
   $llmsText = [System.IO.File]::ReadAllText($llmsPath, [System.Text.Encoding]::UTF8)
   $llmsExpectedUrls = @($pages | ForEach-Object {
     if ($_ -eq 'index.html') { "$canonicalOrigin/" } else { "$canonicalOrigin/$_" }
-  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
+  }) + "$canonicalOrigin/lang/" + "$canonicalOrigin/lang/en/visa/" + "$canonicalOrigin/lang/en/prep/" + "$canonicalOrigin/lang/en/housing/" + "$canonicalOrigin/lang/en/work/" + "$canonicalOrigin/lang/en/scam/"
   foreach ($url in $llmsExpectedUrls) {
     if (-not $llmsText.Contains("($url)")) { Write-Output "FAIL llms.txt 缺頁面：$url"; $errors++ }
   }
