@@ -101,7 +101,7 @@
 ### 2.2 頁面共同結構
 
 每頁：`<head>`（description＋canonical＋OG／Twitter 分享圖＋WebSite／WebPage／Breadcrumb JSON-LD＋fonts＋style＋SVG favicon）→ 桌機 sticky／手機 static header
-（brand＋12 項 nav）→ `<main>`（page-title → toc → 內容）→ 回饋列（JS 注入）→
+（brand＋12 項 nav）→ `<main>`（page-title → 長頁的問題優先 quick-answer hub → 高風險證據卡 → 完整內容與參考資料目錄 → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨架、nav 全站同步加項
 （13 個檔案都要改——用腳本批次替換，別手改）、index 加卡片。
 
@@ -240,6 +240,10 @@ metrics route 不建立 application request log，Wrangler observability 預設�
 ### 4.3 元件語彙
 
 - **卡片**：1px 柔和線＋擴散陰影＋黃綠頂邊布標；hover 只上移，**本體不旋轉**。
+- **長頁問題入口**：`quick-answer-hub` 固定放在繁中攻略頁標題後，以 3–4 個真實問題呈現
+  「先做」的一句可執行動作與同頁深連結；不是另一份摘要文章。完整解釋、例外、查核日期與
+  官方來源保留在下方，目錄標為「完整內容與參考資料」。高風險問題不得因簡化而移除 000、
+  官方系統、州別／簽證類別邊界或專業協助出口。
 - **按鈕**：彈簧曲線 `cubic-bezier(.34,1.56,.64,1)`，active 全壓平（陰影歸零）。
 - **分層證據卡**：先顯示白話下一步，再顯示理由；來源機構、查核日期、翻譯／編輯狀態常駐，
   完整依據可展開。過期高風險內容標「待重新確認」並保留官方出口，不得只隱藏舊內容。

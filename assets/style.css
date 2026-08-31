@@ -807,6 +807,51 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .problem-directory-intro h2 { margin: .32em 0 .35em; }
 .problem-directory-intro p:last-child { margin: 0; color: var(--ink-soft); }
 
+/* ---------- 長頁先解題：常見問題與直接下一步 ---------- */
+.quick-answer-hub {
+  margin: 24px 0 30px;
+  padding: 22px;
+  border: 1px solid color-mix(in srgb, var(--blue) 28%, var(--line));
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--blue-soft) 72%, var(--surface));
+  box-shadow: var(--shadow-pop);
+}
+.quick-answer-hub h2 { margin: .28em 0 .3em; }
+.quick-answer-hub > p:not(.section-eyebrow) { margin: 0; max-width: 760px; color: var(--ink-soft); }
+.quick-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.quick-answer-card {
+  display: flex;
+  min-width: 0;
+  min-height: 148px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--ink) 7%, transparent);
+}
+.quick-answer-card:hover { border-color: var(--green); text-decoration: none; transform: translateY(-1px); }
+.quick-answer-question { font-family: var(--font-serif); font-size: 1rem; font-weight: 900; line-height: 1.5; }
+.quick-answer-step { display: block; margin-top: 8px; color: var(--ink-soft); font-size: .9rem; line-height: 1.65; }
+.quick-answer-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: auto;
+  padding-top: 10px;
+  color: var(--link);
+  font-size: .84rem;
+  font-weight: 900;
+}
+.quick-answer-note { margin-top: 14px !important; font-size: .84rem; }
+
 /* ---------- 首頁旅程索引 ---------- */
 .journey-directory {
   display: grid;
@@ -2264,6 +2309,9 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 main [id] { scroll-margin-top: 170px; }
 
 @media (max-width: 640px) {
+  .quick-answer-hub { padding: 19px 15px; }
+  .quick-answer-grid { grid-template-columns: 1fr; }
+  .quick-answer-card { min-height: 0; }
   .source-model { grid-template-columns: 1fr; gap: 16px; padding: 20px 18px; }
   .source-model .btn { width: 100%; }
   .source-method-grid { grid-template-columns: 1fr; }

@@ -236,6 +236,43 @@ if (-not $evidenceCss.Contains('.evidence-card[data-evidence-status="stale"]')) 
   $errors++
 }
 
+# 長篇攻略先列真實問題與一句可執行下一步；完整解釋與來源保留在下方。
+$quickAnswerPages = @('why.html', 'visa.html', 'prep.html', 'cost.html', 'housing.html', 'work.html', 'scam.html', 'english.html', 'health.html', 'leave.html', 'pr.html')
+foreach ($quickAnswerPage in $quickAnswerPages) {
+  $quickAnswerText = [System.IO.File]::ReadAllText((Join-Path $dir $quickAnswerPage), [System.Text.Encoding]::UTF8)
+  $quickAnswerSections = [regex]::Matches($quickAnswerText, '(?s)<section class="quick-answer-hub" aria-labelledby="quick-answers">.*?</section>')
+  if ($quickAnswerSections.Count -ne 1) {
+    Write-Output "FAIL [$quickAnswerPage] 必須有唯一問題優先入口"
+    $errors++
+    continue
+  }
+  $quickAnswerSection = $quickAnswerSections[0].Value
+  if (-not $quickAnswerSection.Contains('<h2 id="quick-answers">')) {
+    Write-Output "FAIL [$quickAnswerPage] 問題入口缺 quick-answers 標題"
+    $errors++
+  }
+  if ([regex]::Matches($quickAnswerSection, 'class="quick-answer-card"').Count -ne 4 -or
+      [regex]::Matches($quickAnswerSection, '<strong>先做：</strong>').Count -ne 4 -or
+      [regex]::Matches($quickAnswerSection, 'class="quick-answer-action"').Count -ne 4) {
+    Write-Output "FAIL [$quickAnswerPage] 必須有 4 張問題卡、4 個先做與 4 個直接入口"
+    $errors++
+  }
+  if ($quickAnswerText.IndexOf('class="quick-answer-hub"') -gt $quickAnswerText.IndexOf('class="toc"')) {
+    Write-Output "FAIL [$quickAnswerPage] 問題入口必須在完整目錄前"
+    $errors++
+  }
+  if (-not $quickAnswerText.Contains('<strong>完整內容與參考資料</strong>')) {
+    Write-Output "FAIL [$quickAnswerPage] 完整目錄必須與快速解法分層"
+    $errors++
+  }
+}
+foreach ($quickAnswerCssNeedle in @('.quick-answer-hub {', '.quick-answer-grid {', '.quick-answer-card {', '.quick-answer-action {')) {
+  if (-not $evidenceCss.Contains($quickAnswerCssNeedle)) {
+    Write-Output "FAIL [style.css] 問題優先元件缺樣式：$quickAnswerCssNeedle"
+    $errors++
+  }
+}
+
 # 檸檬圖文必須保留等義文字與原生連結，不能只剩裝飾圖案或 JavaScript 畫面。
 $lemonDiagrams = @(
   @{ Page = 'why.html'; Class = 'lemon-choice-map'; Items = 2 },
