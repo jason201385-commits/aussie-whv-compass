@@ -238,6 +238,19 @@ if (-not $evidenceCss.Contains('.evidence-card[data-evidence-status="stale"]')) 
 
 # 長篇攻略先列真實問題與一句可執行下一步；完整解釋與來源保留在下方。
 $quickAnswerPages = @('why.html', 'visa.html', 'prep.html', 'cost.html', 'housing.html', 'work.html', 'scam.html', 'english.html', 'health.html', 'leave.html', 'pr.html')
+$quickAnswerExpectedRoutes = @{
+  'why.html' = @('#quick-quiz', '#worksheet', '#worksheet', '#after-reflection')
+  'visa.html' = @('#first', '#apply', '#where', '#evidence')
+  'prep.html' = @('#timeline', '#72h', '#first-week', '#checklist')
+  'cost.html' = @('#cost-first-action', '#math', '#food', '#car-checklist')
+  'housing.html' = @('#book', '#find', '#bond', '#contract')
+  'work.html' = @('#channels', '#verify', '#seasons', '#injury')
+  'scam.html' = @('#scam-first-action', '#help', '#job', '#rent')
+  'english.html' = @('#reality', '#before', '#work-english', '#after')
+  'health.html' = @('tel:000', '#health-first-action', '#doctor', '#mental')
+  'leave.html' = @('#tax', '#super', '#dasp', '#checklist')
+  'pr.html' = @('#overview', '#employer', '#points', '#reality')
+}
 foreach ($quickAnswerPage in $quickAnswerPages) {
   $quickAnswerText = [System.IO.File]::ReadAllText((Join-Path $dir $quickAnswerPage), [System.Text.Encoding]::UTF8)
   $quickAnswerSections = [regex]::Matches($quickAnswerText, '(?s)<section class="quick-answer-hub" aria-labelledby="quick-answers">.*?</section>')
@@ -257,6 +270,29 @@ foreach ($quickAnswerPage in $quickAnswerPages) {
     Write-Output "FAIL [$quickAnswerPage] 必須有 4 張問題卡、4 個先做與 4 個直接入口"
     $errors++
   }
+  $quickAnswerLinks = [regex]::Matches($quickAnswerSection, '<a class="quick-answer-card" href="([^"]+)"')
+  $actualQuickAnswerRoutes = @($quickAnswerLinks | ForEach-Object { $_.Groups[1].Value })
+  if (($actualQuickAnswerRoutes -join '|') -ne ($quickAnswerExpectedRoutes[$quickAnswerPage] -join '|')) {
+    Write-Output "FAIL [$quickAnswerPage] 問題卡導路與驗收契約不符：$($actualQuickAnswerRoutes -join ', ')"
+    $errors++
+  }
+  foreach ($quickAnswerRoute in $actualQuickAnswerRoutes) {
+    if ($quickAnswerRoute.StartsWith('#')) {
+      $quickAnswerTarget = $quickAnswerRoute.Substring(1)
+      if (-not [regex]::IsMatch($quickAnswerText, 'id="' + [regex]::Escape($quickAnswerTarget) + '"')) {
+        Write-Output "FAIL [$quickAnswerPage] 問題卡找不到同頁目標：$quickAnswerRoute"
+        $errors++
+      }
+    } elseif ($quickAnswerRoute -ne 'tel:000' -or $quickAnswerPage -ne 'health.html') {
+      Write-Output "FAIL [$quickAnswerPage] 問題卡不得導向未允許的外部或通訊入口：$quickAnswerRoute"
+      $errors++
+    }
+  }
+  if (-not $quickAnswerSection.Contains('class="quick-answer-skip" href="#full-contents"') -or
+      -not $quickAnswerText.Contains('id="full-contents"')) {
+    Write-Output "FAIL [$quickAnswerPage] 必須提供未命中四題時的完整內容捷徑"
+    $errors++
+  }
   if ($quickAnswerText.IndexOf('class="quick-answer-hub"') -gt $quickAnswerText.IndexOf('class="toc"')) {
     Write-Output "FAIL [$quickAnswerPage] 問題入口必須在完整目錄前"
     $errors++
@@ -269,6 +305,32 @@ foreach ($quickAnswerPage in $quickAnswerPages) {
 foreach ($quickAnswerCssNeedle in @('.quick-answer-hub {', '.quick-answer-grid {', '.quick-answer-card {', '.quick-answer-action {')) {
   if (-not $evidenceCss.Contains($quickAnswerCssNeedle)) {
     Write-Output "FAIL [style.css] 問題優先元件缺樣式：$quickAnswerCssNeedle"
+    $errors++
+  }
+}
+if (-not $evidenceCss.Contains('.quick-answer-skip {') -or
+    -not $evidenceCss.Contains('html { scroll-behavior: auto; }')) {
+  Write-Output 'FAIL [style.css] 問題入口缺完整內容捷徑或手機即時錨點跳轉'
+  $errors++
+}
+
+# 高風險語意路徑不能只靠「href 存在」通過。
+$healthQuickAnswerText = [System.IO.File]::ReadAllText((Join-Path $dir 'health.html'), [System.Text.Encoding]::UTF8)
+if (-not $healthQuickAnswerText.Contains('class="quick-answer-card" href="tel:000"') -or
+    -not $healthQuickAnswerText.Contains('href="#emergency">緊急聯絡總表</a>')) {
+  Write-Output 'FAIL [health.html] 生命危險入口必須可直接撥 000 並保留緊急聯絡說明'
+  $errors++
+}
+$scamQuickAnswerText = [System.IO.File]::ReadAllText((Join-Path $dir 'scam.html'), [System.Text.Encoding]::UTF8)
+if (-not $scamQuickAnswerText.Contains('已匯款、信用卡或網銀帳號可能被控制') -or
+    -not $scamQuickAnswerText.Contains('你自己查到的銀行／發卡機構')) {
+  Write-Output 'FAIL [scam.html] 已匯款救濟包必須先提供銀行／發卡機構出口'
+  $errors++
+}
+$costQuickAnswerText = [System.IO.File]::ReadAllText((Join-Path $dir 'cost.html'), [System.Text.Encoding]::UTF8)
+foreach ($vehicleAuthorityNeedle in @('id="car-authorities"', 'service.nsw.gov.au/transaction/transfer-a-vehicle-registration', 'vicroads.vic.gov.au/buy-sell-transfer', 'qld.gov.au/transport/registration', 'transport.wa.gov.au/licensing/vehicle/buy-sell-transfer/buy', 'sa.gov.au/topics/driving-and-transport/registration', 'service.tas.gov.au/services/transport/vehicle-registration', 'accesscanberra.act.gov.au/driving-transport-and-parking/registration', 'nt.gov.au/driving/rego/existing-nt-registration')) {
+  if (-not $costQuickAnswerText.Contains($vehicleAuthorityNeedle)) {
+    Write-Output "FAIL [cost.html] 買車州別邊界缺官方入口：$vehicleAuthorityNeedle"
     $errors++
   }
 }

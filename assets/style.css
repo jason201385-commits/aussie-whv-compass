@@ -818,6 +818,15 @@ body:not(.home-page) main > p { max-width: 76ch; }
 }
 .quick-answer-hub h2 { margin: .28em 0 .3em; }
 .quick-answer-hub > p:not(.section-eyebrow) { margin: 0; max-width: 760px; color: var(--ink-soft); }
+.quick-answer-skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 10px;
+  color: var(--link);
+  font-size: .88rem;
+  font-weight: 800;
+}
 .quick-answer-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2309,6 +2318,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 main [id] { scroll-margin-top: 170px; }
 
 @media (max-width: 640px) {
+  html { scroll-behavior: auto; }
   .quick-answer-hub { padding: 19px 15px; }
   .quick-answer-grid { grid-template-columns: 1fr; }
   .quick-answer-card { min-height: 0; }
