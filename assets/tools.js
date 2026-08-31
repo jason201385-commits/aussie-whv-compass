@@ -832,6 +832,286 @@
     show();
   }
 
+  /* ================= 住宿五平台快速搜尋（housing.html） ================= */
+  var housingTool = document.getElementById("housing-search-tool");
+  if (housingTool) {
+    var housingEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+    var housingForm = document.getElementById("housing-search-form");
+    var housingLocation = document.getElementById("housing-location");
+    var housingCheckin = document.getElementById("housing-checkin");
+    var housingStayLength = document.getElementById("housing-stay-length");
+    var housingGuests = document.getElementById("housing-guests");
+    var housingResults = document.getElementById("housing-search-results");
+    var housingSummary = document.getElementById("housing-search-summary");
+    var housingStatus = document.getElementById("housing-search-status");
+    var housingCopy = document.getElementById("housing-copy-location");
+    var housingCopyValue = "";
+
+    var housingLinks = {
+      hostelworld: document.getElementById("housing-hostelworld-link"),
+      booking: document.getElementById("housing-booking-link"),
+      flatmates: document.getElementById("housing-flatmates-link"),
+      rea: document.getElementById("housing-rea-link"),
+      domain: document.getElementById("housing-domain-link")
+    };
+    var housingNotes = {
+      hostelworld: document.getElementById("housing-hostelworld-note"),
+      booking: document.getElementById("housing-booking-note"),
+      flatmates: document.getElementById("housing-flatmates-note"),
+      rea: document.getElementById("housing-rea-note"),
+      domain: document.getElementById("housing-domain-note")
+    };
+    var housingCityDefaults = {
+      perth: { place: "Perth", state: "WA", postcode: "6000" },
+      sydney: { place: "Sydney", state: "NSW", postcode: "2000" },
+      melbourne: { place: "Melbourne", state: "VIC", postcode: "3000" },
+      brisbane: { place: "Brisbane", state: "QLD", postcode: "4000" },
+      adelaide: { place: "Adelaide", state: "SA", postcode: "5000" },
+      cairns: { place: "Cairns", state: "QLD", postcode: "4870" },
+      darwin: { place: "Darwin", state: "NT", postcode: "0800" },
+      hobart: { place: "Hobart", state: "TAS", postcode: "7000" }
+    };
+    var housingStateNames = {
+      NSW: "New South Wales",
+      VIC: "Victoria",
+      QLD: "Queensland",
+      WA: "Western Australia",
+      SA: "South Australia",
+      TAS: "Tasmania",
+      ACT: "Australian Capital Territory",
+      NT: "Northern Territory"
+    };
+    var housingHostelworldCities = {
+      "adelaide": true, "airlie-beach": true, "alice-springs": true, "apollo-bay": true,
+      "brisbane": true, "broome": true, "byron-bay": true, "cairns": true,
+      "canberra": true, "coffs-harbour": true, "darwin": true, "gold-coast": true,
+      "hobart": true, "kununurra": true, "melbourne": true, "perth": true,
+      "sydney": true, "townsville": true
+    };
+
+    var housingDateString = function (date) {
+      var year = date.getFullYear();
+      var month = String(date.getMonth() + 1).padStart(2, "0");
+      var day = String(date.getDate()).padStart(2, "0");
+      return year + "-" + month + "-" + day;
+    };
+    var housingSlug = function (value) {
+      var normalized = value;
+      if (normalized.normalize) normalized = normalized.normalize("NFKD");
+      return normalized
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    };
+    var parseHousingLocation = function (rawValue) {
+      var raw = rawValue.replace(/\s+/g, " ").trim();
+      var locationOnly = raw.replace(/(?:,\s*|\s+)Australia$/i, "").replace(/,\s*$/, "").trim();
+      var parts = locationOnly.split(",").map(function (part) { return part.trim(); }).filter(Boolean);
+      var locality = locationOnly;
+      if (parts.length > 1) {
+        var last = parts[parts.length - 1];
+        locality = /^(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)\s+\d{4}$/i.test(last) && parts.length > 1
+          ? parts[parts.length - 2] + " " + last
+          : last;
+      }
+      locality = locality.replace(/\s+/g, " ").trim();
+      var match = locality.match(/^(.+?)\s+(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)(?:\s+(\d{4}))?$/i);
+      var parsed = {
+        raw: raw,
+        locality: locality,
+        place: match ? match[1].trim() : locality.replace(/\b\d{4}\b/g, "").trim(),
+        state: match ? match[2].toUpperCase() : "",
+        postcode: match && match[3] ? match[3] : ""
+      };
+      var cityDefault = housingCityDefaults[housingSlug(parsed.place)];
+      if (cityDefault && !parsed.state && !parsed.postcode) {
+        parsed.place = cityDefault.place;
+        parsed.state = cityDefault.state;
+        parsed.postcode = cityDefault.postcode;
+        parsed.locality = cityDefault.place + " " + cityDefault.state + " " + cityDefault.postcode;
+      }
+      return parsed;
+    };
+    var setHousingNote = function (key, text) {
+      if (housingNotes[key]) housingNotes[key].textContent = text;
+    };
+    var housingStateForPostcode = function (postcode) {
+      var pc = parseInt(postcode, 10);
+      if (pc >= 800 && pc <= 999) return "NT";
+      if ((pc >= 2600 && pc <= 2618) || (pc >= 2900 && pc <= 2920)) return "ACT";
+      if ((pc >= 2000 && pc <= 2599) || (pc >= 2619 && pc <= 2898) || (pc >= 2921 && pc <= 2999)) return "NSW";
+      if (pc >= 3000 && pc <= 3999) return "VIC";
+      if (pc >= 4000 && pc <= 4999) return "QLD";
+      if (pc >= 5000 && pc <= 5999) return "SA";
+      if (pc >= 6000 && pc <= 6999) return "WA";
+      if (pc >= 7000 && pc <= 7999) return "TAS";
+      return "";
+    };
+
+    housingCheckin.min = housingDateString(new Date());
+    housingTool.hidden = false;
+    housingLocation.addEventListener("input", function () { housingLocation.setCustomValidity(""); });
+
+    housingForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      housingResults.hidden = true;
+      housingCopyValue = "";
+      housingLocation.setCustomValidity("");
+      var raw = housingLocation.value.replace(/\s+/g, " ").trim();
+      if (/(?:^[a-z][a-z0-9+.-]*:|:\/\/|^www\.)/i.test(raw)) {
+        housingLocation.setCustomValidity(housingEnglish
+          ? "Enter an address or area, not a web link."
+          : "請輸入地址或地區，不要貼網址。");
+      } else if (/^\d+[A-Za-z]?\s/.test(raw) && raw.indexOf(",") === -1) {
+        housingLocation.setCustomValidity(housingEnglish
+          ? "Add a comma before the suburb, for example: 123 Hay St, Perth WA 6000."
+          : "請在街道與 suburb 之間加逗號，例如：123 Hay St, Perth WA 6000。");
+      }
+      if (!housingForm.checkValidity()) {
+        housingStatus.textContent = housingEnglish
+          ? "Correct the location before preparing new routes."
+          : "請先修正地點，再建立新的搜尋入口。";
+        housingForm.reportValidity();
+        return;
+      }
+
+      var parsed = parseHousingLocation(raw);
+      if (parsed.state && parsed.postcode && housingStateForPostcode(parsed.postcode) !== parsed.state) {
+        housingLocation.setCustomValidity(housingEnglish
+          ? "The state and postcode do not match. Check both before continuing."
+          : "州別與郵遞區號不相符，請確認後再試。");
+        housingForm.reportValidity();
+        housingStatus.textContent = housingEnglish
+          ? "Check the state and postcode before preparing new routes."
+          : "請先確認州別與郵遞區號，再建立新的搜尋入口。";
+        return;
+      }
+      var placeSlug = housingSlug(parsed.place);
+      if (!placeSlug) {
+        housingLocation.setCustomValidity(housingEnglish
+          ? "Include a suburb or city name."
+          : "請加入 suburb 或城市名稱。");
+        housingForm.reportValidity();
+        housingStatus.textContent = housingEnglish
+          ? "Include a suburb or city name before preparing new routes."
+          : "請加入 suburb 或城市名稱，再建立新的搜尋入口。";
+        return;
+      }
+      housingCopyValue = parsed.locality;
+
+      var bookingUrl = new URL("https://www.booking.com/searchresults.html");
+      var bookingLocation = parsed.place
+        + (housingStateNames[parsed.state] ? ", " + housingStateNames[parsed.state] : "")
+        + ", Australia";
+      bookingUrl.searchParams.set("ss", bookingLocation);
+      bookingUrl.searchParams.set("group_adults", housingGuests.value);
+      bookingUrl.searchParams.set("no_rooms", "1");
+      bookingUrl.searchParams.set("group_children", "0");
+      if (housingCheckin.value) {
+        var checkout = new Date(housingCheckin.value + "T12:00:00");
+        checkout.setDate(checkout.getDate() + parseInt(housingStayLength.value, 10));
+        bookingUrl.searchParams.set("checkin", housingCheckin.value);
+        bookingUrl.searchParams.set("checkout", housingDateString(checkout));
+      }
+      housingLinks.booking.href = bookingUrl.toString();
+      setHousingNote("booking", housingEnglish
+        ? (housingCheckin.value
+          ? "Location, check-in, " + housingStayLength.value + " nights and " + housingGuests.value + " guest(s) prepared; recheck them on the platform"
+          : "Location and " + housingGuests.value + " guest(s) prepared; choose dates on the platform")
+        : (housingCheckin.value
+          ? "已帶入地點、" + housingCheckin.value + " 起 " + housingStayLength.value + " 晚與 " + housingGuests.value + " 人；進站後再確認"
+          : "已帶入地點與 " + housingGuests.value + " 人；日期進站後再選"));
+
+      if (housingHostelworldCities[placeSlug]) {
+        housingLinks.hostelworld.href = "https://www.hostelworld.com/hostels/oceania/australia/" + placeSlug + "/";
+        setHousingNote("hostelworld", housingEnglish
+          ? parsed.place + " hostel route prepared; confirm dates and guests on the platform"
+          : "已建立 " + parsed.place + " 青旅入口；日期與人數進站後再確認");
+      } else {
+        housingLinks.hostelworld.href = "https://www.hostelworld.com/hostels/oceania/australia/";
+        setHousingNote("hostelworld", housingEnglish
+          ? "No stable direct route for this area; open Australia and paste " + parsed.locality
+          : "這個地區沒有穩定深連結；開啟澳洲入口後貼上 " + parsed.locality);
+      }
+
+      housingLinks.flatmates.href = "https://flatmates.com.au/rooms/" + placeSlug;
+      setHousingNote("flatmates", housingEnglish
+        ? parsed.place + " room route prepared; set price and move-in filters on the platform"
+        : "已建立 " + parsed.place + " 合租入口；價格與入住日請在平台內篩選");
+
+      if (parsed.state && parsed.postcode) {
+        var stateSlug = parsed.state.toLowerCase();
+        housingLinks.rea.href = "https://www.realestate.com.au/rent/in-" + placeSlug + ",+" + stateSlug + "+" + parsed.postcode + "/list-1";
+        housingLinks.domain.href = "https://www.domain.com.au/rent/" + placeSlug + "-" + stateSlug + "-" + parsed.postcode + "/";
+        setHousingNote("rea", housingEnglish
+          ? parsed.place + " " + parsed.state + " " + parsed.postcode + " rental route prepared"
+          : "已建立 " + parsed.place + " " + parsed.state + " " + parsed.postcode + " 整租入口");
+        setHousingNote("domain", housingEnglish
+          ? parsed.place + " " + parsed.state + " " + parsed.postcode + " rental route prepared"
+          : "已建立 " + parsed.place + " " + parsed.state + " " + parsed.postcode + " 整租入口");
+      } else {
+        housingLinks.rea.href = "https://www.realestate.com.au/rent/";
+        housingLinks.domain.href = "https://www.domain.com.au/rent/";
+        setHousingNote("rea", housingEnglish
+          ? "State or postcode missing; open Rent and paste " + parsed.locality
+          : "缺州別或郵遞區號；開啟 Rent 後貼上 " + parsed.locality);
+        setHousingNote("domain", housingEnglish
+          ? "State or postcode missing; open Rent and paste " + parsed.locality
+          : "缺州別或郵遞區號；開啟 Rent 後貼上 " + parsed.locality);
+      }
+
+      housingSummary.textContent = housingEnglish
+        ? "Five platform routes prepared for " + parsed.locality + "."
+        : "已為 " + parsed.locality + " 建立五個平台入口。";
+      housingResults.hidden = false;
+      housingStatus.textContent = housingEnglish
+        ? "Ready. Open platforms one at a time and recheck every filter."
+        : "已就緒。請逐一開啟平台，並重新確認每個篩選條件。";
+      housingResults.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest" });
+    });
+
+    housingForm.addEventListener("reset", function () {
+      setTimeout(function () {
+        housingResults.hidden = true;
+        housingCopyValue = "";
+        housingLocation.setCustomValidity("");
+        housingStatus.textContent = housingEnglish
+          ? "Enter a location or choose a common city."
+          : "輸入地點，或點一個常見城市。";
+      }, 0);
+    });
+
+    housingTool.querySelectorAll("[data-housing-location]").forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        housingLocation.value = chip.getAttribute("data-housing-location");
+        housingLocation.setCustomValidity("");
+        if (housingForm.requestSubmit) housingForm.requestSubmit();
+        else housingForm.dispatchEvent(new Event("submit", { cancelable: true }));
+      });
+    });
+
+    housingCopy.addEventListener("click", function () {
+      if (!housingCopyValue) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(housingCopyValue).then(function () {
+          housingStatus.textContent = housingEnglish
+            ? "Location copied: " + housingCopyValue
+            : "已複製地點：" + housingCopyValue;
+        }).catch(function () {
+          housingStatus.textContent = housingEnglish
+            ? "Automatic copy is unavailable. Copy this area manually: " + housingCopyValue
+            : "瀏覽器無法自動複製；請手動複製這段地區：" + housingCopyValue;
+        });
+      } else {
+        housingStatus.textContent = housingEnglish
+          ? "Automatic copy is unavailable. Copy this area manually: " + housingCopyValue
+          : "瀏覽器無法自動複製；請手動複製這段地區：" + housingCopyValue;
+      }
+    });
+  }
+
   /* ================= 離澳收尾清單（leave.html） ================= */
   var leaveChecklist = document.getElementById("leave-checklist");
   if (leaveChecklist) {

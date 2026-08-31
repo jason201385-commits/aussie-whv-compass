@@ -1520,7 +1520,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .tool-row label { font-weight: 800; min-width: 7.5em; font-size: .95rem; }
 .tool-row output { font-weight: 900; color: var(--accent); min-width: 4.5em; text-align: right; font-variant-numeric: tabular-nums; }
 .tool input[type="range"] { flex: 1; min-width: 140px; accent-color: var(--accent); height: 6px; }
-.tool select, .tool input[type="number"], .tool input[type="text"] {
+.tool select, .tool input[type="number"], .tool input[type="text"], .tool input[type="date"] {
   font: inherit; padding: 8px 12px; border-radius: 10px;
   border: 2px solid var(--ink); background: var(--surface); color: var(--ink);
 }
@@ -1542,6 +1542,68 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 }
 .tool input[type="text"], .tool input[type="number"] { width: 8em; }
 .tool select:focus-visible, .tool input:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- 住宿五平台快速搜尋 ---------- */
+.housing-search-tool[hidden], .housing-search-results[hidden] { display: none; }
+.housing-search-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0 12px;
+}
+.housing-search-field { min-width: 0; }
+.housing-search-field-wide { grid-column: 1 / -1; }
+.housing-search-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: .86rem;
+  font-weight: 900;
+}
+.tool .housing-search-field input,
+.tool .housing-search-field select { width: 100%; min-height: 44px; }
+.housing-search-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.housing-search-actions .btn { min-height: 44px; }
+.housing-search-tool .chip { min-height: 40px; }
+.housing-search-privacy,
+.housing-search-limit {
+  color: var(--ink-soft);
+  font-size: .82rem;
+  line-height: 1.65;
+}
+.housing-search-status {
+  min-height: 1.6em;
+  margin: 10px 0 0;
+  font-size: .88rem;
+  font-weight: 800;
+}
+.housing-search-results {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--line);
+}
+.housing-search-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.housing-search-summary p { margin: 0; }
+.housing-search-summary .btn { flex: 0 0 auto; min-height: 42px; }
+.housing-search-results .support-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+.housing-search-results .support-link { min-height: 108px; }
+.housing-fallback { margin: 18px 0 26px; }
+.housing-fallback > summary { font-weight: 900; }
+.housing-fallback[open] > summary { margin-bottom: 12px; }
 
 .result-card {
   background: var(--bg);
@@ -2319,6 +2381,14 @@ main [id] { scroll-margin-top: 170px; }
   .evidence-card__basis summary { padding: 14px 16px 14px 22px; }
   .evidence-card__basis > p { padding: 0 16px 17px 22px; }
   .tool { padding: 18px 16px; }
+  .housing-search-fields { grid-template-columns: 1fr; }
+  .housing-search-field-wide { grid-column: 1; }
+  .housing-search-actions { align-items: stretch; }
+  .housing-search-actions .btn { width: 100%; }
+  .housing-search-summary { align-items: stretch; flex-direction: column; }
+  .housing-search-summary .btn { width: 100%; }
+  .housing-search-results .support-grid { grid-template-columns: 1fr; }
+  .housing-search-results .support-link { min-height: 76px; }
   .hero { margin-top: 12px; padding: 46px 18px 38px; border-radius: 26px; }
   .hero-cutouts { display: none; }
   .trust-strip { justify-content: flex-start; margin: 18px 0 0; gap: 2px 12px; font-size: .88rem; }

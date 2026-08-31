@@ -55,7 +55,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@700;900&amp;display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=20260830-36">
+<link rel="stylesheet" href="/assets/style.css?v=20260831-37">
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2'&gt;&lt;circle cx='12' cy='12' r='10'/&gt;&lt;path d='M16 8l-2 6-6 2 2-6z'/&gt;&lt;/svg&gt;">
 </head>
 <body class="i18n-page english-guide-page" data-i18n-topic="housing">
@@ -117,8 +117,90 @@
   </nav>
 
   <h2 id="find-now">1. Search and book without giving away control</h2>
-  <p>These are direct commercial platform links, not endorsements. Aussie WHV Compass has no affiliate relationship with them, does not book accommodation and does not receive your dates, budget, account details or search history. Availability, ranking, fees and cancellation terms change; the final booking screen controls your transaction.</p>
-  <div class="support-grid" aria-label="Accommodation search routes">
+  <p>Enter one location to prepare five platform routes. The tool only pre-fills conditions that each link can carry reliably; it does not claim to retrieve or filter live vacancies.</p>
+
+  <section class="tool housing-search-tool" id="housing-search-tool" aria-labelledby="housing-search-title" hidden>
+    <span class="tool-tag">ON-DEVICE QUICK SEARCH</span>
+    <h3 id="housing-search-title">Enter once, prepare five search routes</h3>
+    <p>You may enter a full address, but <strong>Suburb State 4-digit postcode</strong>, such as <strong>Perth WA 6000</strong>, is more reliable. For “123 Hay St, Perth WA 6000”, the tool uses only the location after the comma to prepare links.</p>
+    <form id="housing-search-form">
+      <div class="housing-search-fields">
+        <div class="housing-search-field housing-search-field-wide">
+          <label for="housing-location">Address or area</label>
+          <input id="housing-location" name="location" type="text" required maxlength="120" autocomplete="address-level2" placeholder="Perth WA 6000">
+        </div>
+        <div class="housing-search-field">
+          <label for="housing-checkin">Expected check-in</label>
+          <input id="housing-checkin" name="checkin" type="date">
+        </div>
+        <div class="housing-search-field">
+          <label for="housing-stay-length">Initial stay</label>
+          <select id="housing-stay-length" name="stayLength">
+            <option value="7">7 nights</option>
+            <option value="14" selected>14 nights</option>
+            <option value="28">28 nights</option>
+          </select>
+        </div>
+        <div class="housing-search-field">
+          <label for="housing-guests">Guests</label>
+          <select id="housing-guests" name="guests">
+            <option value="1" selected>1 guest</option>
+            <option value="2">2 guests</option>
+            <option value="3">3 guests</option>
+            <option value="4">4 guests</option>
+          </select>
+        </div>
+      </div>
+      <div class="chip-row" aria-label="Fill a common arrival city">
+        <span class="chip-label">Common cities:</span>
+        <button class="chip" type="button" data-housing-location="Perth WA 6000">Perth</button>
+        <button class="chip" type="button" data-housing-location="Sydney NSW 2000">Sydney</button>
+        <button class="chip" type="button" data-housing-location="Melbourne VIC 3000">Melbourne</button>
+        <button class="chip" type="button" data-housing-location="Brisbane QLD 4000">Brisbane</button>
+        <button class="chip" type="button" data-housing-location="Adelaide SA 5000">Adelaide</button>
+        <button class="chip" type="button" data-housing-location="Cairns QLD 4870">Cairns</button>
+        <button class="chip" type="button" data-housing-location="Darwin NT 0800">Darwin</button>
+        <button class="chip" type="button" data-housing-location="Hobart TAS 7000">Hobart</button>
+      </div>
+      <div class="housing-search-actions">
+        <button class="btn" type="submit">Prepare five search routes</button>
+        <button class="btn secondary" type="reset">Clear</button>
+      </div>
+      <p class="housing-search-privacy">Your input stays in this tab's memory. It is not written to browser storage or sent to this site. A location and supported conditions are sent to a platform only after you open that platform link.</p>
+      <p class="housing-search-status" id="housing-search-status" role="status" aria-live="polite">Enter a location or choose a common city.</p>
+    </form>
+
+    <div class="housing-search-results" id="housing-search-results" hidden>
+      <div class="housing-search-summary">
+        <p><strong id="housing-search-summary">No search routes prepared yet.</strong></p>
+        <button class="btn secondary" id="housing-copy-location" type="button">Copy location</button>
+      </div>
+      <div class="support-grid" aria-label="Five accommodation platform search routes">
+        <a class="support-link" id="housing-hostelworld-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
+          <span class="icon" aria-hidden="true">H</span><span><strong>Hostelworld</strong><small id="housing-hostelworld-note">Hostels and short stays; some locations need another search on the platform</small></span>
+        </a>
+        <a class="support-link" id="housing-booking-link" href="https://www.booking.com/country/au.html" target="_blank" rel="noopener noreferrer nofollow">
+          <span class="icon" aria-hidden="true">B</span><span><strong>Booking.com</strong><small id="housing-booking-note">Can carry location, dates and guest count</small></span>
+        </a>
+        <a class="support-link" id="housing-flatmates-link" href="https://flatmates.com.au/rooms" target="_blank" rel="noopener noreferrer nofollow">
+          <span class="icon" aria-hidden="true">F</span><span><strong>Flatmates</strong><small id="housing-flatmates-note">Rooms and share houses</small></span>
+        </a>
+        <a class="support-link" id="housing-rea-link" href="https://www.realestate.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
+          <span class="icon" aria-hidden="true">R</span><span><strong>realestate.com.au</strong><small id="housing-rea-note">A direct area route needs a state and postcode</small></span>
+        </a>
+        <a class="support-link" id="housing-domain-link" href="https://www.domain.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
+          <span class="icon" aria-hidden="true">D</span><span><strong>Domain</strong><small id="housing-domain-note">A direct area route needs a state and postcode</small></span>
+        </a>
+      </div>
+      <p class="housing-search-limit">These are platform search routes, not listings retrieved by this site. A platform may rewrite or ignore some conditions. Recheck the location, dates, total price, availability and cancellation terms after opening it.</p>
+    </div>
+  </section>
+
+  <noscript><p class="warn">Quick search needs JavaScript. You can still use the direct Australia-wide platform links below.</p></noscript>
+  <details class="housing-fallback">
+    <summary>Without the tool: open direct Australia-wide platform links</summary>
+    <p>These are direct commercial platform links, not endorsements. Aussie WHV Compass has no affiliate relationship with them, does not book accommodation and does not receive your dates, budget, account details or search history.</p>
+    <div class="support-grid" aria-label="Accommodation search routes">
     <a class="support-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
       <span class="icon" aria-hidden="true">H</span><span><strong>Hostels and short stays</strong><small>Hostelworld Australia listings</small></span>
     </a>
@@ -134,7 +216,8 @@
     <a class="support-link" href="https://www.domain.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
       <span class="icon" aria-hidden="true">D</span><span><strong>Compare another rental market</strong><small>Domain rental listings</small></span>
     </a>
-  </div>
+    </div>
+  </details>
   <ul>
     <li>Open the property in a new search instead of trusting a link sent in chat. Compare the address, photos, weekly total and advertiser across services.</li>
     <li>Do not move a short-stay booking or payment off-platform because the host offers a discount. You may lose the platform's records and dispute route.</li>
@@ -250,8 +333,9 @@
   <p class="disclaimer">For immediate danger call 000. The current rental authority, signed agreement and booking provider terms control. This site does not receive your accommodation searches or applications.</p>
 </div></footer>
 
-<script src="/assets/analytics-config.js?v=20260830-36"></script>
-<script src="/assets/analytics.js?v=20260830-36"></script>
-<script src="/assets/i18n.js?v=20260830-36"></script>
+<script src="/assets/analytics-config.js?v=20260831-37"></script>
+<script src="/assets/analytics.js?v=20260831-37"></script>
+<script src="/assets/i18n.js?v=20260831-37"></script>
+<script src="/assets/tools.js?v=20260831-37"></script>
 </body>
 </html>

@@ -59,7 +59,7 @@
 | `prep.html` | 行前準備與落地 SOP＋**互動檢查清單** |
 | `simulator.html` | **5 分鐘角色設定＋抵澳 30 天模擬器**：固定六情境、同分頁 session 暫存、緊急關卡在選項前提供 `tel:000` 安全中斷、官方出口與第 30 天行動地圖；從攻略返回或重新整理可繼續，重開需確認，不做成功／簽證／醫療預測；無 JavaScript 時隱藏不可操作表單並提供靜態替代入口 |
 | `cost.html` | 物價薪水稅務＋Perth 採買、簡易食譜、二手衣／平價新品＋主要找車／自行刊登平台與官方查核＋**存錢試算器** |
-| `housing.html` | 住宿與租屋：短住訂房、合租／整租原始平台入口、WA 官方租屋權益與安全清單 |
+| `housing.html` | 住宿與租屋：一次輸入地點的五平台搜尋轉接器、短住訂房、合租／整租原始平台入口、WA 官方租屋權益與安全清單 |
 | `work.html` | 找工作（管道、查核、證照、履歷、官方月份工具、四季職類與條件式抵達建議、工傷） |
 | `scam.html` | 防詐騙（三道防線、16 手法、救濟包）＋**防詐測驗** |
 | `english.html` | 英文資源與策略 |
@@ -78,7 +78,7 @@
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
 | `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
-| `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP（特徵偵測按頁啟用） |
+| `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP 與住宿五平台搜尋轉接器（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
 | `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、14 個完整繁中頁＋語言 Quick Start 搜尋探索、公開內容 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
@@ -87,6 +87,7 @@
 | `scripts/build_seo.py` | 從頁面 title／description 重建 JSON-LD、分享 meta、sitemap、robots、llms、內容狀態與 crawler policy；`--check` 防止產物過期 |
 | `scripts/build_search.py` | 從 14 頁 `<main>` 的 h1／h2、段落與固定別名重建搜尋索引；所有段落 h2 必須有 id，`--check` 驗證涵蓋與深連結 |
 | `scripts/build_i18n.py`／`lang/` | 從 locale registry 重建語言 hub、37 個非繁中 Quick Start、`hreflang` 與語言切換 JS；產物不得手改 |
+| `scripts/test_housing_search.mjs` | 無第三方相依的住宿搜尋 DOM 行為回放：尾端國名、完整地址、跨年日期、前導零、錯誤輸入、reset、英文與五平台 URL |
 | `lang/en/visa/index.html` | 第一個完整英文 editorial beta：護照中立的 417／462 分流、官方來源、指定工作與 417-only 郵遞區號快查；未經母語移民專業人士校對前不得標為 reviewed |
 | `lang/en/prep/index.html` | 完整英文行前與落地 editorial beta：護照中立的 RHCA／保險、入境申報、藥品、各州駕照、落地住宿、TFN／銀行／myGov／super 與獨立本機進度的 21 項清單；未經母語澳洲 settlement 或 consumer-services 專業人士校對前不得標為 reviewed |
 | `lang/en/cost/index.html` | 完整英文生活成本 editorial beta：2026–27 薪資／WHM 稅／super 邊界、46 收入週／52 支出週本機試算、食衣交通、PPSR 與八州領地車輛過戶；未經母語澳洲 tax、financial-counselling 或 consumer-services 專業人士校對前不得標為 reviewed |
@@ -125,6 +126,11 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
   `/` 開啟、Escape／關閉鈕離開，行動版入口與結果維持至少 44px 可操作高度。
+- **住宿搜尋轉接器**：`housing.html` 與完整英文住宿頁共用 `tools.js`；地點、日期與人數
+  只存在當頁記憶體，不寫 storage、不呼叫本站 API。工具只建立 Hostelworld、Booking.com、
+  Flatmates、realestate.com.au 與 Domain 的平台入口；沒有穩定深連結時必須明示要求使用者
+  進站再貼上地點，不得聲稱已抓回、比價或篩出即時房源。使用者點某個平台後，該連結的
+  地點與可支援條件才交給該平台；不使用地址 autocomplete API、抓取或聯盟參數。
 - **多國語言**：繁中 14 頁仍是唯一完整內容集與維護基準；`lang/<locale>/` 是靜態、可索引的
   Quick Start，另以 `lang/<locale>/<topic>/` 漸進增加完整翻譯。語言切換不保存選擇、不送出資料，
   只依使用者選擇導向固定同站 URL。機器翻譯不得移除風險聲明或冒充人工／官方翻譯；

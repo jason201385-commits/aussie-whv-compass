@@ -795,7 +795,7 @@ if (-not (Test-Path $englishHousingPath)) {
   }
   foreach ($commercialHost in @('hostelworld.com', 'booking.com', 'flatmates.com.au', 'realestate.com.au', 'domain.com.au')) {
     $commercialLink = @([regex]::Matches($englishHousingText, '<a\b[^>]*target="_blank"[^>]*>') | Where-Object { $_.Value.Contains($commercialHost) })
-    if ($commercialLink.Count -ne 1 -or $commercialLink[0].Value -notmatch 'rel="[^"]*nofollow[^"]*"') {
+    if ($commercialLink.Count -lt 1 -or @($commercialLink | Where-Object { $_.Value -notmatch 'rel="[^"]*nofollow[^"]*"' }).Count -gt 0) {
       Write-Output "FAIL [lang/en/housing/] 商業平台連結缺 nofollow 或不存在：$commercialHost"; $errors++
     }
   }
@@ -1276,6 +1276,70 @@ foreach ($housingNeedle in @(
 }
 if ($housingText -match '(?i)(utm_|affiliate|aff_id=)') {
   Write-Output 'FAIL [housing.html] 住宿平台連結不得含追蹤或聯盟參數'
+  $errors++
+}
+
+# 住宿搜尋轉接器：繁中／英文共用、預設隱藏、不保存或抓取使用者輸入
+$englishHousingToolText = [System.IO.File]::ReadAllText((Join-Path $dir 'lang\en\housing\index.html'), [System.Text.Encoding]::UTF8)
+foreach ($housingToolPage in @(
+  @{ Name = 'housing.html'; Text = $housingText; Script = 'assets/tools.js?v=' },
+  @{ Name = 'lang/en/housing/'; Text = $englishHousingToolText; Script = '/assets/tools.js?v=' }
+)) {
+  foreach ($housingToolNeedle in @(
+    'id="housing-search-tool"',
+    'id="housing-search-form"',
+    'id="housing-search-results"',
+    'id="housing-hostelworld-link"',
+    'id="housing-booking-link"',
+    'id="housing-flatmates-link"',
+    'id="housing-rea-link"',
+    'id="housing-domain-link"',
+    $housingToolPage.Script
+  )) {
+    if (-not $housingToolPage.Text.Contains($housingToolNeedle)) {
+      Write-Output "FAIL [$($housingToolPage.Name)] 住宿五平台搜尋缺標記或程式：$housingToolNeedle"
+      $errors++
+    }
+  }
+  if (-not $housingToolPage.Text.Contains('id="housing-search-tool" aria-labelledby="housing-search-title" hidden')) {
+    Write-Output "FAIL [$($housingToolPage.Name)] 住宿工具必須預設隱藏，只在 JavaScript 成功後揭露"
+    $errors++
+  }
+}
+$housingToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
+$housingToolScript = [regex]::Match($housingToolsText, '(?s)/\* ================= 住宿五平台快速搜尋.*?/\* ================= 離澳收尾清單')
+if (-not $housingToolScript.Success) {
+  Write-Output 'FAIL [tools.js] 缺住宿五平台搜尋功能塊'
+  $errors++
+} else {
+  foreach ($housingToolNeedle in @(
+    'housingTool.hidden = false',
+    'new URL("https://www.booking.com/searchresults.html")',
+    'WA: "Western Australia"',
+    'bookingUrl.searchParams.set("ss", bookingLocation)',
+    'https://www.hostelworld.com/hostels/oceania/australia/',
+    'https://flatmates.com.au/rooms/',
+    'https://www.realestate.com.au/rent/',
+    'https://www.domain.com.au/rent/',
+    'housingSummary.textContent',
+    'housingForm.checkValidity()',
+    'prefers-reduced-motion'
+  )) {
+    if (-not $housingToolScript.Value.Contains($housingToolNeedle)) {
+      Write-Output "FAIL [tools.js] 住宿搜尋缺安全轉接行為：$housingToolNeedle"
+      $errors++
+    }
+  }
+  foreach ($housingToolForbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest', 'sendBeacon', 'window.open', 'innerHTML')) {
+    if ($housingToolScript.Value.Contains($housingToolForbidden)) {
+      Write-Output "FAIL [tools.js] 住宿搜尋不得保存、上傳、抓取或自動多開平台：$housingToolForbidden"
+      $errors++
+    }
+  }
+}
+& node (Join-Path $dir 'scripts\test_housing_search.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 住宿五平台搜尋行為測試失敗'
   $errors++
 }
 
