@@ -153,7 +153,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260831-41";
+      script.src = "assets/search-index.js?v=20260831-42";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -353,6 +353,87 @@
       homeSearchInput.value = query;
       openSiteSearch(query);
     });
+  }
+
+  // ---------- 各地社群：只篩選頁面上的公開入口；輸入不上傳 ----------
+  var communityList = document.getElementById("community-list");
+  if (communityList) {
+    var communityInput = document.getElementById("community-search-input");
+    var communityPlatform = document.getElementById("community-platform-filter");
+    var communityClear = document.getElementById("community-filter-clear");
+    var communityStatus = document.getElementById("community-list-status");
+    var communityEmpty = document.getElementById("community-empty");
+    var communityFacebook = document.getElementById("community-facebook-search");
+    var communityReddit = document.getElementById("community-reddit-search");
+    var communityEntries = Array.prototype.slice.call(communityList.querySelectorAll("[data-community-platform][data-community-region]"));
+    var communityRegions = Array.prototype.slice.call(document.querySelectorAll(".map-region[data-community-region]"));
+    var selectedCommunityRegion = "all";
+    var communityRegionNames = {
+      WA: "Western Australia", NT: "Northern Territory", QLD: "Queensland", SA: "South Australia",
+      NSW: "New South Wales", ACT: "Canberra ACT", VIC: "Victoria", TAS: "Tasmania"
+    };
+
+    var normalizeCommunityQuery = function (value) {
+      var normalized = String(value || "").toLowerCase();
+      try { normalized = normalized.normalize("NFKC"); } catch (e) {}
+      return normalized.replace(/\s+/g, " ").trim();
+    };
+
+    var updateCommunityPlatformLinks = function () {
+      var typed = communityInput.value.trim();
+      var locationHint = typed || communityRegionNames[selectedCommunityRegion] || "Australia";
+      var platformQuery = locationHint + " working holiday";
+      communityFacebook.href = "https://www.facebook.com/search/groups/?q=" + encodeURIComponent(platformQuery);
+      communityReddit.href = "https://www.reddit.com/search/?q=" + encodeURIComponent(platformQuery) + "&type=communities";
+    };
+
+    var renderCommunityEntries = function () {
+      var query = normalizeCommunityQuery(communityInput.value);
+      var platform = communityPlatform.value;
+      var visibleCount = 0;
+      communityEntries.forEach(function (entry) {
+        var searchText = normalizeCommunityQuery(entry.getAttribute("data-community-search") || entry.textContent);
+        var regionMatch = selectedCommunityRegion === "all" || entry.getAttribute("data-community-region") === selectedCommunityRegion;
+        var platformMatch = platform === "all" || entry.getAttribute("data-community-platform") === platform;
+        var queryMatch = !query || searchText.indexOf(query) >= 0;
+        var visible = regionMatch && platformMatch && queryMatch;
+        entry.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+      communityStatus.textContent = visibleCount
+        ? "目前顯示 " + visibleCount + " 個公開入口。"
+        : "目前名單裡沒有符合的公開入口。";
+      communityEmpty.hidden = visibleCount !== 0;
+      updateCommunityPlatformLinks();
+    };
+
+    communityInput.addEventListener("input", renderCommunityEntries);
+    communityPlatform.addEventListener("change", renderCommunityEntries);
+    communityRegions.forEach(function (button) {
+      button.addEventListener("click", function () {
+        selectedCommunityRegion = button.getAttribute("data-community-region") || "all";
+        communityRegions.forEach(function (regionButton) {
+          var active = regionButton === button;
+          regionButton.classList.toggle("active", active);
+          regionButton.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+        renderCommunityEntries();
+        communityStatus.focus({ preventScroll: true });
+      });
+    });
+    communityClear.addEventListener("click", function () {
+      communityInput.value = "";
+      communityPlatform.value = "all";
+      selectedCommunityRegion = "all";
+      communityRegions.forEach(function (button) {
+        var active = button.getAttribute("data-community-region") === "all";
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      renderCommunityEntries();
+      communityInput.focus();
+    });
+    renderCommunityEntries();
   }
 
   // ---------- 最近閱讀：只記錄白名單頁名，作為首頁的回訪續接 ----------

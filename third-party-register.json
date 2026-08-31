@@ -35,6 +35,32 @@
       "editorialStatus": "listed-with-third-party-boundary"
     },
     {
+      "id": "public-local-reddit-communities",
+      "type": "neutral-community-navigation-group",
+      "name": "澳洲八州與領地公開 Reddit 在地討論區",
+      "placement": "https://www.aussiewhvcompass.com/#communities",
+      "purpose": "general-local-discussion-discovery-only",
+      "relationship": "none",
+      "compensation": "none",
+      "affiliateTracking": false,
+      "siteOperated": false,
+      "siteModerated": false,
+      "workingHolidaySpecific": false,
+      "qualifiedProfessionalReferral": false,
+      "destinations": [
+        "https://www.reddit.com/r/perth/",
+        "https://www.reddit.com/r/sydney/",
+        "https://www.reddit.com/r/melbourne/",
+        "https://www.reddit.com/r/brisbane/",
+        "https://www.reddit.com/r/Adelaide/",
+        "https://www.reddit.com/r/canberra/",
+        "https://www.reddit.com/r/darwin/",
+        "https://www.reddit.com/r/tasmania/"
+      ],
+      "checkedAt": "2026-08-31",
+      "editorialStatus": "public-entry-only-not-endorsed"
+    },
+    {
       "id": "commercial-navigation-platforms",
       "type": "neutral-navigation-group",
       "name": "住宿、租屋、二手車與分類廣告平台",

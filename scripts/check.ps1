@@ -1841,6 +1841,41 @@ if (-not $indexText.Contains('id="journey-map"')) {
   Write-Output 'FAIL [index.html] 缺完整旅程錨點：journey-map'
   $errors++
 }
+foreach ($homeZoneNeedle in @(
+  'class="home-zone-nav"',
+  'href="#self-assessment"',
+  'href="#common-problems"',
+  'href="#communities"',
+  'href="#games"',
+  'id="self-assessment"',
+  'id="common-problems"',
+  'id="communities"',
+  'id="games"',
+  'href="housing.html#book"',
+  'href="work.html#channels"',
+  '開始多平台找房',
+  '打開多平台求職入口',
+  '開始澳打模擬器'
+)) {
+  if (-not $indexText.Contains($homeZoneNeedle)) { Write-Output "FAIL [index.html] 缺首頁四區或直接解法：$homeZoneNeedle"; $errors++ }
+}
+$homeZoneNav = [regex]::Match($indexText, '(?s)<nav class="home-zone-nav".*?</nav>')
+if (-not $homeZoneNav.Success -or [regex]::Matches($homeZoneNav.Value, '<a\b').Count -ne 4) {
+  Write-Output 'FAIL [index.html] 首頁四大入口必須恰好四個'
+  $errors++
+}
+$communityEntries = [regex]::Matches($indexText, 'data-community-platform="(?:line|reddit)"').Count
+$communityRegions = [regex]::Matches($indexText, 'class="map-region[^\"]*"[^>]*data-community-region=').Count
+if ($communityEntries -ne 9 -or $communityRegions -ne 9) {
+  Write-Output "FAIL [index.html] 社群清單或全澳簡化地圖不完整（entries=$communityEntries regions=$communityRegions）"
+  $errors++
+}
+foreach ($communityUiNeedle in @('id="community-search-input"', 'id="community-platform-filter"', 'id="community-filter-clear"', 'id="community-list-status"', 'id="community-facebook-search"', 'id="community-reddit-search"', '簡化區域圖・不按比例', '非 WHV 專屬・無合作關係', '本站只建立搜尋連結，不抓取、不複製平台貼文或成員資料')) {
+  if (-not $indexText.Contains($communityUiNeedle)) { Write-Output "FAIL [index.html] 社群篩選、地圖或第三方邊界缺失：$communityUiNeedle"; $errors++ }
+}
+foreach ($communityScriptNeedle in @('renderCommunityEntries', 'encodeURIComponent(platformQuery)', 'entry.hidden = !visible', 'communityEmpty.hidden = visibleCount !== 0')) {
+  if (-not $mainJs.Contains($communityScriptNeedle)) { Write-Output "FAIL [main.js] 社群本機篩選或安全平台搜尋缺失：$communityScriptNeedle"; $errors++ }
+}
 foreach ($savedId in @('saved-pages', 'saved-pages-title', 'saved-pages-list', 'saved-pages-clear')) {
   if (-not $indexText.Contains("id=`"$savedId`"")) {
     Write-Output "FAIL [index.html] 缺我的收藏元件：$savedId"
@@ -1872,7 +1907,7 @@ $homeRouteOrder = @(
   'id="journey-map"',
   'class="site-search-home"',
   'class="route-guide"',
-  'class="community-callout"'
+  'id="communities"'
 )
 $previousHomeRouteIndex = -1
 foreach ($homeRouteNeedle in $homeRouteOrder) {
@@ -2026,8 +2061,13 @@ if (-not (Test-Path $thirdPartyRegisterPath)) {
       if ($thirdPartyRegister.currentState.$inactiveField -ne $false) { Write-Output "FAIL [third-party-register.json] P1-11 現況不得冒充已啟用：$inactiveField"; $errors++ }
     }
     $registerIds = @($thirdPartyRegister.entries | ForEach-Object { $_.id })
-    foreach ($requiredRegisterId in @('perth-line-community', 'commercial-navigation-platforms', 'omara-official-register')) {
+    foreach ($requiredRegisterId in @('perth-line-community', 'public-local-reddit-communities', 'commercial-navigation-platforms', 'omara-official-register')) {
       if ($registerIds -notcontains $requiredRegisterId) { Write-Output "FAIL [third-party-register.json] 缺現行第三方關係：$requiredRegisterId"; $errors++ }
+    }
+    $publicLocalCommunities = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'public-local-reddit-communities' })[0]
+    if ($publicLocalCommunities.relationship -ne 'none' -or $publicLocalCommunities.compensation -ne 'none' -or $publicLocalCommunities.workingHolidaySpecific -ne $false -or @($publicLocalCommunities.destinations).Count -ne 8) {
+      Write-Output 'FAIL [third-party-register.json] 公開在地社群的非合作／非 WHV 邊界未同步'
+      $errors++
     }
     $commercialNavigation = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'commercial-navigation-platforms' })[0]
     if ($commercialNavigation.onSiteListingDisplayActive -ne $false -or $commercialNavigation.aggregationMode -ne 'licensed-api-only-plus-external-links' -or $commercialNavigation.marketCoverageClaim -ne 'none' -or $commercialNavigation.combinedRanking -ne $false -or @($commercialNavigation.platformAccess).Count -ne 5) {
