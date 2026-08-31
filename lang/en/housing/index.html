@@ -55,7 +55,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@700;900&amp;display=swap">
-<link rel="stylesheet" href="/assets/style.css?v=20260831-39">
+<link rel="stylesheet" href="/assets/style.css?v=20260831-41">
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2'&gt;&lt;circle cx='12' cy='12' r='10'/&gt;&lt;path d='M16 8l-2 6-6 2 2-6z'/&gt;&lt;/svg&gt;">
 </head>
 <body class="i18n-page english-guide-page" data-i18n-topic="housing">
@@ -116,12 +116,12 @@
     <a href="#problems">Problems and leaving</a>
   </nav>
 
-  <h2 id="find-now">1. Search and book without giving away control</h2>
-  <p>Enter one location to prepare five platform routes. The tool only pre-fills conditions that each link can carry reliably; it does not claim to retrieve or filter live vacancies.</p>
+  <h2 id="find-now">1. Search once: check authorised results, then open five platforms</h2>
+  <p>Only a platform that has formally authorised API display can return listings inside this site. Every other platform remains an original search route: no page scraping, login bypass or claim of live availability.</p>
 
   <section class="tool housing-search-tool" id="housing-search-tool" aria-labelledby="housing-search-title" hidden>
-    <span class="tool-tag">ON-DEVICE QUICK SEARCH</span>
-    <h3 id="housing-search-title">Enter once, prepare five search routes</h3>
+    <span class="tool-tag">LAWFUL HYBRID SEARCH</span>
+    <h3 id="housing-search-title">Enter once: authorised listings plus five original routes</h3>
     <p>You may enter a full address, but <strong>Suburb State 4-digit postcode</strong>, such as <strong>Perth WA 6000</strong>, is more reliable. For “123 Hay St, Perth WA 6000”, the tool uses only the location after the comma to prepare links.</p>
     <form id="housing-search-form">
       <div class="housing-search-fields">
@@ -163,10 +163,10 @@
         <button class="chip" type="button" data-housing-location="Hobart TAS 7000">Hobart</button>
       </div>
       <div class="housing-search-actions">
-        <button class="btn" type="submit">Prepare five search routes</button>
+        <button class="btn" type="submit">Search accommodation options</button>
         <button class="btn secondary" type="reset">Clear</button>
       </div>
-      <p class="housing-search-privacy">Your input stays in this tab's memory. It is not written to browser storage or sent to this site. A location and supported conditions are sent to a platform only after you open that platform link.</p>
+      <p class="housing-search-privacy" id="housing-search-privacy">Live provider search is not enabled on the public site. Your input stays in this tab's memory and is sent to a platform only after you open its link.</p>
       <p class="housing-search-status" id="housing-search-status" role="status" aria-live="polite">Enter a location or choose a common city.</p>
     </form>
 
@@ -175,6 +175,14 @@
         <p><strong id="housing-search-summary">No search routes prepared yet.</strong></p>
         <button class="btn secondary" id="housing-copy-location" type="button">Copy location</button>
       </div>
+      <section class="housing-live-panel" id="housing-live-panel" aria-labelledby="housing-live-title">
+        <p class="section-eyebrow">VIEW ON THIS SITE</p>
+        <h4 id="housing-live-title">Authorised provider results</h4>
+        <p class="housing-live-status" id="housing-live-status" role="status" aria-live="polite">No provider is authorised for live display yet. Use the five original platform routes below.</p>
+        <div class="housing-live-list" id="housing-live-list" hidden></div>
+        <p class="housing-search-limit">Only partial results returned by connected, authorised providers are shown, grouped by provider. This is not all-market coverage or a combined “cheapest” ranking. Any future affiliate or paid relationship will be labelled beside the provider name.</p>
+      </section>
+      <h4 class="housing-route-title">Five original platform routes</h4>
       <div class="support-grid" aria-label="Five accommodation platform search routes">
         <a class="support-link" id="housing-hostelworld-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
           <span class="icon" aria-hidden="true">H</span><span><strong>Hostelworld</strong><small id="housing-hostelworld-note">Hostels and short stays; some locations need another search on the platform</small></span>
@@ -192,7 +200,7 @@
           <span class="icon" aria-hidden="true">D</span><span><strong>Domain</strong><small id="housing-domain-note">A direct area route needs a state and postcode</small></span>
         </a>
       </div>
-      <p class="housing-search-limit">These are platform search routes, not listings retrieved by this site. A platform may rewrite or ignore some conditions. Recheck the location, dates, total price, availability and cancellation terms after opening it.</p>
+      <p class="housing-search-limit">A route is not a listing owned by this site or proof of live availability. A platform may rewrite or ignore some conditions. Recheck the location, dates, total price, availability and cancellation terms after opening it.</p>
     </div>
   </section>
 
@@ -333,9 +341,10 @@
   <p class="disclaimer">For immediate danger call 000. The current rental authority, signed agreement and booking provider terms control. This site does not receive your accommodation searches or applications.</p>
 </div></footer>
 
-<script src="/assets/analytics-config.js?v=20260831-39"></script>
-<script src="/assets/analytics.js?v=20260831-39"></script>
-<script src="/assets/i18n.js?v=20260831-39"></script>
-<script src="/assets/tools.js?v=20260831-39"></script>
+<script src="/assets/analytics-config.js?v=20260831-41"></script>
+<script src="/assets/analytics.js?v=20260831-41"></script>
+<script src="/assets/i18n.js?v=20260831-41"></script>
+<script src="/assets/api-config.js?v=20260831-41"></script>
+<script src="/assets/tools.js?v=20260831-41"></script>
 </body>
 </html>

@@ -1598,7 +1598,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .tool select:focus-visible, .tool input:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- 住宿五平台快速搜尋 ---------- */
-.housing-search-tool[hidden], .housing-search-results[hidden] { display: none; }
+.housing-search-tool[hidden], .housing-search-results[hidden], .housing-live-list[hidden] { display: none; }
 .housing-search-fields {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1624,7 +1624,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   margin-top: 18px;
 }
 .housing-search-actions .btn { min-height: 44px; }
-.housing-search-tool .chip { min-height: 40px; }
+.housing-search-tool .chip { min-height: 44px; }
 .housing-search-privacy,
 .housing-search-limit {
   color: var(--ink-soft);
@@ -1650,6 +1650,41 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 }
 .housing-search-summary p { margin: 0; }
 .housing-search-summary .btn { flex: 0 0 auto; min-height: 42px; }
+.housing-live-panel {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--green-pale) 52%, var(--bg));
+}
+.housing-live-panel .section-eyebrow { margin: 0 0 4px; }
+.housing-live-panel h4 { margin: 0; color: var(--ink); }
+.housing-live-status { margin: 8px 0 0; font-weight: 800; }
+.housing-live-list { margin-top: 16px; }
+.housing-provider-group + .housing-provider-group { margin-top: 20px; }
+.housing-provider-group h5 { margin: 0 0 10px; font-size: 1rem; }
+.housing-listing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.housing-listing-card {
+  display: flex;
+  min-width: 0;
+  min-height: 112px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--bg);
+}
+.housing-listing-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.housing-listing-card strong, .housing-listing-card span, .housing-listing-card small { overflow-wrap: anywhere; }
+.housing-listing-card span, .housing-listing-card small { color: var(--ink-soft); }
+.housing-route-title { margin: 22px 0 0; }
 .housing-search-results .support-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 14px;
@@ -2445,6 +2480,8 @@ main [id] { scroll-margin-top: 170px; }
   .housing-search-actions .btn { width: 100%; }
   .housing-search-summary { align-items: stretch; flex-direction: column; }
   .housing-search-summary .btn { width: 100%; }
+  .housing-listing-grid { grid-template-columns: 1fr; }
+  .housing-live-panel { padding: 15px; }
   .housing-search-results .support-grid { grid-template-columns: 1fr; }
   .housing-search-results .support-link { min-height: 76px; }
   .hero { margin-top: 12px; padding: 46px 18px 38px; border-radius: 26px; }

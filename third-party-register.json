@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-30",
+  "generatedAt": "2026-08-31",
   "canonicalOrigin": "https://www.aussiewhvcompass.com",
   "editorialPolicyUrl": "https://www.aussiewhvcompass.com/about.html#recommendation-policy",
   "currentState": {
@@ -47,6 +47,37 @@
       "relationship": "none",
       "compensation": "none",
       "affiliateTracking": false,
+      "onSiteListingDisplayActive": false,
+      "aggregationMode": "licensed-api-only-plus-external-links",
+      "marketCoverageClaim": "none",
+      "combinedRanking": false,
+      "platformAccess": [
+        {
+          "platform": "Booking.com",
+          "status": "external-link-only-pending-managed-affiliate-approval",
+          "policyUrl": "https://developers.booking.com/demand/docs/getting-started/prerequisites"
+        },
+        {
+          "platform": "Hostelworld",
+          "status": "external-link-only-pending-affiliate-and-api-approval",
+          "policyUrl": "https://partners.hostelworld.com/wp-content/uploads/2020/05/hostelworld-affiliate-programme-tcs.pdf"
+        },
+        {
+          "platform": "Domain",
+          "status": "external-link-only-pending-approved-api-purpose",
+          "policyUrl": "https://developer.domain.com.au/docs/v1/"
+        },
+        {
+          "platform": "realestate.com.au",
+          "status": "external-link-only-no-consumer-aggregation-authorisation",
+          "policyUrl": "https://partner.realestate.com.au/"
+        },
+        {
+          "platform": "Flatmates",
+          "status": "external-link-only-terms-prohibit-scraping",
+          "policyUrl": "https://flatmates.com.au/info/terms"
+        }
+      ],
       "selectionBasis": [
         "task-relevance",
         "direct-provider-link",
@@ -55,7 +86,7 @@
         "safety-and-official-check-route"
       ],
       "isCertificationOrQualityGuarantee": false,
-      "checkedAt": "2026-08-29",
+      "checkedAt": "2026-08-31",
       "editorialStatus": "neutral-navigation-not-ranked-by-payment"
     },
     {

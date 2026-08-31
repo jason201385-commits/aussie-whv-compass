@@ -1388,6 +1388,10 @@ foreach ($housingToolPage in @(
     'id="housing-search-tool"',
     'id="housing-search-form"',
     'id="housing-search-results"',
+    'id="housing-search-privacy"',
+    'id="housing-live-panel"',
+    'id="housing-live-status"',
+    'id="housing-live-list"',
     'id="housing-hostelworld-link"',
     'id="housing-booking-link"',
     'id="housing-flatmates-link"',
@@ -1422,6 +1426,13 @@ if (-not $housingToolScript.Success) {
     'https://www.domain.com.au/rent/',
     'housingSummary.textContent',
     'housingForm.checkValidity()',
+    'event.key !== "Enter"',
+    'accommodationSearchEnabled !== true',
+    'window.fetch(housingApiSettings.baseUrl + "/api/accommodation/search"',
+    'credentials: "omit"',
+    'referrerPolicy: "no-referrer"',
+    'licensed-api-plus-external-links',
+    'housingLiveList.replaceChildren()',
     'prefers-reduced-motion'
   )) {
     if (-not $housingToolScript.Value.Contains($housingToolNeedle)) {
@@ -1429,7 +1440,7 @@ if (-not $housingToolScript.Success) {
       $errors++
     }
   }
-  foreach ($housingToolForbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest', 'sendBeacon', 'window.open', 'innerHTML')) {
+  foreach ($housingToolForbidden in @('localStorage', 'sessionStorage', 'XMLHttpRequest', 'sendBeacon', 'window.open', 'innerHTML')) {
     if ($housingToolScript.Value.Contains($housingToolForbidden)) {
       Write-Output "FAIL [tools.js] 住宿搜尋不得保存、上傳、抓取或自動多開平台：$housingToolForbidden"
       $errors++
@@ -2008,7 +2019,7 @@ if (-not (Test-Path $thirdPartyRegisterPath)) {
 } else {
   try {
     $thirdPartyRegister = [System.IO.File]::ReadAllText($thirdPartyRegisterPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-    if ($thirdPartyRegister.schemaVersion -ne 1 -or $thirdPartyRegister.generatedAt -ne '2026-08-30') {
+    if ($thirdPartyRegister.schemaVersion -ne 1 -or $thirdPartyRegister.generatedAt -ne '2026-08-31') {
       Write-Output 'FAIL [third-party-register.json] schemaVersion／generatedAt 錯誤'; $errors++
     }
     foreach ($inactiveField in @('paidPlacementActive', 'affiliateLinksActive', 'commercialReferralActive', 'sponsoredRankingAllowed')) {
@@ -2017,6 +2028,10 @@ if (-not (Test-Path $thirdPartyRegisterPath)) {
     $registerIds = @($thirdPartyRegister.entries | ForEach-Object { $_.id })
     foreach ($requiredRegisterId in @('perth-line-community', 'commercial-navigation-platforms', 'omara-official-register')) {
       if ($registerIds -notcontains $requiredRegisterId) { Write-Output "FAIL [third-party-register.json] 缺現行第三方關係：$requiredRegisterId"; $errors++ }
+    }
+    $commercialNavigation = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'commercial-navigation-platforms' })[0]
+    if ($commercialNavigation.onSiteListingDisplayActive -ne $false -or $commercialNavigation.aggregationMode -ne 'licensed-api-only-plus-external-links' -or $commercialNavigation.marketCoverageClaim -ne 'none' -or $commercialNavigation.combinedRanking -ne $false -or @($commercialNavigation.platformAccess).Count -ne 5) {
+      Write-Output 'FAIL [third-party-register.json] 住宿平台授權、覆蓋或排序邊界未同步'; $errors++
     }
     $omaraRegister = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'omara-official-register' })[0]
     if ($omaraRegister.destinationHost -ne 'portal.mara.gov.au' -or $omaraRegister.destinationUrl -ne 'https://portal.mara.gov.au/search-the-register-of-migration-agents/' -or $omaraRegister.checkedAt -ne '2026-08-30') {
@@ -2103,7 +2118,7 @@ if (-not (Test-Path $apiConfigPath)) {
   $errors++
 } else {
   $apiConfigText = [System.IO.File]::ReadAllText($apiConfigPath, [System.Text.Encoding]::UTF8)
-  foreach ($apiConfigNeedle in @('apiBaseUrl: ""', 'turnstileSiteKey: ""', 'Public values only', 'P0-4')) {
+  foreach ($apiConfigNeedle in @('apiBaseUrl: ""', 'turnstileSiteKey: ""', 'accommodationSearchEnabled: false', 'Public values only', 'P0-4')) {
     if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] P0-4 前必須 fail closed：$apiConfigNeedle"; $errors++ }
   }
   foreach ($apiSecretName in @('TURNSTILE_SECRET_KEY', 'RATE_LIMIT_HMAC_KEY', 'API_KEY')) {
@@ -2222,9 +2237,11 @@ $workerRequired = @(
   'src\contact-validation.ts',
   'src\tokens.ts',
   'src\metrics.ts',
+  'src\accommodation.ts',
   'test\http.test.ts',
   'test\contact.test.ts',
   'test\metrics.test.ts',
+  'test\accommodation.test.ts',
   'test\security.test.ts',
   'test\repository.test.ts',
   'test\mail.test.ts'
@@ -2245,6 +2262,7 @@ if (Test-Path (Join-Path $workerDir 'wrangler.jsonc')) {
     '"database_id": "00000000-0000-0000-0000-000000000000"',
     '"name": "CONTACT_RATE_LIMITER"',
     '"name": "DPLUS_RATE_LIMITER"',
+    '"name": "ACCOMMODATION_RATE_LIMITER"',
     '"TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2"'
   )) {
     if (-not $workerConfig.Contains($workerConfigNeedle)) {

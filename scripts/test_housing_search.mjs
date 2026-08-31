@@ -12,6 +12,10 @@ class FakeElement {
     this.validationMessage = "";
     this.listeners = {};
     this.attributes = options.attributes || {};
+    this.children = [];
+    this.className = "";
+    this.target = "";
+    this.rel = "";
   }
 
   addEventListener(type, handler) {
@@ -19,8 +23,8 @@ class FakeElement {
     this.listeners[type].push(handler);
   }
 
-  dispatch(type) {
-    const event = { preventDefault() {} };
+  dispatch(type, eventOptions = {}) {
+    const event = { preventDefault() {}, ...eventOptions };
     for (const handler of this.listeners[type] || []) handler(event);
   }
 
@@ -33,9 +37,18 @@ class FakeElement {
   }
 
   scrollIntoView() {}
+
+  appendChild(child) {
+    this.children.push(child);
+    return child;
+  }
+
+  replaceChildren(...children) {
+    this.children = children;
+  }
 }
 
-function createHarness(lang = "zh-Hant") {
+function createHarness(lang = "zh-Hant", options = {}) {
   const elements = {};
   const add = (id, options) => {
     elements[id] = new FakeElement(options);
@@ -51,6 +64,10 @@ function createHarness(lang = "zh-Hant") {
   add("housing-search-summary");
   add("housing-search-status");
   add("housing-copy-location");
+  add("housing-search-privacy");
+  add("housing-live-panel");
+  add("housing-live-status");
+  add("housing-live-list", { hidden: true });
 
   for (const platform of ["hostelworld", "booking", "flatmates", "rea", "domain"]) {
     add(`housing-${platform}-link`);
@@ -72,16 +89,24 @@ function createHarness(lang = "zh-Hant") {
 
   const document = {
     documentElement: { lang },
-    getElementById(id) { return elements[id] || null; }
+    getElementById(id) { return elements[id] || null; },
+    createElement() { return new FakeElement(); }
+  };
+  const windowObject = {
+    matchMedia: () => ({ matches: false }),
+    WHV_API_CONFIG: options.apiConfig,
+    fetch: options.fetch
   };
   const context = vm.createContext({
     URL,
     Date,
     Event,
     Promise,
+    AbortController,
     navigator: {},
     document,
-    window: { matchMedia: () => ({ matches: false }) },
+    location: { hostname: options.hostname || "www.aussiewhvcompass.com" },
+    window: windowObject,
     setTimeout,
     clearTimeout,
     console
@@ -95,6 +120,10 @@ const harness = createHarness();
 const { elements, chips, housingForm, housingLocation } = harness;
 
 assert.equal(elements["housing-search-tool"].hidden, false, "tool should reveal only after JavaScript runs");
+
+housingLocation.value = "Perth WA 6000";
+housingLocation.dispatch("keydown", { key: "Enter" });
+assert.equal(elements["housing-search-results"].hidden, false, "Enter in the location field should submit");
 
 housingLocation.value = "123 Hay St, Perth WA 6000, Australia";
 elements["housing-checkin"].value = "2026-12-28";
@@ -154,4 +183,68 @@ assert.equal(
   "Five platform routes prepared for Brisbane QLD 4000."
 );
 
-console.log("HOUSING SEARCH TESTS PASSED (10 cases)");
+const liveCalls = [];
+const liveHarness = createHarness("zh-Hant", {
+  apiConfig: {
+    apiBaseUrl: "https://api.aussiewhvcompass.com",
+    accommodationSearchEnabled: true
+  },
+  async fetch(url, init) {
+    liveCalls.push({ url, init });
+    return {
+      ok: true,
+      async json() {
+        return {
+          ok: true,
+          mode: "licensed-api-plus-external-links",
+          coverage: { connectedProviders: 1, listedPlatforms: 5, allMarket: false, combinedRanking: false },
+          groups: [{
+            provider: "booking",
+            providerName: "Booking.com",
+            commercialRelationship: "affiliate",
+            listings: [{
+              name: "Authorised Perth stay",
+              area: "Perth WA 6000",
+              priceDisplay: "A$210 total",
+              stayType: "2 nights",
+              url: "https://www.booking.com/hotel/au/authorised-perth.html"
+            }, {
+              name: "Unsafe result",
+              area: "Perth",
+              priceDisplay: "A$1",
+              stayType: "2 nights",
+              url: "https://attacker.example/fake"
+            }]
+          }]
+        };
+      }
+    };
+  }
+});
+liveHarness.housingLocation.value = "123 Hay St, Perth WA 6000";
+liveHarness.elements["housing-checkin"].value = "2026-09-12";
+liveHarness.elements["housing-guests"].value = "2";
+liveHarness.housingForm.requestSubmit();
+await new Promise((resolve) => setTimeout(resolve, 5));
+
+assert.equal(liveCalls.length, 1, "enabled licensed search should make one request");
+assert.equal(liveCalls[0].url, "https://api.aussiewhvcompass.com/api/accommodation/search");
+assert.equal(liveCalls[0].init.credentials, "omit");
+assert.equal(liveCalls[0].init.referrerPolicy, "no-referrer");
+assert.deepEqual(JSON.parse(liveCalls[0].init.body), {
+  location: "Perth WA 6000",
+  checkin: "2026-09-12",
+  stayLength: 14,
+  guests: 2
+}, "the Worker must receive only the parsed area and selected filters");
+assert.equal(liveHarness.elements["housing-live-list"].hidden, false);
+assert.match(liveHarness.elements["housing-live-status"].textContent, /1 個已連接平台列出 1 筆/);
+const liveGroup = liveHarness.elements["housing-live-list"].children[0];
+assert.equal(liveGroup.children[0].textContent, "Booking.com（聯盟合作）");
+assert.equal(liveGroup.children[1].children.length, 1, "unsafe provider URLs must be discarded");
+assert.equal(
+  liveGroup.children[1].children[0].href,
+  "https://www.booking.com/hotel/au/authorised-perth.html"
+);
+
+console.log("HOUSING SEARCH TESTS PASSED (13 cases)");

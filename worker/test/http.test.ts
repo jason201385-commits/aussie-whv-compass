@@ -57,4 +57,22 @@ describe("Worker HTTP boundary", () => {
       "http://127.0.0.1:4175",
     );
   });
+
+  it("answers accommodation preflight without exposing provider credentials", async () => {
+    const response = await dispatch(
+      new Request("https://api.example.test/api/accommodation/search", {
+        method: "OPTIONS",
+        headers: {
+          Origin: "https://www.aussiewhvcompass.com",
+          "Access-Control-Request-Method": "POST",
+        },
+      }),
+    );
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(
+      "https://www.aussiewhvcompass.com",
+    );
+    expect(await response.text()).toBe("");
+  });
 });

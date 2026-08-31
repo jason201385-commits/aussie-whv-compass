@@ -845,7 +845,12 @@
     var housingSummary = document.getElementById("housing-search-summary");
     var housingStatus = document.getElementById("housing-search-status");
     var housingCopy = document.getElementById("housing-copy-location");
+    var housingPrivacy = document.getElementById("housing-search-privacy");
+    var housingLivePanel = document.getElementById("housing-live-panel");
+    var housingLiveStatus = document.getElementById("housing-live-status");
+    var housingLiveList = document.getElementById("housing-live-list");
     var housingCopyValue = "";
+    var housingRequestController = null;
 
     var housingLinks = {
       hostelworld: document.getElementById("housing-hostelworld-link"),
@@ -888,6 +893,36 @@
       "hobart": true, "kununurra": true, "melbourne": true, "perth": true,
       "sydney": true, "townsville": true
     };
+    var housingProviderHosts = {
+      hostelworld: ["hostelworld.com", "www.hostelworld.com"],
+      booking: ["booking.com", "www.booking.com"],
+      flatmates: ["flatmates.com.au", "www.flatmates.com.au"],
+      realestate: ["realestate.com.au", "www.realestate.com.au"],
+      domain: ["domain.com.au", "www.domain.com.au"]
+    };
+
+    var getHousingApiSettings = function () {
+      var config = window.WHV_API_CONFIG;
+      if (!config || config.accommodationSearchEnabled !== true || typeof config.apiBaseUrl !== "string") return null;
+      try {
+        var url = new URL(config.apiBaseUrl);
+        var loopback = (url.hostname === "127.0.0.1" || url.hostname === "localhost") && location.hostname === url.hostname;
+        if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) return null;
+        if (url.username || url.password || url.search || url.hash || (url.pathname && url.pathname !== "/")) return null;
+        return { baseUrl: url.origin };
+      } catch (e) { return null; }
+    };
+    var housingApiSettings = getHousingApiSettings();
+
+    if (housingPrivacy) {
+      housingPrivacy.textContent = housingApiSettings
+        ? (housingEnglish
+          ? "This search sends only the suburb/state/postcode, dates and guest count to this site's Worker for a one-time query to authorised providers. The application does not store the search. Opening a platform sends its link conditions to that platform."
+          : "本次搜尋只會把 suburb／州別／郵遞區號、日期與人數送到本站 Worker，單次查詢已授權平台；應用程式不保存搜尋。點開平台後，連結條件才會交給該平台。")
+        : (housingEnglish
+          ? "Live provider search is not enabled on the public site. Your input stays in this tab's memory and is sent to a platform only after you open its link."
+          : "公開站目前未啟用平台房源 API；輸入只留在這個分頁的記憶體。只有你點選某個平台時，連結條件才會交給該平台。");
+    }
 
     var housingDateString = function (date) {
       var year = date.getFullYear();
@@ -949,14 +984,147 @@
       if (pc >= 7000 && pc <= 7999) return "TAS";
       return "";
     };
+    var clearHousingLiveResults = function () {
+      if (housingRequestController) {
+        housingRequestController.abort();
+        housingRequestController = null;
+      }
+      if (housingLiveList) {
+        housingLiveList.replaceChildren();
+        housingLiveList.hidden = true;
+      }
+      if (housingLivePanel) housingLivePanel.hidden = false;
+      if (housingLiveStatus) {
+        housingLiveStatus.textContent = housingApiSettings
+          ? (housingEnglish ? "Ready to check authorised provider results." : "可以查詢已授權平台結果。")
+          : (housingEnglish
+            ? "No provider is authorised for live display yet. Use the five original platform routes below."
+            : "目前尚未取得可在本站顯示房源的正式授權；請使用下方五個平台原始入口。");
+      }
+    };
+    var safeHousingProviderUrl = function (provider, rawUrl) {
+      if (!housingProviderHosts[provider] || typeof rawUrl !== "string" || rawUrl.length > 2048) return "";
+      try {
+        var url = new URL(rawUrl);
+        if (url.protocol !== "https:" || url.username || url.password || housingProviderHosts[provider].indexOf(url.hostname.toLowerCase()) === -1) return "";
+        return url.toString();
+      } catch (e) { return ""; }
+    };
+    var renderHousingLiveResults = function (payload) {
+      if (!payload || payload.ok !== true || payload.mode !== "licensed-api-plus-external-links" || !Array.isArray(payload.groups)) {
+        throw new Error("invalid_accommodation_response");
+      }
+      housingLiveList.replaceChildren();
+      var rendered = 0;
+      payload.groups.forEach(function (group) {
+        if (!group || typeof group.provider !== "string" || !housingProviderHosts[group.provider] || !Array.isArray(group.listings)) return;
+        var groupSection = document.createElement("section");
+        groupSection.className = "housing-provider-group";
+        var heading = document.createElement("h5");
+        var relationship = group.commercialRelationship === "affiliate"
+          ? (housingEnglish ? " — affiliate relationship" : "（聯盟合作）")
+          : (group.commercialRelationship === "paid-placement"
+            ? (housingEnglish ? " — paid placement" : "（付費版位）")
+            : "");
+        heading.textContent = (typeof group.providerName === "string" ? group.providerName : group.provider) + relationship;
+        groupSection.appendChild(heading);
+        var grid = document.createElement("div");
+        grid.className = "housing-listing-grid";
+        group.listings.slice(0, 8).forEach(function (listing) {
+          if (!listing || typeof listing !== "object") return;
+          var safeUrl = safeHousingProviderUrl(group.provider, listing.url);
+          if (!safeUrl || typeof listing.name !== "string" || typeof listing.area !== "string" || typeof listing.priceDisplay !== "string" || typeof listing.stayType !== "string") return;
+          var card = document.createElement("a");
+          card.className = "housing-listing-card";
+          card.href = safeUrl;
+          card.target = "_blank";
+          card.rel = "noopener noreferrer nofollow";
+          var title = document.createElement("strong");
+          title.textContent = listing.name.slice(0, 160);
+          var area = document.createElement("span");
+          area.textContent = listing.area.slice(0, 120);
+          var details = document.createElement("small");
+          details.textContent = listing.priceDisplay.slice(0, 80) + " ・ " + listing.stayType.slice(0, 80);
+          card.appendChild(title);
+          card.appendChild(area);
+          card.appendChild(details);
+          grid.appendChild(card);
+          rendered++;
+        });
+        if (grid.children.length) {
+          groupSection.appendChild(grid);
+          housingLiveList.appendChild(groupSection);
+        }
+      });
+      housingLiveList.hidden = rendered === 0;
+      var connected = payload.coverage && Number.isInteger(payload.coverage.connectedProviders)
+        ? payload.coverage.connectedProviders
+        : 0;
+      housingLiveStatus.textContent = rendered > 0
+        ? (housingEnglish
+          ? rendered + " authorised result(s) from " + connected + " connected provider(s). Results remain grouped by provider; recheck the final price and terms there."
+          : "已從 " + connected + " 個已連接平台列出 " + rendered + " 筆授權結果；結果按平台分組，請到平台再次確認總價與條款。")
+        : (connected > 0
+          ? (housingEnglish
+            ? "Connected providers returned no verifiable result this time. Use the five original routes below."
+            : "已連接平台本次沒有回傳可驗證結果；請改用下方五個原始入口。")
+          : (housingEnglish
+            ? "No provider is authorised for live display yet. Use the five original routes below."
+            : "目前尚未取得可在本站顯示房源的正式授權；請使用下方五個平台原始入口。"));
+    };
+    var searchHousingLicensedResults = function (parsed) {
+      clearHousingLiveResults();
+      if (!housingApiSettings || !window.fetch || !housingLivePanel || !housingLiveStatus || !housingLiveList) return;
+
+      var controller = new AbortController();
+      housingRequestController = controller;
+      housingLiveStatus.textContent = housingEnglish
+        ? "Checking authorised providers. The five original routes are already ready below."
+        : "正在查詢已授權平台；下方五個原始入口已先準備完成。";
+      var timeoutId = setTimeout(function () { controller.abort(); }, 8000);
+      window.fetch(housingApiSettings.baseUrl + "/api/accommodation/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          location: parsed.locality,
+          checkin: housingCheckin.value || null,
+          stayLength: parseInt(housingStayLength.value, 10),
+          guests: parseInt(housingGuests.value, 10)
+        }),
+        credentials: "omit",
+        referrerPolicy: "no-referrer",
+        signal: controller.signal
+      }).then(function (response) {
+        if (!response.ok) throw new Error("accommodation_search_failed");
+        return response.json();
+      }).then(function (payload) {
+        if (housingRequestController !== controller) return;
+        renderHousingLiveResults(payload);
+      }).catch(function () {
+        if (housingRequestController !== controller) return;
+        housingLiveStatus.textContent = housingEnglish
+          ? "Live results could not be verified. The five original platform routes below still work."
+          : "無法驗證站內房源結果；下方五個平台原始入口仍可使用。";
+      }).then(function () {
+        clearTimeout(timeoutId);
+        if (housingRequestController === controller) housingRequestController = null;
+      });
+    };
 
     housingCheckin.min = housingDateString(new Date());
     housingTool.hidden = false;
     housingLocation.addEventListener("input", function () { housingLocation.setCustomValidity(""); });
+    housingLocation.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      if (housingForm.requestSubmit) housingForm.requestSubmit();
+      else housingForm.dispatchEvent(new Event("submit", { cancelable: true }));
+    });
 
     housingForm.addEventListener("submit", function (event) {
       event.preventDefault();
       housingResults.hidden = true;
+      clearHousingLiveResults();
       housingCopyValue = "";
       housingLocation.setCustomValidity("");
       var raw = housingLocation.value.replace(/\s+/g, " ").trim();
@@ -1069,12 +1237,14 @@
       housingStatus.textContent = housingEnglish
         ? "Ready. Open platforms one at a time and recheck every filter."
         : "已就緒。請逐一開啟平台，並重新確認每個篩選條件。";
+      searchHousingLicensedResults(parsed);
       housingResults.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest" });
     });
 
     housingForm.addEventListener("reset", function () {
       setTimeout(function () {
         housingResults.hidden = true;
+        clearHousingLiveResults();
         housingCopyValue = "";
         housingLocation.setCustomValidity("");
         housingStatus.textContent = housingEnglish

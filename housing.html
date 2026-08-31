@@ -29,7 +29,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260831-39" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260831-41" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -61,7 +61,7 @@
       "publishingPrinciples": "https://www.aussiewhvcompass.com/crawler-policy.txt",
       "subjectOf": "https://www.aussiewhvcompass.com/content-status.json",
       "image": "https://www.aussiewhvcompass.com/assets/og-cover.png",
-      "dateModified": "2026-08-30"
+      "dateModified": "2026-08-31"
     },
     {
       "@type": "BreadcrumbList",
@@ -88,7 +88,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260831-39">
+<link rel="stylesheet" href="assets/style.css?v=20260831-41">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body data-i18n-topic="housing">
@@ -162,12 +162,12 @@
     <a href="#rural">農區住宿與消防</a>
   </div>
 
-  <h2 id="book">一、現在就找：一次輸入、五個平台快速搜尋</h2>
-  <p>輸入地址，或填寫 <strong>suburb＋州別＋4 碼郵遞區號</strong>，工具會在這台裝置上產生五個平台入口。若你只知道工作地點，先查它所在的 suburb／州別／郵遞區號；單獨輸入郵遞區號不足以建立所有平台的穩定連結。能穩定預填的條件才會帶入，不會把「開啟搜尋」說成「已篩出空房」。</p>
+  <h2 id="book">一、現在就找：一次輸入，先看授權結果，再開五個平台</h2>
+  <p>輸入地址，或填寫 <strong>suburb＋州別＋4 碼郵遞區號</strong>。已取得正式 API 授權的平台，才會把本次結果直接列在本站；其餘平台只提供原始搜尋入口，不抓頁面、不繞過登入，也不冒充即時空房。若你只知道工作地點，先查它所在的 suburb／州別／郵遞區號。</p>
 
   <section class="tool housing-search-tool" id="housing-search-tool" aria-labelledby="housing-search-title" hidden>
-    <span class="tool-tag">本機快速搜尋</span>
-    <h3 id="housing-search-title">輸入一次，建立五個搜尋入口</h3>
+    <span class="tool-tag">合法混合搜尋</span>
+    <h3 id="housing-search-title">輸入一次，搜尋授權房源＋準備五個入口</h3>
     <p>可輸入完整地址，但建議只填 <strong>Suburb 州別 4 碼郵遞區號</strong>，例如 <strong>Perth WA 6000</strong>。若貼上「123 Hay St, Perth WA 6000」，工具只會使用逗號後的地區建立連結。</p>
     <form id="housing-search-form">
       <div class="housing-search-fields">
@@ -209,10 +209,10 @@
         <button class="chip" type="button" data-housing-location="Hobart TAS 7000">Hobart</button>
       </div>
       <div class="housing-search-actions">
-        <button class="btn" type="submit">建立五個搜尋入口</button>
+        <button class="btn" type="submit">搜尋住宿選項</button>
         <button class="btn secondary" type="reset">清除</button>
       </div>
-      <p class="housing-search-privacy">輸入只在這個分頁的記憶體內處理，不寫入瀏覽器儲存空間、不傳給本站。只有你點選某個平台時，該連結中的地點與可預填條件才會交給該平台。</p>
+      <p class="housing-search-privacy" id="housing-search-privacy">公開站目前未啟用平台房源 API；輸入只留在這個分頁的記憶體。只有你點選某個平台時，連結條件才會交給該平台。</p>
       <p class="housing-search-status" id="housing-search-status" role="status" aria-live="polite">輸入地點，或點一個常見城市。</p>
     </form>
 
@@ -221,6 +221,14 @@
         <p><strong id="housing-search-summary">尚未建立搜尋入口。</strong></p>
         <button class="btn secondary" id="housing-copy-location" type="button">複製地點</button>
       </div>
+      <section class="housing-live-panel" id="housing-live-panel" aria-labelledby="housing-live-title">
+        <p class="section-eyebrow">站內可查看</p>
+        <h4 id="housing-live-title">已授權平台結果</h4>
+        <p class="housing-live-status" id="housing-live-status" role="status" aria-live="polite">目前尚未取得可在本站顯示房源的正式授權；請使用下方五個平台原始入口。</p>
+        <div class="housing-live-list" id="housing-live-list" hidden></div>
+        <p class="housing-search-limit">只列出已授權平台本次回傳的部分結果，並按平台分組；不宣稱涵蓋全市場、不合併成「最便宜」排名。若日後有聯盟或付費關係，會在平台名稱旁直接標示。</p>
+      </section>
+      <h4 class="housing-route-title">五個平台原始入口</h4>
       <div class="support-grid" aria-label="五個住宿平台搜尋入口">
         <a class="support-link" id="housing-hostelworld-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
           <svg class="icon" aria-hidden="true"><use href="#i-luggage"/></svg>
@@ -243,7 +251,7 @@
           <span><strong>Domain</strong><small id="housing-domain-note">正式整租；有州別與郵遞區號時才建立地點連結</small></span>
         </a>
       </div>
-      <p class="housing-search-limit">這裡顯示的是「平台搜尋入口」，不是本站抓回的房源。平台可能改寫或忽略部分條件；開啟後請再確認地點、日期、總價、空房與取消條款。</p>
+      <p class="housing-search-limit">入口不是本站房源，也不是即時空房證明。平台可能改寫或忽略部分條件；開啟後請再確認地點、日期、總價、空房與取消條款。</p>
     </div>
   </section>
 
@@ -378,11 +386,11 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260831-39"></script>
-<script src="assets/analytics.js?v=20260831-39"></script>
-<script src="assets/i18n.js?v=20260831-39"></script>
-<script src="assets/api-config.js?v=20260831-39"></script>
-<script src="assets/main.js?v=20260831-39"></script>
-<script src="assets/tools.js?v=20260831-39"></script>
+<script src="assets/analytics-config.js?v=20260831-41"></script>
+<script src="assets/analytics.js?v=20260831-41"></script>
+<script src="assets/i18n.js?v=20260831-41"></script>
+<script src="assets/api-config.js?v=20260831-41"></script>
+<script src="assets/main.js?v=20260831-41"></script>
+<script src="assets/tools.js?v=20260831-41"></script>
 </body>
 </html>

@@ -1,3 +1,8 @@
+import {
+  searchLicensedAccommodation,
+  type AccommodationDependencies,
+  type AccommodationEnv,
+} from "./accommodation";
 import { parseAllowedOrigins, preflightResponse, requireAllowedOrigin, withCors } from "./cors";
 import {
   createContactCase,
@@ -15,9 +20,9 @@ interface RuntimeSecrets {
   RATE_LIMIT_HMAC_KEY: string;
 }
 
-export type AppEnv = Env & RuntimeSecrets;
+export type AppEnv = Env & RuntimeSecrets & AccommodationEnv;
 
-export interface AppDependencies extends ContactDependencies {}
+export interface AppDependencies extends ContactDependencies, AccommodationDependencies {}
 
 function logResult(requestId: string, request: Request, status: number): void {
   const url = new URL(request.url);
@@ -75,6 +80,8 @@ function createFetchHandler(dependencies: AppDependencies) {
         response = await deleteManagedContact(request, env, dependencies);
       } else if (request.method === "POST" && url.pathname === "/api/metrics") {
         response = await recordAggregateMetric(request, env);
+      } else if (request.method === "POST" && url.pathname === "/api/accommodation/search") {
+        response = await searchLicensedAccommodation(request, env, dependencies);
       } else {
         response = jsonResponse(
           {

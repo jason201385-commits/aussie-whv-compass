@@ -27,6 +27,7 @@ function createTestEnvironment(keys: string[]): AppEnv {
     DB: env.DB,
     CONTACT_RATE_LIMITER: rateLimiter as RateLimit,
     DPLUS_RATE_LIMITER: rateLimiter as RateLimit,
+    ACCOMMODATION_RATE_LIMITER: rateLimiter as RateLimit,
     ENVIRONMENT: "local",
     ALLOWED_ORIGINS:
       "https://www.aussiewhvcompass.com,https://aussiewhvcompass.com,http://127.0.0.1:4175,http://localhost:4175",
