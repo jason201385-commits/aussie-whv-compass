@@ -691,7 +691,7 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .home-zone-note { margin: 16px 0 0; color: var(--ink-soft); font-size: .82rem; }
 .direct-solution-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin: 0 0 24px;
 }
@@ -708,6 +708,7 @@ body:not(.home-page) main > p { max-width: 76ch; }
   box-shadow: var(--shadow-pop-sm);
 }
 .direct-solution-grid > a:nth-child(2) { background: var(--green-soft); }
+.direct-solution-grid > a:nth-child(3) { background: var(--blue-soft); }
 .direct-solution-grid > a:hover { transform: translateY(-2px); text-decoration: none; }
 .direct-solution-grid .icon { flex: 0 0 auto; width: 34px; height: 34px; color: var(--link); }
 .direct-solution-grid span, .direct-solution-grid strong, .direct-solution-grid small, .direct-solution-grid b { display: block; }
@@ -874,6 +875,96 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .game-quick-grid .card { min-height: 215px; }
 .game-category { display: block; margin: 2px 0 8px; color: var(--green-ink); font-size: .72rem; font-weight: 900; letter-spacing: .08em; }
 .home-tool-subtitle { margin: 10px 0 0; font-family: var(--font-serif); font-size: 1.25rem; }
+
+/* ---------- 離澳出清 × 初登澳補給 ---------- */
+.market-tool { margin-top: 30px; }
+.market-tool > h2 { margin: .3em 0; }
+.market-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 22px 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.market-mode-switch button {
+  min-height: 50px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.market-mode-switch button:hover { background: var(--blue-soft); }
+.market-mode-switch button.active { border-color: var(--ink); background: var(--gold); color: var(--on-gold); }
+.market-mode-switch button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.market-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.market-form-grid > div { display: grid; align-content: start; gap: 7px; min-width: 0; }
+.market-form-grid label { font-size: .83rem; font-weight: 900; }
+.market-form-grid input,
+.market-form-grid select,
+.market-form-grid textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  padding: 10px 12px;
+}
+.market-form-grid textarea { min-height: 116px; resize: vertical; }
+.market-field-wide { grid-column: 1 / -1; }
+.market-safety-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 18px 0 8px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--line));
+  border-radius: 12px;
+  background: var(--danger-soft);
+  line-height: 1.55;
+  cursor: pointer;
+}
+.market-safety-confirm input { flex: 0 0 auto; width: 1.2rem; height: 1.2rem; margin-top: .18rem; accent-color: var(--green); }
+.market-draft-result {
+  margin-top: 22px;
+  padding: 20px;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  background: var(--gold-soft);
+}
+.market-draft-result[hidden] { display: none; }
+.market-draft-result h3 { margin-top: 0; font-family: var(--font-serif); }
+.market-draft-result textarea {
+  width: 100%;
+  min-height: 230px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.65;
+  padding: 14px;
+  resize: vertical;
+}
+.market-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.market-platform-grid .support-link { min-height: 92px; }
 
 /* ---------- 回訪續接：只讀本機最近閱讀 ---------- */
 .journey-resume {
@@ -1811,6 +1902,8 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   }
 }
 .tool input[type="text"], .tool input[type="number"] { width: 8em; }
+.tool .market-form-grid input[type="text"],
+.tool .market-form-grid input[type="number"] { width: 100%; }
 .tool select:focus-visible, .tool input:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- 住宿五平台快速搜尋 ---------- */
@@ -2716,7 +2809,10 @@ main [id] { scroll-margin-top: 170px; }
   .self-assessment-grid,
   .direct-solution-grid,
   .community-map-layout,
-  .game-quick-grid { grid-template-columns: 1fr; }
+  .game-quick-grid,
+  .market-form-grid,
+  .market-platform-grid { grid-template-columns: 1fr; }
+  .market-field-wide { grid-column: 1; }
   .self-assessment-grid a { min-height: 132px; }
   .direct-solution-grid > a { min-height: 142px; padding: 18px 16px; }
   .community-finder-controls { grid-template-columns: 1fr; }

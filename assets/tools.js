@@ -1348,4 +1348,98 @@
       c.addEventListener("click", function () { bal.value = c.getAttribute("data-amt"); calcDasp(); });
     });
   }
+
+  /* ================= 離澳出清 × 初登澳補給（market.html） ================= */
+  var marketForm = document.getElementById("market-draft-form");
+  if (marketForm) {
+    var marketMode = "sell";
+    var marketModeButtons = Array.prototype.slice.call(document.querySelectorAll("[data-market-mode]"));
+    var marketPriceLabel = document.getElementById("market-price-label");
+    var marketResult = document.getElementById("market-draft-result");
+    var marketOutput = document.getElementById("market-draft-output");
+    var marketStatus = document.getElementById("market-status");
+    var marketFacebook = document.getElementById("market-facebook-link");
+    var marketEbay = document.getElementById("market-ebay-link");
+    var marketCategoryKeywords = {
+      home: "home kitchen bedding household",
+      furniture: "furniture appliance",
+      clothing: "clothing workwear",
+      bike: "bicycle bike",
+      outdoor: "camping outdoor",
+      other: "second hand"
+    };
+
+    var setMarketMode = function (nextMode) {
+      marketMode = nextMode === "buy" ? "buy" : "sell";
+      marketModeButtons.forEach(function (button) {
+        var active = button.getAttribute("data-market-mode") === marketMode;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      marketPriceLabel.textContent = marketMode === "buy" ? "預算上限（AUD，可填 0）" : "售價（AUD，可填 0）";
+    };
+
+    marketModeButtons.forEach(function (button) {
+      button.addEventListener("click", function () { setMarketMode(button.getAttribute("data-market-mode")); });
+    });
+
+    marketForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!marketForm.checkValidity()) { marketForm.reportValidity(); return; }
+      var city = document.getElementById("market-city").value.trim();
+      var category = document.getElementById("market-category");
+      var categoryLabel = category.options[category.selectedIndex].text;
+      var item = document.getElementById("market-item").value.trim();
+      var price = Math.max(0, Number(document.getElementById("market-price").value) || 0);
+      var condition = document.getElementById("market-condition").value.trim();
+      var pickup = document.getElementById("market-pickup").value.trim();
+      var notes = document.getElementById("market-notes").value.trim();
+      var heading = marketMode === "buy" ? "初登澳徵求" : "離澳出清";
+      var priceName = marketMode === "buy" ? "預算上限" : "售價";
+      var lines = [
+        "【" + heading + "｜" + city + "】",
+        "品項：" + item,
+        "品類：" + categoryLabel,
+        priceName + "：AUD $" + Math.round(price).toLocaleString("en-AU"),
+        "狀況：" + condition,
+        "交收：" + pickup
+      ];
+      if (notes) lines.push("補充：" + notes);
+      lines.push("", "請在刊登平台內聯絡；高價品先看實物與確認交易方，不先匯款卡位。");
+      marketOutput.value = lines.join("\n");
+      marketResult.hidden = false;
+      marketStatus.textContent = "草稿已在此分頁產生，尚未刊登或送出。";
+
+      var searchQuery = city + " " + item + " " + (marketCategoryKeywords[category.value] || "second hand");
+      marketFacebook.href = "https://www.facebook.com/marketplace/search/?query=" + encodeURIComponent(searchQuery);
+      marketEbay.href = "https://www.ebay.com.au/sch/i.html?_nkw=" + encodeURIComponent(searchQuery);
+      marketResult.focus({ preventScroll: true });
+    });
+
+    document.getElementById("market-copy").addEventListener("click", function () {
+      if (!marketOutput.value) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(marketOutput.value).then(function () {
+          marketStatus.textContent = "已複製草稿；請到你選擇的平台自行確認並刊登。";
+        }).catch(function () {
+          marketOutput.select();
+          marketStatus.textContent = "無法自動複製，已選取文字，請手動複製。";
+        });
+      } else {
+        marketOutput.select();
+        marketStatus.textContent = "瀏覽器不支援自動複製，已選取文字，請手動複製。";
+      }
+    });
+
+    document.getElementById("market-reset").addEventListener("click", function () {
+      marketForm.reset();
+      setMarketMode("sell");
+      marketOutput.value = "";
+      marketResult.hidden = true;
+      marketStatus.textContent = "";
+      marketFacebook.href = "https://www.facebook.com/marketplace/search/?query=working%20holiday";
+      marketEbay.href = "https://www.ebay.com.au/sch/i.html?_nkw=working+holiday";
+      document.getElementById("market-city").focus();
+    });
+  }
 })();

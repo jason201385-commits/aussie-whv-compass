@@ -14,8 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
-LAST_MODIFIED = "2026-08-31"
-ASSET_VERSION = "20260831-42"
+LAST_MODIFIED = "2026-09-01"
+ASSET_VERSION = "20260901-43"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -29,6 +29,7 @@ PAGES = [
     "simulator.html",
     "cost.html",
     "housing.html",
+    "market.html",
     "work.html",
     "scam.html",
     "english.html",
@@ -45,6 +46,7 @@ RISK_LEVELS = {
     "visa.html": "high",
     "cost.html": "high",
     "housing.html": "high",
+    "market.html": "high",
     "work.html": "high",
     "scam.html": "high",
     "health.html": "high",
@@ -206,7 +208,7 @@ def build_sitemap() -> str:
 def build_llms(page_sources: dict[str, str]) -> str:
     groups = [
         ("開始前", ["why.html", "visa.html", "prep.html", "simulator.html"]),
-        ("在澳洲生活與工作", ["cost.html", "housing.html", "work.html", "scam.html", "english.html", "health.html"]),
+        ("在澳洲生活與工作", ["cost.html", "housing.html", "market.html", "work.html", "scam.html", "english.html", "health.html"]),
         ("離開或留下", ["leave.html", "pr.html"]),
         ("關於與合作", ["about.html"]),
     ]

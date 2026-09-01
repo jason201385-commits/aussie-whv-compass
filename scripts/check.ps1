@@ -154,7 +154,7 @@ foreach ($p in $pages) {
   else {
     $nav = [regex]::Matches($t, 'class="nav-links"[\s\S]*?</div>')[0].Value
     $links = ($nav -split '<a ').Count - 1
-    $expectedNavLinks = if ($p -eq 'simulator.html') { 13 } else { 12 }
+    $expectedNavLinks = if ($p -in @('simulator.html', 'market.html')) { 13 } else { 12 }
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks）"; $errors++ }
   }
   $currentPageNeedle = if ($p -eq 'index.html') {
@@ -194,7 +194,7 @@ if ($uniqueAssetVersions.Count -eq 1 -and @($contentStatusVersions | Where-Objec
 }
 
 # 高風險主題必須先給安全下一步，再常駐揭露來源、查核日與編輯狀態。
-$evidencePages = @('visa.html', 'cost.html', 'housing.html', 'work.html', 'health.html', 'scam.html', 'leave.html', 'pr.html')
+$evidencePages = @('visa.html', 'cost.html', 'housing.html', 'market.html', 'work.html', 'health.html', 'scam.html', 'leave.html', 'pr.html')
 foreach ($evidencePage in $evidencePages) {
   $evidenceText = [System.IO.File]::ReadAllText((Join-Path $dir $evidencePage), [System.Text.Encoding]::UTF8)
   $evidenceCards = [regex]::Matches($evidenceText, '(?s)<section class="evidence-card" data-evidence-status="(checked|stale)".*?</section>')
@@ -237,13 +237,14 @@ if (-not $evidenceCss.Contains('.evidence-card[data-evidence-status="stale"]')) 
 }
 
 # 長篇攻略先列真實問題與一句可執行下一步；完整解釋與來源保留在下方。
-$quickAnswerPages = @('why.html', 'visa.html', 'prep.html', 'cost.html', 'housing.html', 'work.html', 'scam.html', 'english.html', 'health.html', 'leave.html', 'pr.html')
+$quickAnswerPages = @('why.html', 'visa.html', 'prep.html', 'cost.html', 'housing.html', 'market.html', 'work.html', 'scam.html', 'english.html', 'health.html', 'leave.html', 'pr.html')
 $quickAnswerExpectedRoutes = @{
   'why.html' = @('#quick-quiz', '#worksheet', '#worksheet', '#after-reflection')
   'visa.html' = @('#first', '#apply', '#where', '#evidence')
   'prep.html' = @('#timeline', '#72h', '#first-week', '#checklist')
   'cost.html' = @('#cost-first-action', '#math', '#food', '#car-checklist')
   'housing.html' = @('#book', '#find', '#bond', '#contract')
+  'market.html' = @('#market-tool', '#market-tool', '#platforms', '#safety')
   'work.html' = @('#channels', '#verify', '#seasons', '#injury')
   'scam.html' = @('#scam-first-action', '#help', '#job', '#rent')
   'english.html' = @('#reality', '#before', '#work-english', '#after')
@@ -1616,11 +1617,11 @@ if (-not (Test-Path $contentStatusPath)) {
     if ($contentStatus.schemaVersion -ne 2 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
     if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
     if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
-    if (@($contentStatus.primaryPages).Count -ne 14) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 14）"; $errors++ }
+    if (@($contentStatus.primaryPages).Count -ne 15) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 15）"; $errors++ }
     if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
     if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
     $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceCardStatus -eq 'checked' })
-    if ($checkedEvidence.Count -ne 8 -or @($checkedEvidence | Where-Object { -not $_.evidenceCardCheckedAt -or $_.evidenceCardScope -ne 'first-action-only' }).Count -gt 0) { Write-Output 'FAIL content-status.json 已查核證據卡數量、日期或範圍錯誤'; $errors++ }
+    if ($checkedEvidence.Count -ne 9 -or @($checkedEvidence | Where-Object { -not $_.evidenceCardCheckedAt -or $_.evidenceCardScope -ne 'first-action-only' }).Count -gt 0) { Write-Output 'FAIL content-status.json 已查核證據卡數量、日期或範圍錯誤'; $errors++ }
     if (@($contentStatus.primaryPages | Where-Object { -not $_.pageReviewStatus }).Count -gt 0 -or @($contentStatus.fullEnglishGuides | Where-Object { $_.pageReviewStatus -ne 'editorial-draft-unreviewed-by-native-domain-professional' }).Count -gt 0) { Write-Output 'FAIL content-status.json 缺整頁 review 狀態或英文草稿誤稱完整'; $errors++ }
     if (-not $contentStatus.legacyFieldPolicy.Contains('retained for compatibility')) { Write-Output 'FAIL content-status.json 缺舊欄位相容界線'; $errors++ }
     if (@($contentStatus.primaryPages | Where-Object { $_.reviewedByDomainProfessional -eq $true }).Count -gt 0 -or @($contentStatus.fullEnglishGuides | Where-Object { $_.reviewedByDomainProfessional -eq $true }).Count -gt 0) { Write-Output 'FAIL content-status.json 不得假稱已有專業審校'; $errors++ }
@@ -1853,8 +1854,10 @@ foreach ($homeZoneNeedle in @(
   'id="games"',
   'href="housing.html#book"',
   'href="work.html#channels"',
+  'href="market.html#market-tool"',
   '開始多平台找房',
   '打開多平台求職入口',
+  '開啟二手交換工具',
   '開始澳打模擬器'
 )) {
   if (-not $indexText.Contains($homeZoneNeedle)) { Write-Output "FAIL [index.html] 缺首頁四區或直接解法：$homeZoneNeedle"; $errors++ }
@@ -1875,6 +1878,38 @@ foreach ($communityUiNeedle in @('id="community-search-input"', 'id="community-p
 }
 foreach ($communityScriptNeedle in @('renderCommunityEntries', 'encodeURIComponent(platformQuery)', 'entry.hidden = !visible', 'communityEmpty.hidden = visibleCount !== 0')) {
   if (-not $mainJs.Contains($communityScriptNeedle)) { Write-Output "FAIL [main.js] 社群本機篩選或安全平台搜尋缺失：$communityScriptNeedle"; $errors++ }
+}
+$marketText = [System.IO.File]::ReadAllText((Join-Path $dir 'market.html'), [System.Text.Encoding]::UTF8)
+foreach ($marketNeedle in @(
+  'id="market-draft-form"',
+  'data-market-mode="sell"',
+  'data-market-mode="buy"',
+  'id="market-safety-confirm"',
+  'id="market-draft-output"',
+  'id="market-facebook-link"',
+  'id="market-ebay-link"',
+  '本站目前不收刊登、不保存聯絡資料，也不介入付款',
+  '不保存刊登內容、不驗證身分、不檢驗商品',
+  '多數 consumer guarantees 不適用',
+  '商品所有權、買方不受干擾持有，以及沒有未揭露債務／權利負擔'
+)) {
+  if (-not $marketText.Contains($marketNeedle)) { Write-Output "FAIL [market.html] 二手交換工具或法律邊界缺失：$marketNeedle"; $errors++ }
+}
+foreach ($marketScriptNeedle in @(
+  'var marketMode = "sell"',
+  'marketForm.checkValidity()',
+  'marketForm.reportValidity()',
+  'marketOutput.value = lines.join("\n")',
+  '尚未刊登或送出',
+  'encodeURIComponent(searchQuery)',
+  'navigator.clipboard.writeText(marketOutput.value)',
+  'marketForm.reset()'
+)) {
+  if (-not $toolsJs.Contains($marketScriptNeedle)) { Write-Output "FAIL [tools.js] 二手交換本機草稿行為缺失：$marketScriptNeedle"; $errors++ }
+}
+if ([regex]::Match($toolsJs, '(?s)/\* ================= 離澳出清.*?\n  \}').Value.Contains('fetch(')) {
+  Write-Output 'FAIL [tools.js] 二手交換第一版不得把草稿送到後端'
+  $errors++
 }
 foreach ($savedId in @('saved-pages', 'saved-pages-title', 'saved-pages-list', 'saved-pages-clear')) {
   if (-not $indexText.Contains("id=`"$savedId`"")) {
@@ -2061,12 +2096,17 @@ if (-not (Test-Path $thirdPartyRegisterPath)) {
       if ($thirdPartyRegister.currentState.$inactiveField -ne $false) { Write-Output "FAIL [third-party-register.json] P1-11 現況不得冒充已啟用：$inactiveField"; $errors++ }
     }
     $registerIds = @($thirdPartyRegister.entries | ForEach-Object { $_.id })
-    foreach ($requiredRegisterId in @('perth-line-community', 'public-local-reddit-communities', 'commercial-navigation-platforms', 'omara-official-register')) {
+    foreach ($requiredRegisterId in @('perth-line-community', 'public-local-reddit-communities', 'second-hand-marketplace-navigation', 'commercial-navigation-platforms', 'omara-official-register')) {
       if ($registerIds -notcontains $requiredRegisterId) { Write-Output "FAIL [third-party-register.json] 缺現行第三方關係：$requiredRegisterId"; $errors++ }
     }
     $publicLocalCommunities = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'public-local-reddit-communities' })[0]
     if ($publicLocalCommunities.relationship -ne 'none' -or $publicLocalCommunities.compensation -ne 'none' -or $publicLocalCommunities.workingHolidaySpecific -ne $false -or @($publicLocalCommunities.destinations).Count -ne 8) {
       Write-Output 'FAIL [third-party-register.json] 公開在地社群的非合作／非 WHV 邊界未同步'
+      $errors++
+    }
+    $secondHandNavigation = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'second-hand-marketplace-navigation' })[0]
+    if ($secondHandNavigation.relationship -ne 'none' -or $secondHandNavigation.compensation -ne 'none' -or $secondHandNavigation.siteHostedListings -ne $false -or $secondHandNavigation.sitePaymentOrEscrow -ne $false -or $secondHandNavigation.combinedRanking -ne $false -or @($secondHandNavigation.destinations).Count -ne 3) {
+      Write-Output 'FAIL [third-party-register.json] 二手交換平台的外部入口／無收款／無排名邊界未同步'
       $errors++
     }
     $commercialNavigation = @($thirdPartyRegister.entries | Where-Object { $_.id -eq 'commercial-navigation-platforms' })[0]

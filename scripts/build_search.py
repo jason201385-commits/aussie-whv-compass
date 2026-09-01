@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
-VERSION = "2026-08-29"
+VERSION = "2026-09-01"
 INACTIVE_UI_SENTINELS = {
     "情境載入中",
     "需求已由後端接收",
@@ -28,6 +28,7 @@ PAGES = [
     "simulator.html",
     "cost.html",
     "housing.html",
+    "market.html",
     "work.html",
     "scam.html",
     "english.html",
@@ -44,6 +45,7 @@ ALIASES = {
     "simulator.html": "澳洲打工度假 模擬器 生存遊戲 抵澳30天 情境 租屋 找工作 payslip 緊急 預算",
     "cost.html": "生活費 薪水 存錢 稅 超市 便宜 吃飯 食譜 買車 二手車 PPSR 衣服 二手衣",
     "housing.html": "找房 訂房 住宿 hostel share house 合租 bond 押金 房租 看房",
+    "market.html": "離澳 出清 初登澳 補給 二手 交換 拍賣 marketplace gumtree ebay 買賣",
     "work.html": "找工作 求職 履歷 CV 農場 雇主 薪資 欠薪 Fair Work 證照 白工",
     "scam.html": "詐騙 騙錢 欠薪 黑工 威脅 性騷擾 求助 報案 救濟",
     "english.html": "英文不好 英語 面試 工作 口說 聽力 學習",

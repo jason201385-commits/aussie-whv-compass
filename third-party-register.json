@@ -61,6 +61,28 @@
       "editorialStatus": "public-entry-only-not-endorsed"
     },
     {
+      "id": "second-hand-marketplace-navigation",
+      "type": "neutral-navigation-group",
+      "name": "二手交換第三方平台入口",
+      "placement": "https://www.aussiewhvcompass.com/market.html#platforms",
+      "purpose": "user-initiated-search-or-listing-at-third-party-platform",
+      "relationship": "none",
+      "compensation": "none",
+      "affiliateTracking": false,
+      "siteOperated": false,
+      "siteHostedListings": false,
+      "sitePaymentOrEscrow": false,
+      "identityOrProductVerification": false,
+      "combinedRanking": false,
+      "destinations": [
+        "https://www.facebook.com/marketplace/",
+        "https://www.ebay.com.au/",
+        "https://www.gumtree.com.au/"
+      ],
+      "checkedAt": "2026-09-01",
+      "editorialStatus": "external-link-only-not-endorsed"
+    },
+    {
       "id": "commercial-navigation-platforms",
       "type": "neutral-navigation-group",
       "name": "住宿、租屋、二手車與分類廣告平台",
