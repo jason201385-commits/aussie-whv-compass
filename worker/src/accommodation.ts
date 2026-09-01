@@ -2,7 +2,7 @@ import { readBoundedJson } from "./body";
 import { HttpError, jsonResponse } from "./http";
 import { enforceRateLimit, type RateLimitBinding } from "./rate-limit";
 
-export const ACCOMMODATION_PROVIDER_IDS = [
+export const ACCOMMODATION_PLATFORM_IDS = [
   "hostelworld",
   "booking",
   "flatmates",
@@ -10,6 +10,9 @@ export const ACCOMMODATION_PROVIDER_IDS = [
   "domain",
 ] as const;
 
+export const ACCOMMODATION_PROVIDER_IDS = ["hostelworld", "booking", "domain"] as const;
+
+export type AccommodationPlatformId = (typeof ACCOMMODATION_PLATFORM_IDS)[number];
 export type AccommodationProviderId = (typeof ACCOMMODATION_PROVIDER_IDS)[number];
 export type CommercialRelationship = "none" | "affiliate" | "paid-placement";
 
@@ -23,6 +26,13 @@ export interface AccommodationSearchInput {
 export interface LicensedAccommodationProvider {
   id: AccommodationProviderId;
   commercialRelationship: CommercialRelationship;
+  displayAuthorization: {
+    siteOrigin: "https://www.aussiewhvcompass.com";
+    evidenceRef: string;
+    approvedPurpose: string;
+    reviewedAt: string;
+    validUntil: string;
+  };
   search(input: AccommodationSearchInput, signal: AbortSignal): Promise<unknown>;
 }
 
@@ -45,7 +55,7 @@ interface NormalizedListing {
 }
 
 interface ProviderStatus {
-  id: AccommodationProviderId;
+  id: AccommodationPlatformId;
   name: string;
   access: "licensed-api" | "external-link-only";
   state: "ok" | "empty" | "error" | "not-connected";
@@ -58,10 +68,15 @@ interface ProviderGroup {
   provider: AccommodationProviderId;
   providerName: string;
   commercialRelationship: CommercialRelationship;
+  displayAuthorization: {
+    approvedPurpose: string;
+    reviewedAt: string;
+    validUntil: string;
+  };
   listings: NormalizedListing[];
 }
 
-const PROVIDER_NAMES: Record<AccommodationProviderId, string> = {
+const PROVIDER_NAMES: Record<AccommodationPlatformId, string> = {
   hostelworld: "Hostelworld",
   booking: "Booking.com",
   flatmates: "Flatmates",
@@ -69,7 +84,7 @@ const PROVIDER_NAMES: Record<AccommodationProviderId, string> = {
   domain: "Domain",
 };
 
-const PROVIDER_HOSTS: Record<AccommodationProviderId, readonly string[]> = {
+const PROVIDER_HOSTS: Record<AccommodationPlatformId, readonly string[]> = {
   hostelworld: ["hostelworld.com", "www.hostelworld.com"],
   booking: ["booking.com", "www.booking.com"],
   flatmates: ["flatmates.com.au", "www.flatmates.com.au"],
@@ -97,6 +112,31 @@ function normalizedText(value: unknown, maxLength: number): string | null {
   const normalized = value.replace(/\s+/g, " ").trim();
   if (!normalized || normalized.length > maxLength) return null;
   return normalized;
+}
+
+function hasActiveDisplayAuthorization(
+  provider: LicensedAccommodationProvider,
+  now: Date,
+): boolean {
+  const authorization = provider.displayAuthorization;
+  if (
+    !authorization
+    || authorization.siteOrigin !== "https://www.aussiewhvcompass.com"
+    || !/^[a-z0-9][a-z0-9._-]{2,79}$/i.test(authorization.evidenceRef)
+    || normalizedText(authorization.approvedPurpose, 240) === null
+    || !/^\d{4}-\d{2}-\d{2}$/.test(authorization.reviewedAt)
+    || !/^\d{4}-\d{2}-\d{2}$/.test(authorization.validUntil)
+  ) {
+    return false;
+  }
+  const reviewedAt = new Date(`${authorization.reviewedAt}T00:00:00Z`);
+  const validUntil = new Date(`${authorization.validUntil}T23:59:59Z`);
+  return (
+    !Number.isNaN(reviewedAt.getTime())
+    && !Number.isNaN(validUntil.getTime())
+    && reviewedAt <= now
+    && validUntil >= now
+  );
 }
 
 function validateSearchInput(value: unknown): AccommodationSearchInput {
@@ -223,6 +263,11 @@ async function runProvider(
             provider: provider.id,
             providerName: PROVIDER_NAMES[provider.id],
             commercialRelationship: provider.commercialRelationship,
+            displayAuthorization: {
+              approvedPurpose: provider.displayAuthorization.approvedPurpose,
+              reviewedAt: provider.displayAuthorization.reviewedAt,
+              validUntil: provider.displayAuthorization.validUntil,
+            },
             listings: normalized.listings,
           }
         : null,
@@ -245,7 +290,7 @@ async function runProvider(
   }
 }
 
-function notConnectedStatus(id: AccommodationProviderId): ProviderStatus {
+function notConnectedStatus(id: AccommodationPlatformId): ProviderStatus {
   return {
     id,
     name: PROVIDER_NAMES[id],
@@ -268,9 +313,14 @@ export async function searchLicensedAccommodation(
   const input = validateSearchInput(await readBoundedJson(request, MAX_SEARCH_BODY_BYTES));
   await enforceRateLimit(env.ACCOMMODATION_RATE_LIMITER, "accommodation:public-search");
 
+  const now = (dependencies.accommodationNow ?? (() => new Date()))();
   const configured = new Map<AccommodationProviderId, LicensedAccommodationProvider>();
   for (const provider of dependencies.accommodationProviders ?? []) {
-    if (!ACCOMMODATION_PROVIDER_IDS.includes(provider.id) || configured.has(provider.id)) continue;
+    if (
+      !ACCOMMODATION_PROVIDER_IDS.includes(provider.id)
+      || configured.has(provider.id)
+      || !hasActiveDisplayAuthorization(provider, now)
+    ) continue;
     configured.set(provider.id, provider);
   }
 
@@ -279,8 +329,8 @@ export async function searchLicensedAccommodation(
     Math.max(500, dependencies.accommodationProviderTimeoutMs ?? 4_000),
   );
   const outcomes = await Promise.all(
-    ACCOMMODATION_PROVIDER_IDS.map(async (id) => {
-      const provider = configured.get(id);
+    ACCOMMODATION_PLATFORM_IDS.map(async (id) => {
+      const provider = configured.get(id as AccommodationProviderId);
       return provider ? runProvider(provider, input, timeoutMs) : { status: notConnectedStatus(id), group: null };
     }),
   );
@@ -289,7 +339,7 @@ export async function searchLicensedAccommodation(
   const groups = outcomes
     .map((outcome) => outcome.group)
     .filter((group): group is ProviderGroup => group !== null);
-  const checkedAt = (dependencies.accommodationNow ?? (() => new Date()))().toISOString();
+  const checkedAt = now.toISOString();
 
   return jsonResponse({
     ok: true,
@@ -297,7 +347,7 @@ export async function searchLicensedAccommodation(
     checkedAt,
     coverage: {
       connectedProviders: configured.size,
-      listedPlatforms: ACCOMMODATION_PROVIDER_IDS.length,
+      listedPlatforms: ACCOMMODATION_PLATFORM_IDS.length,
       allMarket: false,
       combinedRanking: false,
     },

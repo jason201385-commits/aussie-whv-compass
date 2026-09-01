@@ -333,6 +333,7 @@ LINE 邀請 URL 在完整繁中頁只保留首頁一處；找工作頁不再把�
 - 結果按平台分組，不合併排序；回應與頁面皆明示 connected coverage、非全市場、無「最便宜／最佳」保證，
   並在平台名稱旁揭露 affiliate／paid-placement。搜尋不寫 D1，application log 不含地點、日期或人數。
 - `assets/api-config.js` 的 `accommodationSearchEnabled` 目前為 false；production provider 清單為空。
+- Worker 不因存在 adapter 或 API key 就宣稱已授權：每個候選 provider 必須附有效的 `displayAuthorization` 核准用途與期限；目前 candidate 只有 Hostelworld、Booking.com、Domain。realestate.com.au 與 Flatmates 保留原始外連，不能在 runtime 偷塞 adapter。
 - 2026-09-01 依 WHV 情境補上住宿類型分流：短住先顯示 Booking.com／Hostelworld、合租先顯示 Flatmates、整租先顯示 realestate.com.au／Domain；農區不假裝五平台能完整覆蓋，改強調最近城鎮短住、書面住宿／交通條件與獨立離場方案。次要平台折疊，並明示只按入口適配度排列。
   因此公開頁仍不送本站 API、不顯示假房源。站長須依 `docs/ACCOMMODATION_PROVIDER_ONBOARDING.md` 親自完成合約／書面許可，
   agent 只能在其後依核准 schema 實作個別 adapter，secret 只能放 Cloudflare 受保護設定。

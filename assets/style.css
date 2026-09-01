@@ -1989,6 +1989,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .housing-live-list { margin-top: 16px; }
 .housing-provider-group + .housing-provider-group { margin-top: 20px; }
 .housing-provider-group h5 { margin: 0 0 10px; font-size: 1rem; }
+.housing-provider-authorization { margin: -3px 0 10px; color: var(--ink-soft); font-size: .78rem; line-height: 1.55; }
 .housing-listing-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

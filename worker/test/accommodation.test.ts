@@ -14,6 +14,14 @@ const validBody = {
   guests: 2,
 };
 
+const validDisplayAuthorization = {
+  siteOrigin: "https://www.aussiewhvcompass.com" as const,
+  evidenceRef: "booking-display-approval-2026",
+  approvedPurpose: "Display authorised Booking.com results grouped by provider without cross-platform price ranking.",
+  reviewedAt: "2026-08-30",
+  validUntil: "2027-08-30",
+};
+
 async function dispatch(
   app: ReturnType<typeof createApp>,
   body: unknown,
@@ -88,6 +96,7 @@ describe("licensed accommodation search", () => {
     const provider: LicensedAccommodationProvider = {
       id: "booking",
       commercialRelationship: "affiliate",
+      displayAuthorization: validDisplayAuthorization,
       async search(input) {
         received = input;
         return { coverageNote: "Booking.com authorised API results only.", listings };
@@ -104,13 +113,17 @@ describe("licensed accommodation search", () => {
     const body = await response.json<{
       checkedAt: string;
       providers: Array<{ id: string; resultCount: number; commercialRelationship: string }>;
-      groups: Array<{ provider: string; listings: Array<{ url: string }> }>;
+      groups: Array<{ provider: string; displayAuthorization: { approvedPurpose: string; reviewedAt: string }; listings: Array<{ url: string }> }>;
     }>();
 
     expect(received).toEqual(validBody);
     expect(body.checkedAt).toBe("2026-08-31T06:00:00.000Z");
     expect(body.groups).toHaveLength(1);
     expect(body.groups[0]?.provider).toBe("booking");
+    expect(body.groups[0]?.displayAuthorization).toMatchObject({
+      approvedPurpose: validDisplayAuthorization.approvedPurpose,
+      reviewedAt: "2026-08-30",
+    });
     expect(body.groups[0]?.listings).toHaveLength(8);
     expect(body.groups[0]?.listings.every((listing) => (
       new URL(listing.url).hostname === "www.booking.com"
@@ -125,6 +138,11 @@ describe("licensed accommodation search", () => {
     const failing: LicensedAccommodationProvider = {
       id: "hostelworld",
       commercialRelationship: "none",
+      displayAuthorization: {
+        ...validDisplayAuthorization,
+        evidenceRef: "hostelworld-display-approval-2026",
+        approvedPurpose: "Display authorised Hostelworld results for temporary stays.",
+      },
       async search() {
         throw new Error("upstream unavailable");
       },
@@ -132,6 +150,11 @@ describe("licensed accommodation search", () => {
     const empty: LicensedAccommodationProvider = {
       id: "domain",
       commercialRelationship: "none",
+      displayAuthorization: {
+        ...validDisplayAuthorization,
+        evidenceRef: "domain-display-approval-2026",
+        approvedPurpose: "Display authorised Domain results for formal rentals.",
+      },
       async search() {
         return { coverageNote: "No matching authorised results.", listings: [] };
       },
@@ -154,6 +177,7 @@ describe("licensed accommodation search", () => {
     const provider: LicensedAccommodationProvider = {
       id: "booking",
       commercialRelationship: "none",
+      displayAuthorization: validDisplayAuthorization,
       search: providerSearch,
     };
     const app = createApp({ accommodationProviders: [provider] });
@@ -170,6 +194,45 @@ describe("licensed accommodation search", () => {
       error: { code: "invalid_search_fields" },
     });
     expect(providerSearch).not.toHaveBeenCalled();
+  });
+
+  it("does not call providers without active display authorisation", async () => {
+    const expiredSearch = vi.fn(async () => ({ coverageNote: "unused", listings: [] }));
+    const blockedSearch = vi.fn(async () => ({ coverageNote: "unused", listings: [] }));
+    const expired: LicensedAccommodationProvider = {
+      id: "booking",
+      commercialRelationship: "none",
+      displayAuthorization: {
+        ...validDisplayAuthorization,
+        evidenceRef: "expired-booking-approval",
+        validUntil: "2026-08-29",
+      },
+      search: expiredSearch,
+    };
+    const structurallyBlocked = {
+      id: "realestate",
+      commercialRelationship: "none",
+      displayAuthorization: validDisplayAuthorization,
+      search: blockedSearch,
+    } as unknown as LicensedAccommodationProvider;
+
+    const response = await dispatch(createApp({
+      accommodationProviders: [expired, structurallyBlocked],
+      accommodationNow: () => new Date("2026-09-01T00:00:00.000Z"),
+    }), validBody);
+    const body = await response.json<{
+      coverage: { connectedProviders: number };
+      providers: Array<{ id: string; access: string; state: string }>;
+    }>();
+
+    expect(response.status).toBe(200);
+    expect(body.coverage.connectedProviders).toBe(0);
+    expect(expiredSearch).not.toHaveBeenCalled();
+    expect(blockedSearch).not.toHaveBeenCalled();
+    expect(body.providers.find((item) => item.id === "realestate")).toMatchObject({
+      access: "external-link-only",
+      state: "not-connected",
+    });
   });
 
   it("does not write the searched location, dates or guests to application logs", async () => {

@@ -25,7 +25,7 @@
 
 1. 站長本人申請帳號、閱讀並接受合約；agent 不代替站長同意條款。
 2. 保存平台核准範圍、可顯示欄位、圖片權利、快取期限、attribution、導回 URL 與商業關係證據；不要把 secret 放進證據檔。
-3. 依核准文件新增單一 provider adapter，將上游不可信 JSON 白名單化成 `name`、`area`、`priceDisplay`、`stayType`、`url`。
+3. 依核准文件新增單一 provider adapter，並提供非 secret 的 `displayAuthorization`：固定本站 origin、內部 evidence reference、核准用途、查核日與有效期限；任一欄缺漏或過期時 Worker 不會呼叫 provider。上游不可信 JSON 仍只白名單化成 `name`、`area`、`priceDisplay`、`stayType`、`url`。
 4. 用 sandbox／平台測試環境驗證，確認 timeout、429、401／403、零結果、錯誤 payload 與不安全 URL 都會安全降級。
 5. 更新 `third-party-register.json` 的 relationship、compensation、affiliateTracking、coverage 與查核日期。
 6. 跑 `scripts/check.ps1`，再做桌機、390px 手機、鍵盤與 API 失敗 E2E；最後才把 `accommodationSearchEnabled` 改成 `true`。
@@ -45,5 +45,6 @@
 - **現在不送件**：realestate.com.au Partner Platform；本站尚無 REA Customer 委任，不能把一般消費者聚合用途包裝成受權 partner 用途。
 - **只詢問書面合作**：Flatmates；沒有公開 listing API／feed 路徑，普通帳號不會產生資料權利。
 - **公開功能不變**：五平台仍是 external-link-only，`accommodationSearchEnabled` 維持 false。任何 affiliate 核准都不會自動解除 inventory display gate。
+- **程式 gate**：只有 Hostelworld、Booking.com、Domain 可成為目前的授權 adapter candidate；realestate.com.au 與 Flatmates 固定為 external-link-only。若未來真的取得足以改變此判斷的正式書面授權，必須經 code review 才能新增 candidate，不接受只塞 key 或 runtime adapter。
 
 可貼入表單的網站說明、用途文字、人工欄位與授權證據清單見 `docs/ACCOMMODATION_PROVIDER_APPLICATION_PACK.md`。

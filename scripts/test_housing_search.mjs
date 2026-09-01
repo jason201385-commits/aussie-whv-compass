@@ -235,6 +235,11 @@ const liveHarness = createHarness("zh-Hant", {
             provider: "booking",
             providerName: "Booking.com",
             commercialRelationship: "affiliate",
+            displayAuthorization: {
+              approvedPurpose: "Temporary-stay display on aussiewhvcompass.com",
+              reviewedAt: "2026-08-30",
+              validUntil: "2027-08-30"
+            },
             listings: [{
               name: "Authorised Perth stay",
               area: "Perth WA 6000",
@@ -274,9 +279,10 @@ assert.equal(liveHarness.elements["housing-live-list"].hidden, false);
 assert.match(liveHarness.elements["housing-live-status"].textContent, /1 個已連接平台列出 1 筆/);
 const liveGroup = liveHarness.elements["housing-live-list"].children[0];
 assert.equal(liveGroup.children[0].textContent, "Booking.com（聯盟合作）");
-assert.equal(liveGroup.children[1].children.length, 1, "unsafe provider URLs must be discarded");
+assert.match(liveGroup.children[1].textContent, /核准用途：Temporary-stay display/);
+assert.equal(liveGroup.children[2].children.length, 1, "unsafe provider URLs must be discarded");
 assert.equal(
-  liveGroup.children[1].children[0].href,
+  liveGroup.children[2].children[0].href,
   "https://www.booking.com/hotel/au/authorised-perth.html"
 );
 

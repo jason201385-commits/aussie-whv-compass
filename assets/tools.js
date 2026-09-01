@@ -1122,6 +1122,23 @@
             : "");
         heading.textContent = (typeof group.providerName === "string" ? group.providerName : group.provider) + relationship;
         groupSection.appendChild(heading);
+        if (
+          group.displayAuthorization
+          && typeof group.displayAuthorization.approvedPurpose === "string"
+          && typeof group.displayAuthorization.reviewedAt === "string"
+          && typeof group.displayAuthorization.validUntil === "string"
+        ) {
+          var authorization = document.createElement("p");
+          authorization.className = "housing-provider-authorization";
+          authorization.textContent = housingEnglish
+            ? "Authorised purpose: " + group.displayAuthorization.approvedPurpose.slice(0, 240)
+              + " · reviewed " + group.displayAuthorization.reviewedAt.slice(0, 10)
+              + " · valid until " + group.displayAuthorization.validUntil.slice(0, 10)
+            : "核准用途：" + group.displayAuthorization.approvedPurpose.slice(0, 240)
+              + "・查核 " + group.displayAuthorization.reviewedAt.slice(0, 10)
+              + "・有效至 " + group.displayAuthorization.validUntil.slice(0, 10);
+          groupSection.appendChild(authorization);
+        }
         var grid = document.createElement("div");
         grid.className = "housing-listing-grid";
         group.listings.slice(0, 8).forEach(function (listing) {

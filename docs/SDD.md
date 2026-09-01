@@ -96,7 +96,7 @@
 | `lang/en/scam/index.html` | 完整英文防詐 editorial beta：工作、簽證、租屋、金流、個資與二手車風險，英文互動測驗、證據包及官方通報分流；未經母語消保或被害支援專業人士校對前不得標為 reviewed |
 | `lang/en/health/index.html` | 完整英文健康安全 editorial beta：跨護照 Medicare／RHCA 分流、訪客保險查核、就醫層級、藥品、職災、心理健康、暴力支援、偏遠工作與緊急聯絡；未經母語澳洲 healthcare、insurance、mental-health、violence-support 或 workplace-safety 專業人士校對前不得標為 reviewed |
 | `docs/` | 本文件與 SPEC |
-| `worker/` | 獨立無框架 Worker 本機骨架：D1 migrations、CORS／body 上限、Turnstile server-side validation、HMAC 限流鍵、prepared-statement repositories、可替換交易信介面、已授權住宿 provider 正規化層與 Workers runtime 測試；正式資源、平台 adapter 與 secret 仍待人工 gate |
+| `worker/` | 獨立無框架 Worker 本機骨架：D1 migrations、CORS／body 上限、Turnstile server-side validation、HMAC 限流鍵、prepared-statement repositories、可替換交易信介面、已授權住宿 provider 正規化層與 Workers runtime 測試；住宿 adapter 必須帶本站 origin、核准用途、查核日與有效期限，過期或缺漏時不呼叫上游；正式資源、平台 adapter 與 secret 仍待人工 gate |
 | `docs/ACCOMMODATION_PROVIDER_ONBOARDING.md` | 五個住宿平台的授權、secret、商業關係、資料欄位、E2E 與公開開關 gate；未通過不得啟用站內房源結果 |
 | `docs/ACCOMMODATION_PROVIDER_APPLICATION_PACK.md` | Booking.com／CJ、Hostelworld／Partnerize、Domain 與 Flatmates 的申請文字、affiliate／inventory API 分界、站長人工欄位與授權證據清單；不代表平台核准 |
 
