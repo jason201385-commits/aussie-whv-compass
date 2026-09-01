@@ -15,9 +15,9 @@
 
 | 平台 | 目前可做 | 站內顯示前必須取得 | 官方起點 |
 |---|---|---|---|
-| Booking.com | 原始搜尋入口 | Managed Affiliate Partner 合約、Partner Centre 權限、可用 token 與 affiliate ID；確認合約允許本站預定的搜尋／導回方式 | [Demand API prerequisites](https://developers.booking.com/demand/docs/getting-started/prerequisites) |
-| Hostelworld | 原始搜尋入口 | Affiliate Programme 核准，以及 Hostelworld 實際提供的 XSAPI／其他適用整合方式；依最新 Developer Guide 實作 | [Affiliate Programme terms](https://partners.hostelworld.com/wp-content/uploads/2020/05/hostelworld-affiliate-programme-tcs.pdf) |
-| Domain | 原始搜尋入口 | Developer project 與所需 API package 的正式使用核准；確認公開顯示、欄位、流量、保存與 attribution 條款 | [Domain Developer Portal](https://developer.domain.com.au/docs/v1/) |
+| Booking.com | 原始搜尋入口；可申請 CJ affiliate | `CJ affiliate link approval` 與 `Managed Affiliate Demand API approval` 是兩個 gate。站內 inventory 另須 Managed Affiliate Partner 合約、Partner Centre、token、affiliate ID，以及允許本站多類型導覽畫面的書面 scope | [Demand API prerequisites](https://developers.booking.com/demand/docs/getting-started/prerequisites) |
+| Hostelworld | 原始搜尋入口；可申請 Partnerize affiliate | `Partnerize affiliate approval` 與 case-by-case `feed／XSAPI approval` 是兩個 gate。站內 inventory 另須確認本流程不違反 meta／travel search 限制，並取得允許欄位與顯示方式的書面 scope | [Affiliate Programme terms](https://partners.hostelworld.com/wp-content/uploads/2020/05/hostelworld-affiliate-programme-tcs.pdf) |
+| Domain | 原始搜尋入口；可建立 Developer project | Agents & Listings 的 Approved Purpose、公開畫面 review、澳洲境內資料處理、no-index、Powered by Domain Insight、engagement events 與 only-link-to-Domain 都完成後才可上線 | [Domain Developer Portal](https://developer.domain.com.au/docs/v1/) |
 | realestate.com.au | 原始搜尋入口 | 目前 Partner Platform 主要供 REA 客戶授權的 partner／服務商；若要做本站消費者聚合，必須先取得針對此用途的書面許可與可用 scope | [REA Partner Platform](https://partner.realestate.com.au/) |
 | Flatmates | 原始搜尋入口 | 明確書面許可或正式 API／feed 合約；現行 Terms 禁止 screen scraping、database scraping 與為取得使用者或其他資料所做的類似行為 | [Flatmates Terms](https://flatmates.com.au/info/terms) |
 
@@ -38,3 +38,12 @@
 - 最終總價、空房、取消與租約條款必須回到平台確認。
 
 比較型服務的覆蓋、排序與商業關係揭露，另參考 [ACCC 的線上比較提醒](https://www.accc.gov.au/consumers/buying-products-and-services/buying-online)。
+
+## 2026-09-01 申請決策
+
+- **現在值得申請**：Booking.com／CJ affiliate、Hostelworld／Partnerize affiliate、Domain Developer account／Approved Purpose。
+- **現在不送件**：realestate.com.au Partner Platform；本站尚無 REA Customer 委任，不能把一般消費者聚合用途包裝成受權 partner 用途。
+- **只詢問書面合作**：Flatmates；沒有公開 listing API／feed 路徑，普通帳號不會產生資料權利。
+- **公開功能不變**：五平台仍是 external-link-only，`accommodationSearchEnabled` 維持 false。任何 affiliate 核准都不會自動解除 inventory display gate。
+
+可貼入表單的網站說明、用途文字、人工欄位與授權證據清單見 `docs/ACCOMMODATION_PROVIDER_APPLICATION_PACK.md`。

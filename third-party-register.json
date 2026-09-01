@@ -102,27 +102,27 @@
       "platformAccess": [
         {
           "platform": "Booking.com",
-          "status": "external-link-only-pending-managed-affiliate-approval",
+          "status": "external-link-only-cj-affiliate-application-ready-demand-api-separate",
           "policyUrl": "https://developers.booking.com/demand/docs/getting-started/prerequisites"
         },
         {
           "platform": "Hostelworld",
-          "status": "external-link-only-pending-affiliate-and-api-approval",
+          "status": "external-link-only-partnerize-affiliate-application-ready-api-case-by-case",
           "policyUrl": "https://partners.hostelworld.com/wp-content/uploads/2020/05/hostelworld-affiliate-programme-tcs.pdf"
         },
         {
           "platform": "Domain",
-          "status": "external-link-only-pending-approved-api-purpose",
+          "status": "external-link-only-developer-application-ready-approved-purpose-not-granted",
           "policyUrl": "https://developer.domain.com.au/docs/v1/"
         },
         {
           "platform": "realestate.com.au",
-          "status": "external-link-only-no-consumer-aggregation-authorisation",
+          "status": "external-link-only-do-not-apply-without-rea-customer-authority",
           "policyUrl": "https://partner.realestate.com.au/"
         },
         {
           "platform": "Flatmates",
-          "status": "external-link-only-terms-prohibit-scraping",
+          "status": "external-link-only-no-public-api-written-data-permission-required",
           "policyUrl": "https://flatmates.com.au/info/terms"
         }
       ],
@@ -134,7 +134,7 @@
         "safety-and-official-check-route"
       ],
       "isCertificationOrQualityGuarantee": false,
-      "checkedAt": "2026-08-31",
+      "checkedAt": "2026-09-01",
       "editorialStatus": "neutral-navigation-not-ranked-by-payment"
     },
     {

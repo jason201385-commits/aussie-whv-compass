@@ -98,6 +98,7 @@
 | `docs/` | 本文件與 SPEC |
 | `worker/` | 獨立無框架 Worker 本機骨架：D1 migrations、CORS／body 上限、Turnstile server-side validation、HMAC 限流鍵、prepared-statement repositories、可替換交易信介面、已授權住宿 provider 正規化層與 Workers runtime 測試；正式資源、平台 adapter 與 secret 仍待人工 gate |
 | `docs/ACCOMMODATION_PROVIDER_ONBOARDING.md` | 五個住宿平台的授權、secret、商業關係、資料欄位、E2E 與公開開關 gate；未通過不得啟用站內房源結果 |
+| `docs/ACCOMMODATION_PROVIDER_APPLICATION_PACK.md` | Booking.com／CJ、Hostelworld／Partnerize、Domain 與 Flatmates 的申請文字、affiliate／inventory API 分界、站長人工欄位與授權證據清單；不代表平台核准 |
 
 ### 2.2 頁面共同結構
 
