@@ -27,7 +27,7 @@
   go.type = "submit";
   go.className = "language-go";
   go.textContent = "Go";
-  go.setAttribute("aria-label", "Open selected language");
+  go.setAttribute("aria-label", "Go — open selected language");
   picker.addEventListener("submit", function (event) {
     event.preventDefault();
     if (select.value) window.location.assign(select.value);

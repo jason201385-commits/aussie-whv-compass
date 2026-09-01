@@ -153,7 +153,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260901-43";
+      script.src = "assets/search-index.js?v=20260901-44";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -672,7 +672,7 @@
       + saveButtonHtml
       + '<button type="button" class="btn secondary" id="fb-share">有幫助，複製網址分享</button>'
       + '<a class="btn" target="_blank" rel="noopener noreferrer" href="' + issueUrl + '">回報問題／提建議</a>'
-      + '<a class="btn ghost" target="_blank" rel="noopener noreferrer" aria-label="前往 GitHub 公開留下一句感謝（另開新頁）" href="' + thanksUrl + '">留下一句感謝（公開於 GitHub）</a>'
+      + '<a class="btn ghost" target="_blank" rel="noopener noreferrer" aria-label="留下一句感謝（公開於 GitHub）；另開新頁" href="' + thanksUrl + '">留下一句感謝（公開於 GitHub）</a>'
       + '</div>'
       + '<p class="feedback-note">回報與感謝會開啟公開的 GitHub Issue，需要登入並會顯示 GitHub 帳號；請勿留下個資或可識別第三人的資訊。</p>';
     footer.parentNode.insertBefore(bar, footer);

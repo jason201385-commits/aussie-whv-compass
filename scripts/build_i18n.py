@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260901-43"
+ASSET_VERSION = "20260901-44"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -156,9 +156,9 @@ def footer(text: str) -> str:
 
 
 def scripts() -> str:
-    return f'''<script src="/assets/analytics-config.js?v={ASSET_VERSION}"></script>
-<script src="/assets/analytics.js?v={ASSET_VERSION}"></script>
-<script src="/assets/i18n.js?v={ASSET_VERSION}"></script>'''
+    return f'''<script src="/assets/analytics-config.js?v={ASSET_VERSION}" defer></script>
+<script src="/assets/analytics.js?v={ASSET_VERSION}" defer></script>
+<script src="/assets/i18n.js?v={ASSET_VERSION}" defer></script>'''
 
 
 def build_locale_page(code: str, locale: dict, data: dict) -> str:
@@ -344,7 +344,7 @@ def build_switcher(data: dict) -> str:
   go.type = "submit";
   go.className = "language-go";
   go.textContent = "Go";
-  go.setAttribute("aria-label", "Open selected language");
+  go.setAttribute("aria-label", "Go — open selected language");
   picker.addEventListener("submit", function (event) {{
     event.preventDefault();
     if (select.value) window.location.assign(select.value);
