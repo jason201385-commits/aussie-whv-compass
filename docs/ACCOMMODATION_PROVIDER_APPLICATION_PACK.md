@@ -86,4 +86,3 @@ Subject: Permission enquiry for a WHV accommodation navigation use case
 4. 確認可否和其他住宿類型／平台入口同頁出現；affiliate approval 本身不能替代這一項。
 5. 測試 credential 與 production credential 分開保管。
 6. 公開頁、privacy／recommendation policy、`third-party-register.json` 與實際畫面一致。
-

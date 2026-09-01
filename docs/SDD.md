@@ -78,7 +78,7 @@
 | `assets/i18n-locales.json`／`i18n.js` | 49 個目前可申請 417／462 的護照國家／地區、38 種主要語言 registry 與全站語言切換；每個 locale 必須標示 source／machine-unreviewed／english-fallback |
 | `assets/analytics-config.js` | 公開 GA4 Measurement ID 設定；空字串代表停用，不得放帳號或憑證 |
 | `assets/analytics.js` | Basic Consent GA4 loader：未同意不載入 Google tag；同意後只送 page view 與固定搜尋摘要 |
-| `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP 與住宿五平台搜尋轉接器（特徵偵測按頁啟用） |
+| `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP 與住宿情境分流／五平台搜尋轉接器（特徵偵測按頁啟用） |
 | `assets/postcodes.js` | **官方集簽郵遞區號資料**（見 §5，更新程序必讀） |
 | `.github/ISSUE_TEMPLATE/` | 結構化公開表單（report.yml／idea.yml／thanks.yml／collaborate.yml／config.yml） |
 | `CNAME`／`sitemap.xml`／`robots.txt`／`llms.txt` | 正式網域、14 個完整繁中頁＋語言 Quick Start 搜尋探索、公開內容 crawler 開放與 AI 導覽；`llms.txt` 是社群提案，不取代 robots／sitemap |
@@ -128,7 +128,7 @@ footer（免責聲明）→ scripts。**新增頁面時**：複製既有頁骨�
   `search-index.js`；查詢不寫 localStorage、不呼叫 fetch、不送往搜尋引擎。結果 URL 只能來自
   builder 的固定同站頁面／錨點，標題、摘要與使用者查詢一律以 `textContent` 呈現。
   `/` 開啟、Escape／關閉鈕離開，行動版入口與結果維持至少 44px 可操作高度。
-- **住宿合法混合搜尋**：`housing.html` 與完整英文住宿頁共用 `tools.js`。公開開關為 false 時，
+- **住宿合法混合搜尋**：`housing.html` 與完整英文住宿頁共用 `tools.js`。使用者先選短住、合租、整租或農區住宿，前台只把適配的 1–2 個原始入口放在第一層，其他入口折疊；排序依住宿類型與連結可帶入條件，不依價格、品質或付費。公開開關為 false 時，
   地點、日期與人數只存在當頁記憶體，不呼叫本站 API；工具建立 Hostelworld、Booking.com、
   Flatmates、realestate.com.au 與 Domain 的平台入口。日後只有通過 `ACCOMMODATION_PROVIDER_ONBOARDING.md`
   的平台可由 Worker provider adapter 查詢；前端只送完整地址解析後的 suburb／州別／郵遞區號、日期、晚數與人數，

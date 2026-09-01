@@ -36,7 +36,7 @@ health → leave → pr → about（+index）。每頁：toc、來源標註、�
 | 存錢試算器 | cost.html／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿預算 select、其他生活支出 select | weeklyGross=r×h；annualGross=weeklyGross×46；annualTax 依 2026–27 WHM 15%／30%／37%／45% 累進級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（僅為 OTE 粗估） | 六格數據＋全年稅／super 邊界；繁中顯示台幣示意、英文顯示稅後收入可覆蓋幾個支出週；依全年餘額分四級壓力測試警語 |
 | 行前互動清單 | prep.html `#prep-checklist` | 21 項勾選（3 組，JS 產生） | localStorage `whv-prep-check-v1`、進度條、100% 彩蛋文案、清空需 confirm | 進度 x/21（%） |
 | 抵澳 30 天模擬器 | simulator.html `#simulator-profile-form`＋`#simulator-stage` | 5 組固定單選：預算、短住緩衝、工作準備、支持網、優先目標；6 個固定事件各 3 個白名單選項 | cash／housing／work／wellbeing／evidence、關卡與固定選項只寫入目前分頁的 `sessionStorage`，讀取時嚴格驗證版本、型別與範圍；不使用 `localStorage`、fetch 或自由文字；固定 delta 可重播且恢復後不得重複套用；緊急就醫事件在選項前顯示可直接撥打的 000 安全中斷；重開本輪需確認；動態捲動尊重 reduced motion；分數不得描述為成功率、適合度、診斷或簽證判定 | 角色快照＋逐關取捨／官方出口＋第 30 天三項弱點行動地圖；從攻略返回或重新整理可繼續，關閉分頁或確認重新開始即清除；無 JavaScript 時只顯示靜態替代入口 |
-| 住宿合法混合搜尋 | housing.html／`lang/en/housing/` `#housing-search-tool` | 地址或地區，可選入住日、7／14／28 晚與 1–4 人；8 個常見城市 chips | 預設不呼叫 API；完整地址只取 suburb／州別／郵遞區號。公開開關啟用後才以 `credentials:omit`、`no-referrer` 呼叫 Worker；後端只查已授權 provider、限流、4 秒 timeout、輸出欄位／平台網域白名單，不寫 D1／搜尋內容 log；失敗保留原始入口 | 已授權結果按平台分組＋Hostelworld、Booking.com、Flatmates、realestate.com.au、Domain 五個原始入口；揭露連接數／商業關係／非全市場且無合併排名。現況尚無正式 provider 授權，公開開關為 false |
+| 住宿合法混合搜尋 | housing.html／`lang/en/housing/` `#housing-search-tool` | 先選短住／Share House／正式整租／農區住宿，再輸入地址或地區，可選入住日、7／14／28 晚與 1–4 人；8 個常見城市 chips | 依住宿類型把 1–2 個適配入口置頂，其餘折疊；這是入口適配度，不是價格、品質或付費排名。預設不呼叫 API；完整地址只取 suburb／州別／郵遞區號。公開開關啟用後才以 `credentials:omit`、`no-referrer` 呼叫 Worker；後端只查已授權 provider、限流、4 秒 timeout、輸出欄位／平台網域白名單，不寫 D1／搜尋內容 log；失敗保留原始入口 | 情境摘要＋風險提醒＋找不到時的降級方案；API 未啟用時不顯示空的授權結果面板。已授權結果按平台分組＋五個原始入口；揭露連接數／商業關係／非全市場且無合併排名。現況尚無正式 provider 授權，公開開關為 false |
 | 離澳收尾清單 | leave.html `#leave-checklist-tool` | 9 項零打字勾選（無 JS 仍可閱讀） | localStorage `whv-leave-check-v1`、進度條、清空需 confirm；100% 時顯示非強迫的感謝銜接 | 進度 x/9（%）＋完成提示 |
 | 防詐測驗 | scam.html `#scam-quiz` | 8 情境 ×（接受/快跑） | 正解：2、5 題為「接受」其餘「快跑」；逐題回饋含紅旗解說 | 計分＋三級稱號（≥7 大師／≥5 有 sense／其餘肥羊） |
 | DASP 扣繳粗估 | leave.html `#dasp-calc` | 估計總額 number＋tax-free component number＋4 個總額 chips | taxFree=clamp(input, 0, total)；taxable=total−taxFree；withholding=taxable×0.65；payment=total−withholding | 估算 payment after withholding＋估算 withholding＋component／個案限制警語；不得表述為實際可領款 |
@@ -333,6 +333,7 @@ LINE 邀請 URL 在完整繁中頁只保留首頁一處；找工作頁不再把�
 - 結果按平台分組，不合併排序；回應與頁面皆明示 connected coverage、非全市場、無「最便宜／最佳」保證，
   並在平台名稱旁揭露 affiliate／paid-placement。搜尋不寫 D1，application log 不含地點、日期或人數。
 - `assets/api-config.js` 的 `accommodationSearchEnabled` 目前為 false；production provider 清單為空。
+- 2026-09-01 依 WHV 情境補上住宿類型分流：短住先顯示 Booking.com／Hostelworld、合租先顯示 Flatmates、整租先顯示 realestate.com.au／Domain；農區不假裝五平台能完整覆蓋，改強調最近城鎮短住、書面住宿／交通條件與獨立離場方案。次要平台折疊，並明示只按入口適配度排列。
   因此公開頁仍不送本站 API、不顯示假房源。站長須依 `docs/ACCOMMODATION_PROVIDER_ONBOARDING.md` 親自完成合約／書面許可，
   agent 只能在其後依核准 schema 實作個別 adapter，secret 只能放 Cloudflare 受保護設定。
 - JavaScript 未執行時工具隱藏，仍保留 Perth／全澳預設平台連結作為靜態 fallback；實機手機開啟外部

@@ -38,6 +38,10 @@ class FakeElement {
 
   scrollIntoView() {}
 
+  focus() {
+    this.focused = true;
+  }
+
   appendChild(child) {
     this.children.push(child);
     return child;
@@ -56,6 +60,8 @@ function createHarness(lang = "zh-Hant", options = {}) {
   };
   const housingTool = add("housing-search-tool", { hidden: true });
   const housingForm = add("housing-search-form");
+  add("housing-intent", { value: "short" });
+  add("housing-intent-help");
   const housingLocation = add("housing-location");
   add("housing-checkin");
   add("housing-stay-length", { value: "14" });
@@ -65,7 +71,14 @@ function createHarness(lang = "zh-Hant", options = {}) {
   add("housing-search-status");
   add("housing-copy-location");
   add("housing-search-privacy");
-  add("housing-live-panel");
+  add("housing-intent-advice");
+  add("housing-risk-note");
+  add("housing-fallback-note");
+  add("housing-route-title");
+  add("housing-primary-routes");
+  add("housing-other-routes");
+  add("housing-other-routes-panel");
+  add("housing-live-panel", { hidden: true });
   add("housing-live-status");
   add("housing-live-list", { hidden: true });
 
@@ -131,7 +144,10 @@ elements["housing-stay-length"].value = "14";
 elements["housing-guests"].value = "2";
 housingForm.requestSubmit();
 
-assert.equal(elements["housing-search-summary"].textContent, "已為 Perth WA 6000 建立五個平台入口。");
+assert.equal(elements["housing-search-summary"].textContent, "已為「短住／Perth WA 6000」排好適合的入口。");
+assert.equal(elements["housing-primary-routes"].children[0], elements["housing-booking-link"]);
+assert.equal(elements["housing-primary-routes"].children[1], elements["housing-hostelworld-link"]);
+assert.equal(elements["housing-live-panel"].hidden, true, "disabled provider search must not show an empty live-results panel");
 assert.match(elements["housing-booking-link"].href, /ss=Perth%2C\+Western\+Australia%2C\+Australia/);
 assert.match(elements["housing-booking-link"].href, /checkout=2027-01-11/);
 assert.equal(elements["housing-flatmates-link"].href, "https://flatmates.com.au/rooms/perth");
@@ -164,8 +180,24 @@ assert.equal(elements["housing-search-results"].hidden, true, "postcode-only inp
 assert.match(housingLocation.validationMessage, /suburb/);
 
 chips[1].dispatch("click");
-assert.equal(elements["housing-search-summary"].textContent, "已為 Darwin NT 0800 建立五個平台入口。");
+assert.equal(elements["housing-search-summary"].textContent, "已為「短住／Darwin NT 0800」排好適合的入口。");
 assert.equal(elements["housing-domain-link"].href, "https://www.domain.com.au/rent/darwin-nt-0800/");
+
+elements["housing-intent"].value = "share";
+elements["housing-intent"].dispatch("change");
+assert.equal(elements["housing-primary-routes"].children.length, 1);
+assert.equal(elements["housing-primary-routes"].children[0], elements["housing-flatmates-link"]);
+assert.match(elements["housing-search-summary"].textContent, /Share House 單房/);
+
+elements["housing-intent"].value = "whole";
+elements["housing-intent"].dispatch("change");
+assert.equal(elements["housing-primary-routes"].children[0], elements["housing-rea-link"]);
+assert.equal(elements["housing-primary-routes"].children[1], elements["housing-domain-link"]);
+
+elements["housing-intent"].value = "rural";
+elements["housing-intent"].dispatch("change");
+assert.match(elements["housing-fallback-note"].textContent, /最近城鎮/);
+assert.match(elements["housing-risk-note"].textContent, /薪資扣款/);
 
 housingForm.reset();
 await new Promise((resolve) => setTimeout(resolve, 1));
@@ -174,13 +206,14 @@ assert.equal(elements["housing-location"].value, "");
 assert.equal(elements["housing-checkin"].value, "");
 assert.equal(elements["housing-stay-length"].value, "14");
 assert.equal(elements["housing-guests"].value, "1");
+assert.equal(elements["housing-intent"].value, "short");
 
 const englishHarness = createHarness("en");
 englishHarness.housingLocation.value = "Brisbane QLD 4000";
 englishHarness.housingForm.requestSubmit();
 assert.equal(
   englishHarness.elements["housing-search-summary"].textContent,
-  "Five platform routes prepared for Brisbane QLD 4000."
+  "For temporary stay in Brisbane QLD 4000, the most relevant routes are ready."
 );
 
 const liveCalls = [];
@@ -247,4 +280,4 @@ assert.equal(
   "https://www.booking.com/hotel/au/authorised-perth.html"
 );
 
-console.log("HOUSING SEARCH TESTS PASSED (13 cases)");
+console.log("HOUSING SEARCH TESTS PASSED (17 cases)");

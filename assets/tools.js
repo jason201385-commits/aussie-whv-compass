@@ -837,6 +837,8 @@
   if (housingTool) {
     var housingEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
     var housingForm = document.getElementById("housing-search-form");
+    var housingIntent = document.getElementById("housing-intent");
+    var housingIntentHelp = document.getElementById("housing-intent-help");
     var housingLocation = document.getElementById("housing-location");
     var housingCheckin = document.getElementById("housing-checkin");
     var housingStayLength = document.getElementById("housing-stay-length");
@@ -846,6 +848,13 @@
     var housingStatus = document.getElementById("housing-search-status");
     var housingCopy = document.getElementById("housing-copy-location");
     var housingPrivacy = document.getElementById("housing-search-privacy");
+    var housingIntentAdvice = document.getElementById("housing-intent-advice");
+    var housingRiskNote = document.getElementById("housing-risk-note");
+    var housingFallbackNote = document.getElementById("housing-fallback-note");
+    var housingRouteTitle = document.getElementById("housing-route-title");
+    var housingPrimaryRoutes = document.getElementById("housing-primary-routes");
+    var housingOtherRoutes = document.getElementById("housing-other-routes");
+    var housingOtherRoutesPanel = document.getElementById("housing-other-routes-panel");
     var housingLivePanel = document.getElementById("housing-live-panel");
     var housingLiveStatus = document.getElementById("housing-live-status");
     var housingLiveList = document.getElementById("housing-live-list");
@@ -865,6 +874,64 @@
       flatmates: document.getElementById("housing-flatmates-note"),
       rea: document.getElementById("housing-rea-note"),
       domain: document.getElementById("housing-domain-note")
+    };
+    var housingIntentConfig = {
+      short: {
+        primary: ["booking", "hostelworld"],
+        other: ["flatmates", "rea", "domain"],
+        labelZh: "短住",
+        labelEn: "temporary stay",
+        helpZh: "短住會先顯示訂房平台；日期與人數只會帶入能接收的入口。",
+        helpEn: "Temporary stay shows booking routes first. Dates and guests are passed only where a route accepts them.",
+        adviceZh: "先開 Booking.com 與 Hostelworld 比較落地緩衝；這兩個入口各自能帶入的條件不同。",
+        adviceEn: "Start with Booking.com and Hostelworld for an arrival buffer. Each route carries a different set of conditions.",
+        riskZh: "付款前到平台重新確認總價、房型、入住時段、取消期限與最新評價；入口不是即時空房證明。",
+        riskEn: "Before paying, recheck the final price, room type, check-in window, cancellation deadline and recent reviews on the platform. A route is not proof of live availability.",
+        fallbackZh: "找不到時先改日期或鄰近大眾運輸區；保留可取消方案，不要降級成未看房就私下匯款。",
+        fallbackEn: "If nothing fits, adjust dates or try nearby public-transport areas. Keep a cancellable option instead of moving to an unseen private transfer."
+      },
+      share: {
+        primary: ["flatmates"],
+        other: ["booking", "hostelworld", "rea", "domain"],
+        labelZh: "Share House 單房",
+        labelEn: "share-house room",
+        helpZh: "合租會先顯示 Flatmates；日期、每週預算與 couple 條件需到平台再選。",
+        helpEn: "Share house shows Flatmates first. Move-in date, weekly budget and couple acceptance must be selected on the platform.",
+        adviceZh: "先開 Flatmates 找單房；Booking.com／Hostelworld 只作 inspection 前的短住備援。",
+        adviceEn: "Start with Flatmates for a room. Booking.com and Hostelworld are only temporary fallbacks before inspection.",
+        riskZh: "確認租金是按房或按人、bills、同住人數、分租權限、書面 agreement 與房屋所在地 bond 流程。",
+        riskEn: "Confirm whether rent is per room or person, bills, occupants, subletting authority, written agreement and the local bond process.",
+        fallbackZh: "沒有結果先擴鄰近 suburb；使用社團或私人刊登時，要加強身分與實地查證，不能先匯款。",
+        fallbackEn: "Try nearby suburbs first. If you use a community or private listing, increase identity and in-person checks and do not transfer money first."
+      },
+      whole: {
+        primary: ["rea", "domain"],
+        other: ["booking", "hostelworld", "flatmates"],
+        labelZh: "正式整租",
+        labelEn: "formal whole-property rental",
+        helpZh: "整租會先顯示 realestate.com.au 與 Domain；有州別和郵遞區號時才能建立較精準入口。",
+        helpEn: "Formal rental shows realestate.com.au and Domain first. State and postcode are needed for a more precise route.",
+        adviceZh: "先開 realestate.com.au 與 Domain；短住平台只作 inspection、申請與入住前的緩衝。",
+        adviceEn: "Start with realestate.com.au and Domain. Short-stay platforms are only buffers during inspection, application and move-in.",
+        riskZh: "進站後補選週預算、房間數與入住日，並確認 inspection、仲介身分、總入住成本、租期與 break-lease 條件。",
+        riskEn: "On the platform, add weekly budget, bedrooms and move-in date, then verify inspection, agent identity, move-in cost, term and break-lease conditions.",
+        fallbackZh: "零結果時先擴鄰區或調整房型；申請期間保留短住，不把口頭承諾當成已租到。",
+        fallbackEn: "If there are no results, expand nearby areas or adjust property type. Keep temporary accommodation while applying; a verbal promise is not a secured rental."
+      },
+      rural: {
+        primary: ["hostelworld", "booking"],
+        other: ["flatmates", "rea", "domain"],
+        labelZh: "農區／雇主附近住宿",
+        labelEn: "rural or near-employer accommodation",
+        helpZh: "五平台不一定涵蓋偏鄉；先找最近城鎮的獨立短住，再向雇主要書面住宿與交通條件。",
+        helpEn: "The five platforms may not cover rural areas. Start with independent temporary accommodation in the nearest town and ask the employer for written housing and transport terms.",
+        adviceZh: "先用最近城鎮找可退場的短住。本站不把雇主口頭提供住宿當成已確認房源。",
+        adviceEn: "Start with a recoverable temporary stay in the nearest town. This site does not treat an employer's verbal housing offer as a confirmed listing.",
+        riskZh: "把工作、住宿、交通、薪資扣款與退款條件分開寫清楚；檢查過度擁擠、逃生出口與停工後如何離開。",
+        riskEn: "Get separate written terms for work, housing, transport, deductions and refunds. Check crowding, fire exits and how you can leave if shifts stop.",
+        fallbackZh: "五平台找不到很正常：改搜最近城鎮、hostel 或 caravan park，並保留不依賴雇主的交通與離場方案。",
+        fallbackEn: "No result on these platforms is common. Search the nearest town, hostel or caravan park, and keep transport and an exit plan independent of the employer."
+      }
     };
     var housingCityDefaults = {
       perth: { place: "Perth", state: "WA", postcode: "6000" },
@@ -972,6 +1039,33 @@
     var setHousingNote = function (key, text) {
       if (housingNotes[key]) housingNotes[key].textContent = text;
     };
+    var applyHousingIntent = function () {
+      var key = housingIntent && housingIntentConfig[housingIntent.value] ? housingIntent.value : "short";
+      var config = housingIntentConfig[key];
+      if (housingIntentHelp) housingIntentHelp.textContent = housingEnglish ? config.helpEn : config.helpZh;
+      if (housingIntentAdvice) housingIntentAdvice.textContent = housingEnglish ? config.adviceEn : config.adviceZh;
+      if (housingRiskNote) housingRiskNote.textContent = housingEnglish ? config.riskEn : config.riskZh;
+      if (housingFallbackNote) housingFallbackNote.textContent = housingEnglish ? config.fallbackEn : config.fallbackZh;
+      if (housingRouteTitle) housingRouteTitle.textContent = housingEnglish
+        ? (config.primary.length === 1 ? "Open this platform first" : "Open these platforms first")
+        : (config.primary.length === 1 ? "先開這個平台" : "先開這些平台");
+      if (housingPrimaryRoutes && housingOtherRoutes) {
+        housingPrimaryRoutes.replaceChildren();
+        housingOtherRoutes.replaceChildren();
+        config.primary.forEach(function (platform) {
+          if (!housingLinks[platform]) return;
+          housingLinks[platform].className = "support-link housing-route-primary";
+          housingPrimaryRoutes.appendChild(housingLinks[platform]);
+        });
+        config.other.forEach(function (platform) {
+          if (!housingLinks[platform]) return;
+          housingLinks[platform].className = "support-link";
+          housingOtherRoutes.appendChild(housingLinks[platform]);
+        });
+        if (housingOtherRoutesPanel) housingOtherRoutesPanel.hidden = config.other.length === 0;
+      }
+      return config;
+    };
     var housingStateForPostcode = function (postcode) {
       var pc = parseInt(postcode, 10);
       if (pc >= 800 && pc <= 999) return "NT";
@@ -993,7 +1087,7 @@
         housingLiveList.replaceChildren();
         housingLiveList.hidden = true;
       }
-      if (housingLivePanel) housingLivePanel.hidden = false;
+      if (housingLivePanel) housingLivePanel.hidden = !housingApiSettings;
       if (housingLiveStatus) {
         housingLiveStatus.textContent = housingApiSettings
           ? (housingEnglish ? "Ready to check authorised provider results." : "可以查詢已授權平台結果。")
@@ -1113,6 +1207,16 @@
 
     housingCheckin.min = housingDateString(new Date());
     housingTool.hidden = false;
+    applyHousingIntent();
+    if (housingIntent) {
+      housingIntent.addEventListener("change", function () {
+        applyHousingIntent();
+        if (housingLocation.value.trim()) {
+          if (housingForm.requestSubmit) housingForm.requestSubmit();
+          else housingForm.dispatchEvent(new Event("submit", { cancelable: true }));
+        }
+      });
+    }
     housingLocation.addEventListener("input", function () { housingLocation.setCustomValidity(""); });
     housingLocation.addEventListener("keydown", function (event) {
       if (event.key !== "Enter") return;
@@ -1168,6 +1272,7 @@
         return;
       }
       housingCopyValue = parsed.locality;
+      var selectedIntent = applyHousingIntent();
 
       var bookingUrl = new URL("https://www.booking.com/searchresults.html");
       var bookingLocation = parsed.place
@@ -1206,8 +1311,8 @@
 
       housingLinks.flatmates.href = "https://flatmates.com.au/rooms/" + placeSlug;
       setHousingNote("flatmates", housingEnglish
-        ? parsed.place + " room route prepared; set price and move-in filters on the platform"
-        : "已建立 " + parsed.place + " 合租入口；價格與入住日請在平台內篩選");
+        ? "Place name " + parsed.place + " prepared; recheck the state, price, move-in date and room type on the platform"
+        : "已帶入地名 " + parsed.place + "；州別、價格、入住日與房型請在平台內重新確認");
 
       if (parsed.state && parsed.postcode) {
         var stateSlug = parsed.state.toLowerCase();
@@ -1231,14 +1336,15 @@
       }
 
       housingSummary.textContent = housingEnglish
-        ? "Five platform routes prepared for " + parsed.locality + "."
-        : "已為 " + parsed.locality + " 建立五個平台入口。";
+        ? "For " + selectedIntent.labelEn + " in " + parsed.locality + ", the most relevant routes are ready."
+        : "已為「" + selectedIntent.labelZh + "／" + parsed.locality + "」排好適合的入口。";
       housingResults.hidden = false;
       housingStatus.textContent = housingEnglish
         ? "Ready. Open platforms one at a time and recheck every filter."
         : "已就緒。請逐一開啟平台，並重新確認每個篩選條件。";
       searchHousingLicensedResults(parsed);
       housingResults.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest" });
+      if (housingSummary.focus) housingSummary.focus({ preventScroll: true });
     });
 
     housingForm.addEventListener("reset", function () {
@@ -1247,6 +1353,7 @@
         clearHousingLiveResults();
         housingCopyValue = "";
         housingLocation.setCustomValidity("");
+        applyHousingIntent();
         housingStatus.textContent = housingEnglish
           ? "Enter a location or choose a common city."
           : "輸入地點，或點一個常見城市。";

@@ -116,24 +116,34 @@
     <a href="#problems">Problems and leaving</a>
   </nav>
 
-  <h2 id="find-now">1. Search once: check authorised results, then open five platforms</h2>
-  <p>Only a platform that has formally authorised API display can return listings inside this site. Every other platform remains an original search route: no page scraping, login bypass or claim of live availability.</p>
+  <h2 id="find-now">1. Choose the stay type, then open the most relevant platform</h2>
+  <p>You do not need to compare all five platforms first. Choose temporary stay, share house, formal rental or rural/work-linked accommodation, then enter a locality. The order is based on route fit, not price, quality, live availability or payment.</p>
 
   <section class="tool housing-search-tool" id="housing-search-tool" aria-labelledby="housing-search-title" hidden>
     <span class="tool-tag">LAWFUL HYBRID SEARCH</span>
-    <h3 id="housing-search-title">Enter once: authorised listings plus five original routes</h3>
+    <h3 id="housing-search-title">Answer two questions: see the routes that fit first</h3>
     <p>You may enter a full address, but <strong>Suburb State 4-digit postcode</strong>, such as <strong>Perth WA 6000</strong>, is more reliable. For “123 Hay St, Perth WA 6000”, the tool uses only the location after the comma to prepare links.</p>
     <form id="housing-search-form">
       <div class="housing-search-fields">
         <div class="housing-search-field housing-search-field-wide">
-          <label for="housing-location">Address or area</label>
+          <label for="housing-intent">1. What kind of accommodation do you need?</label>
+          <select id="housing-intent" name="intent">
+            <option value="short" selected>Tonight / 1–28 night temporary stay</option>
+            <option value="share">A room in a share house</option>
+            <option value="whole">A formal whole-property rental</option>
+            <option value="rural">Rural / near-employer accommodation</option>
+          </select>
+          <small id="housing-intent-help">Temporary stay shows booking routes first. Dates and guests are passed only where a route accepts them.</small>
+        </div>
+        <div class="housing-search-field housing-search-field-wide">
+          <label for="housing-location">2. Where do you need to stay?</label>
           <input id="housing-location" name="location" type="text" required maxlength="120" autocomplete="address-level2" placeholder="Perth WA 6000">
         </div>
-        <div class="housing-search-field">
+        <div class="housing-search-field" data-housing-shortstay-field>
           <label for="housing-checkin">Expected check-in</label>
           <input id="housing-checkin" name="checkin" type="date">
         </div>
-        <div class="housing-search-field">
+        <div class="housing-search-field" data-housing-shortstay-field>
           <label for="housing-stay-length">Initial stay</label>
           <select id="housing-stay-length" name="stayLength">
             <option value="7">7 nights</option>
@@ -163,7 +173,7 @@
         <button class="chip" type="button" data-housing-location="Hobart TAS 7000">Hobart</button>
       </div>
       <div class="housing-search-actions">
-        <button class="btn" type="submit">Search accommodation options</button>
+        <button class="btn" type="submit">Show suitable platforms</button>
         <button class="btn secondary" type="reset">Clear</button>
       </div>
       <p class="housing-search-privacy" id="housing-search-privacy">Live provider search is not enabled on the public site. Your input stays in this tab's memory and is sent to a platform only after you open its link.</p>
@@ -172,34 +182,44 @@
 
     <div class="housing-search-results" id="housing-search-results" hidden>
       <div class="housing-search-summary">
-        <p><strong id="housing-search-summary">No search routes prepared yet.</strong></p>
+        <p><strong id="housing-search-summary" tabindex="-1">No search routes prepared yet.</strong></p>
         <button class="btn secondary" id="housing-copy-location" type="button">Copy location</button>
       </div>
-      <section class="housing-live-panel" id="housing-live-panel" aria-labelledby="housing-live-title">
+      <div class="housing-intent-result" aria-live="polite">
+        <p class="housing-intent-advice" id="housing-intent-advice"></p>
+        <p class="warn" id="housing-risk-note"></p>
+        <p class="tip" id="housing-fallback-note"></p>
+      </div>
+      <section class="housing-live-panel" id="housing-live-panel" aria-labelledby="housing-live-title" hidden>
         <p class="section-eyebrow">VIEW ON THIS SITE</p>
         <h4 id="housing-live-title">Authorised provider results</h4>
         <p class="housing-live-status" id="housing-live-status" role="status" aria-live="polite">No provider is authorised for live display yet. Use the five original platform routes below.</p>
         <div class="housing-live-list" id="housing-live-list" hidden></div>
         <p class="housing-search-limit">Only partial results returned by connected, authorised providers are shown, grouped by provider. This is not all-market coverage or a combined “cheapest” ranking. Any future affiliate or paid relationship will be labelled beside the provider name.</p>
       </section>
-      <h4 class="housing-route-title">Five original platform routes</h4>
-      <div class="support-grid" aria-label="Five accommodation platform search routes">
-        <a class="support-link" id="housing-hostelworld-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
+      <h4 class="housing-route-title" id="housing-route-title">Open the routes that fit first</h4>
+      <p class="housing-search-limit" id="housing-route-order-note">Ordered by accommodation type and which conditions the link can carry — not by price, quality or payment. Every current route is an unpaid external link.</p>
+      <div class="support-grid housing-primary-routes" id="housing-primary-routes" aria-label="Most relevant accommodation platform routes">
+        <a class="support-link" data-housing-platform="hostelworld" id="housing-hostelworld-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
           <span class="icon" aria-hidden="true">H</span><span><strong>Hostelworld</strong><small id="housing-hostelworld-note">Hostels and short stays; some locations need another search on the platform</small></span>
         </a>
-        <a class="support-link" id="housing-booking-link" href="https://www.booking.com/country/au.html" target="_blank" rel="noopener noreferrer nofollow">
+        <a class="support-link" data-housing-platform="booking" id="housing-booking-link" href="https://www.booking.com/country/au.html" target="_blank" rel="noopener noreferrer nofollow">
           <span class="icon" aria-hidden="true">B</span><span><strong>Booking.com</strong><small id="housing-booking-note">Can carry location, dates and guest count</small></span>
         </a>
-        <a class="support-link" id="housing-flatmates-link" href="https://flatmates.com.au/rooms" target="_blank" rel="noopener noreferrer nofollow">
+        <a class="support-link" data-housing-platform="flatmates" id="housing-flatmates-link" href="https://flatmates.com.au/rooms" target="_blank" rel="noopener noreferrer nofollow">
           <span class="icon" aria-hidden="true">F</span><span><strong>Flatmates</strong><small id="housing-flatmates-note">Rooms and share houses</small></span>
         </a>
-        <a class="support-link" id="housing-rea-link" href="https://www.realestate.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
+        <a class="support-link" data-housing-platform="rea" id="housing-rea-link" href="https://www.realestate.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
           <span class="icon" aria-hidden="true">R</span><span><strong>realestate.com.au</strong><small id="housing-rea-note">A direct area route needs a state and postcode</small></span>
         </a>
-        <a class="support-link" id="housing-domain-link" href="https://www.domain.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
+        <a class="support-link" data-housing-platform="domain" id="housing-domain-link" href="https://www.domain.com.au/rent/" target="_blank" rel="noopener noreferrer nofollow">
           <span class="icon" aria-hidden="true">D</span><span><strong>Domain</strong><small id="housing-domain-note">A direct area route needs a state and postcode</small></span>
         </a>
       </div>
+      <details class="housing-other-routes" id="housing-other-routes-panel">
+        <summary>Show other platform routes</summary>
+        <div class="support-grid" id="housing-other-routes" aria-label="Other accommodation platform routes"></div>
+      </details>
       <p class="housing-search-limit">A route is not a listing owned by this site or proof of live availability. A platform may rewrite or ignore some conditions. Recheck the location, dates, total price, availability and cancellation terms after opening it.</p>
     </div>
   </section>
