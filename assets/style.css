@@ -1386,7 +1386,7 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .warn { background: var(--danger-soft); border-color: var(--danger); }
 .tip  { background: var(--green-soft); border-color: var(--green); }
 /* SDD §4.5 基線：行內連結不得只靠顏色辨識（WCAG 1.4.1） */
-.note a, .warn a, .tip a {
+.note a, .warn a, .tip a, td a {
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
   text-underline-offset: 2px;
