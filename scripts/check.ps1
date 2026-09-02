@@ -1,4 +1,4 @@
-# 澳打指南針 — 驗收腳本（SPEC §6 第 1、2 項）
+﻿# 澳打指南針 — 驗收腳本（涵蓋範圍見 docs/SPEC.md §4；文件一致性規則見 docs/README.md §4）
 # 用法：powershell -File scripts/check.ps1（在 repo 根目錄執行）
 # 全部通過輸出 ALL CHECKS PASSED 並以 0 結束；任何錯誤以 1 結束。
 
@@ -2296,6 +2296,45 @@ foreach ($mobileUxNeedle in @('.site-header { position: static; }', 'main [id] {
 if (-not $mainJs.Contains('.then(copied, copyFailed)') -or -not $mainJs.Contains('catch (e) { copyFailed(); }')) {
   Write-Output 'FAIL [main.js] clipboard 失敗分支不得誤報已複製'
   $errors++
+}
+
+# 交接文件一致性（docs/README.md §4）：索引涵蓋、P 編號登記、決策引用、頁面清單、修改過的核心文件標頭日期。
+$docsDir = Join-Path $dir 'docs'
+$docsIndexText = [System.IO.File]::ReadAllText((Join-Path $docsDir 'README.md'), [System.Text.Encoding]::UTF8)
+foreach ($docFile in (Get-ChildItem $docsDir -Filter '*.md' | Where-Object { $_.Name -ne 'README.md' })) {
+  $indexNeedle = '[`' + $docFile.Name + '`](' + $docFile.Name + ')'
+  if (-not $docsIndexText.Contains($indexNeedle)) { Write-Output "FAIL [docs/README.md] 索引 §1 未列出 $($docFile.Name)"; $errors++ }
+}
+$roadmapText = [System.IO.File]::ReadAllText((Join-Path $docsDir 'ROADMAP.md'), [System.Text.Encoding]::UTF8)
+$roadmapIds = @([regex]::Matches($roadmapText, '(?m)^\|\s*(P[0-2]-\d+)\s*\|') | ForEach-Object { $_.Groups[1].Value })
+if ($roadmapIds.Count -lt 10) { Write-Output "FAIL [docs/ROADMAP.md] §1 總表只解析到 $($roadmapIds.Count) 個編號"; $errors++ }
+$decisionsText = [System.IO.File]::ReadAllText((Join-Path $docsDir 'DECISIONS.md'), [System.Text.Encoding]::UTF8)
+$decisionIds = @([regex]::Matches($decisionsText, '(?m)^## (D-\d{4}-\d{2}-\d{2}-\d{2})\b') | ForEach-Object { $_.Groups[1].Value })
+foreach ($docFile in (Get-ChildItem $docsDir -Filter '*.md')) {
+  $docText = [System.IO.File]::ReadAllText($docFile.FullName, [System.Text.Encoding]::UTF8)
+  foreach ($workItemId in ([regex]::Matches($docText, '\bP[0-2]-\d+\b') | ForEach-Object { $_.Value } | Sort-Object -Unique)) {
+    if ($roadmapIds -notcontains $workItemId) { Write-Output "FAIL [docs/$($docFile.Name)] 使用了未在 ROADMAP.md §1 登記的編號：$workItemId"; $errors++ }
+  }
+  foreach ($decisionRef in ([regex]::Matches($docText, '\bD-\d{4}-\d{2}-\d{2}-\d{2}\b') | ForEach-Object { $_.Value } | Sort-Object -Unique)) {
+    if ($decisionIds -notcontains $decisionRef) { Write-Output "FAIL [docs/$($docFile.Name)] 引用了不存在的決策條目：$decisionRef"; $errors++ }
+  }
+}
+$specText = [System.IO.File]::ReadAllText((Join-Path $docsDir 'SPEC.md'), [System.Text.Encoding]::UTF8)
+foreach ($rootPage in $pages) {
+  if (-not $specText.Contains('`' + $rootPage + '`')) { Write-Output "FAIL [docs/SPEC.md] §1.1 頁面清單缺 $rootPage"; $errors++ }
+}
+$gitCommand = Get-Command git -ErrorAction SilentlyContinue
+$todayStamp = (Get-Date).ToString('yyyy-MM-dd')
+foreach ($coreDoc in @('README.md', 'SDD.md', 'SPEC.md', 'ROADMAP.md', 'DECISIONS.md', 'CLARIFIER_SPEC.md')) {
+  $coreDocText = [System.IO.File]::ReadAllText((Join-Path $docsDir $coreDoc), [System.Text.Encoding]::UTF8)
+  $updatedMatch = [regex]::Match($coreDocText, '最後更新 (\d{4}-\d{2}-\d{2})')
+  if (-not $updatedMatch.Success) { Write-Output "FAIL [docs/$coreDoc] 標頭缺「最後更新 YYYY-MM-DD」"; $errors++; continue }
+  if ($null -eq $gitCommand) { Write-Output "WARN [docs/$coreDoc] 找不到 git，略過標頭日期新鮮度檢查"; continue }
+  $docStatus = & $gitCommand.Source -C $dir status --porcelain -- ('docs/' + $coreDoc)
+  if ($LASTEXITCODE -eq 0 -and $docStatus -and $updatedMatch.Groups[1].Value -ne $todayStamp) {
+    Write-Output "FAIL [docs/$coreDoc] 檔案已修改但標頭「最後更新」不是今天（$todayStamp）"
+    $errors++
+  }
 }
 
 # Cloudflare 後端必須維持獨立、本機可重播，而且遠端 P0-4 未完成時要以不可部署佔位值 fail closed。

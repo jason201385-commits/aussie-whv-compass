@@ -1,13 +1,13 @@
 # 🧭 澳打指南針 — 澳洲打工度假開源攻略
 
 給準備去澳洲打工度假（Working Holiday, subclass 417）的中文背包客的一站式開源攻略，
-依旅程階段共 12 頁：
+依旅程階段共 15 頁（含首頁、模擬器與離澳出清）：
 
 | 階段 | 頁面 |
 |---|---|
 | 出發前 | 自我釐清（快思測驗＋慢想工作表）・簽證與集簽・行前準備與落地 SOP・物價與薪水・英文 |
 | 在澳洲 | 住宿與租屋・找工作・防詐騙（只講手法不列黑名單）・保險就醫心理與安全 |
-| 之後 | 報稅退休金與離澳・PR 之路 |
+| 之後 | 報稅退休金與離澳・離澳出清 × 初登澳補給（market.html）・PR 之路 |
 | 本站 | 資料來源與編輯方法・回報修正・私人 Email／需求單・公開共編・贊助 |
 
 **公開攻略與核心工具免費・官方資料可回查・編輯整理與社群經驗分開標示。**
@@ -26,13 +26,15 @@
 ## 現行互動工具（純前端、不上傳填寫內容）
 
 - **澳洲打工度假模擬器**（simulator.html）：5 分鐘角色設定＋抵澳 30 天固定情境；遊戲資源、關卡與固定選項只在目前分頁的 session 暫存，從攻略返回或重新整理可繼續，關閉分頁或重新開始即清除；不上傳答案，也不做成功、簽證或醫療預測。
+- **離澳出清 × 初登澳補給草稿產生器**（market.html）：選賣出／徵求、分類、城市、狀況、價格與面交方式，產生可複製的刊登草稿與 Facebook Marketplace／eBay 搜尋入口；不儲存任何輸入，也不代刊登。
+- **各地社團目錄**（首頁 `#communities`）：地點搜尋、LINE／Reddit 篩選、州別地圖鈕與 Facebook／Reddit 平台搜尋；只列公開入口，本站無管理權，不做站內配對。
 - **集簽郵遞區號初篩**（visa.html）：郵遞區號＋工作類型 → 比對留存的 subclass 417 清單；不取代實際職務、日期、支薪與個人資格查核。
   資料檔 `assets/postcodes.js` 抓取自內政部 specified-work 官方頁（2026-08-29），
   官方更新宣告區時請同步更新此檔。
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
-- Header 與首頁提供**全站搜尋**：搜尋 14 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
+- Header 與首頁提供**全站搜尋**：搜尋 15 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
 ## 多國語言 Quick Start
@@ -74,15 +76,18 @@ P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空�
 
 ## 搜尋引擎與 AI 探索
 
-- 14 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
+- 15 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
 - `robots.txt` 開放所有公開頁，`sitemap.xml` 列出正式網址；`llms.txt` 提供 AI 可讀導覽、授權與事實界線。
 - 修改頁名、description 或頁面清單後，先跑 `python scripts/build_seo.py`，再跑 `scripts/check.ps1`。
 - `llms.txt` 是輔助理解的社群提案，不保證搜尋排名、收錄或任何 AI 服務採用。
 
 ## 開發者／AI agent 從這裡開始
 
-- [docs/SDD.md](docs/SDD.md) — 系統設計文件：架構、設計系統、資料檔、重要教訓
-- [docs/SPEC.md](docs/SPEC.md) — 功能規格：現況基線、待辦 backlog（P0–P2）、驗收程序、例行維護
+- [docs/README.md](docs/README.md) — **先讀這頁**：文件分工、依任務只讀哪幾節、更新規則、啟動指令
+- [docs/SDD.md](docs/SDD.md) — 憲法與架構：不可協商原則、系統邊界、設計系統、資料檔、重要教訓
+- [docs/SPEC.md](docs/SPEC.md) — 現況行為契約：頁面清單、工具規格、內容規範、驗收程序、例行維護
+- [docs/ROADMAP.md](docs/ROADMAP.md) — 全部 P0–P2 編號的唯一登記與狀態
+- [docs/DECISIONS.md](docs/DECISIONS.md) — 按日期的決策與證據日誌
 - `scripts/check.ps1` — 驗收腳本（靜態站結構、連結、錨點、emoji 與 Worker 本機測試），push 前必跑
 - 修改內容標題或段落錨點後，先跑 `python scripts/build_search.py` 更新搜尋索引。
 - 第一次驗證 Worker 前先在 `worker/` 執行 `npm ci`；之後根目錄的 `scripts/check.ps1` 會連同
