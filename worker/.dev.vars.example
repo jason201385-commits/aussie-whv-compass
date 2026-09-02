@@ -1,3 +1,6 @@
 # Copy to .dev.vars for local manual testing only. Never commit the real file.
 TURNSTILE_SECRET_KEY=replace-with-local-test-secret
 RATE_LIMIT_HMAC_KEY=replace-with-at-least-32-random-bytes
+# AI fallback (POST /api/assist). Leave empty to keep the route fail-closed (503 assist_not_configured).
+# The real key lives only in Cloudflare protected settings after P0-4; never commit it.
+MINIMAX_API_KEY=

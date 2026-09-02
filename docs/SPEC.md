@@ -27,7 +27,7 @@
 
 | 檔案 | 旅程階段 | 內容 | 問題入口 | 證據卡 |
 |---|---|---|---|---|
-| `index.html` | 入口 | 安全出口、四大入口、旅程問題卡、搜尋、社團目錄、續讀／收藏、遊戲區 | — | — |
+| `index.html` | 入口 | 安全出口、釐清器（4 階段 × 護照 × 需求 → 21 個出口）、6 題找職類、搜尋、AI 兜底（未啟用）、社團目錄、續讀／收藏、遊戲區 | — | — |
 | `why.html` | 還在考慮 | 自我釐清快思測驗＋慢想工作表 | 有 | — |
 | `visa.html` | 還在考慮 | 簽證與集簽＋郵遞區號初篩 | 有 | 有 |
 | `prep.html` | 決定要去 | 行前準備與落地 SOP＋互動清單＋行前海報 | 有 | — |
@@ -74,10 +74,12 @@
 | 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | `whv-last-page-v1` 只存 `{path}`；固定頁名／階段 map；拒絕未知 path | 續讀連結＋清除；無資料時隱藏 | check.ps1 首頁入口文案 |
 | 我的收藏 | 首頁 `#saved-pages`＋內容頁回饋列 | 單鍵收藏；首頁個別移除或確認後清空 | `whv-saved-pages-v1` 白名單 path 陣列；標題／階段由 `JOURNEY_PAGES` 產生 | 依收藏順序顯示；無收藏隱藏 | check.ps1 首頁入口文案 |
 | 緊急安全出口 | 首頁 `#support-hub` | 4 個零打字入口 | 只連既有內容錨點：立即危險、剛匯款／帳號風險、威脅／剝削／扣證件、簽證到期／官方通知 | 先做降低傷害的第一步，不複製可能過時的電話或政策數字 | check.ps1「高風險語意路徑」區塊 |
-| 首頁四大入口 | 首頁 `nav.home-zone-nav` | — | 四個同頁錨點：`#self-assessment`、`#common-problems`、`#communities`、`#games` | — | check.ps1 首頁入口文案；將由 P0-7 重建 |
+| 首頁四大入口 | 首頁 `nav.home-zone-nav` | — | 四個同頁錨點：`#clarifier`、`#search`、`#communities`、`#games` | — | check.ps1「首頁釐清器」區塊 |
+| 首頁釐清器（P0-7） | 首頁 `#clarifier`：`nav#journey-map`（4 階段）→ 4 個 `.clarifier-panel`（`#considering`、`#committed`、`#in-australia`、`#next-step`）→ 需求 chips → `.clarifier-exit` | 階段 chips 4；護照 chips（台灣 417／中國大陸 462／其他，只在前兩個面板，JS 才顯示，無 JS 顯示一句靜態連結）；需求 chips 6／8／10／6（含「找人聊」「全部顯示」） | hash 驅動、零儲存：`#<stage>` 只顯示該面板並把焦點移到標題；`#exit-*` 只顯示該出口；`#<stage>-exits` 全部顯示；`aria-current="step"`／`aria-pressed` 只在執行期；護照只寫 `data-passport` 屬性並改寫 `data-href-462` 連結；不寫 storage、不 fetch；無 JS 時 4 面板與 21 個出口全部可見、chips 皆為錨點；每個面板附「急事先走安全出口」 | 21 個出口（3／6／8／4）：12 張回收的問題卡（保留 `problem-category`／`card-action`）＋9 個一句話精簡出口，各附深連結與「找人聊」 | check.ps1「首頁釐清器」區塊（階段數、面板 id、出口數、護照區預設 hidden、順序、無打字）；2026-09-02 Playwright 回放 12 步全過（桌機 1280、手機 375／390，截圖 33 張，暫存區） |
+| 6 題找職類 | 首頁 `#job-quiz`（由 `#job-quiz` hash 開啟；靜態六大類清單無 JS 可用） | 6 題各 3 個 chips：工作地點、體力、英文口說、互動程度、證照意願、偏遠意願 | 純前端計分到六大職類（採收與農場／餐飲與服務／清潔與房務／工廠倉儲與物流／零售與門市／辦公與專業）；答案不保存 | 職類結果＋`work.html` 錨點連結 | check.ps1 首頁區塊；vm 煙霧測試 78 斷言（暫存區，未入 repo） |
 | 旅程問題卡＋直接解法 | 首頁 `#journey-map`（4 個 `.journey-phase`）＋`.direct-solution-grid` | — | 12 張「類別＋真實情境」卡依考慮／準備／在澳／離澳與延續分組；3 張直接解法卡（含 `market.html#market-tool`） | 直接進入對應完整攻略 | check.ps1 首頁入口文案；style.css 分段 needles |
 | 各地社團目錄 | 首頁 `#communities` | 地點搜尋框（60 字）、平台 select（全部／LINE／Reddit）、9 格州別地圖鈕、清除 | `main.js` 只在當頁過濾 `data-community-*` 條目；Facebook／Reddit 平台搜尋 href 由輸入或州名 `encodeURIComponent` 組成；不寫 storage、不 fetch；9 個公開入口（1 LINE＋8 Reddit）皆登錄 `third-party-register.json` | 過濾後清單＋狀態文字＋空結果提示＋兩個平台搜尋鈕 | check.ps1「商業合作與第三方入口」區塊（LINE 只在首頁）；篩選邏輯無自動測試（人工） |
-| 可選兩題引導 | 首頁 `.route-guide` | 階段＋最怕的損失 | 原生 `details`，no-JS 可用；只連固定同站頁面／錨點 | 縮小範圍；高風險回安全出口 | check.ps1 首頁入口文案 |
+| AI 兜底（C-4） | 首頁 `#assist`（釐清器與搜尋之後） | 一句話 4–200 字＋Turnstile | 只在 `apiBaseUrl` 與 `turnstileSiteKey` 都非空時渲染表單，否則只顯示「站內 AI 兜底尚未啟用」；送出前顯示第三方揭露（MiniMax、本站不保存、供應商可能依其條款處理）；`POST /api/assist` `{question, turnstileToken}`，`credentials: omit`、`no-referrer`；模型只回傳站內目錄連結，答案由伺服端固定模板組成（模型文字永不渲染）；回覆以 `textContent` 渲染，連結只接受同站白名單；任何錯誤 fail closed 顯示固定文案 | kind：`answer`（固定模板＋目錄連結）／`official_exit`（敏感輸入或個人判定類問題）／`over_cap`／`refused` | check.ps1 首頁區塊（`#assist` 預設 hidden、origin 空時無 fetch）與 worker 區塊（assist.ts 禁 `console.`）；`worker/test/assist.test.ts` 18 案例（含 console spy、主機白名單、缺 IP）；現況 P0-4 未完成，表單不顯示 |
 | 全站搜尋 | header 搜尋鈕＋首頁 `#search`＋JS dialog | 關鍵詞、5 個熱門詞、鍵盤 `/` | 首次使用才載入 `search-index.js`（頁數與入口數以 `scripts/build_search.py` 的 `PAGES` 與產物 `entries` 為準，2026-09-02 為 15 頁／144 入口）；排除 `hidden`、`data-search-ui` 與未啟用 UI；NFKC、固定同義詞、標題／段落加權；不保存、不送出；動態文字只用 `textContent` | 最多 8 個同站深連結；零結果提供縮短關鍵詞與許願入口 | `python scripts/build_search.py --check`（check.ps1 執行）；check.ps1「站內搜尋」區塊 |
 | 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；7 個完整英文頁為 editorial beta，未經母語專業校對不得標 reviewed | `python scripts/build_i18n.py --check`；check.ps1 七個「完整英文…頁」區塊 |
 | 頁尾旅程導覽 | 12 個線性內容頁（`main.js` 注入） | — | 依 `JOURNEY_ORDER` 產生上一站／完整旅程／下一站；首頁、模擬器與市集不注入 | 目前階段與第 x/12 頁 | check.ps1 頁面基線 |

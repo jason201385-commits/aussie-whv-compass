@@ -14,8 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
-LAST_MODIFIED = "2026-09-01"
-ASSET_VERSION = "20260902-46"
+LAST_MODIFIED = "2026-09-02"
+ASSET_VERSION = "20260902-47"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -221,7 +221,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
         "",
         "## 首頁",
         "",
-        f"- [澳打指南針]({ORIGIN}/): 全站旅程地圖、當下需求快導與互動工具入口。",
+        f"- [澳打指南針]({ORIGIN}/): 首頁釐清器：依階段、護照與需求點選找到下一步；安全出口、各地社團與互動工具入口。",
     ]
     for heading, pages in groups:
         lines.extend(["", f"## {heading}", ""])

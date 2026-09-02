@@ -1916,13 +1916,14 @@ if (-not $indexText.Contains('id="journey-map"')) {
   Write-Output 'FAIL [index.html] 缺完整旅程錨點：journey-map'
   $errors++
 }
+# 首頁單一漏斗（docs/CLARIFIER_SPEC.md P0-7）：四大入口保留；自我評估、問題卡目錄與兩題引導由釐清器取代
 foreach ($homeZoneNeedle in @(
   'class="home-zone-nav"',
-  'href="#self-assessment"',
-  'href="#common-problems"',
+  'href="#clarifier"',
+  'href="#search"',
   'href="#communities"',
   'href="#games"',
-  'id="self-assessment"',
+  'id="clarifier"',
   'id="common-problems"',
   'id="communities"',
   'id="games"',
@@ -1941,6 +1942,7 @@ if (-not $homeZoneNav.Success -or [regex]::Matches($homeZoneNav.Value, '<a\b').C
   Write-Output 'FAIL [index.html] 首頁四大入口必須恰好四個'
   $errors++
 }
+# 既有首頁守門（contract §4.1 keep）：社群目錄 9/9 與第三方邊界、二手交換法律邊界與零後端草稿、收藏／最近閱讀、四個安全出口、12 張回收卡
 $communityEntries = [regex]::Matches($indexText, 'data-community-platform="(?:line|reddit)"').Count
 $communityRegions = [regex]::Matches($indexText, 'class="map-region[^\"]*"[^>]*data-community-region=').Count
 if ($communityEntries -ne 9 -or $communityRegions -ne 9) {
@@ -2011,12 +2013,270 @@ if ($problemCategories -ne 12 -or $problemActions -ne 12) {
   Write-Output "FAIL [index.html] 問題卡必須有 12 組類別與第一步（category=$problemCategories action=$problemActions）"
   $errors++
 }
+# 釐清器入口與第 1 層：四個旅程階段依 main.js JOURNEY_ORDER（404.html 依賴四個 id）
+foreach ($clarifierNeedle in @(
+  '<section class="home-zone-section clarifier" id="clarifier" aria-labelledby="clarifier-title" data-clarifier data-stage="" data-passport="">',
+  'id="clarifier-title"',
+  '你現在在哪一步？',
+  '選項只在這一頁，不會送出。'
+)) {
+  if (-not $indexText.Contains($clarifierNeedle)) { Write-Output "FAIL [index.html] 釐清器入口或零儲存聲明缺失：$clarifierNeedle"; $errors++ }
+}
+$clarifierStages = @('considering', 'committed', 'in-australia', 'next-step')
+$journeyDirectory = [regex]::Match($indexText, '(?s)<nav class="journey-directory" id="journey-map".*?</nav>')
+if (-not $journeyDirectory.Success) {
+  Write-Output 'FAIL [index.html] 缺釐清器階段導覽 nav.journey-directory#journey-map'
+  $errors++
+} else {
+  $stageLinks = @([regex]::Matches($journeyDirectory.Value, '<a\b[^>]*href="#([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+  if ([regex]::Matches($journeyDirectory.Value, '<a\b').Count -ne 4 -or ($stageLinks -join ',') -ne ($clarifierStages -join ',')) {
+    Write-Output "FAIL [index.html] 釐清器階段 chips 必須依序恰好四個（$($clarifierStages -join ', ')）；目前：$($stageLinks -join ', ')"
+    $errors++
+  }
+}
+$clarifierPanels = [regex]::Matches($indexText, '<section class="journey-phase clarifier-panel" id="([a-z-]+)"[^>]*data-clarifier-panel="([a-z-]+)"')
+$clarifierPanelIds = @($clarifierPanels | ForEach-Object { $_.Groups[1].Value })
+$clarifierPanelMismatch = @($clarifierPanels | Where-Object { $_.Groups[1].Value -ne $_.Groups[2].Value }).Count
+if ([regex]::Matches($indexText, 'data-clarifier-panel="').Count -ne 4 -or ($clarifierPanelIds -join ',') -ne ($clarifierStages -join ',') -or $clarifierPanelMismatch -ne 0) {
+  Write-Output "FAIL [index.html] 釐清器階段面板必須恰好四個且 id 與 data-clarifier-panel 一致；目前：$($clarifierPanelIds -join ', ')"
+  $errors++
+}
+$clarifierExitCounts = @{ 'considering' = 3; 'committed' = 6; 'in-australia' = 8; 'next-step' = 4 }
+$clarifierPassportCounts = @{ 'considering' = 1; 'committed' = 1; 'in-australia' = 0; 'next-step' = 0 }
+foreach ($stage in $clarifierStages) {
+  $clarifierPanel = [regex]::Match($indexText, "(?s)<section class=`"journey-phase clarifier-panel`" id=`"$stage`".*?</section>")
+  if (-not $clarifierPanel.Success) {
+    Write-Output "FAIL [index.html] 缺釐清器階段面板：$stage"
+    $errors++
+    continue
+  }
+  $clarifierPanelText = $clarifierPanel.Value
+  $clarifierExitCount = [regex]::Matches($clarifierPanelText, '<div class="clarifier-exit(?: clarifier-exit-lite)?" id="exit-').Count
+  if ($clarifierExitCount -ne $clarifierExitCounts[$stage]) {
+    Write-Output "FAIL [index.html] 階段 $stage 出口數=$clarifierExitCount（應為 $($clarifierExitCounts[$stage])）"
+    $errors++
+  }
+  $clarifierChipNav = [regex]::Match($clarifierPanelText, '(?s)<nav class="clarifier-chips"[^>]*>.*?</nav>')
+  if (-not $clarifierChipNav.Success) {
+    Write-Output "FAIL [index.html] 階段 $stage 缺需求 chips（nav.clarifier-chips）"
+    $errors++
+  } else {
+    foreach ($exitChip in [regex]::Matches($clarifierChipNav.Value, 'href="#(exit-[^"]+)"')) {
+      if (-not $clarifierPanelText.Contains("id=`"$($exitChip.Groups[1].Value)`"")) {
+        Write-Output "FAIL [index.html] 階段 $stage 需求 chip 沒有同面板出口：#$($exitChip.Groups[1].Value)"
+        $errors++
+      }
+    }
+    if ([regex]::Matches($clarifierChipNav.Value, "href=`"#$stage-exits`">全部顯示</a>").Count -ne 1) {
+      Write-Output "FAIL [index.html] 階段 $stage 必須有一個「全部顯示」chip 指向 #$stage-exits"
+      $errors++
+    }
+    if (-not $clarifierChipNav.Value.Contains('href="#communities">找人聊</a>')) {
+      Write-Output "FAIL [index.html] 階段 $stage 需求 chips 缺「找人聊」社團入口"
+      $errors++
+    }
+  }
+  if (-not $clarifierPanelText.Contains("<div class=`"clarifier-exits`" id=`"$stage-exits`"")) {
+    Write-Output "FAIL [index.html] 階段 $stage 缺出口容器 #$stage-exits"
+    $errors++
+  }
+  if ([regex]::Matches($clarifierPanelText, [regex]::Escape('最想先解決哪件事？')).Count -ne 1) {
+    Write-Output "FAIL [index.html] 階段 $stage 需求問題必須恰好出現一次"
+    $errors++
+  }
+  if ([regex]::Matches($clarifierPanelText, [regex]::Escape('href="#support-hub">安全出口</a>')).Count -ne 1) {
+    Write-Output "FAIL [index.html] 階段 $stage 必須有一句安全出口連結"
+    $errors++
+  }
+  $clarifierPassportCount = [regex]::Matches($clarifierPanelText, '<div class="clarifier-passport"[^>]*\bhidden\b').Count
+  if ($clarifierPassportCount -ne $clarifierPassportCounts[$stage] -or ($clarifierPassportCounts[$stage] -eq 0 -and $clarifierPanelText.Contains('data-passport='))) {
+    Write-Output "FAIL [index.html] 護照分層只能在 considering／committed 各一組且預設 hidden；階段 $stage 目前 $clarifierPassportCount 組"
+    $errors++
+  }
+}
+# 第 2 層護照：只在頁面記憶體；462 改連 lang/en/visa/ 既有錨點；no-JS 用靜態兩連結句
+foreach ($passportNeedle in @('data-passport="417"', 'data-passport="462"', 'data-passport="other"', 'data-clarifier-passport-static')) {
+  if ([regex]::Matches($indexText, [regex]::Escape($passportNeedle)).Count -ne 2) { Write-Output "FAIL [index.html] 護照分層元件應恰好出現兩次：$passportNeedle"; $errors++ }
+}
+foreach ($passportLink in @('href="lang/en/visa/"', 'href="lang/"')) {
+  if (-not $indexText.Contains($passportLink)) { Write-Output "FAIL [index.html] 護照分層缺 462／其他語言出口：$passportLink"; $errors++ }
+}
+$englishVisaIdText = if (Test-Path $englishVisaPath) { [System.IO.File]::ReadAllText($englishVisaPath, [System.Text.Encoding]::UTF8) } else { '' }
+foreach ($href462 in [regex]::Matches($indexText, 'data-href-462="([^"]+)"')) {
+  $href462Value = $href462.Groups[1].Value
+  if (-not $href462Value.StartsWith('lang/en/visa/')) {
+    Write-Output "FAIL [index.html] 462 替代連結必須指向 lang/en/visa/：$href462Value"
+    $errors++
+    continue
+  }
+  $href462FragmentAt = $href462Value.IndexOf('#')
+  if ($href462FragmentAt -ge 0) {
+    $href462Fragment = $href462Value.Substring($href462FragmentAt + 1)
+    if (-not $englishVisaIdText.Contains("id=`"$href462Fragment`"")) { Write-Output "FAIL [index.html] 462 替代連結錨點不存在於 lang/en/visa/：#$href462Fragment"; $errors++ }
+  }
+}
+# 頁內錨點完整性：釐清器與 AI 兜底內每個 href="#…" 都要有對應 id
+$clarifierStart = $indexText.IndexOf('<section class="home-zone-section clarifier" id="clarifier"')
+$clarifierEnd = $indexText.IndexOf('<section class="site-search-home"')
+$assistSection = [regex]::Match($indexText, '(?s)<section class="clarifier-assist" id="assist" aria-labelledby="assist-title" data-assist hidden>.*?</section>')
+if ($clarifierStart -lt 0 -or $clarifierEnd -le $clarifierStart -or -not $assistSection.Success) {
+  Write-Output 'FAIL [index.html] 釐清器或 AI 兜底區塊邊界缺失（#clarifier 必須在搜尋之前；#assist 必須預設 hidden）'
+  $errors++
+} else {
+  $funnelText = $indexText.Substring($clarifierStart, $clarifierEnd - $clarifierStart) + $assistSection.Value
+  foreach ($inPageAnchor in @([regex]::Matches($funnelText, '<a\b[^>]*href="#([^"]+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)) {
+    if (-not $indexText.Contains("id=`"$inPageAnchor`"")) { Write-Output "FAIL [index.html] 釐清器頁內錨點不存在：#$inPageAnchor"; $errors++ }
+  }
+}
+if ([regex]::Matches($indexText, '<section class="clarifier-assist" id="assist" aria-labelledby="assist-title" data-assist hidden>').Count -ne 1) {
+  Write-Output 'FAIL [index.html] AI 兜底區塊必須恰好一個且預設 hidden'
+  $errors++
+}
+# 工作類型小測驗：題目在 main.js；HTML 只放容器與六大類靜態連結
+foreach ($jobQuizNeedle in @('<section class="job-quiz" id="job-quiz"', 'id="job-quiz-title"', 'id="job-quiz-app" data-job-quiz hidden', 'id="job-families"', '只是入口，不是評估')) {
+  if (-not $indexText.Contains($jobQuizNeedle)) { Write-Output "FAIL [index.html] 缺工作類型小測驗入口：$jobQuizNeedle"; $errors++ }
+}
+$jobFamilyIds = @('farm', 'hospitality', 'cleaning', 'factory', 'retail', 'office')
+if ([regex]::Matches($indexText, 'data-job-family="').Count -ne $jobFamilyIds.Count) {
+  Write-Output "FAIL [index.html] 六大職類必須恰好 $($jobFamilyIds.Count) 筆"
+  $errors++
+}
+foreach ($jobFamily in $jobFamilyIds) {
+  if (-not $indexText.Contains("<li data-job-family=`"$jobFamily`"><a href=`"work.html#")) { Write-Output "FAIL [index.html] 職類 $jobFamily 缺 work.html 錨點連結"; $errors++ }
+}
+# AI 兜底：未設定時只顯示固定句；打字框、揭露句與 Turnstile 全部預設 hidden
+$assistOff = [regex]::Match($indexText, '<p class="clarifier-assist-off" id="assist-off" hidden>(.*?)</p>')
+if (-not $assistOff.Success -or ([regex]::Replace($assistOff.Groups[1].Value, '<[^>]+>', '') -ne '站內 AI 兜底尚未啟用；可用上方搜尋，或到各地社團問人。')) {
+  Write-Output 'FAIL [index.html] AI 兜底未啟用句必須預設 hidden 且文案固定'
+  $errors++
+}
+foreach ($assistNeedle in @(
+  '<div class="clarifier-assist-box" id="assist-box" hidden>',
+  '<form class="clarifier-assist-form" id="assist-form" novalidate hidden>',
+  'id="assist-disclosure"',
+  '你的問題會送到第三方模型（MiniMax）產生回覆；本站伺服器不保存問題文字，但供應商可能依其條款處理。請不要輸入姓名、護照、帳號或他人資料。',
+  '<textarea id="assist-input" rows="2" maxlength="200"',
+  'id="assist-open"',
+  'id="assist-turnstile" hidden',
+  'id="assist-submit"',
+  'id="assist-cancel"',
+  'id="assist-status"',
+  'id="assist-answer"',
+  '不做簽證、法律、醫療、稅務判定'
+)) {
+  if (-not $indexText.Contains($assistNeedle)) { Write-Output "FAIL [index.html] AI 兜底區塊缺失或未預設隱藏：$assistNeedle"; $errors++ }
+}
+# 零打字：搜尋層之前不得出現任何打字框
+$supportHubAt = $indexText.IndexOf('id="support-hub"')
+$searchSectionAt = $indexText.IndexOf('id="search"')
+if ($supportHubAt -lt 0 -or $searchSectionAt -le $supportHubAt) {
+  Write-Output 'FAIL [index.html] 安全出口與搜尋層順序錯誤'
+  $errors++
+} else {
+  $preSearchText = $indexText.Substring($supportHubAt, $searchSectionAt - $supportHubAt)
+  if ($preSearchText.Contains('<input') -or $preSearchText.Contains('<textarea')) {
+    Write-Output 'FAIL [index.html] 釐清器前三層不得出現打字框（input／textarea 只能在搜尋層之後）'
+    $errors++
+  }
+}
+foreach ($retiredHomeNeedle in @('aria-current="step"', 'aria-current="true"', 'class="route-guide"', 'class="direct-solution-grid"', 'id="self-assessment"', 'href="#self-assessment"', 'href="#common-problems"', 'id="problem-directory-title"', '上方 12 張問題卡或下方兩題引導')) {
+  if ($indexText.Contains($retiredHomeNeedle)) { Write-Output "FAIL [index.html] 已退場的首頁區塊或執行期屬性不得留在靜態 HTML：$retiredHomeNeedle"; $errors++ }
+}
+# CLARIFIER_SPEC §3.2：每個既有區塊的去向錨點都必須存在
+foreach ($clarifierDestination in @(
+  'why.html#quick-quiz',
+  'simulator.html',
+  'housing.html#book',
+  'housing.html#housing-search-tool',
+  'work.html#channels',
+  'work.html#seasons',
+  'visa.html#apply',
+  'visa.html#postcode-tool',
+  'cost.html#save-calc',
+  'cost.html#exchange',
+  'cost.html#car',
+  'health.html#doctor',
+  'scam.html#help',
+  'leave.html#leave-checklist-tool',
+  'leave.html#dasp-calc',
+  'market.html#market-tool',
+  'pr.html#overview',
+  'lang/en/visa/',
+  '#job-quiz',
+  '#communities',
+  '#games'
+)) {
+  if (-not $indexText.Contains("href=`"$clarifierDestination`"")) { Write-Output "FAIL [index.html] CLARIFIER_SPEC §3.2 去向缺失：$clarifierDestination"; $errors++ }
+}
+$indexMainBlock = [regex]::Match($indexText, '(?s)<main\b.*?</main>')
+if (-not $indexMainBlock.Success -or [regex]::Matches($indexMainBlock.Value, '<h2\b(?![^>]*\bid=")').Count -ne 0) {
+  Write-Output 'FAIL [index.html] 首頁 main 內每個 h2 都必須有 id（站內搜尋索引依賴）'
+  $errors++
+}
+# main.js 釐清器：hash 驅動、零儲存；AI 兜底只有一個 fetch，且雙設定齊全才啟用
+$clarifierScript = [regex]::Match($mainJs, '(?s)// ---------- 首頁釐清器.*?// ---------- D\+ 匿名彙總量測')
+if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 首頁 AI 兜底')) {
+  Write-Output 'FAIL [main.js] 缺首頁釐清器／AI 兜底功能塊或標記順序錯誤'
+  $errors++
+} else {
+  foreach ($clarifierScriptNeedle in @(
+    '"/api/assist"',
+    'turnstileToken',
+    'credentials: "omit"',
+    'referrerPolicy: "no-referrer"',
+    'getPublicApiBaseUrl()',
+    'turnstileSiteKey',
+    'turnstile-spin-v2',
+    'ASSIST_SAME_SITE',
+    'ASSIST_SENSITIVE',
+    'over_cap',
+    'resultCount === 0',
+    'hashchange',
+    'JOB_QUIZ',
+    'JOB_FAMILY_ORDER'
+  )) {
+    if (-not $clarifierScript.Value.Contains($clarifierScriptNeedle)) { Write-Output "FAIL [main.js] 釐清器或 AI 兜底缺安全界線：$clarifierScriptNeedle"; $errors++ }
+  }
+  if ([regex]::Matches($clarifierScript.Value, [regex]::Escape('"/api/assist"')).Count -ne 1 -or [regex]::Matches($clarifierScript.Value, 'fetch\(').Count -ne 1) {
+    Write-Output 'FAIL [main.js] AI 兜底只能有一個 fetch 與一個 /api/assist 路由'
+    $errors++
+  }
+  if ([regex]::Matches($clarifierScript.Value, '\bq:').Count -ne 6) {
+    Write-Output 'FAIL [main.js] 工作類型小測驗必須恰好 6 題'
+    $errors++
+  }
+  foreach ($clarifierForbidden in @('localStorage', 'sessionStorage', 'innerHTML', 'insertAdjacentHTML', 'document.write', 'document.cookie', 'location.hash =', 'history.', 'scrollIntoView', 'navigator.userAgent', 'XMLHttpRequest')) {
+    if ($clarifierScript.Value.Contains($clarifierForbidden)) { Write-Output "FAIL [main.js] 釐清器不得保存狀態、寫入 HTML 字串或改寫網址：$clarifierForbidden"; $errors++ }
+  }
+}
+foreach ($clarifierStyleNeedle in @('.clarifier-panel[hidden]', '.clarifier-exit[hidden]', '.clarifier-passport[hidden]', '.job-quiz[hidden]', '.clarifier-assist[hidden]', '.clarifier-assist-box[hidden]')) {
+  if (-not $styleText.Contains($clarifierStyleNeedle)) { Write-Output "FAIL [style.css] 釐清器 hidden 後援缺失：$clarifierStyleNeedle"; $errors++ }
+}
+$reducedMotionBlock = [regex]::Match($styleText, '(?s)@media \(prefers-reduced-motion: reduce\) \{.*?\n\}')
+if (-not $reducedMotionBlock.Success -or -not $reducedMotionBlock.Value.Contains('.clarifier-chips .chip')) {
+  Write-Output 'FAIL [style.css] 釐清器 chips 未納入 prefers-reduced-motion'
+  $errors++
+}
+$printBlock = [regex]::Match($styleText, '(?s)@media print \{.*?\n\}')
+if (-not $printBlock.Success -or -not $printBlock.Value.Contains('.clarifier-assist')) {
+  Write-Output 'FAIL [style.css] AI 兜底未納入列印隱藏'
+  $errors++
+}
 $homeRouteOrder = @(
   'class="support-hub"',
+  'id="clarifier"',
   'id="journey-map"',
+  'id="considering"',
+  'id="committed"',
+  'id="in-australia"',
+  'id="next-step"',
+  'id="job-quiz"',
   'class="site-search-home"',
-  'class="route-guide"',
-  'id="communities"'
+  'id="assist"',
+  'id="communities"',
+  'id="games"',
+  'id="source-model-title"',
+  'id="principles"'
 )
 $previousHomeRouteIndex = -1
 foreach ($homeRouteNeedle in $homeRouteOrder) {
@@ -2431,13 +2691,16 @@ $workerRequired = @(
   'src\tokens.ts',
   'src\metrics.ts',
   'src\accommodation.ts',
+  'src\assist.ts',
+  'migrations\0003_assist_daily_usage.sql',
   'test\http.test.ts',
   'test\contact.test.ts',
   'test\metrics.test.ts',
   'test\accommodation.test.ts',
   'test\security.test.ts',
   'test\repository.test.ts',
-  'test\mail.test.ts'
+  'test\mail.test.ts',
+  'test\assist.test.ts'
 )
 foreach ($workerFile in $workerRequired) {
   if (-not (Test-Path (Join-Path $workerDir $workerFile))) {
@@ -2456,10 +2719,43 @@ if (Test-Path (Join-Path $workerDir 'wrangler.jsonc')) {
     '"name": "CONTACT_RATE_LIMITER"',
     '"name": "DPLUS_RATE_LIMITER"',
     '"name": "ACCOMMODATION_RATE_LIMITER"',
+    '"name": "ASSIST_RATE_LIMITER"',
+    '"ASSIST_DAILY_CAP": "200"',
     '"TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2"'
   )) {
     if (-not $workerConfig.Contains($workerConfigNeedle)) {
       Write-Output "FAIL [worker/wrangler.jsonc] 缺本機安全界線：$workerConfigNeedle"
+      $errors++
+    }
+  }
+}
+# AI 兜底 Worker：fail closed、只回站內連結、不記錄問題文字；每日 counter 不進 /api/metrics 白名單
+$assistWorkerPath = Join-Path $workerDir 'src\assist.ts'
+if (Test-Path $assistWorkerPath) {
+  $assistWorkerText = [System.IO.File]::ReadAllText($assistWorkerPath, [System.Text.Encoding]::UTF8)
+  foreach ($assistWorkerNeedle in @('over_cap', 'official_exit', 'ASSIST_SAME_SITE', 'perthDate', 'verifyTurnstile', 'ASSIST_DETERMINATION', 'client_ip_missing', 'composeAnswerText')) {
+    if (-not $assistWorkerText.Contains($assistWorkerNeedle)) { Write-Output "FAIL [worker/src/assist.ts] AI 兜底缺 fail-closed 界線：$assistWorkerNeedle"; $errors++ }
+  }
+  if (-not [regex]::IsMatch($assistWorkerText, 'ASSIST_ALLOWED_HOSTS(?:: readonly string\[\])? = \["api\.minimaxi\.com", "api\.minimax\.io"\]')) {
+    Write-Output 'FAIL [worker/src/assist.ts] ASSIST_ALLOWED_HOSTS 必須固定為 api.minimaxi.com 與 api.minimax.io'
+    $errors++
+  }
+  if ([regex]::IsMatch($assistWorkerText, 'console\s*\.')) {
+    Write-Output 'FAIL [worker/src/assist.ts] 不得使用任何 console 方法（問題文字、回覆與 token 不得進 log）'
+    $errors++
+  }
+  if ([regex]::IsMatch($assistWorkerText, '(?:parsed|reply|payload|message)\.answer\b|sanitizeAnswer')) {
+    Write-Output 'FAIL [worker/src/assist.ts] 不得讀取模型回覆的 answer 欄位；回覆文字只能由伺服器模板組成'
+    $errors++
+  }
+  $repositoryPath = Join-Path $workerDir 'src\repository.ts'
+  $metricsPath = Join-Path $workerDir 'src\metrics.ts'
+  if ((Test-Path $repositoryPath) -and (Test-Path $metricsPath)) {
+    $repositoryText = [System.IO.File]::ReadAllText($repositoryPath, [System.Text.Encoding]::UTF8)
+    $metricsText = [System.IO.File]::ReadAllText($metricsPath, [System.Text.Encoding]::UTF8)
+    $metricKeysBlock = [regex]::Match($repositoryText, '(?s)METRIC_KEYS = \[.*?\]')
+    if (-not $metricKeysBlock.Success -or $metricKeysBlock.Value.Contains('assist_requests') -or -not $metricsText.Contains('METRIC_KEYS.includes(')) {
+      Write-Output 'FAIL [worker] AI 兜底每日 counter 不得進入 D+ 量測白名單（METRIC_KEYS／metrics.ts）'
       $errors++
     }
   }

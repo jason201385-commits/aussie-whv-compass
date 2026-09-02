@@ -1,3 +1,4 @@
+import { answerAssistQuestion, type AssistBindings, type AssistDependencies } from "./assist";
 import {
   searchLicensedAccommodation,
   type AccommodationDependencies,
@@ -20,9 +21,15 @@ interface RuntimeSecrets {
   RATE_LIMIT_HMAC_KEY: string;
 }
 
-export type AppEnv = Env & RuntimeSecrets & AccommodationEnv;
+// Assist bindings are re-declared as optional so the route fails closed when
+// they are absent and existing test environments stay valid.
+export type AppEnv = Omit<Env, keyof AssistBindings> &
+  AssistBindings &
+  RuntimeSecrets &
+  AccommodationEnv;
 
-export interface AppDependencies extends ContactDependencies, AccommodationDependencies {}
+export interface AppDependencies
+  extends ContactDependencies, AccommodationDependencies, AssistDependencies {}
 
 function logResult(requestId: string, request: Request, status: number): void {
   const url = new URL(request.url);
@@ -45,12 +52,14 @@ function createFetchHandler(dependencies: AppDependencies) {
   ): Promise<Response> {
     const url = new URL(request.url);
     const isAggregateMetric = url.pathname === "/api/metrics";
-    const requestId = isAggregateMetric ? "" : crypto.randomUUID();
+    // /api/assist keeps no request log line either (CLARIFIER_SPEC §4).
+    const skipRequestLog = isAggregateMetric || url.pathname === "/api/assist";
+    const requestId = skipRequestLog ? "" : crypto.randomUUID();
     const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
     let origin: string | null = null;
 
     function logOperationalResult(status: number): void {
-      if (!isAggregateMetric) logResult(requestId, request, status);
+      if (!skipRequestLog) logResult(requestId, request, status);
     }
 
     try {
@@ -82,6 +91,8 @@ function createFetchHandler(dependencies: AppDependencies) {
         response = await recordAggregateMetric(request, env);
       } else if (request.method === "POST" && url.pathname === "/api/accommodation/search") {
         response = await searchLicensedAccommodation(request, env, dependencies);
+      } else if (request.method === "POST" && url.pathname === "/api/assist") {
+        response = await answerAssistQuestion(request, env, dependencies);
       } else {
         response = jsonResponse(
           {

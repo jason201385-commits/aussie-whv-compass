@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
-VERSION = "2026-09-01"
+VERSION = "2026-09-02"
 INACTIVE_UI_SENTINELS = {
     "情境載入中",
     "需求已由後端接收",

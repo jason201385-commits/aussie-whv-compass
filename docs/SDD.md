@@ -55,8 +55,8 @@
   驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
 - **外部依賴**：現行前端只有 Google Fonts。GA4 程式保留但 ID 為空；Cloudflare Web Analytics
   尚未加入，啟用時必須同步登錄於本節與 `SPEC.md` §3。
-- **後端邊界**：GitHub Pages 提供全部內容；Cloudflare Worker 只提供五種能力：私人需求單、
-  查閱／更正／刪除申請、交易信、D+ 聚合計數、已授權住宿搜尋轉發（§3.1）。正式資源尚未完成
+- **後端邊界**：GitHub Pages 提供全部內容；Cloudflare Worker 只提供六種能力：私人需求單、
+  查閱／更正／刪除申請、交易信、D+ 聚合計數、已授權住宿搜尋轉發、AI 兜底轉發（§3.1）。正式資源尚未完成
   P0-4 前，不得把本機 mock 或設定範本描述成已上線。
 
 ### 2.1 檔案地圖
@@ -65,7 +65,7 @@
 
 | 路徑 | 角色 |
 |---|---|
-| `index.html` | 首頁：安全出口、四大入口（自我評估／常見問題／各地社團／遊戲區）、旅程問題卡、搜尋、續讀與收藏；將由 P0-7 重建 |
+| `index.html` | 首頁：安全出口、釐清器（4 階段 × 護照 × 需求 → 21 個出口）、6 題找職類、搜尋、AI 兜底（未啟用）、各地社團、續讀與收藏、遊戲區 |
 | `why.html` | 自我釐清雙模式（快思測驗＋慢想工作表） |
 | `visa.html` | 簽證與集簽＋集簽郵遞區號初篩 |
 | `prep.html` | 行前準備與落地 SOP＋互動清單＋行前海報 |
@@ -83,7 +83,7 @@
 | `404.html` | 錯誤復原頁（noindex，保留導覽與旅程復原入口） |
 | `assets/style.css` | 全站唯一樣式表（設計 token 見 §4） |
 | `assets/lemon-pattern.svg`、`og-cover.svg`、`og-cover.png` | 本地裝飾圖樣與 1200×630 分享圖 |
-| `assets/main.js` | 全站共用：sprite、導覽、搜尋、續讀／收藏、回饋列、社團目錄篩選、需求單、D+ |
+| `assets/main.js` | 全站共用：sprite、導覽、搜尋、續讀／收藏、回饋列、社團目錄篩選、首頁釐清器（hash 驅動）、AI 兜底（fail closed）、需求單、D+ |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP、住宿搜尋、市集草稿（特徵偵測按頁啟用） |
 | `assets/simulator.js` | 模擬器狀態機 |
 | `assets/api-config.js` | 公開 API origin、Turnstile site key、住宿搜尋公開開關；留空即 fail closed；不得放 secret |
@@ -102,7 +102,7 @@
 | `scripts/test_housing_search.mjs` | 住宿搜尋 DOM 行為回放 |
 | `scripts/test_tools.mjs` | 集簽快查器與存錢試算器固定案例回放（`SPEC.md` §4） |
 | `scripts/test_analytics.cjs` | GA4 敏感頁排除行為測試（vm 沙盒） |
-| `worker/` | 獨立無框架 Cloudflare Worker：`src/`（http、cors、body、turnstile、rate-limit、tokens、repository、mail、contact、contact-validation、metrics、accommodation、index）、`migrations/`、`test/`、`wrangler.jsonc`（D1 ID 為全零佔位、無 `env`）、`README.md` |
+| `worker/` | 獨立無框架 Cloudflare Worker：`src/`（http、cors、body、turnstile、rate-limit、tokens、repository、mail、contact、contact-validation、metrics、accommodation、assist、index）、`migrations/`（0001–0003）、`test/`、`wrangler.jsonc`（D1 ID 為全零佔位、無 `env`）、`README.md` |
 | `docs/` | 交接文件；分工見 `docs/README.md` |
 
 ### 2.2 頁面共同結構
@@ -147,7 +147,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 ### 3.1 最小後端資料契約
 
 - **路由**（`worker/src/index.ts`）：`GET /api/health`、`POST /api/contact`、`/api/contact/manage`、
-  `/api/contact/update`、`/api/contact/delete`、`POST /api/metrics`、`POST /api/accommodation/search`。
+  `/api/contact/update`、`/api/contact/delete`、`POST /api/metrics`、`POST /api/accommodation/search`、`POST /api/assist`。
 - **CRM 必填**：聯絡 Email、需求類型、需求說明；姓名／組織、希望時程、預算區間選填。
   **禁止欄位**：護照、簽證文件、健康／醫療、銀行／卡號、帳密、第三人個資、未公開客戶資料。
 - **保存**：一般詢問與未成交需求以結案或最後聯絡時間為基準，24 個月後由排程刪除；
@@ -160,6 +160,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 - **住宿搜尋**：只接受四個固定欄位、2 KiB body、固定類別限流、provider timeout、每平台最多 8 筆、
   目的網域與顯示欄位白名單；每個候選 provider 必須附有效 `displayAuthorization`（本站 origin、核准用途、
   查核日、有效期限），過期或缺漏不呼叫上游；不寫 D1、不記錄搜尋內容。
+- **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`MINIMAX_API_KEY` 空值或 `ASSIST_BASE_URL` 主機不在白名單（`api.minimaxi.com`／`api.minimax.io`）時 503 fail closed；透過 OpenAI 相容 chat completions（`ASSIST_MODEL`）呼叫，8 秒逾時，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
 - **安全**：所有 `POST` 路由要求 `Origin` 存在且在白名單，否則 `403 origin_not_allowed`（`GET /api/health` 例外）；
   Turnstile token server-side 驗證；輸入長度、rate limit 與 SQL 皆白名單／prepared statement；
   限流鍵以只存在 Worker secret 的 HMAC 產生，原始 Email 或 IP 不作 binding key。

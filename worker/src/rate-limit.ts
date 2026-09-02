@@ -10,10 +10,18 @@ function toHex(bytes: ArrayBuffer): string {
     .join("");
 }
 
-export async function createRateLimitKey(
-  normalizedEmail: string,
+/**
+ * Builds an opaque, scope-prefixed limiter key from an identity (email, case id,
+ * client IP) so the raw identity never reaches the rate limit binding.
+ */
+export async function createScopedRateLimitKey(
+  scope: string,
+  identity: string,
   secret: string,
 ): Promise<string> {
+  if (!/^[a-z][a-z0-9-]{0,31}$/.test(scope)) {
+    throw new HttpError(500, "rate_limit_scope_invalid", "限流範圍設定不正確。");
+  }
   if (secret.length < 32) {
     throw new HttpError(503, "rate_limit_not_configured", "表單安全設定尚未完成。");
   }
@@ -27,9 +35,17 @@ export async function createRateLimitKey(
   const signature = await crypto.subtle.sign(
     "HMAC",
     key,
-    new TextEncoder().encode(normalizedEmail),
+    new TextEncoder().encode(identity),
   );
-  return `contact:${toHex(signature)}`;
+  return `${scope}:${toHex(signature)}`;
+}
+
+export async function createRateLimitKey(
+  normalizedEmail: string,
+  secret: string,
+  scope = "contact",
+): Promise<string> {
+  return createScopedRateLimitKey(scope, normalizedEmail, secret);
 }
 
 export async function enforceRateLimit(

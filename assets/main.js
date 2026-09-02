@@ -153,7 +153,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260902-46";
+      script.src = "assets/search-index.js?v=20260902-47";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -918,6 +918,462 @@
 
     refreshQuickProgress();
     renderQuickResult(false);
+  }
+
+  // ---------- 首頁釐清器：hash 驅動、零儲存 ----------
+  // 狀態只存在網址片段與 DOM 屬性；不寫瀏覽器儲存空間、不送出任何選擇。
+  var clarifierRoot = document.querySelector("[data-clarifier]");
+  if (clarifierRoot) {
+    var clarifierPanels = Array.prototype.slice.call(clarifierRoot.querySelectorAll("[data-clarifier-panel]"));
+    var clarifierStageLinks = Array.prototype.slice.call(document.querySelectorAll("#journey-map a"));
+    var clarifierExits = Array.prototype.slice.call(clarifierRoot.querySelectorAll(".clarifier-exit"));
+    var jobQuizSection = document.getElementById("job-quiz");
+    var jobQuizApp = document.getElementById("job-quiz-app");
+    var jobFamilyItems = Array.prototype.slice.call(document.querySelectorAll("#job-families li[data-job-family]"));
+    var clarifierTitle = document.getElementById("clarifier-title");
+
+    var JOB_FAMILY_ORDER = ["farm", "hospitality", "cleaning", "factory", "retail", "office"];
+    var JOB_QUIZ = [
+      { q: "你想在哪裡工作？", c: [["戶外", ["farm"]], ["店裡或室內", ["hospitality", "cleaning", "factory", "retail"]], ["辦公桌", ["office"]]] },
+      { q: "體力活可以嗎？", c: [["很可以", ["farm", "factory", "cleaning"]], ["一點點", ["hospitality", "retail"]], ["盡量少", ["office"]]] },
+      { q: "英文口說目前？", c: [["能聊天", ["office", "retail", "hospitality"]], ["簡單句", ["hospitality", "cleaning", "retail"]], ["還在練", ["farm", "factory", "cleaning"]]] },
+      { q: "想跟人互動多少？", c: [["很多", ["hospitality", "retail"]], ["一點", ["office", "farm"]], ["越少越好", ["cleaning", "factory"]]] },
+      { q: "願意先考證照嗎？", c: [["願意", ["factory", "hospitality"]], ["看情況", ["retail", "office"]], ["不想", ["farm", "cleaning"]]] },
+      { q: "願意去偏遠地區嗎？", c: [["願意", ["farm", "farm", "factory"]], ["看情況", ["farm", "hospitality"]], ["想留城市", ["hospitality", "retail", "office", "cleaning"]]] }
+    ];
+    var quizStep = 0;
+    var quizScores = {};
+
+    function setClarifierCurrent(links, href, value) {
+      links.forEach(function (a) {
+        if (a.getAttribute("href") === href) a.setAttribute("aria-current", value);
+        else a.removeAttribute("aria-current");
+      });
+    }
+
+    function resetClarifierStage() {
+      clarifierPanels.forEach(function (panel) { panel.hidden = true; });
+      clarifierRoot.dataset.stage = "";
+      clarifierStageLinks.forEach(function (a) { a.removeAttribute("aria-current"); });
+    }
+
+    function focusClarifierHome() {
+      var home = clarifierTitle || clarifierStageLinks[0];
+      if (home && typeof home.focus === "function") home.focus();
+    }
+
+    function applyHash(hash, focus) {
+      var id = (hash || "").slice(1);
+      var target = id ? document.getElementById(id) : null;
+      var panel = target && target.closest ? target.closest("[data-clarifier-panel]") : null;
+      if (!panel) {
+        if (target && id === "job-quiz") { openQuiz(focus); return; }
+        // 站內其他區塊（#search、#communities、#support-hub…）與小測驗內部的錨點不歸釐清器管，維持現狀。
+        if (target && (!clarifierRoot.contains(target) || (jobQuizSection && jobQuizSection.contains(target)))) return;
+        // 空片段、#journey-map、#clarifier 與不存在的舊錨點（#self-assessment、#common-problems…）都回到階段問題。
+        // 原本有面板開著（例如按上一頁）時，焦點移到標題，鍵盤使用者不會停在被隱藏的元素上。
+        var hadStage = clarifierRoot.dataset.stage !== "";
+        resetClarifierStage();
+        if (focus && (hadStage || target)) focusClarifierHome();
+        return;
+      }
+      clarifierRoot.dataset.stage = panel.dataset.clarifierPanel || "";
+      clarifierPanels.forEach(function (p) { p.hidden = p !== panel; });
+      setClarifierCurrent(clarifierStageLinks, "#" + panel.id, "step");
+      var exits = Array.prototype.slice.call(panel.querySelectorAll(".clarifier-exit"));
+      if (target === panel) exits.forEach(function (exit) { exit.hidden = true; });
+      else if (target.classList.contains("clarifier-exits")) exits.forEach(function (exit) { exit.hidden = false; });
+      else if (target.classList.contains("clarifier-exit")) exits.forEach(function (exit) { exit.hidden = exit !== target; });
+      setClarifierCurrent(Array.prototype.slice.call(panel.querySelectorAll(".clarifier-chips a")), "#" + id, "true");
+      if (focus) {
+        var focusTarget = target === panel ? panel.querySelector("h2") : target;
+        if (focusTarget && typeof focusTarget.focus === "function") focusTarget.focus();
+      }
+    }
+
+    function applyPassport(value) {
+      clarifierRoot.dataset.passport = value;
+      clarifierRoot.querySelectorAll("button[data-passport]").forEach(function (button) {
+        button.setAttribute("aria-pressed", String(button.dataset.passport === value));
+      });
+      clarifierRoot.querySelectorAll("[data-passport-note]").forEach(function (note) {
+        note.hidden = note.dataset.passportNote !== value;
+      });
+      clarifierRoot.querySelectorAll("a[data-href-462]").forEach(function (a) {
+        // data-href-462 的 dataset 鍵是 href-462（連字號後接數字不轉駝峰），所以直接讀屬性。
+        if (!a.hasAttribute("data-href-default")) a.setAttribute("data-href-default", a.getAttribute("href") || "");
+        var swapped = value === "462" ? a.getAttribute("data-href-462") : a.getAttribute("data-href-default");
+        if (swapped) a.setAttribute("href", swapped);
+      });
+    }
+
+    function familyLink(family) {
+      for (var i = 0; i < jobFamilyItems.length; i += 1) {
+        if (jobFamilyItems[i].dataset.jobFamily === family) return jobFamilyItems[i].querySelector("a");
+      }
+      return null;
+    }
+
+    function rankFamilies() {
+      var ranked = JOB_FAMILY_ORDER.slice();
+      ranked.sort(function (a, b) {
+        var diff = (quizScores[b] || 0) - (quizScores[a] || 0);
+        return diff !== 0 ? diff : JOB_FAMILY_ORDER.indexOf(a) - JOB_FAMILY_ORDER.indexOf(b);
+      });
+      return ranked;
+    }
+
+    function makeQuizLink(family) {
+      var source = familyLink(family);
+      var a = document.createElement("a");
+      a.setAttribute("href", source ? source.getAttribute("href") : "work.html#channels");
+      a.textContent = source ? source.textContent : "全部管道";
+      return a;
+    }
+
+    function renderQuizResult() {
+      var ranked = rankFamilies();
+      var top = ranked[0];
+      var second = ranked[1];
+      jobQuizApp.textContent = "";
+      var result = document.createElement("div");
+      result.className = "job-quiz-result";
+      result.setAttribute("role", "status");
+      result.setAttribute("tabindex", "-1");
+      var topLine = document.createElement("p");
+      topLine.textContent = "比較像你的方向：";
+      topLine.appendChild(makeQuizLink(top));
+      result.appendChild(topLine);
+      var secondLine = document.createElement("p");
+      secondLine.textContent = "也可以看：";
+      secondLine.appendChild(makeQuizLink(second));
+      result.appendChild(secondLine);
+      var all = document.createElement("a");
+      all.setAttribute("href", "work.html#channels");
+      all.textContent = "全部管道";
+      result.appendChild(all);
+      var again = document.createElement("button");
+      again.type = "button";
+      again.className = "btn ghost";
+      again.textContent = "再做一次";
+      again.addEventListener("click", function () { startQuiz(); });
+      result.appendChild(again);
+      jobQuizApp.appendChild(result);
+      jobFamilyItems.forEach(function (item) {
+        var isTop = item.dataset.jobFamily === top;
+        item.classList.toggle("is-top", isTop);
+        if (isTop) item.setAttribute("aria-current", "true");
+        else item.removeAttribute("aria-current");
+      });
+      result.focus();
+    }
+
+    function renderQuizStep() {
+      var item = JOB_QUIZ[quizStep];
+      jobQuizApp.textContent = "";
+      var progress = document.createElement("p");
+      progress.className = "job-quiz-progress";
+      progress.setAttribute("aria-live", "polite");
+      progress.textContent = "第 " + (quizStep + 1) + "／" + JOB_QUIZ.length + " 題";
+      jobQuizApp.appendChild(progress);
+      var question = document.createElement("p");
+      question.className = "clarifier-q";
+      question.textContent = item.q;
+      jobQuizApp.appendChild(question);
+      var group = document.createElement("div");
+      group.className = "clarifier-chips";
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", item.q);
+      var firstChip = null;
+      item.c.forEach(function (choice) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip";
+        chip.textContent = choice[0];
+        chip.addEventListener("click", function () {
+          choice[1].forEach(function (family) { quizScores[family] = (quizScores[family] || 0) + 1; });
+          quizStep += 1;
+          if (quizStep < JOB_QUIZ.length) renderQuizStep();
+          else renderQuizResult();
+        });
+        group.appendChild(chip);
+        if (!firstChip) firstChip = chip;
+      });
+      jobQuizApp.appendChild(group);
+      if (firstChip) firstChip.focus();
+    }
+
+    function startQuiz() {
+      quizStep = 0;
+      quizScores = {};
+      jobFamilyItems.forEach(function (item) {
+        item.classList.remove("is-top");
+        item.removeAttribute("aria-current");
+      });
+      renderQuizStep();
+    }
+
+    function openQuiz(focus) {
+      if (!jobQuizSection || !jobQuizApp) return;
+      jobQuizSection.hidden = false;
+      jobQuizApp.hidden = false;
+      startQuiz();
+      if (focus) jobQuizSection.focus();
+    }
+
+    clarifierRoot.dataset.enhanced = "true";
+    clarifierRoot.querySelectorAll("[data-clarifier-passport]").forEach(function (el) { el.hidden = false; });
+    clarifierRoot.querySelectorAll("[data-clarifier-passport-static]").forEach(function (el) { el.hidden = true; });
+    clarifierPanels.forEach(function (panel) {
+      panel.hidden = true;
+      var heading = panel.querySelector("h2");
+      if (heading) heading.setAttribute("tabindex", "-1");
+    });
+    clarifierExits.forEach(function (exit) { exit.hidden = true; });
+    if (jobQuizSection) jobQuizSection.hidden = true;
+    if (clarifierTitle) clarifierTitle.setAttribute("tabindex", "-1");
+
+    applyHash(location.hash, false);
+    window.addEventListener("hashchange", function () { applyHash(location.hash, true); });
+
+    // 再點一次目前的籤：瀏覽器不會觸發 hashchange，這裡補做同樣的顯示與聚焦。
+    document.addEventListener("click", function (event) {
+      var a = event.target.closest ? event.target.closest('a[href^="#"]') : null;
+      if (!a) return;
+      var href = a.getAttribute("href");
+      if (href.length < 2 || href !== location.hash) return;
+      var hashTarget = document.getElementById(href.slice(1));
+      if (!hashTarget || !clarifierRoot.contains(hashTarget)) return;
+      event.preventDefault();
+      applyHash(location.hash, true);
+    });
+
+    clarifierRoot.addEventListener("click", function (event) {
+      var button = event.target.closest ? event.target.closest("button[data-passport]") : null;
+      if (!button || !clarifierRoot.contains(button)) return;
+      applyPassport(button.dataset.passport || "");
+    });
+  }
+
+  // ---------- 首頁 AI 兜底（apiBaseUrl 與 turnstileSiteKey 都設定時才啟用） ----------
+  var assistSection = document.querySelector("[data-assist]");
+  if (assistSection) {
+    var assistOff = document.getElementById("assist-off");
+    var assistBox = document.getElementById("assist-box");
+    var assistOpen = document.getElementById("assist-open");
+    var assistForm = document.getElementById("assist-form");
+    var assistInput = document.getElementById("assist-input");
+    var assistTurnstile = document.getElementById("assist-turnstile");
+    var assistSubmit = document.getElementById("assist-submit");
+    var assistCancel = document.getElementById("assist-cancel");
+    var assistStatus = document.getElementById("assist-status");
+    var assistAnswer = document.getElementById("assist-answer");
+    var ASSIST_SAME_SITE = /^(?:[a-z0-9-]+\.html|lang\/[a-z]{2}(?:-[A-Za-z]{2,4})?\/(?:[a-z-]+\/)?)?(?:#[A-Za-z0-9_-]{1,80})?$/;
+    var ASSIST_SENSITIVE = /自殺|自傷|想死|不想活|輕生|傷害自己|被打|強暴|性侵|被威脅|扣護照|扣證件|剛匯款|匯款了|轉帳了|被騙了|急診|000/;
+    var ASSIST_FALLBACK_LINKS = [["用站內搜尋", "#search"], ["到各地社團問人", "#communities"]];
+    var assistToken = "";
+    var assistWidgetId = null;
+    var assistInFlight = false;
+
+    function isSameSiteHref(h) {
+      return typeof h === "string" && h.length > 0 && h.length <= 120 && h.indexOf("..") === -1 && ASSIST_SAME_SITE.test(h);
+    }
+
+    function assistSettings() {
+      var config = window.WHV_API_CONFIG;
+      var apiBaseUrl = getPublicApiBaseUrl();
+      if (!apiBaseUrl || !config || typeof config.turnstileSiteKey !== "string") return null;
+      if (!config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
+      return { baseUrl: apiBaseUrl, siteKey: config.turnstileSiteKey };
+    }
+
+    function loadTurnstileApi() {
+      if (window.turnstile && window.turnstile.render) return Promise.resolve(window.turnstile);
+      return new Promise(function (resolve, reject) {
+        var existing = document.getElementById("turnstile-api-script");
+        var script = existing || document.createElement("script");
+        function loaded() {
+          if (window.turnstile && window.turnstile.render) resolve(window.turnstile);
+          else reject(new Error("turnstile_not_ready"));
+        }
+        script.addEventListener("load", loaded, { once: true });
+        script.addEventListener("error", function () { reject(new Error("turnstile_load_failed")); }, { once: true });
+        if (!existing) {
+          script.id = "turnstile-api-script";
+          script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+          script.async = true;
+          script.defer = true;
+          script.referrerPolicy = "no-referrer";
+          document.head.appendChild(script);
+        }
+      });
+    }
+
+    function setAssistStatus(message) {
+      if (assistStatus) assistStatus.textContent = message;
+    }
+
+    function appendAssistLinks(pairs) {
+      var list = document.createElement("ul");
+      pairs.forEach(function (pair) {
+        var item = document.createElement("li");
+        var a = document.createElement("a");
+        a.setAttribute("href", pair[1]);
+        a.textContent = pair[0];
+        item.appendChild(a);
+        list.appendChild(item);
+      });
+      assistAnswer.appendChild(list);
+    }
+
+    function filterAssistLinks(links) {
+      var kept = [];
+      if (!Array.isArray(links)) return kept;
+      links.forEach(function (link) {
+        if (kept.length >= 5 || !link || typeof link !== "object") return;
+        if (!isSameSiteHref(link.href)) return;
+        var title = String(link.title || "").slice(0, 80).trim();
+        kept.push([title || link.href, link.href]);
+      });
+      return kept;
+    }
+
+    function renderAssistAnswer(text, pairs) {
+      assistAnswer.textContent = "";
+      var p = document.createElement("p");
+      p.textContent = text;
+      assistAnswer.appendChild(p);
+      appendAssistLinks(pairs.length ? pairs : ASSIST_FALLBACK_LINKS);
+      assistAnswer.hidden = false;
+      assistAnswer.focus();
+    }
+
+    function renderAssistResult(result) {
+      if (result && result.kind === "over_cap") {
+        renderAssistAnswer("今天的 AI 額度已用完。", ASSIST_FALLBACK_LINKS);
+        return;
+      }
+      if (result && result.ok === true && result.kind === "refused") {
+        renderAssistAnswer("這題 AI 不能答，請看官方入口。", filterAssistLinks(result.links));
+        return;
+      }
+      if (result && result.ok === true && (result.kind === "answer" || result.kind === "official_exit")) {
+        var answer = String(result.answer || "").slice(0, 600).trim();
+        renderAssistAnswer(answer || "AI 暫時無法回覆。", filterAssistLinks(result.links));
+        return;
+      }
+      renderAssistAnswer("AI 暫時無法回覆。", ASSIST_FALLBACK_LINKS);
+    }
+
+    function renderTurnstile(settings) {
+      assistTurnstile.hidden = false;
+      loadTurnstileApi().then(function (turnstile) {
+        if (assistWidgetId !== null) { turnstile.reset(assistWidgetId); return; }
+        assistWidgetId = turnstile.render(assistTurnstile, {
+          sitekey: settings.siteKey,
+          action: "turnstile-spin-v2",
+          callback: function (token) { assistToken = token; },
+          "error-callback": function () { assistToken = ""; },
+          "expired-callback": function () { assistToken = ""; }
+        });
+      }).catch(function () {
+        setAssistStatus("驗證載入失敗，稍後再試。");
+      });
+    }
+
+    function openAssist() {
+      var settings = assistSettings();
+      if (!settings) return;
+      assistBox.hidden = false;
+      assistForm.hidden = false;
+      assistOpen.setAttribute("aria-expanded", "true");
+      renderTurnstile(settings);
+      assistInput.focus();
+    }
+
+    function cancelAssist() {
+      assistForm.hidden = true;
+      assistInput.value = "";
+      assistToken = "";
+      assistOpen.setAttribute("aria-expanded", "false");
+      assistOpen.focus();
+    }
+
+    function finishAssist() {
+      setAssistStatus("");
+      assistSubmit.disabled = false;
+      if (window.turnstile && assistWidgetId !== null) window.turnstile.reset(assistWidgetId);
+      assistToken = "";
+      assistInFlight = false;
+    }
+
+    function submitAssist() {
+      if (assistInFlight) return;
+      var question = assistInput.value.trim();
+      if (question.length < 4 || question.length > 200) {
+        setAssistStatus("先寫一句話，最多 200 字。");
+        assistInput.focus();
+        return;
+      }
+      if (ASSIST_SENSITIVE.test(question)) {
+        renderAssistAnswer("這種情況不要等 AI。", [["有人受傷或有立即危險", "health.html#emergency"], ["剛匯款、被威脅或扣證件", "scam.html#help"]]);
+        return;
+      }
+      var settings = assistSettings();
+      if (!settings) {
+        assistOff.hidden = false;
+        assistBox.hidden = true;
+        return;
+      }
+      if (assistToken === "") {
+        setAssistStatus("先完成驗證再送出。");
+        return;
+      }
+      assistInFlight = true;
+      assistSubmit.disabled = true;
+      setAssistStatus("正在問 AI…");
+      fetch(settings.baseUrl + "/api/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: question, turnstileToken: assistToken }),
+        credentials: "omit",
+        referrerPolicy: "no-referrer"
+      }).then(function (response) {
+        if (response.status === 429) return { ok: true, kind: "over_cap" };
+        if (!response.ok) throw new Error("assist_http_" + response.status);
+        return response.json();
+      }).then(function (result) {
+        renderAssistResult(result);
+      }).catch(function () {
+        renderAssistResult(null);
+      }).then(finishAssist);
+    }
+
+    assistSection.hidden = false;
+    if (assistSettings()) {
+      if (assistBox) assistBox.hidden = false;
+    } else if (assistOff) {
+      assistOff.hidden = false;
+    }
+
+    if (assistOpen && assistForm && assistInput && assistBox && assistAnswer && assistSubmit) {
+      assistOpen.addEventListener("click", openAssist);
+      if (assistCancel) assistCancel.addEventListener("click", cancelAssist);
+      assistForm.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") { event.preventDefault(); cancelAssist(); }
+      });
+      assistForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        submitAssist();
+      });
+      window.addEventListener("whv:search", function (event) {
+        if (event.detail && event.detail.resultCount === 0 && assistSettings()) openAssist();
+      });
+      if ("#assist" === location.hash) openAssist();
+      window.addEventListener("hashchange", function () {
+        if ("#assist" === location.hash) openAssist();
+      });
+    }
   }
 
   // ---------- D+ 匿名彙總量測（固定類別，不送頁面、識別碼或自由文字） ----------

@@ -139,3 +139,14 @@
 - 反方審查結果：12 個裁決全部 refuted=false（最高 severity low）。完整性批評指出並已處理：`worker/README.md` 未記 Origin 要求、分析測試只在暫存區、文件未更新；未處理：`delete_after` 措辭（站長判斷）、CSS 800 前提過時（併入 P2-4 時重驗）、其他 POST 路由缺逐路由測試（列 ROADMAP §3）。實作者未經指令驗證的主張：社群平台接受索引色 PNG（低風險，未驗）；GitHub Pages 提供無副檔名 URL（比對器已涵蓋，只是理由未驗）。
 - 證據：`scripts/check.ps1` ALL CHECKS PASSED（prove label `sdd-spec-hardening-check-20260902`）；本 commit。
 - 狀態：已完成；依站長回答 (3) 合併 push。
+
+## D-2026-09-02-04 P0-7 首頁單一漏斗釐清器建置（as-built）
+
+- 決策：依站長回答照 `CLARIFIER_SPEC.md` 草案動工；設計差異與參數以 `CLARIFIER_SPEC.md` §0.1 為準；首頁釐清器隨本 commit 上線，AI 兜底程式完成但表單在 P0-4 前不顯示。
+- 執行（Claude Code workflow，35 個 agent）：2 位設計者（極簡文字／安全與無 JS 對等）＋評審合成契約；4 路平行實作（`index.html`、`assets/main.js` 447 行新區塊、`assets/style.css` 194 行、`worker/src/assist.ts`＋14 案例測試＋migration 0003）；整合者重寫 `check.ps1` 首頁區塊並升版資產 `20260902-47`；閘門兩次通過；瀏覽器回放兩次 12 步全過（桌機 1280、手機 375／390，Playwright 33 張截圖）；20 個四面向反方審查；2 個修復；完整性批評。
+- 反方審查裁決：worker `spec-fit`（medium）——含判定字眼的回覆原本落到 `refused`＋搜尋連結，違反 §4「改為固定官方出口文案」，**採納並修正**為 `official_exit`；integrator 三面向（high）——`check.ps1` 拼接時刪掉約 70 行既有治理斷言（社團 9／9、支援出口 4、問題卡 12、收藏／續讀 id、market 需求），**採納並復原**，主 session 複核關鍵 needle 各 1 次出現；其餘 16 個裁決 refuted=false（最高 low）。
+- 完整性批評（已處理）：`build_seo.py` `LAST_MODIFIED` 與 `llms.txt` 首頁一句、`build_search.py` `VERSION` 改 2026-09-02；行動版 34px 點擊目標補 44px。（未處理，列 `ROADMAP.md` §3）：C-5 地區×需求推薦、§6 指標設計、無 JS 與 reduce 未在瀏覽器實測、每日額度存 D1 一列 vs「不寫 D1」字面、MiniMax 主機未驗證。
+- 未經指令驗證的主張：MiniMax 端點形狀「已對照 vendor 文件」只有審查者的網頁查證；index.html 實作者的 66 項驗證在整合升版後重跑會有 4 項預期差異（head 版本字串）。
+- 跨供應商反方審查（Codex，read-only）：Codex（gpt-5.6-terra，read-only，label `p07-clarifier-critic-codex-20260902`）六題回覆全部帶 file:line。**採納並修正**：(1) 模型自由文字經少量正規式過濾仍可帶出個人簽證／法律／醫療／稅務判定，且裸網域（如 immi.homeaffairs.gov.au）會以文字呈現 → 改為「可枚舉路由」：模型只回傳目錄連結，答案由伺服端固定模板組成，模型文字永不渲染；問題含個人判定字眼（能不能申請、合法嗎、退稅多少等）先回固定官方出口，不呼叫模型；(2) `ASSIST_BASE_URL` 只驗 HTTPS、未鎖主機，設定錯誤會把問題與金鑰送往任意主機 → 主機白名單 `api.minimaxi.com`／`api.minimax.io`，其餘視為未設定；(3) 缺 `CF-Connecting-IP` 時所有人共用 `HMAC("unknown")` 限流鍵 → 缺 header 直接 400 `client_ip_missing`；(4) `check.ps1` 只禁 `console.log` → 改禁 assist.ts 任何 `console.`，並加 console spy 測試涵蓋全部路徑；(5) 前端 hash 邊界：Back 回空 hash 未重新安置焦點、未知或舊 hash 使四面板全隱藏 → 未知 hash 視同空 hash，空狀態把焦點放到 `#clarifier-title`。**接受為 as-built／列 ROADMAP**：無 JS 未退化成 `<details>`（§0.1 已記）；護照三個 `aria-pressed` 切換語意不如 `radiogroup`（列 §3）；`check.ps1` 新斷言多為字串存在、無法證明零請求與焦點行為（以 vm 煙霧測試與回放補足）。Codex 總評「不能直接上線，必須先把 AI 自由文字改成伺服端固定模板或可枚舉意圖」已由 (1) 處理；首頁釐清器本身無阻擋項。修復由 Claude Code 小型 workflow 完成（2 路實作＋4 個反方審查）。
+- 證據：`scripts/check.ps1` ALL CHECKS PASSED（prove label `p07-clarifier-check-final-20260902`，Codex 修復後 `p07-clarifier-check-final-r2-20260902`）；`worker` vitest 51 案例（assist 18）；本 commit。
+- 狀態：程式完成／本機驗證；依站長回答 (3) 合併 push。

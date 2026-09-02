@@ -6,7 +6,7 @@
 
 ## 首頁
 
-- [澳打指南針](https://www.aussiewhvcompass.com/): 全站旅程地圖、當下需求快導與互動工具入口。
+- [澳打指南針](https://www.aussiewhvcompass.com/): 首頁釐清器：依階段、護照與需求點選找到下一步；安全出口、各地社團與互動工具入口。
 
 ## 開始前
 

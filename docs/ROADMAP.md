@@ -27,7 +27,7 @@
 | P0-4 | Cloudflare 最小後端正式資源 | 人工前置未完成 | 站長建立 Worker／D1／Turnstile／寄信並輸入 secrets | SDD §3.1、worker/README.md | 713f310（本機骨架） |
 | P0-5 | 五支腳本 render-blocking | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-5 | a823e88；D-2026-09-01-01 |
 | P0-6 | 無障礙倒退三項 | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-6 | a823e88；D-2026-09-01-01 |
-| P0-7 | 首頁單一漏斗釐清器 | 決策已定／設計未開始 | 站長審核 CLARIFIER_SPEC §3–§7 設計後才可動工 | CLARIFIER_SPEC.md | D-2026-09-02-01 |
+| P0-7 | 首頁單一漏斗釐清器 | 程式完成／本機驗證（首頁釐清器可上線；AI 兜底待 P0-4） | P0-4 與 `MINIMAX_API_KEY`；C-5 地區×需求推薦與 §6 指標設計未做（§3） | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
 | P1-1 | 採收季節月曆（work.html） | 已上線 | — | SPEC §1.2 | 3375363、eacc868 |
 | P1-2 | 我的行前海報 PNG 輸出 | 程式完成／本機驗證 | iPhone Safari 與 Android Chrome 實機下載 | SPEC §1.2 | 063f966 |
 | P1-3 | 動態剪紙 hero | 已上線 | — | SDD §4.3 | c720dec |
@@ -97,4 +97,12 @@
 | 更正案件時 `delete_after` 重推 24 個月 | `worker/src/repository.ts` | PERF spec §4 | 待站長決定對外措辭（建立後 24 個月，或最後聯絡後 24 個月） |
 | CSS 宣告未被請求的字重 800 | `assets/style.css` | PERF spec P2-4 | 前提可能已過時（P0-6 已把 34 處 800 改 900），併入 P2-4 時先重新確認 |
 | `worker/` 其他 POST 路由缺逐路由 Origin 測試 | `worker/test/` | 2026-09-02 完整性批評 | 未處理：目前靠 `index.ts` 單一入口保證；新增路由時補測試 |
-| 首頁重建後 `check.ps1` 首頁區塊需同步 | `scripts/check.ps1` 首頁區塊 | P0-7 | 併入 P0-7 |
+| 首頁重建後 `check.ps1` 首頁區塊需同步 | `scripts/check.ps1` 首頁區塊 | P0-7 | 已處理：首頁區塊重寫為釐清器契約（D-2026-09-02-04） |
+| 首頁 34px 點擊目標（熱門搜尋 chips、六大職類連結） | `assets/style.css` 640px 區塊 | 2026-09-02 瀏覽器回放 | 已處理：行動版 `min-height: 44px` |
+| C-5 依地區×需求推薦社團 | 首頁 `#communities` | CLARIFIER_SPEC §5 | 未處理：目前只有地點／平台／州別篩選；出口只連到 `#communities` 不帶需求；下一輪設計 |
+| CLARIFIER_SPEC §6 釐清器專屬指標（各層完成率、出口點擊、AI 觸發率、超額次數） | `assets/main.js` D+ 鍵、`worker/src/repository.ts` | CLARIFIER_SPEC §6 | 未處理：先設計白名單 key，再實作；受 P0-3／P0-4 gate |
+| 無 JS 與 `prefers-reduced-motion` 只做靜態檢查，未在瀏覽器實測 | `index.html`、`assets/style.css` | 2026-09-02 完整性批評 | 未處理：下一次回放加 JS 停用與 reduce 模擬 |
+| AI 每日額度存 D1 一列聚合 vs CLARIFIER_SPEC §4「不寫 D1」字面 | `worker/src/assist.ts`、`migrations/0003` | 2026-09-02 完整性批評 | 待站長決定：接受「每日一列聚合計數」（不含任何問題文字）或改用 KV |
+| MiniMax 端點主機 `api.minimaxi.com` 與國際文件差異未驗證 | `worker/wrangler.jsonc` `ASSIST_BASE_URL` | 2026-09-02 完整性批評 | 待 P0-4 啟用前以真實 key 做一次受控呼叫；主機已鎖白名單 |
+| 釐清器護照選擇用三個 `aria-pressed` 切換，語意不如 `radiogroup`／`radio` | `index.html` 護照區、`assets/main.js` | Codex 審查 2026-09-02 | 未處理：下一輪改 `role="radiogroup"`＋`aria-checked`，同步 `check.ps1` |
+| `check.ps1` 釐清器斷言多為字串存在，無法證明零請求與焦點行為 | `scripts/check.ps1`、vm 煙霧測試（暫存區） | Codex 審查 2026-09-02 | 未處理：把 `clarifier-smoke.js` 收進 `scripts/` 並掛進 `check.ps1` |
