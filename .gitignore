@@ -9,3 +9,4 @@ worker/.dev.vars
 worker/.env
 worker/.env.*
 !worker/.dev.vars.example
+.codex-remote-attachments/

@@ -84,15 +84,17 @@
 
 ## 3. 已知漂移與小型加固（未編號，先到先做）
 
-| 項目 | 位置 | 來源 | 處理方式 |
+| 項目 | 位置 | 來源 | 狀態（2026-09-02） |
 |---|---|---|---|
-| 全站 nav 不一致：`market.html`、`simulator.html` 的 nav 有 13 連結（含 market），其餘 13 頁 12 連結、未連到 market | `scripts/check.ps1:157` 已把例外寫死 | 2026-09-02 漂移稽核 | 站長決定 market 是否進全站 nav；決定後統一 15 頁並改 check.ps1 |
-| GA4 填入 ID 前，`assets/analytics.js` 會在所有頁面送 page view，未排除詐騙、健康、剝削頁 | `assets/analytics.js` | Codex 反方審查 2026-09-02 | 在 P0-3 前加入敏感頁排除清單並寫入 SPEC §1.5 驗收；未完成不得填 ID |
-| `scripts/check.ps1` 未斷言 `defer`，P0-5 修復可被回歸而不被發現 | `scripts/check.ps1` script-order 區塊 | Codex 反方審查 2026-09-02 | 加一條「15 頁 5 支 `<script src>` 皆含 `defer`」斷言 |
-| SPEC §4 驗收第 3、4 項（集簽快查器測試組、試算器基準）仍是人工步驟 | `scripts/check.ps1` | 2026-09-02 漂移稽核 | 以 node 或 PowerShell 回放兩組固定案例；完成前在 SPEC §4 標為人工 |
-| `/api/metrics` 無 Origin 即放行 | `worker/src/cors.ts`、`worker/src/index.ts` | PERF spec §4 | 部署前要求 Origin 存在且在白名單 |
-| `assets/og-cover.png` 559 KB | `assets/og-cover.png` | PERF spec §4 | 壓至 200 KB 以下 |
-| `@types/node: "latest"` | `worker/package.json` | PERF spec §4 | 釘住版本 |
-| `.codex-remote-attachments/` 未忽略 | `.gitignore` | PERF spec §4 | 加入忽略清單 |
-| 更正案件時 `delete_after` 重推 24 個月 | `worker/src/repository.ts` | PERF spec §4 | 對外措辭與行為對齊後決定 |
-| CSS 宣告未被請求的字重 800 | `assets/style.css` | PERF spec P2-4 | 併入 P2-4 |
+| 全站 nav 不一致（`market.html`、`simulator.html` 曾自加第 13 個連結） | `scripts/check.ps1` nav 規則 | 2026-09-02 漂移稽核 | 已處理：站長決定工具頁不進 nav，15 頁統一 12 連結，`check.ps1` 改為強制（D-2026-09-02-03） |
+| GA4 填入 ID 前必須排除詐騙、健康頁的 page view | `assets/analytics.js` | Codex 反方審查 2026-09-02 | 已處理：`SENSITIVE_PATHS`＋`scripts/test_analytics.cjs`；範圍為整頁清單，見 SPEC §1.5 |
+| `check.ps1` 未斷言 `defer` | `scripts/check.ps1` | Codex 反方審查 2026-09-02 | 已處理：根層＋`lang/` 全部頁面的本機 script 必須含 `defer` |
+| SPEC §4 的集簽快查器測試組與試算器基準仍是人工步驟 | `scripts/test_tools.mjs` | 2026-09-02 漂移稽核 | 已處理：21 案例回放，納入 `check.ps1` |
+| `/api/metrics` 無 Origin 即放行 | `worker/src/cors.ts` | PERF spec §4 | 已處理：所有 POST 路由要求 Origin 在白名單；測試涵蓋 metrics、contact，其餘 POST 路由靠同一入口 |
+| `assets/og-cover.png` 559 KB | `assets/og-cover.png` | PERF spec §4 | 已處理：8-bit 索引色 97 KB，1200×630 不變 |
+| `@types/node: "latest"` | `worker/package.json` | PERF spec §4 | 已處理：釘 26.4.0 |
+| `.codex-remote-attachments/` 未忽略 | `.gitignore` | PERF spec §4 | 已處理 |
+| 更正案件時 `delete_after` 重推 24 個月 | `worker/src/repository.ts` | PERF spec §4 | 待站長決定對外措辭（建立後 24 個月，或最後聯絡後 24 個月） |
+| CSS 宣告未被請求的字重 800 | `assets/style.css` | PERF spec P2-4 | 前提可能已過時（P0-6 已把 34 處 800 改 900），併入 P2-4 時先重新確認 |
+| `worker/` 其他 POST 路由缺逐路由 Origin 測試 | `worker/test/` | 2026-09-02 完整性批評 | 未處理：目前靠 `index.ts` 單一入口保證；新增路由時補測試 |
+| 首頁重建後 `check.ps1` 首頁區塊需同步 | `scripts/check.ps1` 首頁區塊 | P0-7 | 併入 P0-7 |

@@ -1026,6 +1026,8 @@ Performance trace 的 `Cache` insight 會持續回報快取壽命問題。
 
 ## 4. 本規格未涵蓋、但同日健檢發現的次要項目
 
+> 2026-09-02：本表除 `delete_after` 措辭（待站長決定）與字重 800（併入 P2-4 時重驗）外皆已處理，見 `ROADMAP.md` §3 與 `DECISIONS.md` D-2026-09-02-03。
+
 | 項目 | 位置 | 建議 |
 |---|---|---|
 | `/api/metrics` 無 Origin 即放行 | `worker/src/cors.ts:22`、`index.ts:56` | 部署前要求 Origin 存在且在白名單內，否則匿名計數可被灌水，污染留存判斷依據 |

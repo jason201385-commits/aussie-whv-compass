@@ -48,7 +48,7 @@
   housing → work → scam → pr（已在澳洲）→ leave → about（回程與延續）；`index`、`simulator`、`market` 不在線性順序內。
   上表「旅程階段」欄以此為準。
 - 每頁：toc（長頁為「完整內容與參考資料」）、來源標註、頁尾免責、回饋列。
-- 導覽：`.nav-links` 12 連結；`market.html`、`simulator.html` 為 13（多 market），見 `ROADMAP.md` §3。
+- 導覽：全部 15 頁的 `.nav-links` 統一 12 連結（why→about）。`simulator.html` 與 `market.html` 是工具頁，不進全站 nav、頁內不標 `aria-current`，只從首頁、`prep.html`、`leave.html` 與內文連結進入（站長 2026-09-02 決定，`check.ps1` 強制）。
 - 內容基準日 2026-08-28／29；換匯段落 2026-09-01 查核。
 
 ### 1.2 互動工具契約
@@ -57,8 +57,8 @@
 
 | 工具 | 位置 | 輸入 | 邏輯與隱私邊界 | 輸出 | 驗證指標 |
 |---|---|---|---|---|---|
-| 集簽郵遞區號初篩 | `visa.html` `#postcode-tool`；`lang/en/visa/`（417-only） | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描；不寫 storage | 是否符合 2026-08-29 留存清單＋類型日期條件＋適用限制＋官方頁；不得表述為個人簽證資格判定 | §4 人工測試組（7 案例）；check.ps1「完整英文簽證頁」鎖 417 邊界 |
-| 存錢試算器 | `cost.html`／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿 select、其他支出 select | weeklyGross=r×h；annualGross=×46；annualTax 依 2026–27 WHM 15／30／37／45% 級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（OTE 粗估）；輸入與最近結果存 `whv-save-calc-v1` | 六格數據＋稅／super 邊界；繁中台幣示意（係數 22.8 在 tools.js）、英文顯示可覆蓋幾個支出週；四級壓力警語 | §4 人工基準；check.ps1「完整英文生活成本頁」 |
+| 集簽郵遞區號初篩 | `visa.html` `#postcode-tool`；`lang/en/visa/`（417-only） | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描；不寫 storage | 是否符合 2026-08-29 留存清單＋類型日期條件＋適用限制＋官方頁；不得表述為個人簽證資格判定 | `scripts/test_tools.mjs`（check.ps1 執行；7 案例）；check.ps1「完整英文簽證頁」鎖 417 邊界 |
+| 存錢試算器 | `cost.html`／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿 select、其他支出 select | weeklyGross=r×h；annualGross=×46；annualTax 依 2026–27 WHM 15／30／37／45% 級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（OTE 粗估）；輸入與最近結果存 `whv-save-calc-v1` | 六格數據＋稅／super 邊界；繁中台幣示意（係數 22.8 在 tools.js）、英文顯示可覆蓋幾個支出週；四級壓力警語 | `scripts/test_tools.mjs`（check.ps1 執行；基準四值與 0 工時）；check.ps1「完整英文生活成本頁」 |
 | 行前互動清單 | `prep.html` `#prep-checklist`；`lang/en/prep/`（獨立 key） | 21 項勾選（3 組，JS 產生） | `whv-prep-check-v1`／`whv-prep-check-en-v1`、進度條、100% 文案、清空需 confirm | 進度 x/21 | check.ps1 頁面基線；「完整英文行前頁」 |
 | 我的行前海報 | `prep.html` | 工作表答案＋清單進度＋試算結果（皆 localStorage） | Canvas A4 直式 PNG 本機生成；下載／長按儲存備援；空資料引導 | PNG | 桌機／390px E2E 通過；iPhone Safari／Android Chrome 實機為人工 gate（P1-2） |
 | 抵澳 30 天模擬器 | `simulator.html` `#simulator-profile-form`＋`#simulator-stage` | 5 組固定單選；6 個固定事件各 3 個白名單選項 | 資源與關卡只寫 `sessionStorage` `whv-simulator-progress-v1`（版本、型別、範圍嚴格驗證）；不用 localStorage、fetch、自由文字；delta 可重播且恢復不重複套用；緊急就醫事件選項前顯示 `tel:000`；重開需確認；分數不得描述為成功率、適合度、診斷或簽證判定 | 角色快照＋逐關取捨／官方出口＋第 30 天行動地圖；no-JS 只顯示靜態入口 | check.ps1「模擬器」區塊 |
@@ -128,9 +128,10 @@ label「需要查證」）＋`idea.yml`（許願池）＋`thanks.yml`（公開�
 - GA4 契約：設定有效 `G-...` 後仍未選擇或拒絕時不建立 Google tag request；同意後才載入；選擇只存
   `whv-analytics-consent-v1`，頁尾可重開設定；不設 User-ID；停用廣告儲存／個人化與 Google Signals；
   page view 移除 URL query／hash；站內搜尋只送 `result_count` 與白名單 `top_result_page`。
-- **填 ID 前必須完成**：敏感頁排除清單（`scam.html`、`health.html`、`lang/en/scam/`、`lang/en/health/`
-  與任何含剝削、暴力、心理健康段落的頁面不載入 GA4，也不送 page view）；目前 `analytics.js` 未排除，
-  列 `ROADMAP.md` §3。
+- **敏感頁排除（已實作）**：`assets/analytics.js` 的 `SENSITIVE_PATHS` 固定為 `/scam.html`、`/health.html`、
+  `/lang/en/scam/`、`/lang/en/health/`（比對 pathname 尾段，不分大小寫，含無副檔名與子路徑部署）；這些頁即使 ID 有效且已同意，
+  也不建立 `dataLayer`、不載入 Google tag、不送 page view 或事件，只保留同意設定 UI。排除以整頁為單位；
+  `work.html` 的職場紅旗段落不另行排除（D-2026-09-02-03）。驗證：`scripts/test_analytics.cjs`（check.ps1 執行）與 check.ps1 GA4 區塊斷言。
 - 敏感頁面即使量測上線，也不得做個人層級行為量測。
 - GA 帳戶／Property／Web data stream、Search Console 網域驗證與 sitemap 提交都屬 §0 人工前置；
   步驟見 `MEASUREMENT_SETUP.md`。
@@ -170,20 +171,20 @@ powershell -File scripts/check.ps1
    404 契約、唯一 h1／main、`zh-Hant`、viewport、ID 不重複、`noopener`、`button type`、skip link、
    `aria-current`、共用 `?v=` 資產版本、JSON-LD 可解析。
 2. emoji 掃描（`*.html`、`lang/**/*.html`、`assets/*.js`；0 命中才過）。
-3. 主題契約：證據卡、問題入口目的地、高風險語意路徑、檸檬圖文、GA4 空 ID 與同意、多國語言產物、
-   七個完整英文頁、站內搜尋索引、住宿搜尋（`test_housing_search.mjs`）、自我釐清、模擬器、
-   商業治理與 LINE 位置、D+ 邊界、已撤回的絕對商業承諾、失效 OMARA 網址。
-4. 產物同步：`build_seo.py --check`、`build_search.py --check`、`build_i18n.py --check`。
-5. 交接文件一致性：`docs/README.md` §4 標「[檢查]」的規則。
-6. Worker：secret 不進 repo、`npm run check`（TypeScript、Vitest、D1 local migration、Wrangler dry-run）。
+3. `defer` 斷言：根層與 `lang/` 全部 HTML 的每個本機 `<script src>` 都必須含 `defer`；沒有本機 script 的頁面也算失敗。
+4. 主題契約：證據卡、問題入口目的地、高風險語意路徑、檸檬圖文、GA4 空 ID、同意與 `SENSITIVE_PATHS`、多國語言產物、
+   七個完整英文頁、站內搜尋索引、自我釐清、模擬器、商業治理與 LINE 位置、D+ 邊界、已撤回的絕對商業承諾、失效 OMARA 網址。
+5. 固定案例回放：`scripts/test_housing_search.mjs`（17 案例）、`scripts/test_tools.mjs`（集簽快查器 7 案例＋試算器基準，21 案例）、
+   `scripts/test_analytics.cjs`（GA4 敏感頁排除，187 斷言）。
+6. 產物同步：`build_seo.py --check`、`build_search.py --check`、`build_i18n.py --check`。
+7. 交接文件一致性：`docs/README.md` §4 標「[檢查]」的規則。
+8. Worker：secret 不進 repo、`npm run check`（TypeScript、Vitest、D1 local migration、Wrangler dry-run）。
 
 **仍是人工步驟**（尚未自動化，列 `ROADMAP.md` §3）：
 
-- 集簽快查器測試組（線上或本地開頁跑 JS）：4880/plant=YES、2000/plant=NO、0870/tourism=YES、
-  7215/tourism=YES、3000/tourism=NO、5000/plant=YES、2615/bushfire=YES。
-- 試算器基準：33.05×38h、住宿 250、其他 240 → gross week $1,256、annual tax $10,581、
-  after-tax work week $1,026、annual remainder $21,710；0 工時 → 負全年餘額＋警語。
 - DASP 粗估與市集草稿的輸出抽測。
+- 線上站抽測集簽快查器與試算器各一組案例（固定案例已由 `test_tools.mjs` 回放：4880/plant=YES、2000/plant=NO、0870/tourism=YES、
+  7215/tourism=YES、3000/tourism=NO、5000/plant=YES、2615/bushfire=YES；33.05×38h、住宿 250、其他 240 → $1,256／$10,581／$1,026／$21,710）。
 - 部署後：cache-bust 開線上站，抽測一個工具＋回饋列存在。
 - 實機手機（iPhone Safari、Android Chrome）下載與外部 App 開啟行為。
 

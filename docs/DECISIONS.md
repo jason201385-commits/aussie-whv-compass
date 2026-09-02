@@ -126,3 +126,16 @@
 | 重組不得默默改語意（SDD §1.1、SPEC §0、後端契約、郵遞區號怪點、a11y、provider 授權） | 採納 | 九條原則原文保留，只有第 5 條標註取代來源；SPEC §0 原文保留 |
 | README 任務路由仍必須先讀不可協商邊界 | 採納 | docs/README.md §2 |
 | 一錘定音證據應是 blind handoff replay（新 agent 只靠新文件完成一次任務） | 採納為驗證方式，本次未執行 | 列為下一次接手任務的順帶驗證；本 commit 只有 check.ps1 通過作為證明 |
+
+## D-2026-09-02-03 站長三項回答與第一輪加固
+
+- 站長回答（2026-09-02 下午）：(1) `market.html` 不進全站 nav，15 頁統一 12 連結；(2) P0-7 照 `CLARIFIER_SPEC.md` §3–§7 草案動工，§8 未決項用預設值（AI 每日總額度 200 次、揭露文字用 §4 草稿、工作類型小測驗 6 題、「想去哪」用 `why.html` 快思分面、12 張問題卡文案回收為出口說明）；(3) 驗收通過即合併到 `main` 並 push。
+- 加固輪（Claude Code workflow，18 個 agent：3 個實作、1 個檢查、1 個閘門、12 個三面向反方審查、1 個完整性批評）：
+  - `assets/analytics.js` 新增 `SENSITIVE_PATHS`／`isSensitivePath`；敏感頁不建 `dataLayer`、不載入 tag、不送事件，同意 UI 保留。範圍決策：以整頁清單為準（scam、health 與其英文頁），`work.html` 的職場紅旗段落不排除，因為求職頁是主要找路指標且該段落屬一般資訊。
+  - `worker/src/cors.ts`：所有 POST 路由要求 Origin 且在白名單（403 `origin_not_allowed`）；`@types/node` 釘 26.4.0；`.gitignore` 加 `.codex-remote-attachments/`；vitest 33 通過。
+  - `assets/og-cover.png` 559,520 → 97,211 bytes（8-bit 索引色，PSNR 43.99 dB，1200×630 不變）。
+  - `scripts/check.ps1`：defer 斷言（61 頁）、`SENSITIVE_PATHS` 斷言、`scripts/test_tools.mjs`（21 案例）與 `scripts/test_analytics.cjs`（187 斷言）掛鉤、nav 統一 12 連結且工具頁不標 `aria-current`。
+  - 資產版本 `20260901-45` → `20260902-46`，三支 builder 重跑。
+- 反方審查結果：12 個裁決全部 refuted=false（最高 severity low）。完整性批評指出並已處理：`worker/README.md` 未記 Origin 要求、分析測試只在暫存區、文件未更新；未處理：`delete_after` 措辭（站長判斷）、CSS 800 前提過時（併入 P2-4 時重驗）、其他 POST 路由缺逐路由測試（列 ROADMAP §3）。實作者未經指令驗證的主張：社群平台接受索引色 PNG（低風險，未驗）；GitHub Pages 提供無副檔名 URL（比對器已涵蓋，只是理由未驗）。
+- 證據：`scripts/check.ps1` ALL CHECKS PASSED（prove label `sdd-spec-hardening-check-20260902`）；本 commit。
+- 狀態：已完成；依站長回答 (3) 合併 push。

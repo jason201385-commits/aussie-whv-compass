@@ -12,15 +12,31 @@ export function parseAllowedOrigins(csv: string): ReadonlySet<string> {
   );
 }
 
+/**
+ * Every POST route is only ever called from pages of this site, so a POST that
+ * carries no Origin header is not a browser call from an allowed page and is
+ * rejected exactly like a disallowed origin (same status, code and message).
+ * GET stays reachable for origin-less probes such as health checks; OPTIONS
+ * keeps its own preflight rule in preflightResponse.
+ */
+function isOriginRequired(method: string): boolean {
+  return method === "POST";
+}
+
+function originNotAllowed(): HttpError {
+  return new HttpError(403, "origin_not_allowed", "這個來源不允許呼叫本站 API。");
+}
+
 export function requireAllowedOrigin(
   request: Request,
   allowedOrigins: ReadonlySet<string>,
 ): string | null {
   const origin = request.headers.get("Origin");
-  if (origin === null) return null;
-  if (!allowedOrigins.has(origin)) {
-    throw new HttpError(403, "origin_not_allowed", "這個來源不允許呼叫本站 API。");
+  if (origin === null) {
+    if (isOriginRequired(request.method)) throw originNotAllowed();
+    return null;
   }
+  if (!allowedOrigins.has(origin)) throw originNotAllowed();
   return origin;
 }
 

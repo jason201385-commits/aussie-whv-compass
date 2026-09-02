@@ -11,6 +11,7 @@
 ## 邊界
 
 - 僅承接需求單、確認信／刪除流程、無個人識別的 D+ 聚合計數，以及日後已取得書面授權的平台住宿單次搜尋。
+- 所有 `POST` 路由（含 `/api/metrics`）都要求請求帶 `Origin` 且在 `ALLOWED_ORIGINS` 白名單內；缺少或不在名單一律 `403 origin_not_allowed`，用 curl 做煙霧測試時要加 `-H "Origin: http://localhost:4175"`。`GET /api/health` 不受此限。
 - 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY` 或寄信憑證。
 - `wrangler.jsonc` 的 D1 `database_id` 是不可部署的全零佔位值。P0-4 完成後才由站長建立正式資源並在 Cloudflare 受保護設定輸入 secrets。
 - Rate Limit `namespace_id=1001`～`1003` 是本機設定範本；正式啟用前要由站長確認帳戶內唯一值。

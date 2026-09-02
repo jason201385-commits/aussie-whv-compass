@@ -1,10 +1,46 @@
-/* 澳打指南針 — consent-gated GA4（未同意前完全不載入 Google tag） */
+/* 澳打指南針 — consent-gated GA4（未同意前完全不載入 Google tag）
+   敏感頁排除（SPEC §1.5）：詐騙、健康等敏感頁即使已同意且已設定 ID，
+   也不建立 dataLayer、不載入 Google tag、不送 page view 或事件；
+   只保留同意選擇的儲存與頁尾「網站統計設定」，讓訪客仍可在此改變選擇。 */
 (function () {
   "use strict";
+
+  /* 敏感頁路徑清單：以 pathname 尾段比對（大小寫不分），
+     同時涵蓋 /scam.html、/scam、/scam/、/lang/en/scam/、/lang/en/scam/index.html，
+     以及站台掛在子路徑下（例如 /aussie/scam.html）的情況。 */
+  var SENSITIVE_PATHS = [
+    "/scam.html",
+    "/health.html",
+    "/lang/en/scam/",
+    "/lang/en/health/"
+  ];
+
+  var normalisePath = function (pathname) {
+    var path = String(pathname || "").split(/[?#]/)[0].toLowerCase();
+    try { path = decodeURIComponent(path); } catch (e) {}
+    path = path.replace(/\/+$/, "");
+    path = path.replace(/\/index(?:\.html?)?$/, "");
+    path = path.replace(/\.html?$/, "");
+    return path;
+  };
+
+  var isSensitivePath = function (pathname) {
+    var path = normalisePath(pathname);
+    if (!path) return false;
+    for (var i = 0; i < SENSITIVE_PATHS.length; i += 1) {
+      var pattern = normalisePath(SENSITIVE_PATHS[i]);
+      if (!pattern) continue;
+      if (path === pattern) return true;
+      if (path.slice(-pattern.length) === pattern) return true;
+      if (path.indexOf(pattern + "/") !== -1) return true;
+    }
+    return false;
+  };
 
   var config = window.WHV_ANALYTICS_CONFIG || {};
   var measurementId = String(config.measurementId || "").trim();
   var isConfigured = /^G-[A-Z0-9]+$/.test(measurementId);
+  var isSensitive = isSensitivePath(location.pathname);
   var CONSENT_KEY = "whv-analytics-consent-v1";
   var active = false;
   var loading = false;
@@ -35,7 +71,7 @@
   };
 
   updateStatus(readChoice());
-  document.documentElement.setAttribute("data-analytics", isConfigured ? "available" : "disabled");
+  document.documentElement.setAttribute("data-analytics", !isConfigured ? "disabled" : (isSensitive ? "excluded" : "available"));
   if (!isConfigured) return;
 
   var banner = document.createElement("aside");
@@ -83,7 +119,8 @@
   };
 
   var loadAnalytics = function () {
-    if (active || loading) return;
+    /* 敏感頁永遠不載入：同意只寫入本機儲存，交由其他頁面生效。 */
+    if (isSensitive || active || loading) return;
     loading = true;
     queueGtag();
     window.gtag("consent", "default", {
@@ -128,6 +165,13 @@
     hideBanner();
   });
   settingsButton.addEventListener("click", function () { showBanner(true); });
+
+  if (isSensitive) {
+    /* 敏感頁：到此為止。不建立 dataLayer、不載入 Google tag、不註冊 whv:search；
+       只在尚未選擇時顯示同意提示，讓訪客可在此做出或改變選擇。 */
+    if (readChoice() === null) showBanner(false);
+    return;
+  }
 
   window.addEventListener("whv:search", function (event) {
     if (readChoice() !== "granted" || !window.gtag) return;

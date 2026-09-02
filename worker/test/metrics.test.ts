@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import worker, { type AppEnv } from "../src/index";
 import { recordAggregateMetric, type MetricsEnvironment } from "../src/metrics";
 import type { RateLimitBinding } from "../src/rate-limit";
+import type { MetricKey } from "../src/repository";
 
 function metricsEnvironment(keys: string[]): MetricsEnvironment {
   const limiter: RateLimitBinding = {
@@ -127,5 +128,81 @@ describe("D+ aggregate metrics", () => {
     await expect(
       recordAggregateMetric(metricRequest({ metricKey: "free_text" }), appEnv),
     ).rejects.toMatchObject({ status: 400, code: "metric_not_allowed" });
+  });
+});
+
+describe("D+ aggregate metrics origin gate", () => {
+  async function dispatchMetric(
+    metricKey: MetricKey,
+    headers: Record<string, string>,
+  ): Promise<{ response: Response; logCalls: number }> {
+    const consoleLog = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      const ctx = createExecutionContext();
+      const response = await worker.fetch(
+        metricRequest({ metricKey }, "", headers),
+        env as unknown as AppEnv,
+        ctx,
+      );
+      await waitOnExecutionContext(ctx);
+      return { response, logCalls: consoleLog.mock.calls.length };
+    } finally {
+      consoleLog.mockRestore();
+    }
+  }
+
+  async function storedCounter(metricKey: MetricKey): Promise<number | null> {
+    const row = await env.DB.prepare(
+      "SELECT counter_value FROM daily_counters WHERE metric_key = ?",
+    )
+      .bind(metricKey)
+      .first<{ counter_value: number }>();
+    return row?.counter_value ?? null;
+  }
+
+  it("accepts a POST from an allowed origin and echoes it in the CORS headers", async () => {
+    const { response, logCalls } = await dispatchMetric("task_evidence_understood", {
+      Origin: "https://aussiewhvcompass.com",
+    });
+
+    expect(response.status).toBe(202);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(
+      "https://aussiewhvcompass.com",
+    );
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      accepted: true,
+      metricKey: "task_evidence_understood",
+    });
+    expect(logCalls).toBe(0);
+    await expect(storedCounter("task_evidence_understood")).resolves.toBe(1);
+  });
+
+  it("rejects a POST without an Origin header before touching the counter", async () => {
+    const { response, logCalls } = await dispatchMetric("official_source_opened", {});
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: { code: "origin_not_allowed", message: "這個來源不允許呼叫本站 API。" },
+    });
+    expect(logCalls).toBe(0);
+    await expect(storedCounter("official_source_opened")).resolves.toBeNull();
+  });
+
+  it("rejects a POST from an origin outside the allow-list", async () => {
+    const { response, logCalls } = await dispatchMetric("official_source_opened", {
+      Origin: "https://attacker.example",
+    });
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: { code: "origin_not_allowed", message: "這個來源不允許呼叫本站 API。" },
+    });
+    expect(logCalls).toBe(0);
+    await expect(storedCounter("official_source_opened")).resolves.toBeNull();
   });
 });

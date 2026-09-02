@@ -154,16 +154,24 @@ foreach ($p in $pages) {
   else {
     $nav = [regex]::Matches($t, 'class="nav-links"[\s\S]*?</div>')[0].Value
     $links = ($nav -split '<a ').Count - 1
-    $expectedNavLinks = if ($p -in @('simulator.html', 'market.html')) { 13 } else { 12 }
-    if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks）"; $errors++ }
+    $expectedNavLinks = 12
+    if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
+    if ($nav -match 'href="(?:simulator|market)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html 或 market.html（站長 2026-09-02 決定）"; $errors++ }
   }
-  $currentPageNeedle = if ($p -eq 'index.html') {
-    '<a class="brand" aria-current="page" href="index.html">'
+  $offNavPages = @('simulator.html', 'market.html')
+  if ($p -in $offNavPages) {
+    if ([regex]::Matches($t, 'aria-current="page"').Count -ne 0) {
+      Write-Output "FAIL [$p] 不在全站 nav 的工具頁不得標 aria-current=page"; $errors++
+    }
   } else {
-    '<a class="active" aria-current="page" href="{0}">' -f $p
-  }
-  if (-not $t.Contains($currentPageNeedle) -or [regex]::Matches($t, 'aria-current="page"').Count -ne 1) {
-    Write-Output "FAIL [$p] 靜態目前頁標記缺失或不唯一：$currentPageNeedle"; $errors++
+    $currentPageNeedle = if ($p -eq 'index.html') {
+      '<a class="brand" aria-current="page" href="index.html">'
+    } else {
+      '<a class="active" aria-current="page" href="{0}">' -f $p
+    }
+    if (-not $t.Contains($currentPageNeedle) -or [regex]::Matches($t, 'aria-current="page"').Count -ne 1) {
+      Write-Output "FAIL [$p] 靜態目前頁標記缺失或不唯一：$currentPageNeedle"; $errors++
+    }
   }
 
   # 內部連結與錨點
@@ -419,6 +427,44 @@ if (-not (Test-Path $analyticsConfigPath) -or -not (Test-Path $analyticsScriptPa
   foreach ($analyticsForbidden in @('search_term', 'event.detail.query', 'user_id:', 'briefText', 'worksheet')) {
     if ($analyticsScript.Contains($analyticsForbidden)) { Write-Output "FAIL [analytics.js] 不得傳送輸入內容或 User-ID：$analyticsForbidden"; $errors++ }
   }
+  # 敏感頁排除（SPEC §1.5、ROADMAP §3）：詐騙／健康頁必須列在 SENSITIVE_PATHS，且 loader 在建立 dataLayer／載入 gtag 前先查此清單
+  $sensitiveListMatch = [regex]::Match($analyticsScript, 'var SENSITIVE_PATHS = \[(.*?)\];', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+  if (-not $sensitiveListMatch.Success) {
+    Write-Output 'FAIL [analytics.js] 缺敏感頁排除清單：var SENSITIVE_PATHS = ['
+    $errors++
+  } else {
+    foreach ($sensitivePath in @('"/scam.html"', '"/health.html"', '"/lang/en/scam/"', '"/lang/en/health/"')) {
+      if (-not $sensitiveListMatch.Groups[1].Value.Contains($sensitivePath)) { Write-Output "FAIL [analytics.js] 敏感頁排除清單缺：$sensitivePath"; $errors++ }
+    }
+  }
+  foreach ($sensitiveNeedle in @(
+    'var isSensitivePath = function (pathname) {',
+    'var isSensitive = isSensitivePath(location.pathname);',
+    'if (isSensitive || active || loading) return;',
+    'document.documentElement.setAttribute("data-analytics", !isConfigured ? "disabled" : (isSensitive ? "excluded" : "available"));',
+    'if (isSensitive) {'
+  )) {
+    if (-not $analyticsScript.Contains($sensitiveNeedle)) { Write-Output "FAIL [analytics.js] 缺敏感頁排除界線：$sensitiveNeedle"; $errors++ }
+  }
+  $sensitiveFlagAt = $analyticsScript.IndexOf('var isSensitive = isSensitivePath(location.pathname);')
+  $sensitiveGuardAt = $analyticsScript.IndexOf('if (isSensitive || active || loading) return;')
+  $sensitiveReturnAt = $analyticsScript.IndexOf('if (isSensitive) {')
+  $dataLayerAt = $analyticsScript.IndexOf('window.dataLayer = window.dataLayer || [];')
+  $queueGtagCallAt = $analyticsScript.IndexOf('queueGtag();')
+  $gtagLoadAt = $analyticsScript.IndexOf('https://www.googletagmanager.com/gtag/js?id=')
+  $searchListenerAt = $analyticsScript.IndexOf('window.addEventListener("whv:search"')
+  if ($sensitiveFlagAt -lt 0 -or $dataLayerAt -lt 0 -or $sensitiveFlagAt -gt $dataLayerAt) {
+    Write-Output 'FAIL [analytics.js] 敏感頁判斷必須在建立 dataLayer 之前完成'
+    $errors++
+  }
+  if ($sensitiveGuardAt -lt 0 -or $queueGtagCallAt -lt 0 -or $gtagLoadAt -lt 0 -or $sensitiveGuardAt -gt $queueGtagCallAt -or $sensitiveGuardAt -gt $gtagLoadAt) {
+    Write-Output 'FAIL [analytics.js] loadAnalytics 必須先查敏感頁旗標再建立 dataLayer／載入 gtag'
+    $errors++
+  }
+  if ($sensitiveReturnAt -lt 0 -or $searchListenerAt -lt 0 -or $sensitiveReturnAt -gt $searchListenerAt) {
+    Write-Output 'FAIL [analytics.js] 敏感頁必須在註冊 whv:search 前結束'
+    $errors++
+  }
 }
 
 foreach ($p in $allPages) {
@@ -430,6 +476,24 @@ foreach ($p in $allPages) {
   if ($configAt -lt 0 -or $loaderAt -lt 0 -or $i18nAt -lt 0 -or $mainAt -lt 0 -or -not ($configAt -lt $loaderAt -and $loaderAt -lt $i18nAt -and $i18nAt -lt $mainAt)) {
     Write-Output "FAIL [$p] GA4 config／loader／i18n／main.js 缺少或順序錯誤"
     $errors++
+  }
+}
+
+# defer 斷言（ROADMAP §3、P0-5）：根目錄（含 404）與 lang/ 每一頁的本機 <script src> 都必須帶 defer，避免修復被回歸
+$deferTargets = @(Get-ChildItem (Join-Path $dir '*.html')) + @(Get-ChildItem (Join-Path $dir 'lang') -Recurse -Filter '*.html')
+foreach ($deferFile in $deferTargets) {
+  $deferText = [System.IO.File]::ReadAllText($deferFile.FullName, [System.Text.Encoding]::UTF8)
+  $deferRelativePath = $deferFile.FullName.Substring($dir.Length).TrimStart('\', '/')
+  $deferScripts = [regex]::Matches($deferText, '<script\b[^>]*\bsrc="(?:(?:\.\./)+|/)?assets/[^"]+\.js(?:\?[^"]*)?"[^>]*>')
+  if ($deferScripts.Count -eq 0) {
+    Write-Output "FAIL [$deferRelativePath] 找不到任何本機 <script src>，defer 斷言無從成立"
+    $errors++
+  }
+  foreach ($deferScript in $deferScripts) {
+    if ($deferScript.Value -notmatch '\sdefer(?=[\s/>=])') {
+      Write-Output "FAIL [$deferRelativePath] 本機 script 缺 defer：$($deferScript.Value)"
+      $errors++
+    }
   }
 }
 
@@ -1451,6 +1515,16 @@ if (-not $housingToolScript.Success) {
 & node (Join-Path $dir 'scripts\test_housing_search.mjs')
 if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 住宿五平台搜尋行為測試失敗'
+  $errors++
+}
+& node (Join-Path $dir 'scripts\test_analytics.cjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL GA4 敏感頁排除行為測試失敗（scripts/test_analytics.cjs）'
+  $errors++
+}
+& node (Join-Path $dir 'scripts\test_tools.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 集簽快查器與存錢試算器固定案例測試失敗（scripts/test_tools.mjs）'
   $errors++
 }
 

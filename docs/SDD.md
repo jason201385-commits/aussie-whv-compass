@@ -89,7 +89,7 @@
 | `assets/api-config.js` | 公開 API origin、Turnstile site key、住宿搜尋公開開關；留空即 fail closed；不得放 secret |
 | `assets/search-index.js` | 由 `build_search.py` 產生的靜態搜尋索引；產物不得手改 |
 | `assets/i18n-locales.json`、`i18n.js` | 護照國家／語言 registry 與語言切換；`i18n.js` 為產物 |
-| `assets/analytics-config.js`、`analytics.js` | GA4 Measurement ID（空＝停用）與 Basic Consent loader |
+| `assets/analytics-config.js`、`analytics.js` | GA4 Measurement ID（空＝停用）與 Basic Consent loader；`SENSITIVE_PATHS` 敏感頁排除（`SPEC.md` §1.5） |
 | `assets/postcodes.js` | 官方集簽郵遞區號資料（§5） |
 | `assets/seasons.js` | 各州官方採收季節資料（§5 同規則） |
 | `lang/` | 語言 hub、37 個非繁中 Quick Start、`lang/en/<topic>/` 7 頁完整英文 beta；產物由 `build_i18n.py` 產生 |
@@ -100,6 +100,8 @@
 | `scripts/build_seo.py`、`build_search.py`、`build_i18n.py` | 產物產生器，皆有 `--check` |
 | `scripts/check.ps1` | 驗收腳本（`SPEC.md` §4） |
 | `scripts/test_housing_search.mjs` | 住宿搜尋 DOM 行為回放 |
+| `scripts/test_tools.mjs` | 集簽快查器與存錢試算器固定案例回放（`SPEC.md` §4） |
+| `scripts/test_analytics.cjs` | GA4 敏感頁排除行為測試（vm 沙盒） |
 | `worker/` | 獨立無框架 Cloudflare Worker：`src/`（http、cors、body、turnstile、rate-limit、tokens、repository、mail、contact、contact-validation、metrics、accommodation、index）、`migrations/`、`test/`、`wrangler.jsonc`（D1 ID 為全零佔位、無 `env`）、`README.md` |
 | `docs/` | 交接文件；分工見 `docs/README.md` |
 
@@ -110,8 +112,8 @@
 quick-answer hub → 高風險證據卡 → 完整內容與參考資料目錄 → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ 五支 `<script src defer>`。
 
-**導覽現況**：13 頁的 `.nav-links` 為 12 連結（why→about）；`market.html` 與 `simulator.html` 為
-13 連結（多 `market.html`），`check.ps1` 把此例外寫死。統一與否列 `ROADMAP.md` §3 待站長決定。
+**導覽**：全部 15 頁的 `.nav-links` 統一 12 連結（why→about）；`simulator.html` 與 `market.html` 是工具頁，
+不進全站 nav、不標 `aria-current`（站長 2026-09-02 決定，`check.ps1` 強制；理由見 §6 教訓 3）。
 **新增頁面時**：複製既有頁骨架；16 個根層 HTML（含 404）與 7 個 `lang/en/**` 頁的 nav 都要改
 （用腳本批次替換，別手改）；`build_seo.py`、`build_search.py` 的頁面清單加項並重跑；
 `SPEC.md` §1.1 加列。
@@ -158,7 +160,8 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 - **住宿搜尋**：只接受四個固定欄位、2 KiB body、固定類別限流、provider timeout、每平台最多 8 筆、
   目的網域與顯示欄位白名單；每個候選 provider 必須附有效 `displayAuthorization`（本站 origin、核准用途、
   查核日、有效期限），過期或缺漏不呼叫上游；不寫 D1、不記錄搜尋內容。
-- **安全**：Turnstile token server-side 驗證；輸入長度、CORS origin、rate limit 與 SQL 皆白名單／prepared statement；
+- **安全**：所有 `POST` 路由要求 `Origin` 存在且在白名單，否則 `403 origin_not_allowed`（`GET /api/health` 例外）；
+  Turnstile token server-side 驗證；輸入長度、rate limit 與 SQL 皆白名單／prepared statement；
   限流鍵以只存在 Worker secret 的 HMAC 產生，原始 Email 或 IP 不作 binding key。
   Cloudflare Rate Limiting 是 edge-local、最終一致，只作防濫用。基礎設施仍會為傳輸與防濫用處理必要連線資料，
   隱私文案不得寫成供應商完全看不到。

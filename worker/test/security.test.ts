@@ -1,4 +1,7 @@
+import { env } from "cloudflare:workers";
+import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
+import worker, { type AppEnv } from "../src/index";
 import { readBoundedJson } from "../src/body";
 import { HttpError } from "../src/http";
 import { createRateLimitKey, enforceRateLimit, type RateLimitBinding } from "../src/rate-limit";
@@ -102,5 +105,40 @@ describe("privacy-preserving rate limit", () => {
       status: 429,
       code: "rate_limited",
     });
+  });
+});
+
+describe("Origin gate shared by every POST API route", () => {
+  async function dispatch(request: Request): Promise<Response> {
+    const ctx = createExecutionContext();
+    const response = await worker.fetch(request, env as unknown as AppEnv, ctx);
+    await waitOnExecutionContext(ctx);
+    return response;
+  }
+
+  it("rejects an origin-less POST to /api/contact before reading the body", async () => {
+    const response = await dispatch(
+      new Request("https://api.example.test/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{not json",
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+    await expect(response.json()).resolves.toMatchObject({
+      ok: false,
+      error: { code: "origin_not_allowed" },
+      requestId: expect.stringMatching(/^[0-9a-f-]{36}$/),
+    });
+  });
+
+  it("keeps GET /api/health reachable for origin-less probes", async () => {
+    const response = await dispatch(new Request("https://api.example.test/api/health"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+    await expect(response.json()).resolves.toMatchObject({ ok: true });
   });
 });
