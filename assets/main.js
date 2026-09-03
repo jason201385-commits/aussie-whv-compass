@@ -66,6 +66,31 @@
 
   // ---------- 全站搜尋：同站索引、查詢不離開裝置、不保存輸入 ----------
   var navInner = document.querySelector(".nav-inner");
+  // 熱門 chip 直接綁錨點，不經過搜尋；首頁 #search 的 chip-row 與這裡必須一致（check.ps1 比對）。
+  var SEARCH_HOT_LINKS = [
+    ["work.html#verify", "這工合法嗎"],
+    ["visa.html#counting", "88天怎麼算"],
+    ["housing.html#bond", "押金先給嗎"],
+    ["prep.html#first-week", "三大號順序"],
+    ["english.html#reality", "英文很爛"],
+    ["cost.html#budget", "要帶多少錢"],
+    ["lang/en/visa/#choose", "462抽籤"],
+    ["health.html#insurance", "保險買哪邊"]
+  ];
+  // 零結果時的出口，依序：4 個階段 chip（id 與 JOURNEY_ORDER 同源）、安全列 5 個入口（與 index.html nav#support-hub 同序）。
+  var SEARCH_STAGE_LINKS = [
+    ["index.html#considering", "還在考慮"],
+    ["index.html#committed", "決定要去"],
+    ["index.html#in-australia", "已在澳洲"],
+    ["index.html#next-step", "回程或留下"]
+  ];
+  var SEARCH_SAFETY_LINKS = [
+    ["health.html#emergency", "受傷"],
+    ["scam.html#help", "剛匯款"],
+    ["scam.html#help", "被威脅或扣證件"],
+    ["visa.html#apply", "簽證到期"],
+    ["housing.html#housing-search-tool", "今晚沒地方住"]
+  ];
   var searchDialog = document.createElement("dialog");
   searchDialog.className = "site-search-dialog";
   searchDialog.id = "site-search-dialog";
@@ -80,15 +105,12 @@
     + '<input id="site-search-input" type="search" inputmode="search" autocomplete="off" maxlength="80" placeholder="例如：二簽、找房、欠薪、看醫生" required>'
     + '<button class="btn" type="submit">搜尋</button>'
     + '</form>'
-    + '<div class="site-search-quick" aria-label="熱門搜尋">'
-    + '<span>可以先點：</span>'
-    + '<button class="chip" type="button" data-search-query="二簽 88 天">二簽 88 天</button>'
-    + '<button class="chip" type="button" data-search-query="找房">找房</button>'
-    + '<button class="chip" type="button" data-search-query="欠薪">欠薪</button>'
-    + '<button class="chip" type="button" data-search-query="看醫生">看醫生</button>'
+    + '<div class="site-search-quick" aria-label="熱門問題">'
+    + '<span>直接跳到：</span>'
+    + SEARCH_HOT_LINKS.map(function (item) { return '<a class="chip" href="' + item[0] + '">' + item[1] + '</a>'; }).join("")
     + '</div>'
     + '<p class="site-search-privacy">搜尋在這台裝置內完成，不會把查詢送到本站或搜尋引擎，也不會保存搜尋紀錄。</p>'
-    + '<p class="site-search-status" id="site-search-status" role="status" aria-live="polite">輸入一個主題，或先點熱門搜尋。</p>'
+    + '<p class="site-search-status" id="site-search-status" role="status" aria-live="polite">輸入一個主題，或先點熱門問題。</p>'
     + '<div id="site-search-results"></div>'
     + '</div>';
   document.body.appendChild(searchDialog);
@@ -125,26 +147,158 @@
   var searchStatus = document.getElementById("site-search-status");
   var searchResults = document.getElementById("site-search-results");
   var searchLoadPromise = null;
-  var SEARCH_SYNONYMS = {
-    "租房": ["找房", "租屋", "住宿", "房租", "sharehouse"],
-    "找房": ["租房", "租屋", "住宿", "房租", "sharehouse"],
-    "二簽": ["集簽", "88天", "指定工作"],
-    "三簽": ["集簽", "179天", "指定工作"],
-    "欠薪": ["薪資", "fairwork", "追薪", "工資"],
-    "醫生": ["看醫生", "gp", "診所", "急診"],
-    "看醫生": ["醫生", "gp", "診所", "急診"],
-    "買車": ["二手車", "ppsr", "過戶", "車輛"],
-    "買二手車": ["買車", "二手車", "ppsr", "過戶", "車輛"],
-    "英文": ["英語", "面試", "口說"],
-    "回台": ["離澳", "dasp", "退休金", "報稅"],
-    "移民": ["pr", "永居", "雇主擔保", "技術移民"]
-  };
+  // ==== search-core:start ====
+  // 純函式、不碰 DOM。scripts/test_search.mjs 以這兩個標記把這段抽出來在 Node 執行，
+  // 瀏覽器與驗收測試因此永遠用同一份演算法（OPTIMIZATION_PLAN P0-9 實作 1–3）。
+  // 疑問詞／語助詞：正規化後由長到短移除；移除後才跑 AND 比對，仍零結果才降級到二字詞 OR。
+  var SEARCH_STOP_WORDS = ["要注意什麼", "要怎麼辦", "怎麼辦", "要幾天", "要多久", "注意什麼", "可以嗎", "是什麼", "什麼", "怎麼", "如何", "哪裡", "哪些", "多少", "幾天", "多久", "可以", "應該", "需要", "注意", "很爛", "很差", "不好", "太", "了", "嗎", "呢", "要", "我", "的"];
+  // 權重 provenance：原詞（標題／頁名／內文）1.0；同義詞（索引 synonyms／keywords 欄位）0.7；
+  // 入口段（quick-answers、evidence-card、首頁出口卡，索引 hub=1）的標題與內文只算導引語，純同義詞命中再乘 0.5。
+  var SEARCH_SYNONYM_WEIGHT = 0.7;
+  var SEARCH_HUB_SYNONYM_WEIGHT = 0.5;
 
   var normalizeSearch = function (value) {
     var normalized = String(value || "").toLowerCase();
     try { normalized = normalized.normalize("NFKC"); } catch (e) {}
     return normalized.replace(/[\s\-_.,，。！？!?、/\\()（）:：;；'"“”‘’]+/g, "");
   };
+
+  var splitSearchTokens = function (query) {
+    return String(query || "").trim().toLowerCase().split(/\s+/).map(normalizeSearch).filter(Boolean);
+  };
+
+  var rewriteSearchQuery = function (query) {
+    var original = splitSearchTokens(query);
+    var rewritten = [];
+    original.forEach(function (token) {
+      var value = token;
+      SEARCH_STOP_WORDS.forEach(function (word) { value = value.split(word).join(" "); });
+      value.split(" ").forEach(function (part) { if (part) rewritten.push(part); });
+    });
+    return { original: original, rewritten: rewritten, changed: rewritten.join(" ") !== original.join(" ") };
+  };
+
+  var searchFields = function (entry) {
+    return {
+      title: normalizeSearch(entry.title),
+      pageTitle: normalizeSearch(entry.pageTitle),
+      text: normalizeSearch(entry.text),
+      keywords: normalizeSearch(entry.keywords),
+      synonyms: normalizeSearch(entry.synonyms),
+      overview: entry.title === "本頁總覽",
+      hub: entry.hub === 1
+    };
+  };
+
+  var searchTokenScore = function (fields, needle) {
+    var original = 0;
+    var synonym = 0;
+    if (fields.title === needle) original = 140;
+    else if (fields.title.indexOf(needle) >= 0) original = 95;
+    if (fields.overview) {
+      if (fields.pageTitle === needle) original = Math.max(original, 110);
+      else if (fields.pageTitle.indexOf(needle) >= 0) original = Math.max(original, 72);
+    }
+    if (fields.text.indexOf(needle) >= 0) original = Math.max(original, 24);
+    if (fields.hub && original) original = original >= 95 ? 49 : 17;
+    if (fields.synonyms.indexOf(needle) >= 0) synonym = 80;
+    if (fields.keywords.indexOf(needle) >= 0) synonym = Math.max(synonym, 42);
+    synonym = synonym * SEARCH_SYNONYM_WEIGHT;
+    return { original: original, synonym: synonym };
+  };
+
+  // wholes：整句加分的候選（使用者原句、改寫後的串接），取最高者；tokens 已正規化。
+  var searchEntries = function (entries, tokens, wholes) {
+    var candidates = (wholes || []).concat([tokens.join("")]).filter(function (value, index, list) {
+      return value && list.indexOf(value) === index;
+    });
+    var wholeBonus = function (fields) {
+      var bonus = 0;
+      var expanded = fields.synonyms + " " + fields.keywords;
+      candidates.forEach(function (whole) {
+        var value = 0;
+        if (fields.hub) {
+          if ((fields.title + fields.text + expanded).indexOf(whole) >= 0) value = 14;
+        } else if (fields.title.indexOf(whole) >= 0) value = 80;
+        else if (fields.overview && fields.pageTitle.indexOf(whole) >= 0) value = 55;
+        else if (fields.text.indexOf(whole) >= 0) value = 20;
+        else if (expanded.indexOf(whole) >= 0) value = 14;
+        bonus = Math.max(bonus, value);
+      });
+      return bonus;
+    };
+    return entries.map(function (entry, order) {
+      var fields = searchFields(entry);
+      var score = 0;
+      var originalHits = 0;
+      for (var i = 0; i < tokens.length; i++) {
+        var hit = searchTokenScore(fields, tokens[i]);
+        var best = Math.max(hit.original, hit.synonym);
+        if (!best) return null;
+        if (hit.original) originalHits += 1;
+        score += best;
+      }
+      if (fields.hub && !originalHits) score = score * SEARCH_HUB_SYNONYM_WEIGHT;
+      score += wholeBonus(fields);
+      return { entry: entry, score: score, order: order };
+    }).filter(Boolean).sort(function (a, b) {
+      return b.score - a.score || a.order - b.order;
+    });
+  };
+
+  // 降級：二字詞 OR 比對，命中過半才算；只在 AND 比對零結果時使用（原型 search-fallback-proto.js 驗證 5/5）。
+  var searchApproximate = function (entries, tokens) {
+    var grams = [];
+    var seen = {};
+    var add = function (gram) { if (!seen[gram]) { seen[gram] = true; grams.push(gram); } };
+    tokens.forEach(function (token) {
+      if (token.length <= 2) add(token);
+      for (var i = 0; i + 2 <= token.length; i++) add(token.slice(i, i + 2));
+    });
+    var needed = Math.max(1, Math.ceil(grams.length / 2));
+    return entries.map(function (entry, order) {
+      var fields = searchFields(entry);
+      var score = 0;
+      var hits = 0;
+      grams.forEach(function (gram) {
+        var best = 0;
+        if (fields.title.indexOf(gram) >= 0) best = fields.hub ? 5 : 9;
+        else if (fields.overview && fields.pageTitle.indexOf(gram) >= 0) best = 6;
+        if (fields.synonyms.indexOf(gram) >= 0 || fields.keywords.indexOf(gram) >= 0) best = Math.max(best, 5);
+        if (fields.text.indexOf(gram) >= 0) best = Math.max(best, 2);
+        if (best) { hits += 1; score += best; }
+      });
+      return hits >= needed ? { entry: entry, score: score, order: order } : null;
+    }).filter(Boolean).sort(function (a, b) {
+      return b.score - a.score || a.order - b.order;
+    });
+  };
+
+  // mode：exact（原詞 AND）、rewritten（去疑問詞後 AND）、approximate（二字詞 OR 降級）、none。
+  var runSiteSearch = function (entries, query) {
+    var plan = rewriteSearchQuery(query);
+    var tokens = plan.rewritten.length ? plan.rewritten : plan.original;
+    if (!tokens.length) return { matches: [], mode: "none", tokens: [] };
+    var wholes = [plan.original.join("")];
+    var matches = searchEntries(entries, tokens, wholes);
+    if (matches.length) return { matches: matches, mode: plan.changed && plan.rewritten.length ? "rewritten" : "exact", tokens: tokens };
+    if (plan.changed && plan.rewritten.length) {
+      matches = searchEntries(entries, plan.original, wholes);
+      if (matches.length) return { matches: matches, mode: "exact", tokens: plan.original };
+    }
+    matches = searchApproximate(entries, tokens);
+    return { matches: matches, mode: matches.length ? "approximate" : "none", tokens: tokens };
+  };
+
+  var makeSnippet = function (entry, token) {
+    var source = String(entry.text || "").replace(/\s+/g, " ").trim();
+    if (!source) return "開啟這一節查看整理內容與官方來源。";
+    var at = token ? source.toLowerCase().indexOf(token) : -1;
+    var start = at > 48 ? at - 48 : 0;
+    var snippet = source.slice(start, start + 150);
+    return (start ? "…" : "") + snippet + (start + 150 < source.length ? "…" : "");
+  };
+  // ==== search-core:end ====
 
   var loadSearchIndex = function () {
     if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -153,7 +307,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260902-47";
+      script.src = "assets/search-index.js?v=20260903-49";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -168,86 +322,72 @@
     return searchLoadPromise;
   };
 
-  var tokenScore = function (entry, token) {
-    var options = [token].concat(SEARCH_SYNONYMS[token] || []);
-    var title = normalizeSearch(entry.title);
-    var pageTitle = normalizeSearch(entry.pageTitle);
-    var text = normalizeSearch(entry.text);
-    var keywords = normalizeSearch(entry.keywords);
-    var best = 0;
-    options.forEach(function (option) {
-      var needle = normalizeSearch(option);
-      if (!needle) return;
-      if (title === needle) best = Math.max(best, 140);
-      else if (title.indexOf(needle) >= 0) best = Math.max(best, 95);
-      if (entry.title === "本頁總覽" && pageTitle === needle) best = Math.max(best, 110);
-      else if (entry.title === "本頁總覽" && pageTitle.indexOf(needle) >= 0) best = Math.max(best, 72);
-      if (keywords.indexOf(needle) >= 0) best = Math.max(best, 42);
-      if (text.indexOf(needle) >= 0) best = Math.max(best, 24);
+  var appendSearchLinks = function (parent, className, label, items) {
+    var row = document.createElement("div");
+    row.className = "site-search-quick " + className;
+    row.setAttribute("aria-label", label);
+    var lead = document.createElement("span");
+    lead.textContent = label;
+    row.appendChild(lead);
+    items.forEach(function (item) {
+      var link = document.createElement("a");
+      link.className = "chip";
+      link.href = item[0];
+      link.textContent = item[1];
+      row.appendChild(link);
     });
-    return best;
-  };
-
-  var searchEntries = function (entries, query) {
-    var originalTokens = String(query || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
-    var whole = normalizeSearch(query);
-    return entries.map(function (entry, order) {
-      var score = 0;
-      for (var i = 0; i < originalTokens.length; i++) {
-        var matched = tokenScore(entry, normalizeSearch(originalTokens[i]));
-        if (!matched) return null;
-        score += matched;
-      }
-      var title = normalizeSearch(entry.title);
-      var pageTitle = normalizeSearch(entry.pageTitle);
-      var combined = normalizeSearch(entry.text + " " + entry.keywords);
-      if (title.indexOf(whole) >= 0) score += 80;
-      else if (entry.title === "本頁總覽" && pageTitle.indexOf(whole) >= 0) score += 55;
-      else if (combined.indexOf(whole) >= 0) score += 20;
-      return { entry: entry, score: score, order: order };
-    }).filter(Boolean).sort(function (a, b) {
-      return b.score - a.score || a.order - b.order;
-    });
-  };
-
-  var makeSnippet = function (entry, query) {
-    var source = String(entry.text || "").replace(/\s+/g, " ").trim();
-    if (!source) return "開啟這一節查看整理內容與官方來源。";
-    var direct = String(query || "").trim().toLowerCase().split(/\s+/).filter(Boolean)[0] || "";
-    var at = source.toLowerCase().indexOf(direct);
-    var start = at > 48 ? at - 48 : 0;
-    var snippet = source.slice(start, start + 150);
-    return (start ? "…" : "") + snippet + (start + 150 < source.length ? "…" : "");
+    parent.appendChild(row);
   };
 
   var renderSearch = function (entries, query) {
     var cleaned = String(query || "").trim();
     searchResults.textContent = "";
     if (!cleaned) {
-      searchStatus.textContent = "輸入一個主題，或先點熱門搜尋。";
+      searchStatus.textContent = "輸入一個主題，或先點熱門問題。";
       return;
     }
-    var matches = searchEntries(entries, cleaned);
+    var result = runSiteSearch(entries, cleaned);
+    var matches = result.matches;
     if (!matches.length) {
       searchStatus.textContent = "找不到符合「" + cleaned + "」的內容。";
+      // 零結果狀態順序（P0-9 實作 5）：階段 chip → 安全列 → 問一次 AI（僅在啟用且使用者點擊後）→ GitHub 回報。
       var empty = document.createElement("div");
       empty.className = "site-search-empty";
       var emptyTitle = document.createElement("strong");
-      emptyTitle.textContent = "換一個比較短的關鍵詞試試看";
+      emptyTitle.textContent = "先選你現在的階段，或換一個比較短的關鍵詞";
       var emptyCopy = document.createElement("p");
-      emptyCopy.textContent = "例如把「我被老闆拖欠薪水」縮成「欠薪」。如果網站真的缺這題，也可以回報建議。";
+      emptyCopy.textContent = "例如把「我被老闆拖欠薪水」縮成「欠薪」。很急的事直接走安全出口。";
+      empty.appendChild(emptyTitle);
+      empty.appendChild(emptyCopy);
+      appendSearchLinks(empty, "site-search-stages", "你的階段：", SEARCH_STAGE_LINKS);
+      appendSearchLinks(empty, "site-search-safety", "很急？", SEARCH_SAFETY_LINKS);
+      var aiSlot = document.createElement("p");
+      aiSlot.className = "site-search-ai";
+      aiSlot.id = "site-search-ai";
+      aiSlot.hidden = true;
+      var aiLink = document.createElement("a");
+      aiLink.className = "btn secondary";
+      aiLink.href = "#assist";
+      aiLink.textContent = "問一次 AI";
+      aiSlot.appendChild(aiLink);
+      empty.appendChild(aiSlot);
       var emptyLink = document.createElement("a");
       emptyLink.className = "btn ghost";
       emptyLink.href = "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=idea.yml";
       emptyLink.target = "_blank";
       emptyLink.rel = "noopener noreferrer";
       emptyLink.textContent = "告訴我們缺哪一題";
-      empty.appendChild(emptyTitle);
-      empty.appendChild(emptyCopy);
       empty.appendChild(emptyLink);
       searchResults.appendChild(empty);
     } else {
-      searchStatus.textContent = "找到 " + matches.length + " 個相關段落，先顯示最接近的 " + Math.min(matches.length, 8) + " 個。";
+      var shown = Math.min(matches.length, 8);
+      if (result.mode === "approximate") {
+        searchStatus.textContent = "沒有完全符合的段落，已用相近詞找到 " + matches.length + " 個，先顯示最接近的 " + shown + " 個。";
+      } else if (result.mode === "rewritten") {
+        searchStatus.textContent = "已略過「要、嗎、怎麼」這類字，以「" + result.tokens.join(" ") + "」找到 " + matches.length + " 個段落，先顯示最接近的 " + shown + " 個。";
+      } else {
+        searchStatus.textContent = "找到 " + matches.length + " 個相關段落，先顯示最接近的 " + shown + " 個。";
+      }
       var list = document.createElement("ol");
       list.className = "site-search-results-list";
       matches.slice(0, 8).forEach(function (match) {
@@ -261,7 +401,7 @@
         title.textContent = match.entry.title;
         var snippet = document.createElement("span");
         snippet.className = "site-search-result-snippet";
-        snippet.textContent = makeSnippet(match.entry, cleaned);
+        snippet.textContent = makeSnippet(match.entry, result.tokens[0]);
         link.appendChild(context);
         link.appendChild(title);
         link.appendChild(snippet);
@@ -271,7 +411,7 @@
       searchResults.appendChild(list);
     }
     window.dispatchEvent(new CustomEvent("whv:search", {
-      detail: { resultCount: matches.length, topPage: matches.length ? matches[0].entry.page : "none" }
+      detail: { resultCount: matches.length, topPage: matches.length ? matches[0].entry.page : "none", mode: result.mode }
     }));
   };
 
@@ -322,11 +462,10 @@
   searchInput.addEventListener("input", function () {
     loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); });
   });
+  // 熱門 chip、結果、階段與安全出口都是 <a href>；點了就關閉 dialog，讓瀏覽器照常導向（同頁錨點也適用）。
   searchDialog.addEventListener("click", function (event) {
-    var quick = event.target.closest ? event.target.closest("[data-search-query]") : null;
-    if (!quick) return;
-    searchInput.value = quick.getAttribute("data-search-query");
-    loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); searchInput.focus(); });
+    var link = event.target.closest ? event.target.closest("a[href]") : null;
+    if (link && searchDialog.contains(link)) closeSiteSearch();
   });
   document.addEventListener("keydown", function (event) {
     if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) return;
@@ -346,12 +485,14 @@
       if (!query) { homeSearchInput.focus(); return; }
       openSiteSearch(query);
     });
-    document.addEventListener("click", function (event) {
-      var homeQuick = event.target.closest ? event.target.closest("[data-home-search-query]") : null;
-      if (!homeQuick) return;
-      var query = homeQuick.getAttribute("data-home-search-query");
-      homeSearchInput.value = query;
-      openSiteSearch(query);
+  }
+
+  // 釐清器底部固定搜尋鈕（P0-8）：有 JS 就開既有搜尋 dialog；無 JS 時是 #search 錨點
+  var clarifierSearchOpen = document.getElementById("clarifier-search-open");
+  if (clarifierSearchOpen) {
+    clarifierSearchOpen.addEventListener("click", function (event) {
+      event.preventDefault();
+      openSiteSearch("");
     });
   }
 
@@ -457,6 +598,18 @@
     if (item.remember) JOURNEY_PAGES[item.path] = { title: item.title, stage: item.stage };
   });
 
+  // 首頁「續讀／收藏」入口卡（P0-8）：只在最近閱讀或收藏有資料時顯示；顯示規則沿用兩個區塊本身，不另讀儲存空間
+  var homeEntryResume = document.getElementById("home-entry-resume");
+  var syncHomeEntryResume = function () {
+    if (!homeEntryResume) return;
+    var resumeSection = document.getElementById("journey-resume");
+    var savedSection = document.getElementById("saved-pages");
+    var hasResume = !!(resumeSection && !resumeSection.hidden);
+    var hasSaved = !!(savedSection && !savedSection.hidden);
+    homeEntryResume.hidden = !hasResume && !hasSaved;
+    homeEntryResume.setAttribute("href", hasResume ? "#journey-resume" : "#saved-pages");
+  };
+
   // ---------- 我的收藏：只接受白名單頁名，不保存標題、網址或使用者輸入 ----------
   var SAVED_PAGES_KEY = "whv-saved-pages-v1";
   var readSavedPages = function () {
@@ -485,6 +638,7 @@
       var savedPaths = readSavedPages();
       savedPagesList.textContent = "";
       savedPagesSection.hidden = savedPaths.length === 0;
+      syncHomeEntryResume();
       if (!savedPaths.length) return;
 
       savedPaths.forEach(function (savedPath) {
@@ -557,9 +711,11 @@
         resumeLink.textContent = "回到「" + lastMeta.title + "」";
         resumeSummary.textContent = "你上次停在「" + lastMeta.title + "」，目前屬於「" + lastMeta.stage + "」階段。";
         resume.hidden = false;
+        syncHomeEntryResume();
         resumeClear.addEventListener("click", function () {
           try { localStorage.removeItem(LAST_PAGE_KEY); } catch (e) {}
           resume.hidden = true;
+          syncHomeEntryResume();
           var journeyStart = document.querySelector(".journey-directory a");
           if (journeyStart) journeyStart.focus();
         });
@@ -632,14 +788,10 @@
       heroTicking = false;
       if (!heroMotion.matches || !heroWide.matches) {
         hero.style.removeProperty("--hero-gold-y");
-        hero.style.removeProperty("--hero-green-y");
-        hero.style.removeProperty("--hero-accent-y");
         return;
       }
       var offset = Math.min(window.scrollY || 0, 650);
       hero.style.setProperty("--hero-gold-y", (offset * 0.08).toFixed(1) + "px");
-      hero.style.setProperty("--hero-green-y", (offset * 0.14).toFixed(1) + "px");
-      hero.style.setProperty("--hero-accent-y", (offset * 0.2).toFixed(1) + "px");
     };
     var queueHeroParallax = function () {
       if (heroTicking) return;
@@ -991,14 +1143,47 @@
       }
     }
 
+    // 只換元素最後一個非空白文字節點：階段 chips 內含 <span>01</span> 編號，不能整個 textContent 覆寫。
+    function swapLabel(el, value) {
+      if (!el.hasAttribute("data-label-default")) {
+        var textNode = null;
+        for (var i = el.childNodes.length - 1; i >= 0; i -= 1) {
+          if (el.childNodes[i].nodeType === 3 && el.childNodes[i].nodeValue.trim() !== "") { textNode = el.childNodes[i]; break; }
+        }
+        el.setAttribute("data-label-default", textNode ? textNode.nodeValue : el.textContent);
+      }
+      var label = value === "462" ? el.getAttribute("data-label-462") : el.getAttribute("data-label-default");
+      if (label === null) return;
+      for (var j = el.childNodes.length - 1; j >= 0; j -= 1) {
+        if (el.childNodes[j].nodeType === 3 && el.childNodes[j].nodeValue.trim() !== "") { el.childNodes[j].nodeValue = label; return; }
+      }
+      el.textContent = label;
+    }
+
     function applyPassport(value) {
       clarifierRoot.dataset.passport = value;
-      clarifierRoot.querySelectorAll("button[data-passport]").forEach(function (button) {
-        button.setAttribute("aria-pressed", String(button.dataset.passport === value));
+      clarifierRoot.querySelectorAll("[data-clarifier-passport]").forEach(function (group) {
+        var radios = Array.prototype.slice.call(group.querySelectorAll('[role="radio"][data-passport]'));
+        var checkedIndex = -1;
+        radios.forEach(function (radio, index) {
+          var checked = radio.dataset.passport === value;
+          radio.setAttribute("aria-checked", String(checked));
+          if (checked) checkedIndex = index;
+        });
+        // 漫遊 tabindex：只有選中的（沒選則第一顆）可用 Tab 到達，方向鍵在群組內移動。
+        radios.forEach(function (radio, index) {
+          radio.setAttribute("tabindex", index === (checkedIndex < 0 ? 0 : checkedIndex) ? "0" : "-1");
+        });
       });
       clarifierRoot.querySelectorAll("[data-passport-note]").forEach(function (note) {
         note.hidden = note.dataset.passportNote !== value;
       });
+      // 462 摘要卡雙態：HTML 初始不帶 hidden（無 JS 常駐可讀），JS 只在選 462 時顯示。
+      clarifierRoot.querySelectorAll("[data-passport-summary]").forEach(function (card) {
+        card.hidden = value !== "462";
+      });
+      // 階段 chips（#journey-map）、需求 chips 與 21 個出口標題都在 [data-clarifier] 內，一次換字；切回非 462 還原台灣版。
+      clarifierRoot.querySelectorAll("[data-label-462]").forEach(function (el) { swapLabel(el, value); });
       clarifierRoot.querySelectorAll("a[data-href-462]").forEach(function (a) {
         // data-href-462 的 dataset 鍵是 href-462（連字號後接數字不轉駝峰），所以直接讀屬性。
         if (!a.hasAttribute("data-href-default")) a.setAttribute("data-href-default", a.getAttribute("href") || "");
@@ -1148,10 +1333,28 @@
       applyHash(location.hash, true);
     });
 
+    // 初始狀態：沒選護照 -> 462 摘要卡收起、三顆 radio 都未選、第一顆可 Tab 到達。
+    applyPassport(clarifierRoot.dataset.passport || "");
+
     clarifierRoot.addEventListener("click", function (event) {
       var button = event.target.closest ? event.target.closest("button[data-passport]") : null;
       if (!button || !clarifierRoot.contains(button)) return;
       applyPassport(button.dataset.passport || "");
+    });
+
+    // radiogroup 鍵盤：左右上下在同一群組內循環移動並選取；空白鍵與 Enter 由原生 button click 處理。
+    clarifierRoot.addEventListener("keydown", function (event) {
+      var radio = event.target.closest ? event.target.closest('[role="radio"][data-passport]') : null;
+      if (!radio) return;
+      var step = (event.key === "ArrowRight" || event.key === "ArrowDown") ? 1 : (event.key === "ArrowLeft" || event.key === "ArrowUp") ? -1 : 0;
+      if (step === 0) return;
+      var group = radio.closest("[data-clarifier-passport]");
+      var radios = group ? Array.prototype.slice.call(group.querySelectorAll('[role="radio"][data-passport]')) : [];
+      if (radios.length < 2) return;
+      event.preventDefault();
+      var next = radios[(radios.indexOf(radio) + step + radios.length) % radios.length];
+      applyPassport(next.dataset.passport || "");
+      next.focus();
     });
   }
 
@@ -1249,6 +1452,10 @@
     }
 
     function renderAssistResult(result) {
+      if (result && result.kind === "rate_limited") {
+        renderAssistAnswer("一分鐘內問太多次，稍等再試。", ASSIST_FALLBACK_LINKS);
+        return;
+      }
       if (result && result.kind === "over_cap") {
         renderAssistAnswer("今天的 AI 額度已用完。", ASSIST_FALLBACK_LINKS);
         return;
@@ -1339,7 +1546,13 @@
         credentials: "omit",
         referrerPolicy: "no-referrer"
       }).then(function (response) {
-        if (response.status === 429) return { ok: true, kind: "over_cap" };
+        if (response.status === 429) {
+          // Two different 429s: per-source rate limit vs. the site-wide daily cap (D-2026-09-02-06).
+          return response.json().then(function (body) {
+            var code = body && body.error && typeof body.error.code === "string" ? body.error.code : "";
+            return { ok: true, kind: code === "rate_limited" ? "rate_limited" : "over_cap" };
+          }, function () { return { ok: true, kind: "over_cap" }; });
+        }
         if (!response.ok) throw new Error("assist_http_" + response.status);
         return response.json();
       }).then(function (result) {
@@ -1366,8 +1579,12 @@
         event.preventDefault();
         submitAssist();
       });
+      // 零結果只揭露搜尋 dialog 裡的「問一次 AI」按鈕（連到 #assist）；不自動開啟、不移焦點、不載入 Turnstile，
+      // 使用者明確點擊後才由 hashchange 進入 openAssist（P0-9 實作 5）。
       window.addEventListener("whv:search", function (event) {
-        if (event.detail && event.detail.resultCount === 0 && assistSettings()) openAssist();
+        if (!(event.detail && event.detail.resultCount === 0 && assistSettings())) return;
+        var searchAiSlot = document.getElementById("site-search-ai");
+        if (searchAiSlot) searchAiSlot.hidden = false;
       });
       if ("#assist" === location.hash) openAssist();
       window.addEventListener("hashchange", function () {

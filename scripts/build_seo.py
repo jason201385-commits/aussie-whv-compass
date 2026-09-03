@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
 LAST_MODIFIED = "2026-09-02"
-ASSET_VERSION = "20260902-47"
+ASSET_VERSION = "20260903-49"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -263,7 +263,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
     for page in PAGES:
         source = page_sources[page]
         evidence = re.search(
-            r'<section class="evidence-card" data-evidence-status="([^"]+)" '
+            r'<section class="(?:evidence-card|answer-card)" data-evidence-status="([^"]+)" '
             r'data-evidence-scope="([^"]+)"[\s\S]*?<time datetime="([^"]+)">',
             source,
         )

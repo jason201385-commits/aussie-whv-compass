@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260902-47" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260903-49" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -67,7 +67,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20260902-47">
+<link rel="stylesheet" href="assets/style.css?v=20260903-49">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 <!-- I18N_DISCOVERY_BEGIN -->
 <link rel="alternate" hreflang="zh-Hant" href="https://www.aussiewhvcompass.com/">
@@ -126,7 +126,16 @@
 </header>
 
 <main id="main-content" tabindex="-1">
-  <section class="hero">
+  <nav id="support-hub" class="safety-bar" aria-label="很急？先走這裡">
+    <span class="safety-bar-label">很急？</span>
+    <a href="health.html#emergency">受傷</a>
+    <a href="scam.html#help">剛匯款</a>
+    <a href="scam.html#help">被威脅或扣證件</a>
+    <a href="visa.html#apply">簽證到期</a>
+    <a href="housing.html#housing-search-tool">今晚沒地方住</a>
+  </nav>
+
+  <section class="hero hero-compact">
     <div class="hero-cutouts" aria-hidden="true">
       <svg class="hero-cut hero-cut-gold" viewBox="0 0 280 250" focusable="false">
         <path class="hero-stem" d="M204 66C222 50 238 39 255 30"/>
@@ -135,318 +144,336 @@
         <path class="hero-lemon-shape" d="M30 130C42 73 96 38 159 44C205 49 244 78 252 121C260 167 225 211 170 220C104 231 48 200 30 151C27 143 27 136 30 130Z"/>
         <path class="hero-detail" d="M70 113C102 79 151 65 194 76"/>
       </svg>
-      <svg class="hero-cut hero-cut-green" viewBox="0 0 260 230" focusable="false">
-        <path class="hero-stem" d="M48 71C67 55 82 43 102 30"/>
-        <path class="hero-leaf" d="M69 52C45 26 19 30 13 49C31 68 52 69 69 52Z"/>
-        <path class="hero-leaf" d="M84 43C98 13 126 7 139 24C126 47 104 55 84 43Z"/>
-        <path class="hero-lemon-shape" d="M38 120C53 70 100 45 153 51C202 57 232 88 229 128C226 170 190 201 143 206C88 211 45 184 34 145C31 136 32 127 38 120Z"/>
-        <path class="hero-detail" d="M69 110C96 81 139 70 180 81"/>
-      </svg>
-      <svg class="hero-cut hero-cut-accent" viewBox="0 0 150 145" focusable="false">
-        <path class="hero-slice" d="M75 12A61 61 0 1 1 20 99Z"/>
-        <path class="hero-detail" d="M75 12L20 99M75 12V134M75 12L126 104"/>
-      </svg>
     </div>
-    <div class="free-badge"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg> 官方資料整理・工具化・可回報修正</div>
-    <h1>我們想成為對打工度假者<br>最友善的網站</h1>
-    <p class="lede">不替你草率做決定，而是幫你看懂選項、查到依據，找到適合自己的下一步。</p>
-  </section>
-
-  <div class="trust-strip" aria-label="本站承諾">
-    <span>官方來源可回查</span><span>風險先揭露</span><span>公開內容免費</span><span>資料性質說清楚</span>
-  </div>
-
-  <nav class="home-zone-nav" aria-label="首頁四大入口">
-    <a href="#clarifier"><span>01</span><strong>釐清</strong><small>點幾下，找到下一步</small></a>
-    <a href="#search"><span>02</span><strong>搜尋</strong><small>直接找全部攻略</small></a>
-    <a href="#communities"><span>03</span><strong>社團</strong><small>找在地的人聊</small></a>
-    <a href="#games"><span>04</span><strong>遊戲</strong><small>先模擬，再面對真實選擇</small></a>
-  </nav>
-
-  <section class="support-hub" id="support-hub" aria-labelledby="support-hub-title">
-    <p class="section-eyebrow">URGENT FIRST</p>
-    <h2 id="support-hub-title">如果事情很急，先走安全出口</h2>
-    <p class="support-hub-intro">這些情況不用從頭讀攻略，也不要留在本站等回覆。先做能降低傷害的第一步。</p>
-    <div class="support-grid">
-      <a class="support-link" href="health.html#emergency">
-        <svg class="icon" aria-hidden="true"><use href="#i-health"/></svg>
-        <span><strong>有人受傷或有立即危險</strong><small>先看 000、急診與緊急支援</small></span>
-      </a>
-      <a class="support-link" href="scam.html#help">
-        <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
-        <span><strong>剛匯款、帳號可能被盜</strong><small>先停損、留證據，再通報</small></span>
-      </a>
-      <a class="support-link" href="scam.html#help">
-        <svg class="icon" aria-hidden="true"><use href="#i-lifebuoy"/></svg>
-        <span><strong>被威脅、剝削或扣住證件</strong><small>先離開危險，再找正確求助</small></span>
-      </a>
-      <a class="support-link" href="visa.html#apply">
-        <svg class="icon" aria-hidden="true"><use href="#i-idcard"/></svg>
-        <span><strong>簽證快到期或收到官方通知</strong><small>先登入官方帳戶核對，不找偏方</small></span>
-      </a>
-    </div>
+    <h1>澳洲打工度假，你現在在哪一步？</h1>
+    <p class="lede">先講你現在卡哪一步，再給你對得上的資料。</p>
   </section>
 
   <section class="home-zone-section clarifier" id="clarifier" aria-labelledby="clarifier-title" data-clarifier data-stage="" data-passport="">
-    <p class="section-eyebrow">01・CLARIFY</p>
-    <h2 id="clarifier-title">你現在在哪一步？</h2>
-    <p class="clarifier-privacy">選項只在這一頁，不會送出。</p>
+    <h2 id="clarifier-title" class="clarifier-title">先選你的階段</h2>
 
     <nav class="journey-directory" id="journey-map" aria-label="依旅程階段瀏覽">
-      <a href="#considering"><span>01</span>還在考慮</a>
-      <a href="#committed"><span>02</span>決定要去</a>
-      <a href="#in-australia"><span>03</span>已在澳洲</a>
-      <a href="#next-step"><span>04</span>回程與延續</a>
+      <a href="#considering" data-label-462="還在糾結"><span>01</span>還在考慮</a>
+      <a href="#committed" data-label-462="決定要去（等抽籤也算）"><span>02</span>決定要去</a>
+      <a href="#in-australia" data-label-462="已經到澳"><span>03</span>已在澳洲</a>
+      <a href="#next-step" data-label-462="回程或留下"><span>04</span>回程或留下</a>
     </nav>
+    <p class="clarifier-privacy clarifier-trust">公開內容免費，不代辦。本站沒有會員、配對或私訊功能，也不會由本站主動私訊。選項只在這一頁，不會送出。</p>
 
     <div class="clarifier-panels" id="common-problems">
 
       <section class="journey-phase clarifier-panel" id="considering" aria-labelledby="considering-title" data-clarifier-panel="considering" tabindex="-1">
-        <p class="section-eyebrow">PHASE 01</p>
         <h2 id="considering-title">還在考慮：先確認適不適合</h2>
 
-        <div class="clarifier-passport" role="group" aria-labelledby="considering-passport-q" data-clarifier-passport hidden>
+        <div class="clarifier-passport" role="radiogroup" aria-labelledby="considering-passport-q" data-clarifier-passport hidden>
+          <p class="clarifier-passport-lead">台灣 417 跟中國 462 不是同一條路。</p>
           <p class="clarifier-q" id="considering-passport-q">你拿哪本護照？</p>
           <div class="clarifier-chips">
-            <button class="chip" type="button" data-passport="417" aria-pressed="false">台灣護照 417</button>
-            <button class="chip" type="button" data-passport="462" aria-pressed="false">中國大陸護照 462</button>
-            <button class="chip" type="button" data-passport="other" aria-pressed="false">其他護照</button>
+            <button class="chip" type="button" role="radio" data-passport="417" aria-checked="false" tabindex="0">台灣 417</button>
+            <button class="chip" type="button" role="radio" data-passport="462" aria-checked="false" tabindex="-1">中國大陸 462</button>
+            <button class="chip" type="button" role="radio" data-passport="other" aria-checked="false" tabindex="-1">其他護照</button>
           </div>
-          <p class="clarifier-passport-note" data-passport-note="462" hidden>462 簽證細節：<a href="lang/en/visa/">英文簽證頁</a></p>
           <p class="clarifier-passport-note" data-passport-note="other" hidden>其他護照：<a href="lang/">先選語言</a></p>
         </div>
-        <p class="clarifier-passport-static" data-clarifier-passport-static>非台灣護照？462 看<a href="lang/en/visa/">英文簽證頁</a>，其他看<a href="lang/">語言入口</a>。</p>
+        <p class="clarifier-passport-static" data-clarifier-passport-static>非台灣護照？462 先看下方摘要與<a href="lang/en/visa/">英文簽證頁</a>，其他看<a href="lang/">語言入口</a>。</p>
+        <aside class="clarifier-passport-summary" id="considering-passport-462" aria-labelledby="considering-passport-462-title" data-passport-summary>
+          <h3 id="considering-passport-462-title">中國大陸護照走 462，和台灣的 417 不同</h3>
+          <ul class="clarifier-passport-summary-lines">
+            <li>每年 5,000 個首簽名額。</li>
+            <li>首簽必須先在 ImmiAccount 登記抽籤（A$25，不退）並被抽中。</li>
+            <li>需要高等教育學歷或完成 2 年大學本科，並具 Functional English。</li>
+            <li>不需要政府支持信。</li>
+          </ul>
+          <p class="clarifier-passport-summary-scope">住宿、找工作、防詐等繁中主題頁中國護照同樣適用；只有簽證細節請看英文版。</p>
+          <p class="clarifier-passport-summary-actions"><a class="btn" href="lang/en/visa/#choose">看英文版 417／462 分流與 462 重點</a></p>
+          <p class="clarifier-exit-more clarifier-passport-summary-links"><a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-462/first-work-holiday-462" target="_blank" rel="noopener noreferrer">官方 462 首簽資格頁</a><a href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/latest-news/new-work-and-holiday-subclass-462-visa-pre-application-process" target="_blank" rel="noopener noreferrer">抽籤說明與時程</a><a href="https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/english-language/functional-english" target="_blank" rel="noopener noreferrer">Functional English 官方說明</a><a href="https://china.embassy.gov.au/bjng/WHV2026-27EN.html" target="_blank" rel="noopener noreferrer">澳洲駐華使館 2026-27 說明</a><a href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/status-of-country-caps" target="_blank" rel="noopener noreferrer">名額即時狀態</a><a href="lang/zh-Hans/#official-title">簡中快速入門</a></p>
+          <p class="clarifier-exit-boundary">本站不判定個案資格；以內政部官方頁、ImmiAccount 與核准信為準。</p>
+          <p class="clarifier-passport-summary-source">來源：內政部 462 首簽頁（官方更新 2026-08-27）、抽籤頁（官方更新 2026-08-26）、名額頁（官方更新 2026-09-02）｜2026-09 查核</p>
+        </aside>
 
         <p class="clarifier-q" id="considering-need">最想先解決哪件事？</p>
         <nav class="clarifier-chips" aria-labelledby="considering-need">
-          <a class="chip" href="#exit-considering-why">去哪、怎麼過</a>
-          <a class="chip" href="#exit-considering-cost">錢夠不夠</a>
-          <a class="chip" href="#exit-considering-visa">能不能申請</a>
-          <a class="chip" href="#games">先玩一次</a>
-          <a class="chip" href="#communities">找人聊</a>
-          <a class="chip" href="#considering-exits">全部顯示</a>
+          <a class="chip" href="#exit-considering-why" data-label-462="先去哪個城">第一站去哪</a>
+          <a class="chip" href="#exit-considering-cost" data-label-462="錢夠不夠花">存得到錢嗎</a>
+          <a class="chip" href="#exit-considering-visa" data-label-462="462夠資格嗎">我能申請嗎</a>
+          <a class="chip" href="#games" data-label-462="先體驗一下">先模擬一次</a>
+          <a class="chip" href="#communities" data-label-462="看公開討論">看公開討論</a>
+          <a class="chip" href="#considering-exits" data-label-462="全部看">全部看</a>
         </nav>
 
         <div class="clarifier-exits" id="considering-exits" tabindex="-1">
-          <div class="clarifier-exit" id="exit-considering-why" tabindex="-1">
+          <div class="clarifier-exit" id="exit-considering-why" tabindex="-1" data-search-entry="我到底要啥|#exit-considering-why">
             <a class="card" href="why.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg></span>
               <span class="problem-category">自我釐清</span>
-              <h3>很想出發，但不知道自己真正要的是什麼</h3>
+              <h3 data-label-462="我到底要啥">我到底要啥</h3>
               <p>用快思看見準備輪廓，再慢慢整理價值、取捨與底線；不是心理診斷。</p>
               <span class="card-action">第一步：做 2 分鐘快思</span>
             </a>
-            <p class="clarifier-exit-more"><a href="why.html#quick-quiz">2 分鐘快思</a><a href="simulator.html">先玩一次</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="why.html#quick-quiz">2 分鐘快思</a><a href="simulator.html">先玩一次</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-considering-cost" tabindex="-1">
+          <div class="clarifier-exit" id="exit-considering-cost" tabindex="-1" data-search-entry="存得到錢嗎|#exit-considering-cost">
             <a class="card" href="cost.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-dollar"/></svg></span>
               <span class="problem-category">預算與生活</span>
-              <h3>怕錢不夠，也不知道薪水能不能撐住生活</h3>
+              <h3 data-label-462="錢夠不夠花">存得到錢嗎</h3>
+              <p>怕錢不夠，也不知道薪水能不能撐住生活。</p>
               <span class="card-action">第一步：算自己的每週收支</span>
             </a>
-            <p class="clarifier-exit-more"><a href="cost.html#save-calc">存錢試算</a><a href="cost.html#budget">起步帶多少</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="cost.html#save-calc">存錢試算</a><a href="cost.html#budget">起步帶多少</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-considering-visa" tabindex="-1">
+          <div class="clarifier-exit" id="exit-considering-visa" tabindex="-1" data-search-entry="我能申請嗎|#exit-considering-visa">
             <a class="card" href="visa.html" data-href-462="lang/en/visa/">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-idcard"/></svg></span>
               <span class="problem-category">簽證與集簽</span>
-              <h3>不知道自己能不能申請，或這份工作算不算集簽</h3>
+              <h3 data-label-462="462夠資格嗎">我能申請嗎</h3>
+              <p>不知道自己能不能申請，或這份工作算不算集簽。本站不判定個案資格；以內政部官方頁、ImmiAccount 與核准信為準。</p>
               <span class="card-action">第一步：從官方申請條件開始</span>
             </a>
-            <p class="clarifier-exit-more"><a href="visa.html#apply" data-href-462="lang/en/visa/#apply">申請流程</a><a href="visa.html#second" data-href-462="lang/en/visa/#second-third">集簽規則</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="visa.html#apply" data-href-462="lang/en/visa/#apply">申請流程</a><a href="visa.html#second" data-href-462="lang/en/visa/#second-third">集簽規則</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
         </div>
         <p class="clarifier-safety">急事先走<a href="#support-hub">安全出口</a>。</p>
       </section>
 
       <section class="journey-phase clarifier-panel" id="committed" aria-labelledby="committed-title" data-clarifier-panel="committed" tabindex="-1">
-        <p class="section-eyebrow">PHASE 02</p>
         <h2 id="committed-title">決定要去：把出發條件備齊</h2>
 
-        <div class="clarifier-passport" role="group" aria-labelledby="committed-passport-q" data-clarifier-passport hidden>
+        <div class="clarifier-passport" role="radiogroup" aria-labelledby="committed-passport-q" data-clarifier-passport hidden>
+          <p class="clarifier-passport-lead">台灣 417 跟中國 462 不是同一條路。</p>
           <p class="clarifier-q" id="committed-passport-q">你拿哪本護照？</p>
           <div class="clarifier-chips">
-            <button class="chip" type="button" data-passport="417" aria-pressed="false">台灣護照 417</button>
-            <button class="chip" type="button" data-passport="462" aria-pressed="false">中國大陸護照 462</button>
-            <button class="chip" type="button" data-passport="other" aria-pressed="false">其他護照</button>
+            <button class="chip" type="button" role="radio" data-passport="417" aria-checked="false" tabindex="0">台灣 417</button>
+            <button class="chip" type="button" role="radio" data-passport="462" aria-checked="false" tabindex="-1">中國大陸 462</button>
+            <button class="chip" type="button" role="radio" data-passport="other" aria-checked="false" tabindex="-1">其他護照</button>
           </div>
-          <p class="clarifier-passport-note" data-passport-note="462" hidden>462 簽證細節：<a href="lang/en/visa/">英文簽證頁</a></p>
           <p class="clarifier-passport-note" data-passport-note="other" hidden>其他護照：<a href="lang/">先選語言</a></p>
         </div>
-        <p class="clarifier-passport-static" data-clarifier-passport-static>非台灣護照？462 看<a href="lang/en/visa/">英文簽證頁</a>，其他看<a href="lang/">語言入口</a>。</p>
+        <p class="clarifier-passport-static" data-clarifier-passport-static>非台灣護照？462 先看下方摘要與<a href="lang/en/visa/">英文簽證頁</a>，其他看<a href="lang/">語言入口</a>。</p>
+        <aside class="clarifier-passport-summary" id="committed-passport-462" aria-labelledby="committed-passport-462-title" data-passport-summary>
+          <h3 id="committed-passport-462-title">中國大陸護照走 462，和台灣的 417 不同</h3>
+          <ul class="clarifier-passport-summary-lines">
+            <li>每年 5,000 個首簽名額。</li>
+            <li>首簽必須先在 ImmiAccount 登記抽籤（A$25，不退）並被抽中。</li>
+            <li>需要高等教育學歷或完成 2 年大學本科，並具 Functional English。</li>
+            <li>不需要政府支持信。</li>
+          </ul>
+          <p class="clarifier-passport-summary-scope">住宿、找工作、防詐等繁中主題頁中國護照同樣適用；只有簽證細節請看英文版。</p>
+          <p class="clarifier-passport-summary-actions"><a class="btn" href="lang/en/visa/#choose">看英文版 417／462 分流與 462 重點</a></p>
+          <p class="clarifier-exit-more clarifier-passport-summary-links"><a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-462/first-work-holiday-462" target="_blank" rel="noopener noreferrer">官方 462 首簽資格頁</a><a href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/latest-news/new-work-and-holiday-subclass-462-visa-pre-application-process" target="_blank" rel="noopener noreferrer">抽籤說明與時程</a><a href="https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/english-language/functional-english" target="_blank" rel="noopener noreferrer">Functional English 官方說明</a><a href="https://china.embassy.gov.au/bjng/WHV2026-27EN.html" target="_blank" rel="noopener noreferrer">澳洲駐華使館 2026-27 說明</a><a href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/status-of-country-caps" target="_blank" rel="noopener noreferrer">名額即時狀態</a><a href="lang/zh-Hans/#official-title">簡中快速入門</a></p>
+          <p class="clarifier-exit-boundary">本站不判定個案資格；以內政部官方頁、ImmiAccount 與核准信為準。</p>
+          <p class="clarifier-passport-summary-source">來源：內政部 462 首簽頁（官方更新 2026-08-27）、抽籤頁（官方更新 2026-08-26）、名額頁（官方更新 2026-09-02）｜2026-09 查核</p>
+        </aside>
 
         <p class="clarifier-q" id="committed-need">最想先解決哪件事？</p>
         <nav class="clarifier-chips" aria-labelledby="committed-need">
-          <a class="chip" href="#exit-committed-prep">行前順序</a>
-          <a class="chip" href="#exit-committed-visa">簽證申請</a>
-          <a class="chip" href="#exit-committed-health">保險就醫</a>
-          <a class="chip" href="#exit-committed-english">英文不夠</a>
-          <a class="chip" href="#exit-committed-housing">先訂住宿</a>
-          <a class="chip" href="#exit-committed-work">先找工作</a>
-          <a class="chip" href="#communities">找人聊</a>
-          <a class="chip" href="#committed-exits">全部顯示</a>
+          <a class="chip" href="#exit-committed-prep" data-label-462="出發先準備">出發先做啥</a>
+          <a class="chip" href="#exit-committed-visa" data-label-462="462怎麼遞">417怎麼送</a>
+          <a class="chip" href="#exit-committed-health" data-label-462="保險買哪邊">保險買哪邊</a>
+          <a class="chip" href="#exit-committed-english" data-label-462="英語不夠用">英文很爛</a>
+          <a class="chip" href="#exit-committed-housing" data-label-462="落地住哪">落地住哪</a>
+          <a class="chip" href="#exit-committed-work" data-label-462="工作去哪找">工作去哪找</a>
+          <a class="chip" href="#communities" data-label-462="看公開討論">看公開討論</a>
+          <a class="chip" href="#committed-exits" data-label-462="全部看">全部看</a>
         </nav>
 
         <div class="clarifier-exits" id="committed-exits" tabindex="-1">
-          <div class="clarifier-exit" id="exit-committed-prep" tabindex="-1">
+          <div class="clarifier-exit" id="exit-committed-prep" tabindex="-1" data-search-entry="出發先做啥|#exit-committed-prep">
             <a class="card" href="prep.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-luggage"/></svg></span>
               <span class="problem-category">行前與落地</span>
-              <h3>機票快到了，卻不知道事情應該先做哪一件</h3>
+              <h3 data-label-462="出發先準備">出發先做啥</h3>
+              <p>機票快到了，卻不知道事情應該先做哪一件。</p>
               <span class="card-action">第一步：打開行前時間軸</span>
             </a>
-            <p class="clarifier-exit-more"><a href="prep.html#timeline">時間軸</a><a href="prep.html#checklist">互動清單</a><a href="prep.html#money">錢怎麼帶</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="prep.html#timeline">時間軸</a><a href="prep.html#checklist">互動清單</a><a href="prep.html#money">錢怎麼帶</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-committed-visa" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-committed-visa" tabindex="-1" data-search-entry="417怎麼送|#exit-committed-visa">
+            <h3 data-label-462="462怎麼遞">417怎麼送</h3>
             <p class="clarifier-exit-lead">全程線上，自己申請就好。</p>
-            <p class="clarifier-exit-more"><a href="visa.html#first" data-href-462="lang/en/visa/#first">首簽條件</a><a href="visa.html#apply" data-href-462="lang/en/visa/#apply">申請流程</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="visa.html#first" data-href-462="lang/en/visa/#first">首簽條件</a><a href="visa.html#apply" data-href-462="lang/en/visa/#apply">申請流程</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-committed-health" tabindex="-1">
+          <div class="clarifier-exit" id="exit-committed-health" tabindex="-1" data-search-entry="保險買哪邊|#exit-committed-health">
             <a class="card" href="health.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-health"/></svg></span>
               <span class="problem-category">健康與安全</span>
-              <h3>不知道保險怎麼選，生病受傷又該去哪裡</h3>
+              <h3 data-label-462="保險買哪邊">保險買哪邊</h3>
+              <p>不知道保險怎麼選，生病受傷又該去哪裡。</p>
               <span class="card-action">第一步：確認自己的醫療保障</span>
             </a>
-            <p class="clarifier-exit-more"><a href="health.html#insurance">保險怎麼買</a><a href="health.html#doctor">就醫分流</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="health.html#insurance">保險怎麼買</a><a href="health.html#doctor">就醫分流</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-committed-english" tabindex="-1">
+          <div class="clarifier-exit" id="exit-committed-english" tabindex="-1" data-search-entry="英文很爛啦|#exit-committed-english">
             <a class="card" href="english.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></span>
               <span class="problem-category">英文溝通</span>
-              <h3>怕英文不夠好，連找工作和看醫生都不敢開口</h3>
+              <h3 data-label-462="英語不夠用">英文很爛啦</h3>
+              <p>怕英文不夠好，連找工作和看醫生都不敢開口。</p>
               <span class="card-action">第一步：選一個真實情境練習</span>
             </a>
-            <p class="clarifier-exit-more"><a href="english.html#before">出發前資源</a><a href="english.html#work-english">工作要多少英文</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="english.html#before">出發前資源</a><a href="english.html#work-english">工作要多少英文</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-committed-housing" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-committed-housing" tabindex="-1" data-search-entry="落地住哪裡|#exit-committed-housing">
+            <h3 data-label-462="落地住哪裡">落地住哪裡</h3>
             <p class="clarifier-exit-lead">先訂可取消的短住。</p>
-            <p class="clarifier-exit-more"><a href="housing.html#book">開始多平台找房</a><a href="housing.html#housing-search-tool">兩題找平台</a><a href="housing.html#options">住宿光譜</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="housing.html#book">開始多平台找房</a><a href="housing.html#housing-search-tool">兩題找平台</a><a href="housing.html#options">住宿光譜</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-committed-work" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-committed-work" tabindex="-1" data-search-entry="工作去哪找|#exit-committed-work">
+            <h3 data-label-462="工作去哪找">工作去哪找</h3>
             <p class="clarifier-exit-lead">先看管道，再做 6 題找職類。</p>
-            <p class="clarifier-exit-more"><a href="work.html#channels">打開多平台求職入口</a><a href="#job-quiz">6 題找職類</a><a href="work.html#certs">先考什麼證照</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="work.html#channels">打開多平台求職入口</a><a href="#job-quiz">6 題找職類</a><a href="work.html#certs">先考什麼證照</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
         </div>
         <p class="clarifier-safety">急事先走<a href="#support-hub">安全出口</a>。</p>
       </section>
 
       <section class="journey-phase clarifier-panel" id="in-australia" aria-labelledby="in-australia-title" data-clarifier-panel="in-australia" tabindex="-1">
-        <p class="section-eyebrow">PHASE 03</p>
         <h2 id="in-australia-title">已在澳洲：安頓、求職與自保</h2>
 
         <p class="clarifier-q" id="in-australia-need">最想先解決哪件事？</p>
         <nav class="clarifier-chips" aria-labelledby="in-australia-need">
-          <a class="chip" href="#exit-in-australia-housing">找房</a>
-          <a class="chip" href="#exit-in-australia-work">找工作</a>
-          <a class="chip" href="#exit-in-australia-visa">集簽</a>
-          <a class="chip" href="#exit-in-australia-money">薪水與稅</a>
-          <a class="chip" href="#exit-in-australia-scam">怕被騙</a>
-          <a class="chip" href="#exit-in-australia-health">看醫生</a>
-          <a class="chip" href="#exit-in-australia-car">買車</a>
-          <a class="chip" href="#exit-in-australia-pr">想留下來</a>
-          <a class="chip" href="#communities">找人聊</a>
-          <a class="chip" href="#in-australia-exits">全部顯示</a>
+          <a class="chip" href="#exit-in-australia-housing" data-label-462="急著找房">急著找房</a>
+          <a class="chip" href="#exit-in-australia-work" data-label-462="這工正規嗎">這工合法嗎</a>
+          <a class="chip" href="#exit-in-australia-visa" data-label-462="集簽怎麼算">88天怎麼算</a>
+          <a class="chip" href="#exit-in-australia-money" data-label-462="工錢對不對">薪水對不對</a>
+          <a class="chip" href="#exit-in-australia-scam" data-label-462="怕現金工">怕遇到黑工</a>
+          <a class="chip" href="#exit-in-australia-health" data-label-462="想看病">想看病</a>
+          <a class="chip" href="#exit-in-australia-car" data-label-462="想買二手車">想買二手車</a>
+          <a class="chip" href="#exit-in-australia-pr" data-label-462="想留下">想轉PR</a>
+          <a class="chip" href="#communities" data-label-462="看公開討論">看公開討論</a>
+          <a class="chip" href="#in-australia-exits" data-label-462="全部看">全部看</a>
         </nav>
 
         <div class="clarifier-exits" id="in-australia-exits" tabindex="-1">
-          <div class="clarifier-exit" id="exit-in-australia-housing" tabindex="-1">
+          <div class="clarifier-exit" id="exit-in-australia-housing" tabindex="-1" data-search-entry="急著找房子|#exit-in-australia-housing">
             <a class="card" href="housing.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span>
               <span class="problem-category">住宿與租屋</span>
-              <h3>急著找地方住，又怕遇到假房東或押金糾紛</h3>
+              <h3 data-label-462="急著找群租">急著找房子</h3>
+              <p>急著找地方住，又怕遇到假房東或押金糾紛。</p>
               <span class="card-action">第一步：選短住或長租路徑</span>
             </a>
-            <p class="clarifier-exit-more"><a href="housing.html#book">開始多平台找房</a><a href="housing.html#bond">押金自保</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="housing.html#book">開始多平台找房</a><a href="housing.html#bond">押金自保</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-in-australia-work" tabindex="-1">
+          <div class="clarifier-exit" id="exit-in-australia-work" tabindex="-1" data-search-entry="這工合法嗎|#exit-in-australia-work">
             <a class="card" href="work.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-briefcase"/></svg></span>
               <span class="problem-category">找工作</span>
-              <h3>投了很多履歷沒回音，也不知道這份工作合不合法</h3>
+              <h3 data-label-462="這工正規嗎">這工合法嗎</h3>
+              <p>投了很多履歷沒回音，也不知道這份工作合不合法。本站不判定個案資格；以內政部官方頁、ImmiAccount 與核准信為準。</p>
               <span class="card-action">第一步：做接工作前 5 分鐘查核</span>
             </a>
-            <p class="clarifier-exit-more"><a href="work.html#channels">打開多平台求職入口</a><a href="#job-quiz">6 題找職類</a><a href="work.html#seasons">採收月曆</a><a href="work.html#verify">5 分鐘查核</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="work.html#channels">打開多平台求職入口</a><a href="#job-quiz">6 題找職類</a><a href="work.html#seasons">採收月曆</a><a href="work.html#verify">5 分鐘查核</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-visa" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-visa" tabindex="-1" data-search-entry="88天怎麼算|#exit-in-australia-visa">
+            <h3 data-label-462="集簽怎麼算">88天怎麼算</h3>
             <p class="clarifier-exit-lead">先查地區與工作，再從第一天存證據。</p>
-            <p class="clarifier-exit-more"><a href="visa.html#postcode-tool" data-href-462="lang/en/visa/#postcode-tool">郵遞區號初篩</a><a href="visa.html#evidence" data-href-462="lang/en/visa/#evidence">集簽證據</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-boundary">本站不判定個案資格；以內政部官方頁、ImmiAccount 與核准信為準。</p>
+            <p class="clarifier-exit-more"><a href="visa.html#postcode-tool" data-href-462="lang/en/visa/#postcode-tool">郵遞區號初篩</a><a href="visa.html#evidence" data-href-462="lang/en/visa/#evidence">集簽證據</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-money" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-money" tabindex="-1" data-search-entry="薪水對不對|#exit-in-australia-money">
+            <h3 data-label-462="工錢對不對">薪水對不對</h3>
             <p class="clarifier-exit-lead">先查依法該領多少。</p>
-            <p class="clarifier-exit-more"><a href="cost.html#wage">法定最低時薪</a><a href="cost.html#tax">稅與 super</a><a href="cost.html#exchange">換匯與匯款</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="cost.html#wage">法定最低時薪</a><a href="cost.html#tax">稅與 super</a><a href="cost.html#exchange">換匯與匯款</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-in-australia-scam" tabindex="-1">
+          <div class="clarifier-exit" id="exit-in-australia-scam" tabindex="-1" data-search-entry="對方催匯款|#exit-in-australia-scam">
             <a class="card" href="scam.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg></span>
               <span class="problem-category">詐騙與剝削</span>
-              <h3>對方催我付錢、交證件，還說錯過就沒機會</h3>
+              <h3 data-label-462="對方催匯款">對方催匯款</h3>
+              <p>對方催你付錢、交證件，還說錯過就沒機會。</p>
               <span class="card-action">第一步：先看不能忽略的紅旗</span>
             </a>
-            <p class="clarifier-exit-more"><a href="scam.html#defense">三道防線</a><a href="scam.html#help">中招救濟包</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="scam.html#defense">三道防線</a><a href="scam.html#help">中招救濟包</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-health" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-health" tabindex="-1" data-search-entry="生病看哪裡|#exit-in-australia-health">
+            <h3 data-label-462="生病看哪裡">生病看哪裡</h3>
             <p class="clarifier-exit-lead">依急迫程度分流，緊急先打 000。</p>
-            <p class="clarifier-exit-more"><a href="health.html#doctor">就醫分流</a><a href="health.html#mental">心理健康</a><a href="health.html#emergency">緊急聯絡總表</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="health.html#doctor">就醫分流</a><a href="health.html#mental">心理健康</a><a href="health.html#emergency">緊急聯絡總表</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-car" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-in-australia-car" tabindex="-1" data-search-entry="想買二手車|#exit-in-australia-car">
+            <h3 data-label-462="想買二手車">想買二手車</h3>
             <p class="clarifier-exit-lead">先找車，付款前查 VIN。</p>
-            <p class="clarifier-exit-more"><a href="cost.html#car">買車與賣車</a><a href="cost.html#car-checklist">付款前 7 件事</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="cost.html#car">買車與賣車</a><a href="cost.html#car-checklist">付款前 7 件事</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-in-australia-pr" tabindex="-1">
+          <div class="clarifier-exit" id="exit-in-australia-pr" tabindex="-1" data-search-entry="想轉PR嗎|#exit-in-australia-pr">
             <a class="card" href="pr.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-key"/></svg></span>
               <span class="problem-category">長期留下</span>
-              <h3>喜歡澳洲，想知道留下來有哪些路可以自己查</h3>
+              <h3 data-label-462="想留下嗎">想轉PR嗎</h3>
+              <p>喜歡澳洲，想知道留下來有哪些路可以自己查。</p>
               <span class="card-action">第一步：看路徑全貌，不先押一條路</span>
             </a>
-            <p class="clarifier-exit-more"><a href="pr.html#overview">四類公開入口</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="pr.html#overview">四類公開入口</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
         </div>
         <p class="clarifier-safety">急事先走<a href="#support-hub">安全出口</a>。</p>
       </section>
 
       <section class="journey-phase clarifier-panel" id="next-step" aria-labelledby="next-step-title" data-clarifier-panel="next-step" tabindex="-1">
-        <p class="section-eyebrow">PHASE 04</p>
-        <h2 id="next-step-title">回程與延續：收好成果再出發</h2>
+        <h2 id="next-step-title">回程或留下：收好成果再出發</h2>
 
         <p class="clarifier-q" id="next-step-need">最想先解決哪件事？</p>
         <nav class="clarifier-chips" aria-labelledby="next-step-need">
-          <a class="chip" href="#exit-next-step-leave">報稅與離澳</a>
-          <a class="chip" href="#exit-next-step-market">出清行李</a>
-          <a class="chip" href="#exit-next-step-pr">想留下來</a>
-          <a class="chip" href="#exit-next-step-about">回報修正</a>
-          <a class="chip" href="#communities">找人聊</a>
-          <a class="chip" href="#next-step-exits">全部顯示</a>
+          <a class="chip" href="#exit-next-step-leave" data-label-462="退稅跟離境">退稅跟離澳</a>
+          <a class="chip" href="#exit-next-step-market" data-label-462="二手怎麼出">東西怎麼賣</a>
+          <a class="chip" href="#exit-next-step-pr" data-label-462="想留下">想轉PR</a>
+          <a class="chip" href="#exit-next-step-about" data-label-462="資料有錯">資料有錯</a>
+          <a class="chip" href="#communities" data-label-462="看公開討論">看公開討論</a>
+          <a class="chip" href="#next-step-exits" data-label-462="全部看">全部看</a>
         </nav>
 
         <div class="clarifier-exits" id="next-step-exits" tabindex="-1">
-          <div class="clarifier-exit" id="exit-next-step-leave" tabindex="-1">
+          <div class="clarifier-exit" id="exit-next-step-leave" tabindex="-1" data-search-entry="退稅跟離澳|#exit-next-step-leave">
             <a class="card" href="leave.html">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-plane"/></svg></span>
               <span class="problem-category">報稅與離澳</span>
-              <h3>準備回家，怕漏掉退租、報稅、super 和帳戶</h3>
+              <h3 data-label-462="退稅跟離境">退稅跟離澳</h3>
+              <p>準備回家，怕漏掉退租、報稅、super 和帳戶。</p>
               <span class="card-action">第一步：打開離澳 checklist</span>
             </a>
-            <p class="clarifier-exit-more"><a href="leave.html#leave-checklist-tool">離澳 checklist</a><a href="leave.html#dasp-calc">DASP 粗估</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="leave.html#leave-checklist-tool">離澳 checklist</a><a href="leave.html#dasp-calc">DASP 粗估</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-next-step-market" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-next-step-market" tabindex="-1" data-search-entry="東西怎麼賣|#exit-next-step-market">
+            <h3 data-label-462="二手怎麼出">東西怎麼賣</h3>
             <p class="clarifier-exit-lead">先寫一份不含個資的草稿。</p>
-            <p class="clarifier-exit-more"><a href="market.html#market-tool">開啟二手交換工具</a><a href="market.html#platforms">平台入口</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="market.html#market-tool">開啟二手交換工具</a><a href="market.html#platforms">平台入口</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit clarifier-exit-lite" id="exit-next-step-pr" tabindex="-1">
+          <div class="clarifier-exit clarifier-exit-lite" id="exit-next-step-pr" tabindex="-1" data-search-entry="留下有哪路|#exit-next-step-pr">
+            <h3 data-label-462="留下有哪路">留下有哪路</h3>
             <p class="clarifier-exit-lead">先分清楚制度，再查個別條件。</p>
-            <p class="clarifier-exit-more"><a href="pr.html#overview">四類公開入口</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="pr.html#overview">四類公開入口</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
-          <div class="clarifier-exit" id="exit-next-step-about" tabindex="-1">
+          <div class="clarifier-exit" id="exit-next-step-about" tabindex="-1" data-search-entry="網站資料錯|#exit-next-step-about">
             <a class="card" href="about.html#maintain">
               <span class="card-emoji"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span>
               <span class="problem-category">回報與修正</span>
-              <h3>發現資料有錯，或網站還缺你遇到的問題</h3>
+              <h3 data-label-462="網站資料錯">網站資料錯</h3>
+              <p>發現資料有錯，或網站還缺你遇到的問題。</p>
               <span class="card-action">第一步：告訴我們缺哪一題</span>
             </a>
-            <p class="clarifier-exit-more"><a href="about.html#maintain">回報錯誤</a><a href="#communities">找人聊</a></p>
+            <p class="clarifier-exit-more"><a href="about.html#maintain">回報錯誤</a><a href="#communities">看公開討論</a></p>
+          <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
           </div>
         </div>
         <p class="clarifier-safety">急事先走<a href="#support-hub">安全出口</a>。</p>
@@ -468,27 +495,32 @@
         <li data-job-family="retail"><a href="work.html#channels">零售與門市</a><small>先看求職管道</small></li>
         <li data-job-family="office"><a href="work.html#resume">辦公與專業</a><small>先改澳式履歷</small></li>
       </ul>
-      <p class="clarifier-exit-more"><a href="work.html#verify">接工作前 5 分鐘查核</a><a href="#communities">找人聊</a></p>
+      <p class="clarifier-exit-more"><a href="work.html#verify">接工作前 5 分鐘查核</a><a href="#communities">看公開討論</a></p>
+      <p class="clarifier-exit-safety">不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。</p>
       <p class="clarifier-safety">被要求先付錢或交證件？先走<a href="#support-hub">安全出口</a>。</p>
     </section>
+    <p class="clarifier-search-jump"><a class="btn" id="clarifier-search-open" href="#search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg> 搜尋全部攻略</a></p>
   </section>
 
   <section class="site-search-home" id="search" aria-labelledby="site-search-home-title">
-    <p class="section-eyebrow">02・SEARCH ALL GUIDES</p>
-    <h2 id="site-search-home-title">還是沒有？搜尋全部攻略</h2>
+    <p class="section-eyebrow">SEARCH ALL GUIDES</p>
+    <h2 id="site-search-home-title">卡片裡沒有你的說法？直接搜尋</h2>
     <p>只在這台裝置搜尋，不送出。</p>
     <form class="site-search-home-form" id="site-search-home-form" role="search" data-search-ui>
       <label class="sr-only" for="site-search-home-input">搜尋全部攻略</label>
       <input id="site-search-home-input" type="search" inputmode="search" autocomplete="off" placeholder="例如：88 天、買二手車、英文面試" maxlength="80">
       <button class="btn" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg> 搜尋攻略</button>
     </form>
-    <div class="chip-row" aria-label="熱門搜尋" data-search-ui>
-      <span class="chip-label">可以先點：</span>
-      <button class="chip" type="button" data-home-search-query="二簽 88 天">二簽 88 天</button>
-      <button class="chip" type="button" data-home-search-query="找房">找房</button>
-      <button class="chip" type="button" data-home-search-query="買二手車">買二手車</button>
-      <button class="chip" type="button" data-home-search-query="欠薪">欠薪</button>
-      <button class="chip" type="button" data-home-search-query="看醫生">看醫生</button>
+    <div class="chip-row" aria-label="熱門問題" data-search-ui>
+      <span class="chip-label">直接跳到：</span>
+      <a class="chip" href="work.html#verify">這工合法嗎</a>
+      <a class="chip" href="visa.html#counting">88天怎麼算</a>
+      <a class="chip" href="housing.html#bond">押金先給嗎</a>
+      <a class="chip" href="prep.html#first-week">三大號順序</a>
+      <a class="chip" href="english.html#reality">英文很爛</a>
+      <a class="chip" href="cost.html#budget">要帶多少錢</a>
+      <a class="chip" href="lang/en/visa/#choose">462抽籤</a>
+      <a class="chip" href="health.html#insurance">保險買哪邊</a>
     </div>
     <noscript><p class="fact-meta">搜尋需要 JavaScript；上方每個選項都是可直接點的連結。</p></noscript>
   </section>
@@ -516,9 +548,27 @@
     </div>
   </section>
 
+  <nav class="home-entry-cards" aria-label="接下來可以去">
+    <a class="home-entry-card" href="#communities">
+      <span class="home-entry-kicker">社團目錄</span>
+      <strong>找在地公開討論</strong>
+      <small>依地區與需求查詢公開入口，不配對、不代聊。</small>
+    </a>
+    <a class="home-entry-card" href="#games">
+      <span class="home-entry-kicker">工具箱</span>
+      <strong>先在安全的地方試一次</strong>
+      <small>模擬器、試算、清單都只在你的裝置上跑。</small>
+    </a>
+    <a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>
+      <span class="home-entry-kicker">續讀／收藏</span>
+      <strong>回到上次停的地方</strong>
+      <small>最近閱讀與收藏只存在這個瀏覽器，不會上傳。</small>
+    </a>
+  </nav>
+
   <section class="home-zone-section community-directory" id="communities" aria-labelledby="communities-title">
     <div class="home-zone-heading">
-      <p class="section-eyebrow">03・LOCAL COMMUNITIES</p>
+      <p class="section-eyebrow">LOCAL COMMUNITIES</p>
       <h2 id="communities-title">各地社團：用地圖點，或直接輸入地點</h2>
       <p>清單收錄已確認可分享的入口與公開在地討論區。它們不是本站客服，也不等於官方、工作、租屋、交易或專業建議。</p>
     </div>
@@ -592,7 +642,7 @@
       </div>
     </div>
     <p class="community-empty" id="community-empty" hidden>目前名單裡沒有符合的社群。可改用上方平台搜尋，或<a href="about.html#contact-brief">提供公開入口給本站查核</a>。</p>
-    <p class="fact-meta community-register-link">名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・<a href="third-party-register.json?v=20260902-47">公開第三方關係登錄表</a></p>
+    <p class="fact-meta community-register-link">名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・<a href="third-party-register.json?v=20260903-49">公開第三方關係登錄表</a></p>
   </section>
 
   <section class="journey-resume" id="journey-resume" aria-labelledby="journey-resume-title" hidden>
@@ -626,7 +676,7 @@
   </section>
 
   <section class="home-zone-section games-zone" id="games" aria-labelledby="toolbox">
-  <p class="section-eyebrow">04・PLAY BEFORE REAL LIFE</p>
+  <p class="section-eyebrow">PLAY BEFORE REAL LIFE</p>
   <h2 id="toolbox">遊戲區：先在安全的地方試一次</h2>
   <p>遊戲不會預測你能不能成功，也不會代替官方查核。它的用途是讓你先練習做選擇、看到後果，再回到真實資料準備。</p>
   <a class="simulator-home-cta" href="simulator.html">
@@ -691,39 +741,24 @@
   </div>
   </section>
 
-  <aside class="source-model" aria-labelledby="source-model-title">
-    <div>
-      <p class="section-eyebrow">HOW WE EDIT</p>
-      <h2 id="source-model-title">這些資料怎麼來？</h2>
-      <p>法律、費用與資格優先引用官方來源；本站把資料整理成步驟與工具。社群第一手回報會另標「非官方」，不把未親歷的內容寫成親身經驗。</p>
-    </div>
-    <a class="btn secondary" href="about.html#editorial-method">看資料來源與編輯方法</a>
-  </aside>
-
-  <h2 id="principles">這個網站的三個原則</h2>
-  <div class="panel">
-    <ol>
-      <li><strong>資料性質說清楚。</strong>官方規則、本站整理與社群第一手回報分開標示；查不到來源就標「待查證」，不把推測寫成事實。</li>
-      <li><strong>每個重要數字都附官方來源與更新日期。</strong>簽證費、稅率、最低薪資年年在變——看到任何攻略（包括本站）都請點進官方來源自己確認一次。</li>
-      <li><strong>開源、可修正。</strong>發現過時或錯誤的資訊，任何人都可以在 GitHub 上提出修改，讓後來的人少走冤枉路。</li>
-    </ol>
-  </div>
-
   <div class="warn"><strong>安全提醒：</strong>任何要你先付錢才給工作、聲稱可以「買集簽天數」或「保證下簽」的服務，都是重大紅旗，可能涉及詐騙、違法收費或不合規安排。先停止付款與交付證件，再從<a href="scam.html">防詐頁</a>與<a href="visa.html">簽證頁</a>的官方入口查證。</div>
 </main>
 
 <footer class="site-footer">
   <div class="foot-inner">
     <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 公開攻略免費・開源維護・<a href="about.html#maintain">回報錯誤與聯絡</a></p>
+    <p class="foot-promise">官方來源可回查・風險先揭露・公開內容免費・資料性質說清楚</p>
+    <p class="source-model"><strong id="source-model-title">這些資料怎麼來？</strong>法律、費用與資格優先引用官方來源，本站整理成步驟與工具，社群第一手回報另標「非官方」，不把未親歷的內容寫成親身經驗。<a href="about.html#editorial-method">看資料來源與編輯方法</a></p>
+    <p class="foot-principles">三個原則：資料性質說清楚、重要數字附官方來源與日期、開源可修正。<a href="about.html#editorial-method">看關於本站怎麼做</a></p>
     <p class="disclaimer">本站為公開資料整理與一般資訊，非移民代理（RMA），內容不構成移民、法律或財務建議。簽證與政策隨時可能變動，請一律以
     <a href="https://immi.homeaffairs.gov.au/" rel="noopener">澳洲內政部官網</a>為準。</p>
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260902-47" defer></script>
-<script src="assets/analytics.js?v=20260902-47" defer></script>
-<script src="assets/i18n.js?v=20260902-47" defer></script>
-<script src="assets/api-config.js?v=20260902-47" defer></script>
-<script src="assets/main.js?v=20260902-47" defer></script>
+<script src="assets/analytics-config.js?v=20260903-49" defer></script>
+<script src="assets/analytics.js?v=20260903-49" defer></script>
+<script src="assets/i18n.js?v=20260903-49" defer></script>
+<script src="assets/api-config.js?v=20260903-49" defer></script>
+<script src="assets/main.js?v=20260903-49" defer></script>
 </body>
 </html>

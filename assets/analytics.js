@@ -177,7 +177,7 @@
     if (readChoice() !== "granted" || !window.gtag) return;
     var detail = event.detail || {};
     var resultCount = Number.isInteger(detail.resultCount) ? Math.max(0, Math.min(200, detail.resultCount)) : 0;
-    var topPage = /^(?:index|why|visa|prep|cost|housing|work|scam|english|health|leave|pr|about)\.html$/.test(detail.topPage)
+    var topPage = /^(?:index|why|visa|prep|simulator|cost|housing|market|work|scam|english|health|leave|pr|about)\.html$/.test(detail.topPage)
       ? detail.topPage
       : "none";
     window.gtag("event", "site_search_used", {

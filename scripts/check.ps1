@@ -202,7 +202,188 @@ if ($uniqueAssetVersions.Count -eq 1 -and @($contentStatusVersions | Where-Objec
 }
 
 # 高風險主題必須先給安全下一步，再常駐揭露來源、查核日與編輯狀態。
-$evidencePages = @('visa.html', 'cost.html', 'housing.html', 'market.html', 'work.html', 'health.html', 'scam.html', 'leave.html', 'pr.html')
+# P0-11：visa／cost／housing／work／scam 五頁改用一張答案卡（answer-card）取代 quick-answer-hub 與 evidence-card；
+# 其餘 7 頁沿用舊 hub，market／health／leave／pr 沿用分層證據卡（health 的 tel:000 卡不動）。
+$answerCardPages = @('visa.html', 'cost.html', 'housing.html', 'work.html', 'scam.html')
+$answerCardContract = @{
+  'visa.html'    = @{ Id = 'visa-first-action';    Points = @('#first', '#apply', '#evidence');    Tool = '#postcode-tool';       TocQuestion = '#where';             Official = 'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417' }
+  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#math', '#food', '#car-checklist'); Tool = '#save-calc';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
+  'housing.html' = @{ Id = 'housing-first-action'; Points = @('#find', '#bond', '#contract');      Tool = '#housing-search-tool'; TocQuestion = '#book';              Official = 'https://www.consumerprotection.wa.gov.au/publications/looking-rental-home-tenants-guide-1' }
+  'work.html'    = @{ Id = 'work-first-action';    Points = @('#channels', '#seasons', '#injury'); Tool = '#verify-steps';        TocQuestion = '#verify';            Official = 'https://abr.business.gov.au/' }
+  'scam.html'    = @{ Id = 'scam-first-action';    Points = @('#help', '#job', '#rent');           Tool = '#help-kit';            TocQuestion = '#scam-first-action'; Official = 'https://www.scamwatch.gov.au/stop-check-protect/help-to-spot-and-avoid-scams' }
+}
+# 縮寫黑名單只允許出現在全形或半形括號內（例：雇主登記（ABN））。
+$answerCardAbbreviationPattern = 'subclass|P\.A\.C\.T\.|PPSR|ABN|ImmiAccount|DASP'
+# 字數單位：一個 CJK 字、標點或符號算 1；一段連續英數（含 P.A.C.T. 這類縮寫）算 1，空白不計。
+$answerCardUnitPattern = '[A-Za-z0-9.]+|[^\sA-Za-z0-9.]'
+foreach ($answerCardPage in $answerCardPages) {
+  $contract = $answerCardContract[$answerCardPage]
+  $answerText = [System.IO.File]::ReadAllText((Join-Path $dir $answerCardPage), [System.Text.Encoding]::UTF8)
+  if ($answerText.Contains('class="quick-answer-hub"') -or $answerText.Contains('class="evidence-card"')) {
+    Write-Output "FAIL [$answerCardPage] 答案卡頁不得殘留 quick-answer-hub 或 evidence-card 首屏版面"
+    $errors++
+  }
+  $answerCards = [regex]::Matches($answerText, '(?s)<section class="answer-card" data-evidence-status="(checked|stale)" data-evidence-scope="first-action-only" aria-labelledby="' + [regex]::Escape($contract.Id) + '">.*?</section>')
+  if ($answerCards.Count -ne 1) {
+    Write-Output "FAIL [$answerCardPage] 必須有唯一答案卡（answer-card，aria-labelledby=$($contract.Id)）"
+    $errors++
+    continue
+  }
+  $answerCard = $answerCards[0].Value
+  $answerStatus = $answerCards[0].Groups[1].Value
+  # 類別標籤＋「417／462 適用」＋「2026-MM 查核」；查核月份必須對得上四列 meta 的查核日期，不得補新日期。
+  $answerDate = [regex]::Match($answerCard, '<span>查核日期</span><time datetime="(\d{4}-\d{2})-\d{2}">')
+  $answerDateTag = [regex]::Match($answerCard, '<span class="answer-card-tag answer-card-tag-date">(\d{4}-\d{2}) 查核</span>')
+  if ([regex]::Matches($answerCard, '<span class="answer-card-tag">').Count -lt 2 -or -not $answerCard.Contains('<span class="answer-card-tag">417／462 適用</span>') -or -not $answerDateTag.Success) {
+    Write-Output "FAIL [$answerCardPage] 答案卡缺類別標籤、417／462 適用或 YYYY-MM 查核標籤"
+    $errors++
+  }
+  if (-not $answerDate.Success) {
+    Write-Output "FAIL [$answerCardPage] 答案卡缺查核日期 meta"
+    $errors++
+  } elseif ($answerDateTag.Success -and $answerDateTag.Groups[1].Value -ne $answerDate.Groups[1].Value) {
+    Write-Output "FAIL [$answerCardPage] 答案卡查核月份標籤與 meta 查核日期不一致"
+    $errors++
+  }
+  # 主結論：≤ 35 字、單句（無「，」「；」）、縮寫只在括號內。
+  $answerHeading = [regex]::Match($answerCard, '(?s)<h2 id="' + [regex]::Escape($contract.Id) + '">(.*?)</h2>')
+  if (-not $answerHeading.Success) {
+    Write-Output "FAIL [$answerCardPage] 答案卡缺主結論 h2#$($contract.Id)"
+    $errors++
+  } else {
+    $headingText = [regex]::Replace($answerHeading.Groups[1].Value, '<[^>]+>', '').Trim()
+    $headingUnits = [regex]::Matches($headingText, $answerCardUnitPattern).Count
+    if ($headingUnits -gt 35 -or $headingText -match '[，；]') {
+      Write-Output "FAIL [$answerCardPage] 主結論必須 ≤ 35 字且為單句（無「，」「；」）：$headingUnits 字「$headingText」"
+      $errors++
+    }
+    if (([regex]::Replace($headingText, '（[^）]*）|\([^)]*\)', '')) -match $answerCardAbbreviationPattern) {
+      Write-Output "FAIL [$answerCardPage] 主結論的英文縮寫只能放在括號內：$headingText"
+      $errors++
+    }
+  }
+  # 3 個要點：各 ≤ 25 字、各自 <a> 到同頁錨點（回收原 4 題中的 3 題）、縮寫只在括號內。
+  $answerPointsList = [regex]::Match($answerCard, '(?s)<ul class="answer-card-points">(.*?)</ul>')
+  $answerPoints = @()
+  if ($answerPointsList.Success) { $answerPoints = @([regex]::Matches($answerPointsList.Groups[1].Value, '<li><a href="([^"]+)">([^<]+)</a></li>')) }
+  if ($answerPoints.Count -ne 3) {
+    Write-Output "FAIL [$answerCardPage] 答案卡必須有 3 個要點連結"
+    $errors++
+  } else {
+    $actualPointRoutes = @($answerPoints | ForEach-Object { $_.Groups[1].Value })
+    if (($actualPointRoutes -join '|') -ne ($contract.Points -join '|')) {
+      Write-Output "FAIL [$answerCardPage] 要點導路與驗收契約不符：$($actualPointRoutes -join ', ')"
+      $errors++
+    }
+    foreach ($answerPoint in $answerPoints) {
+      $pointRoute = $answerPoint.Groups[1].Value
+      $pointText = $answerPoint.Groups[2].Value.Trim()
+      $pointUnits = [regex]::Matches($pointText, $answerCardUnitPattern).Count
+      if ($pointUnits -gt 25) {
+        Write-Output "FAIL [$answerCardPage] 要點必須 ≤ 25 字：$pointUnits 字「$pointText」"
+        $errors++
+      }
+      if (([regex]::Replace($pointText, '（[^）]*）|\([^)]*\)', '')) -match $answerCardAbbreviationPattern) {
+        Write-Output "FAIL [$answerCardPage] 要點的英文縮寫只能放在括號內：$pointText"
+        $errors++
+      }
+      if (-not $pointRoute.StartsWith('#') -or -not [regex]::IsMatch($answerText, 'id="' + [regex]::Escape($pointRoute.Substring(1)) + '"')) {
+        Write-Output "FAIL [$answerCardPage] 要點找不到同頁目標：$pointRoute"
+        $errors++
+      }
+    }
+  }
+  # 主按鈕直達工具輸入區：目標必須是 input|select|button|form，或標有 data-answer-target="tool" 的容器，不能是標題。
+  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="(#[^"]+)">')
+  if (-not $answerPrimary.Success -or $answerPrimary.Groups[1].Value -ne $contract.Tool) {
+    Write-Output "FAIL [$answerCardPage] 主按鈕必須直達 $($contract.Tool)"
+    $errors++
+  } else {
+    $toolId = $contract.Tool.Substring(1)
+    $toolTag = [regex]::Match($answerText, '<([a-z0-9]+)\b[^>]*\bid="' + [regex]::Escape($toolId) + '"[^>]*>')
+    $toolIsInput = $toolTag.Success -and $toolTag.Groups[1].Value -match '^(input|select|button|form)$'
+    $toolIsContainer = $toolTag.Success -and $toolTag.Groups[1].Value -notmatch '^h[1-6]$' -and $toolTag.Value.Contains('data-answer-target="tool"')
+    if (-not ($toolIsInput -or $toolIsContainer)) {
+      Write-Output "FAIL [$answerCardPage] 主按鈕目標 $($contract.Tool) 必須是表單元素或含工具的容器（data-answer-target=""tool""），不能是標題"
+      $errors++
+    }
+    $answerReturn = $answerText.IndexOf('<p class="answer-card-return"><a href="#' + $contract.Id + '">回到答案卡</a></p>')
+    if ($answerReturn -lt 0 -or -not $toolTag.Success -or $answerReturn -gt $toolTag.Index) {
+      Write-Output "FAIL [$answerCardPage] 工具上方必須放「回到答案卡」錨點"
+      $errors++
+    }
+  }
+  # 次要官方連結沿用原證據卡的來源機構，附外連 SVG。
+  if (-not $answerCard.Contains('class="answer-card-official" href="' + $contract.Official + '" rel="noopener"') -or -not $answerCard.Contains('<svg class="answer-card-ext"')) {
+    Write-Output "FAIL [$answerCardPage] 答案卡缺官方主管機關次要連結或外連圖示：$($contract.Official)"
+    $errors++
+  }
+  # 官方依據 details：summary「官方依據：機構名（YYYY-MM 查核）」，展開為原四列 meta 與依據；無 JS 可展開；stale 預設 open。
+  $answerDetails = [regex]::Match($answerCard, '(?s)<details class="answer-card-evidence"( open)?>.*?</details>')
+  if (-not $answerDetails.Success) {
+    Write-Output "FAIL [$answerCardPage] 答案卡缺 details.answer-card-evidence"
+    $errors++
+  } else {
+    $detailsSummary = [regex]::Match($answerDetails.Value, '<summary>官方依據：[^<（]+（(\d{4}-\d{2}) 查核）</summary>')
+    if (-not $detailsSummary.Success -or ($answerDate.Success -and $detailsSummary.Groups[1].Value -ne $answerDate.Groups[1].Value)) {
+      Write-Output "FAIL [$answerCardPage] details summary 必須是「官方依據：機構名（YYYY-MM 查核）」且月份與 meta 一致"
+      $errors++
+    }
+    foreach ($evidenceNeedle in @(
+      'class="evidence-card__meta"',
+      '<span>來源機構</span><a href="https://',
+      '<span>查核日期</span><time datetime="',
+      '<span>編輯狀態</span>繁中人工整理・未經',
+      '<span>查核範圍</span>只查核本卡的第一步；不代表整頁已由專業人士審校',
+      'class="answer-card-basis"'
+    )) {
+      if (-not $answerDetails.Value.Contains($evidenceNeedle)) {
+        Write-Output "FAIL [$answerCardPage] 答案卡依據缺欄位：$evidenceNeedle"
+        $errors++
+      }
+    }
+    if ($answerStatus -eq 'stale' -and (-not $answerDetails.Groups[1].Success -or -not $answerCard.Contains('待重新確認'))) {
+      Write-Output "FAIL [$answerCardPage] 過期答案卡必須預設展開依據並明示待重新確認"
+      $errors++
+    }
+    # checked 狀態必須預設收合（依據列 36px 一行）；只有 stale 才預設展開
+    if ($answerStatus -eq 'checked' -and $answerDetails.Groups[1].Success) {
+      Write-Output "FAIL [$answerCardPage] 已查核的答案卡依據列必須預設收合，不得帶 open"
+      $errors++
+    }
+  }
+  # 逃生口與版面順序：答案卡在目錄前；「以上都不是」直達 #full-contents；原第 4 題進頁內目錄並保留錨點。
+  if (-not $answerCard.Contains('<a class="answer-card-skip" href="#full-contents">') -or -not $answerText.Contains('id="full-contents"')) {
+    Write-Output "FAIL [$answerCardPage] 答案卡必須提供「以上都不是」的完整內容捷徑"
+    $errors++
+  }
+  if ($answerText.IndexOf('class="answer-card"') -gt $answerText.IndexOf('class="toc"')) {
+    Write-Output "FAIL [$answerCardPage] 答案卡必須在完整目錄前"
+    $errors++
+  }
+  $answerToc = [regex]::Match($answerText, '(?s)<div class="toc" id="full-contents">.*?</div>')
+  if (-not $answerToc.Success -or -not $answerToc.Value.Contains('<strong>完整內容與參考資料</strong>') -or -not $answerToc.Value.Contains('<a class="toc-question" href="' + $contract.TocQuestion + '">')) {
+    Write-Output "FAIL [$answerCardPage] 完整目錄必須保留原第 4 題（$($contract.TocQuestion)）並與答案卡分層"
+    $errors++
+  }
+  if ($contract.TocQuestion.StartsWith('#') -and -not [regex]::IsMatch($answerText, 'id="' + [regex]::Escape($contract.TocQuestion.Substring(1)) + '"')) {
+    Write-Output "FAIL [$answerCardPage] 目錄第 4 題找不到同頁目標：$($contract.TocQuestion)"
+    $errors++
+  }
+}
+$evidenceCss = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\style.css'), [System.Text.Encoding]::UTF8)
+foreach ($answerCardCssNeedle in @('.answer-card {', '.answer-card-tag {', '.answer-card-points {', '.answer-card-primary {', '.answer-card-evidence summary {', '.answer-card-skip {', '.answer-card[data-evidence-status="stale"] {', '.answer-card-return {', '.toc .toc-question {')) {
+  if (-not $evidenceCss.Contains($answerCardCssNeedle)) {
+    Write-Output "FAIL [style.css] 答案卡缺樣式：$answerCardCssNeedle"
+    $errors++
+  }
+}
+if (-not [regex]::IsMatch($evidenceCss, '(?s)\.answer-card-evidence summary \{[^}]*min-height: 36px;')) {
+  Write-Output 'FAIL [style.css] 答案卡 details summary 必須是 36px 目標'
+  $errors++
+}
+
+$evidencePages = @('market.html', 'health.html', 'leave.html', 'pr.html')
 foreach ($evidencePage in $evidencePages) {
   $evidenceText = [System.IO.File]::ReadAllText((Join-Path $dir $evidencePage), [System.Text.Encoding]::UTF8)
   $evidenceCards = [regex]::Matches($evidenceText, '(?s)<section class="evidence-card" data-evidence-status="(checked|stale)".*?</section>')
@@ -238,23 +419,17 @@ foreach ($evidencePage in $evidencePages) {
     $errors++
   }
 }
-$evidenceCss = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\style.css'), [System.Text.Encoding]::UTF8)
 if (-not $evidenceCss.Contains('.evidence-card[data-evidence-status="stale"]')) {
   Write-Output 'FAIL [style.css] 證據卡缺待重新確認狀態樣式'
   $errors++
 }
 
-# 長篇攻略先列真實問題與一句可執行下一步；完整解釋與來源保留在下方。
-$quickAnswerPages = @('why.html', 'visa.html', 'prep.html', 'cost.html', 'housing.html', 'market.html', 'work.html', 'scam.html', 'english.html', 'health.html', 'leave.html', 'pr.html')
+# 長篇攻略先列真實問題與一句可執行下一步；完整解釋與來源保留在下方（P0-11 五頁改用答案卡，見上）。
+$quickAnswerPages = @('why.html', 'prep.html', 'market.html', 'english.html', 'health.html', 'leave.html', 'pr.html')
 $quickAnswerExpectedRoutes = @{
   'why.html' = @('#quick-quiz', '#worksheet', '#worksheet', '#after-reflection')
-  'visa.html' = @('#first', '#apply', '#where', '#evidence')
   'prep.html' = @('#timeline', '#72h', '#first-week', '#checklist')
-  'cost.html' = @('#cost-first-action', '#math', '#food', '#car-checklist')
-  'housing.html' = @('#book', '#find', '#bond', '#contract')
   'market.html' = @('#market-tool', '#market-tool', '#platforms', '#safety')
-  'work.html' = @('#channels', '#verify', '#seasons', '#injury')
-  'scam.html' = @('#scam-first-action', '#help', '#job', '#rent')
   'english.html' = @('#reality', '#before', '#work-english', '#after')
   'health.html' = @('tel:000', '#health-first-action', '#doctor', '#mental')
   'leave.html' = @('#tax', '#super', '#dasp', '#checklist')
@@ -420,7 +595,8 @@ if (-not (Test-Path $analyticsConfigPath) -or -not (Test-Path $analyticsScriptPa
     'https://www.googletagmanager.com/gtag/js?id=',
     'window.addEventListener("whv:search"',
     'result_count:',
-    'top_result_page:'
+    'top_result_page:',
+    '/^(?:index|why|visa|prep|simulator|cost|housing|market|work|scam|english|health|leave|pr|about)\.html$/'
   )) {
     if (-not $analyticsScript.Contains($analyticsNeedle)) { Write-Output "FAIL [analytics.js] 缺同意／最小化界線：$analyticsNeedle"; $errors++ }
   }
@@ -1395,6 +1571,9 @@ if (-not (Test-Path $searchBuilder) -or -not (Test-Path $searchIndex)) {
 } else {
   & python $searchBuilder --check
   if ($LASTEXITCODE -ne 0) { Write-Output 'FAIL 站內搜尋索引過期或覆蓋不足'; $errors++ }
+  # P0-9 驗收 3：索引檔不得超過改版前 178,908 bytes 的 130%（build_search.py MAX_INDEX_BYTES 同值）
+  $searchIndexBytes = (Get-Item $searchIndex).Length
+  if ($searchIndexBytes -gt 232580) { Write-Output "FAIL 站內搜尋索引 $searchIndexBytes bytes 超過上限 232580"; $errors++ }
 }
 $searchScript = [regex]::Match($mainJs, '(?s)// ---------- 全站搜尋.*?// ---------- 最近閱讀')
 if (-not $searchScript.Success) {
@@ -1410,12 +1589,35 @@ if (-not $searchScript.Success) {
     'CustomEvent("whv:search"',
     'event.key !== "/"',
     'resultCount:',
-    'topPage:'
+    'topPage:',
+    '// ==== search-core:start ====',
+    '// ==== search-core:end ====',
+    'var SEARCH_STOP_WORDS = [',
+    'var SEARCH_SYNONYM_WEIGHT = 0.7;',
+    'var SEARCH_HUB_SYNONYM_WEIGHT = 0.5;',
+    'var rewriteSearchQuery = function',
+    'var searchApproximate = function',
+    'var runSiteSearch = function',
+    'synonyms: normalizeSearch(entry.synonyms)',
+    'hub: entry.hub === 1',
+    'result.mode === "approximate"',
+    '已用相近詞找到',
+    'result.mode === "rewritten"',
+    'mode: result.mode'
   )) {
     if (-not $searchScript.Value.Contains($searchNeedle)) { Write-Output "FAIL [main.js] 搜尋缺安全／鍵盤／量測界面：$searchNeedle"; $errors++ }
   }
-  foreach ($forbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest')) {
-    if ($searchScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 搜尋不得保存或送出查詢：$forbidden"; $errors++ }
+  foreach ($forbidden in @('localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest', 'SEARCH_SYNONYMS', 'data-search-query', 'data-home-search-query', 'openAssist')) {
+    if ($searchScript.Value.Contains($forbidden)) { Write-Output "FAIL [main.js] 搜尋不得保存或送出查詢、不得保留死同義詞表或查詢字串 chip、不得自行開啟 AI：$forbidden"; $errors++ }
+  }
+  # P0-9 驗收 4：零結果狀態 DOM 順序：階段 chips → 安全列 → 問一次 AI（預設 hidden）→ GitHub 連結
+  $zeroStagesAt = $searchScript.Value.IndexOf('"site-search-stages"')
+  $zeroSafetyAt = $searchScript.Value.IndexOf('"site-search-safety"')
+  $zeroAiAt = $searchScript.Value.IndexOf('aiSlot.id = "site-search-ai"')
+  $zeroGithubAt = $searchScript.Value.IndexOf('issues/new?template=idea.yml')
+  if ($zeroStagesAt -lt 0 -or $zeroSafetyAt -le $zeroStagesAt -or $zeroAiAt -le $zeroSafetyAt -or $zeroGithubAt -le $zeroAiAt -or -not $searchScript.Value.Contains('aiSlot.hidden = true;')) {
+    Write-Output 'FAIL [main.js] 零結果狀態順序必須是階段 chips → 安全列 → 問一次 AI（預設 hidden）→ GitHub 連結'
+    $errors++
   }
   $searchVersion = [regex]::Match($searchScript.Value, 'assets/search-index\.js\?v=([0-9-]+)').Groups[1].Value
   if ($uniqueAssetVersions.Count -eq 1 -and $searchVersion -ne $uniqueAssetVersions[0]) {
@@ -1525,6 +1727,16 @@ if ($LASTEXITCODE -ne 0) {
 & node (Join-Path $dir 'scripts\test_tools.mjs')
 if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 集簽快查器與存錢試算器固定案例測試失敗（scripts/test_tools.mjs）'
+  $errors++
+}
+& node (Join-Path $dir 'scripts\test_search.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 站內搜尋驗收失敗（scripts/test_search.mjs；OPTIMIZATION_PLAN P0-9 驗收 1–2）'
+  $errors++
+}
+& node (Join-Path $dir 'scripts\clarifier-contract.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 首頁釐清器契約測試失敗（scripts/clarifier-contract.mjs；OPTIMIZATION_PLAN P0-8 驗收 6）'
   $errors++
 }
 
@@ -1916,10 +2128,8 @@ if (-not $indexText.Contains('id="journey-map"')) {
   Write-Output 'FAIL [index.html] 缺完整旅程錨點：journey-map'
   $errors++
 }
-# 首頁單一漏斗（docs/CLARIFIER_SPEC.md P0-7）：四大入口保留；自我評估、問題卡目錄與兩題引導由釐清器取代
+# 首頁首屏（docs/OPTIMIZATION_PLAN.md P0-8）：安全列 → 緊湊 hero（問句 h1）→ 釐清器；四格入口與承諾列退場；直接解法出口仍在
 foreach ($homeZoneNeedle in @(
-  'class="home-zone-nav"',
-  'href="#clarifier"',
   'href="#search"',
   'href="#communities"',
   'href="#games"',
@@ -1935,14 +2145,193 @@ foreach ($homeZoneNeedle in @(
   '開啟二手交換工具',
   '開始澳打模擬器'
 )) {
-  if (-not $indexText.Contains($homeZoneNeedle)) { Write-Output "FAIL [index.html] 缺首頁四區或直接解法：$homeZoneNeedle"; $errors++ }
+  if (-not $indexText.Contains($homeZoneNeedle)) { Write-Output "FAIL [index.html] 缺首頁分區或直接解法：$homeZoneNeedle"; $errors++ }
 }
-$homeZoneNav = [regex]::Match($indexText, '(?s)<nav class="home-zone-nav".*?</nav>')
-if (-not $homeZoneNav.Success -or [regex]::Matches($homeZoneNav.Value, '<a\b').Count -ne 4) {
-  Write-Output 'FAIL [index.html] 首頁四大入口必須恰好四個'
+# P0-8 安全列：<nav id="support-hub" class="safety-bar">，恰好 5 個 <a>、依序五個目的地、不收合（無 <details>）、只留短文案
+$safetyBar = [regex]::Match($indexText, '(?s)<nav id="support-hub" class="safety-bar" aria-label="很急？先走這裡">.*?</nav>')
+$safetyBarHrefs = @('health.html#emergency', 'scam.html#help', 'scam.html#help', 'visa.html#apply', 'housing.html#housing-search-tool')
+if (-not $safetyBar.Success) {
+  Write-Output 'FAIL [index.html] 缺常駐安全列 nav#support-hub.safety-bar'
+  $errors++
+} else {
+  $safetyLinks = @([regex]::Matches($safetyBar.Value, '<a\b[^>]*href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+  if ($safetyLinks.Count -ne 5 -or ($safetyLinks -join ',') -ne ($safetyBarHrefs -join ',')) {
+    Write-Output "FAIL [index.html] 安全列必須恰好 5 個 <a> 且依序為 $($safetyBarHrefs -join ', ')；目前：$($safetyLinks -join ', ')"
+    $errors++
+  }
+  if ($safetyBar.Value.Contains('<details') -or -not $safetyBar.Value.Contains('<span class="safety-bar-label">很急？</span>')) {
+    Write-Output 'FAIL [index.html] 安全列不得收合，且必須以「很急？」開頭'
+    $errors++
+  }
+  foreach ($safetyLabel in @('>受傷</a>', '>剛匯款</a>', '>被威脅或扣證件</a>', '>簽證到期</a>', '>今晚沒地方住</a>')) {
+    if (-not $safetyBar.Value.Contains($safetyLabel)) { Write-Output "FAIL [index.html] 安全列缺出口文案：$safetyLabel"; $errors++ }
+  }
+  if ($safetyBar.Value.Contains('<small') -or $safetyBar.Value.Contains('support-link') -or $safetyBar.Value.Contains('<svg')) {
+    Write-Output 'FAIL [index.html] 安全列連結只留短文案（說明文字已移到各目的頁），不放圖示或 small'
+    $errors++
+  }
+}
+# P0-9 搜尋強化（docs/OPTIMIZATION_PLAN.md）：8 個熱門 chip 都是 <a href>、首頁與 header dialog 一致；21 個出口卡進索引；零結果出口與階段／安全列同源
+$searchHotLinks = @(
+  @('work.html#verify', '這工合法嗎'),
+  @('visa.html#counting', '88天怎麼算'),
+  @('housing.html#bond', '押金先給嗎'),
+  @('prep.html#first-week', '三大號順序'),
+  @('english.html#reality', '英文很爛'),
+  @('cost.html#budget', '要帶多少錢'),
+  @('lang/en/visa/#choose', '462抽籤'),
+  @('health.html#insurance', '保險買哪邊')
+)
+$expectedHotChips = ($searchHotLinks | ForEach-Object { $_[0] + '|' + $_[1] }) -join ','
+$homeChipRow = [regex]::Match($indexText, '(?s)<div class="chip-row" aria-label="熱門問題" data-search-ui>.*?</div>')
+if (-not $homeChipRow.Success) {
+  Write-Output 'FAIL [index.html] 搜尋區缺熱門問題 chip-row（aria-label="熱門問題"，data-search-ui）'
+  $errors++
+} else {
+  $homeChips = @([regex]::Matches($homeChipRow.Value, '<a class="chip" href="([^"]+)">([^<]+)</a>') | ForEach-Object { $_.Groups[1].Value + '|' + $_.Groups[2].Value })
+  if ($homeChips.Count -ne 8 -or ($homeChips -join ',') -ne $expectedHotChips -or $homeChipRow.Value.Contains('<button')) {
+    Write-Output "FAIL [index.html] 熱門 chip 必須恰好 8 個 <a href> 且依序為 $expectedHotChips；目前：$($homeChips -join ',')"
+    $errors++
+  }
+}
+$dialogHotBlock = [regex]::Match($mainJs, '(?s)var SEARCH_HOT_LINKS = \[(.*?)\];')
+$dialogChips = @()
+if ($dialogHotBlock.Success) {
+  $dialogChips = @([regex]::Matches($dialogHotBlock.Groups[1].Value, '\["([^"]+)", "([^"]+)"\]') | ForEach-Object { $_.Groups[1].Value + '|' + $_.Groups[2].Value })
+}
+if (-not $dialogHotBlock.Success -or ($dialogChips -join ',') -ne $expectedHotChips -or -not $mainJs.Contains('SEARCH_HOT_LINKS.map(function (item) { return ''<a class="chip" href="'' + item[0] + ''">'' + item[1] + ''</a>''; })')) {
+  Write-Output "FAIL [main.js] header 搜尋 dialog 的 SEARCH_HOT_LINKS 必須與首頁 8 個 chip 一致並渲染為 <a class=\"chip\" href>；目前：$($dialogChips -join ',')"
   $errors++
 }
-# 既有首頁守門（contract §4.1 keep）：社群目錄 9/9 與第三方邊界、二手交換法律邊界與零後端草稿、收藏／最近閱讀、四個安全出口、12 張回收卡
+$exitSearchEntries = [regex]::Matches($indexText, '<div class="clarifier-exit(?: clarifier-exit-lite)?" id="(exit-[a-z-]+)" tabindex="-1" data-search-entry="[^"|]+\|#\1">').Count
+if ($exitSearchEntries -ne 21) {
+  Write-Output "FAIL [index.html] 21 個出口卡都必須帶 data-search-entry=`"標題|#自身 id`"（build_search.py 抽取契約）；目前 $exitSearchEntries"
+  $errors++
+}
+$zeroStageBlock = [regex]::Match($mainJs, '(?s)var SEARCH_STAGE_LINKS = \[(.*?)\];')
+$zeroStageHrefs = @()
+if ($zeroStageBlock.Success) { $zeroStageHrefs = @([regex]::Matches($zeroStageBlock.Groups[1].Value, '\["([^"]+)"') | ForEach-Object { $_.Groups[1].Value }) }
+if (($zeroStageHrefs -join ',') -ne 'index.html#considering,index.html#committed,index.html#in-australia,index.html#next-step') {
+  Write-Output "FAIL [main.js] 零結果階段 chips 必須依序連到四個階段面板；目前：$($zeroStageHrefs -join ',')"
+  $errors++
+}
+$zeroSafetyBlock = [regex]::Match($mainJs, '(?s)var SEARCH_SAFETY_LINKS = \[(.*?)\];')
+$zeroSafetyHrefs = @()
+if ($zeroSafetyBlock.Success) { $zeroSafetyHrefs = @([regex]::Matches($zeroSafetyBlock.Groups[1].Value, '\["([^"]+)"') | ForEach-Object { $_.Groups[1].Value }) }
+if (($zeroSafetyHrefs -join ',') -ne ($safetyBarHrefs -join ',')) {
+  Write-Output "FAIL [main.js] 零結果安全列必須與 index.html nav#support-hub 同序；目前：$($zeroSafetyHrefs -join ',')"
+  $errors++
+}
+$heroBlock = [regex]::Match($indexText, '(?s)<section class="hero hero-compact">.*?</section>')
+if (-not $heroBlock.Success -or [regex]::Matches($heroBlock.Value, '<h1>[^<]*哪一步[^<]*</h1>').Count -ne 1 -or -not $heroBlock.Value.Contains('<p class="lede">先講你現在卡哪一步，再給你對得上的資料。</p>')) {
+  Write-Output 'FAIL [index.html] 緊湊 hero 必須恰好一個含「哪一步」問句的 h1 與固定 lede'
+  $errors++
+}
+if ($heroBlock.Success -and ([regex]::Matches($heroBlock.Value, '<svg\b').Count -gt 1 -or $heroBlock.Value.Contains('free-badge') -or $heroBlock.Value.Contains('最友善'))) {
+  Write-Output 'FAIL [index.html] hero 只留單顆裝飾 SVG；badge 與使命句已移到 about.html'
+  $errors++
+}
+$mainOpenAt = $indexText.IndexOf('<main id="main-content"')
+$safetyBarAt = $indexText.IndexOf('<nav id="support-hub" class="safety-bar"')
+$heroAt = $indexText.IndexOf('<section class="hero hero-compact">')
+$clarifierAt = $indexText.IndexOf('id="clarifier"')
+if ($mainOpenAt -lt 0 -or $safetyBarAt -le $mainOpenAt -or $heroAt -le $safetyBarAt -or $clarifierAt -le $heroAt) {
+  Write-Output 'FAIL [index.html] 首屏順序必須是 main → 安全列 → hero → 釐清器'
+  $errors++
+}
+# P0-8 信任列（階段 chips 下方一句）、護照上方一句（兩組）、搜尋標題與固定搜尋鈕、三張入口卡
+$clarifierTrustLine = '公開內容免費，不代辦。本站沒有會員、配對或私訊功能，也不會由本站主動私訊。選項只在這一頁，不會送出。'
+$journeyMapAt = $indexText.IndexOf('id="journey-map"')
+$trustLineAt = $indexText.IndexOf($clarifierTrustLine)
+$panelsAt = $indexText.IndexOf('id="common-problems"')
+if ([regex]::Matches($indexText, [regex]::Escape($clarifierTrustLine)).Count -ne 1 -or $trustLineAt -le $journeyMapAt -or $panelsAt -le $trustLineAt) {
+  Write-Output 'FAIL [index.html] 信任列必須恰好一句且位於階段 chips 與面板之間'
+  $errors++
+}
+if ([regex]::Matches($indexText, '<p class="clarifier-passport-lead">台灣 417 跟中國 462 不是同一條路。</p>').Count -ne 2) {
+  Write-Output 'FAIL [index.html] 護照 chips 上方一句「台灣 417 跟中國 462 不是同一條路。」應恰好兩處'
+  $errors++
+}
+if (-not $indexText.Contains('<h2 id="site-search-home-title">卡片裡沒有你的說法？直接搜尋</h2>') -or -not $indexText.Contains('<p>只在這台裝置搜尋，不送出。</p>')) {
+  Write-Output 'FAIL [index.html] 搜尋區標題或本機搜尋聲明文案不符'
+  $errors++
+}
+$searchJump = [regex]::Match($indexText, '<p class="clarifier-search-jump"><a class="btn" id="clarifier-search-open" href="#search">.*?</a></p>')
+$searchSectionOpenAt = $indexText.IndexOf('<section class="site-search-home"')
+if (-not $searchJump.Success -or $searchJump.Index -le $indexText.IndexOf('<section class="job-quiz" id="job-quiz"') -or $searchJump.Index -ge $searchSectionOpenAt) {
+  Write-Output 'FAIL [index.html] 釐清器底部缺固定搜尋鈕（a#clarifier-search-open → #search，位於小測驗之後、搜尋區之前）'
+  $errors++
+}
+$entryCards = [regex]::Match($indexText, '(?s)<nav class="home-entry-cards" aria-label="接下來可以去">.*?</nav>')
+if (-not $entryCards.Success) {
+  Write-Output 'FAIL [index.html] 缺三張入口卡 nav.home-entry-cards'
+  $errors++
+} else {
+  $entryHrefs = @([regex]::Matches($entryCards.Value, '<a class="home-entry-card"[^>]*href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+  if ($entryHrefs.Count -ne 3 -or ($entryHrefs -join ',') -ne '#communities,#games,#journey-resume') {
+    Write-Output "FAIL [index.html] 入口卡必須恰好三張且依序連 #communities、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
+    $errors++
+  }
+  foreach ($entryCardNeedle in @('找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
+    if (-not $entryCards.Value.Contains($entryCardNeedle)) { Write-Output "FAIL [index.html] 入口卡文案或續讀卡預設 hidden 缺失：$entryCardNeedle"; $errors++ }
+  }
+  if ($entryCards.Index -le $indexText.IndexOf('id="assist"') -or $entryCards.Index -ge $indexText.IndexOf('id="communities"')) {
+    Write-Output 'FAIL [index.html] 入口卡必須在 AI 兜底之後、社團目錄之前'
+    $errors++
+  }
+}
+# P0-8 頁尾：承諾一行、「資料怎麼來」一句連 about.html#editorial-method、三原則恰好一個連結
+$footerBlock = [regex]::Match($indexText, '(?s)<footer class="site-footer">.*?</footer>')
+if (-not $footerBlock.Success) {
+  Write-Output 'FAIL [index.html] 缺頁尾'
+  $errors++
+} else {
+  foreach ($footerNeedle in @(
+    '<p class="foot-promise">官方來源可回查・風險先揭露・公開內容免費・資料性質說清楚</p>',
+    '<p class="source-model"><strong id="source-model-title">這些資料怎麼來？</strong>',
+    '<a href="about.html#editorial-method">看資料來源與編輯方法</a></p>',
+    '<p class="foot-principles">三個原則：'
+  )) {
+    if (-not $footerBlock.Value.Contains($footerNeedle)) { Write-Output "FAIL [index.html] 頁尾缺承諾列、資料來源句或三原則連結：$footerNeedle"; $errors++ }
+  }
+  if ([regex]::Matches($footerBlock.Value, '<p class="foot-principles">[^<]*<a href="about.html#editorial-method">[^<]+</a></p>').Count -ne 1) {
+    Write-Output 'FAIL [index.html] 三原則必須是頁尾一句加恰好一個 about.html#editorial-method 連結'
+    $errors++
+  }
+}
+foreach ($homeStyleNeedle in @('.safety-bar {', '.safety-bar a {', '.hero-cut-gold {', '.home-entry-cards {', '.home-entry-card[hidden] { display: none; }', '.clarifier-search-jump { display: none; }', '.clarifier-search-jump { display: block; position: sticky;', '.clarifier-passport-lead {', '.foot-promise {', '.foot-principles {')) {
+  if (-not $styleText.Contains($homeStyleNeedle)) { Write-Output "FAIL [style.css] 缺 P0-8 首屏樣式：$homeStyleNeedle"; $errors++ }
+}
+# P0-8 收尾：手機版 hero h1 最小 1.5rem（375px 時 24px，不得比內文小），上限維持 2.1rem
+$heroTitleRule = [regex]::Match($styleText, '(?s)\.hero h1 \{.*?\}')
+if (-not $heroTitleRule.Success -or -not $heroTitleRule.Value.Contains('font-size: clamp(1.5rem, 5vw, 2.1rem);')) {
+  Write-Output 'FAIL [style.css] hero h1 字級必須是 clamp(1.5rem, 5vw, 2.1rem)（手機最小 24px）'
+  $errors++
+}
+# P0-8 驗收 1：護照三顆 radio 必須同一列（第三顆換行會把需求 chips 推出第一屏）
+$passportChipsRule = [regex]::Match($styleText, '(?s)\.clarifier-passport \.clarifier-chips \{\s*display: grid;.*?\}')
+if (-not $passportChipsRule.Success -or -not $passportChipsRule.Value.Contains('grid-template-columns: repeat(3, minmax(0, 1fr));')) {
+  Write-Output 'FAIL [style.css] 護照 radiogroup 必須是三欄同列（grid-template-columns: repeat(3, minmax(0, 1fr))）'
+  $errors++
+}
+foreach ($passportLabel in @('tabindex="0">台灣 417</button>', 'tabindex="-1">中國大陸 462</button>', 'tabindex="-1">其他護照</button>')) {
+  if ([regex]::Matches($indexText, [regex]::Escape($passportLabel)).Count -ne 2) {
+    Write-Output "FAIL [index.html] 護照 radio 文案必須在兩個面板各一份（短標籤以維持單列）：$passportLabel"
+    $errors++
+  }
+}
+$safetyBarLinkRule = [regex]::Match($styleText, '(?s)\.safety-bar a \{.*?\}')
+if (-not $safetyBarLinkRule.Success -or -not $safetyBarLinkRule.Value.Contains('min-height: 44px;')) {
+  Write-Output 'FAIL [style.css] 安全列連結必須維持 44px 可點高度'
+  $errors++
+}
+foreach ($retiredStyleNeedle in @('.home-zone-nav', '.trust-strip', '.free-badge', '.hero-cut-green', '.hero-cut-accent', '.support-hub')) {
+  if ($styleText.Contains($retiredStyleNeedle)) { Write-Output "FAIL [style.css] 已退場的首頁樣式不得留下：$retiredStyleNeedle"; $errors++ }
+}
+foreach ($homeScriptNeedle in @('getElementById("clarifier-search-open")', 'openSiteSearch("")', 'getElementById("home-entry-resume")', 'homeEntryResume.hidden = !hasResume && !hasSaved')) {
+  if (-not $mainJs.Contains($homeScriptNeedle)) { Write-Output "FAIL [main.js] 固定搜尋鈕或續讀入口卡行為缺失：$homeScriptNeedle"; $errors++ }
+}
+# 既有首頁守門（contract §4.1 keep）：社群目錄 9/9 與第三方邊界、二手交換法律邊界與零後端草稿、收藏／最近閱讀、12 張回收卡（安全出口見上方 P0-8 安全列契約）
 $communityEntries = [regex]::Matches($indexText, 'data-community-platform="(?:line|reddit)"').Count
 $communityRegions = [regex]::Matches($indexText, 'class="map-region[^\"]*"[^>]*data-community-region=').Count
 if ($communityEntries -ne 9 -or $communityRegions -ne 9) {
@@ -1999,14 +2388,6 @@ foreach ($resumeId in @('journey-resume', 'journey-resume-link', 'journey-resume
     $errors++
   }
 }
-$supportBlock = [regex]::Match($indexText, '(?s)<section class="support-hub".*?</section>')
-if (-not $supportBlock.Success) {
-  Write-Output 'FAIL [index.html] 缺當下需求快導'
-  $errors++
-} else {
-  $supportLinks = [regex]::Matches($supportBlock.Value, 'class="support-link"').Count
-  if ($supportLinks -ne 4) { Write-Output "FAIL [index.html] 緊急安全出口數=$supportLinks（應為 4）"; $errors++ }
-}
 $problemCategories = [regex]::Matches($indexText, 'class="problem-category"').Count
 $problemActions = [regex]::Matches($indexText, 'class="card-action"').Count
 if ($problemCategories -ne 12 -or $problemActions -ne 12) {
@@ -2043,6 +2424,9 @@ if ([regex]::Matches($indexText, 'data-clarifier-panel="').Count -ne 4 -or ($cla
 }
 $clarifierExitCounts = @{ 'considering' = 3; 'committed' = 6; 'in-australia' = 8; 'next-step' = 4 }
 $clarifierPassportCounts = @{ 'considering' = 1; 'committed' = 1; 'in-australia' = 0; 'next-step' = 0 }
+# P0-10 固定句：G5 安全句（每個出口「看公開討論」下方）與 passport.md §10 短版邊界句（出口 3、11、12 與 462 摘要卡）
+$clarifierPublicSafety = '不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。'
+$clarifierBoundary = '本站不判定個案資格；以內政部官方頁、ImmiAccount 與核准信為準。'
 foreach ($stage in $clarifierStages) {
   $clarifierPanel = [regex]::Match($indexText, "(?s)<section class=`"journey-phase clarifier-panel`" id=`"$stage`".*?</section>")
   if (-not $clarifierPanel.Success) {
@@ -2067,14 +2451,41 @@ foreach ($stage in $clarifierStages) {
         $errors++
       }
     }
-    if ([regex]::Matches($clarifierChipNav.Value, "href=`"#$stage-exits`">全部顯示</a>").Count -ne 1) {
-      Write-Output "FAIL [index.html] 階段 $stage 必須有一個「全部顯示」chip 指向 #$stage-exits"
+    if ([regex]::Matches($clarifierChipNav.Value, "href=`"#$stage-exits`" data-label-462=`"全部看`">全部看</a>").Count -ne 1) {
+      Write-Output "FAIL [index.html] 階段 $stage 必須有一個「全部看」chip 指向 #$stage-exits"
       $errors++
     }
-    if (-not $clarifierChipNav.Value.Contains('href="#communities">找人聊</a>')) {
-      Write-Output "FAIL [index.html] 階段 $stage 需求 chips 缺「找人聊」社團入口"
+    if (-not $clarifierChipNav.Value.Contains('href="#communities" data-label-462="看公開討論">看公開討論</a>')) {
+      Write-Output "FAIL [index.html] 階段 $stage 需求 chips 缺「看公開討論」公開入口"
       $errors++
     }
+    # P0-10：每個需求 chip 都要有 data-label-462（462 換字用；無 JS 顯示台灣版）
+    $needChips = [regex]::Matches($clarifierChipNav.Value, '<a class="chip"[^>]*>')
+    $needChipsMissing = @($needChips | Where-Object { $_.Value -notmatch 'data-label-462="[^"]+"' }).Count
+    if ($needChips.Count -eq 0 -or $needChipsMissing -ne 0) {
+      Write-Output "FAIL [index.html] 階段 $stage 需求 chips 每顆都要有 data-label-462；缺 $needChipsMissing 顆"
+      $errors++
+    }
+  }
+  # P0-10：每個出口都要有 8 字標題（h3 帶 data-label-462）、「看公開討論」連結與其下方安全句
+  foreach ($clarifierExitBlock in [regex]::Matches($clarifierPanelText, '(?s)<div class="clarifier-exit(?: clarifier-exit-lite)?" id="(exit-[^"]+)".*?<p class="clarifier-exit-safety">[^<]*</p>')) {
+    $clarifierExitId = $clarifierExitBlock.Groups[1].Value
+    if ([regex]::Matches($clarifierExitBlock.Value, '<h3 data-label-462="[^"]+">[^<]+</h3>').Count -ne 1) {
+      Write-Output "FAIL [index.html] 出口 $clarifierExitId 必須恰好一個帶 data-label-462 的 h3 標題"
+      $errors++
+    }
+    if (-not $clarifierExitBlock.Value.Contains('<a href="#communities">看公開討論</a></p>')) {
+      Write-Output "FAIL [index.html] 出口 $clarifierExitId 缺「看公開討論」連結"
+      $errors++
+    }
+    if ([regex]::Matches($clarifierExitBlock.Value, [regex]::Escape($clarifierPublicSafety)).Count -ne 1) {
+      Write-Output "FAIL [index.html] 出口 $clarifierExitId 「看公開討論」下方缺固定安全句"
+      $errors++
+    }
+  }
+  if ([regex]::Matches($clarifierPanelText, '<p class="clarifier-exit-safety">').Count -ne $clarifierExitCounts[$stage]) {
+    Write-Output "FAIL [index.html] 階段 $stage 安全句數必須等於出口數 $($clarifierExitCounts[$stage])"
+    $errors++
   }
   if (-not $clarifierPanelText.Contains("<div class=`"clarifier-exits`" id=`"$stage-exits`"")) {
     Write-Output "FAIL [index.html] 階段 $stage 缺出口容器 #$stage-exits"
@@ -2102,6 +2513,102 @@ foreach ($passportLink in @('href="lang/en/visa/"', 'href="lang/"')) {
   if (-not $indexText.Contains($passportLink)) { Write-Output "FAIL [index.html] 護照分層缺 462／其他語言出口：$passportLink"; $errors++ }
 }
 $englishVisaIdText = if (Test-Path $englishVisaPath) { [System.IO.File]::ReadAllText($englishVisaPath, [System.Text.Encoding]::UTF8) } else { '' }
+# P0-10 護照 radiogroup：容器 role="radiogroup" aria-labelledby；三顆 role="radio" aria-checked；不再用 aria-pressed
+$passportGroups = [regex]::Matches($indexText, '(?s)<div class="clarifier-passport"[^>]*>.*?<p class="clarifier-passport-static"')
+if ($passportGroups.Count -ne 2) {
+  Write-Output "FAIL [index.html] 護照 radiogroup 應恰好兩組；目前 $($passportGroups.Count)"
+  $errors++
+}
+foreach ($passportGroup in $passportGroups) {
+  if ($passportGroup.Value -notmatch '<div class="clarifier-passport" role="radiogroup" aria-labelledby="(considering|committed)-passport-q" data-clarifier-passport hidden>') {
+    Write-Output 'FAIL [index.html] 護照容器必須是 role="radiogroup" 且 aria-labelledby 指向問題句'
+    $errors++
+  }
+  if ([regex]::Matches($passportGroup.Value, '<button class="chip" type="button" role="radio" data-passport="(417|462|other)" aria-checked="false" tabindex="(0|-1)">').Count -ne 3) {
+    Write-Output 'FAIL [index.html] 護照 radiogroup 必須恰好三顆 role="radio" aria-checked="false" 的 button'
+    $errors++
+  }
+  if ($passportGroup.Value.Contains('aria-pressed')) {
+    Write-Output 'FAIL [index.html] 護照 radiogroup 不得再用 aria-pressed（改 aria-checked）'
+    $errors++
+  }
+}
+# P0-10 462 摘要卡（G6）：兩張（considering／committed）、HTML 初始不帶 hidden、四行、一句、按鈕、次要連結、邊界句、來源列；不寫 TOEFL
+$passportSummaries = [regex]::Matches($indexText, '(?s)<aside class="clarifier-passport-summary" id="(considering|committed)-passport-462" aria-labelledby="\1-passport-462-title" data-passport-summary>.*?</aside>')
+if ($passportSummaries.Count -ne 2) {
+  Write-Output "FAIL [index.html] 462 摘要卡應恰好兩張且初始不帶 hidden；目前 $($passportSummaries.Count)"
+  $errors++
+}
+foreach ($passportSummary in $passportSummaries) {
+  foreach ($summaryNeedle in @(
+    '中國大陸護照走 462，和台灣的 417 不同',
+    '<li>每年 5,000 個首簽名額。</li>',
+    '<li>首簽必須先在 ImmiAccount 登記抽籤（A$25，不退）並被抽中。</li>',
+    '<li>需要高等教育學歷或完成 2 年大學本科，並具 Functional English。</li>',
+    '<li>不需要政府支持信。</li>',
+    '住宿、找工作、防詐等繁中主題頁中國護照同樣適用；只有簽證細節請看英文版。',
+    'href="lang/en/visa/#choose">看英文版 417／462 分流與 462 重點</a>',
+    'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-462/first-work-holiday-462',
+    'https://immi.homeaffairs.gov.au/what-we-do/whm-program/latest-news/new-work-and-holiday-subclass-462-visa-pre-application-process',
+    'https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/english-language/functional-english',
+    'https://china.embassy.gov.au/bjng/WHV2026-27EN.html',
+    'https://immi.homeaffairs.gov.au/what-we-do/whm-program/status-of-country-caps',
+    'href="lang/zh-Hans/#official-title"',
+    $clarifierBoundary,
+    '來源：內政部 462 首簽頁（官方更新 2026-08-27）、抽籤頁（官方更新 2026-08-26）、名額頁（官方更新 2026-09-02）｜2026-09 查核'
+  )) {
+    if (-not $passportSummary.Value.Contains($summaryNeedle)) { Write-Output "FAIL [index.html] 462 摘要卡缺：$summaryNeedle"; $errors++ }
+  }
+  if ([regex]::Matches($passportSummary.Value, '<li>').Count -ne 4) { Write-Output 'FAIL [index.html] 462 摘要卡必須恰好四行'; $errors++ }
+  if ($passportSummary.Value -match 'TOEFL|toefl') { Write-Output 'FAIL [index.html] 462 摘要卡不得寫 TOEFL 規則（官方頁互相矛盾）'; $errors++ }
+}
+if (-not $indexText.Contains('href="lang/en/visa/#choose"') -or -not $englishVisaIdText.Contains('id="choose"')) {
+  Write-Output 'FAIL [index.html] 462 摘要卡按鈕錨點 lang/en/visa/#choose 不存在'
+  $errors++
+}
+# P0-10 換字契約：階段 chips 4、需求 chips 30、出口標題 21 = 55 個 data-label-462；出口 3、11、12 含邊界句；462 文案為繁體字
+if ([regex]::Matches($indexText, 'data-label-462="').Count -ne 55) {
+  Write-Output "FAIL [index.html] data-label-462 應恰好 55 個（階段 4＋需求 30＋出口 21）；目前 $([regex]::Matches($indexText, 'data-label-462=`"').Count)"
+  $errors++
+}
+if ($journeyDirectory.Success -and [regex]::Matches($journeyDirectory.Value, '<a href="#[a-z-]+" data-label-462="[^"]+"><span>0[1-4]</span>[^<]+</a>').Count -ne 4) {
+  Write-Output 'FAIL [index.html] 四個階段 chips 都要有 data-label-462'
+  $errors++
+}
+foreach ($stageLabel in @('還在考慮', '決定要去', '已在澳洲', '回程或留下')) {
+  if (-not $journeyDirectory.Value.Contains("</span>$stageLabel</a>")) { Write-Output "FAIL [index.html] 階段 chip 台灣版文案缺：$stageLabel"; $errors++ }
+}
+# P0-8 收尾：四個面板 h2 的階段字面必須與階段 chip 台灣版文案一致（chip「回程或留下」對應 h2「回程或留下：…」）
+$stagePanelLabels = @{ 'considering' = '還在考慮'; 'committed' = '決定要去'; 'in-australia' = '已在澳洲'; 'next-step' = '回程或留下' }
+foreach ($stageId in $clarifierStages) {
+  if (-not $indexText.Contains("<h2 id=`"$stageId-title`">$($stagePanelLabels[$stageId])：")) { Write-Output "FAIL [index.html] 面板 $stageId 的 h2 必須以階段 chip 文案「$($stagePanelLabels[$stageId])：」開頭"; $errors++ }
+}
+foreach ($stageLabel462 in @('還在糾結', '決定要去（等抽籤也算）', '已經到澳', '回程或留下')) {
+  if (-not $journeyDirectory.Value.Contains("data-label-462=`"$stageLabel462`"")) { Write-Output "FAIL [index.html] 階段 chip 462 版文案缺：$stageLabel462"; $errors++ }
+}
+foreach ($boundaryExit in @('exit-considering-visa', 'exit-in-australia-work', 'exit-in-australia-visa')) {
+  $boundaryBlock = [regex]::Match($indexText, "(?s)<div class=`"clarifier-exit(?: clarifier-exit-lite)?`" id=`"$boundaryExit`".*?<p class=`"clarifier-exit-safety`">")
+  if (-not $boundaryBlock.Success -or -not $boundaryBlock.Value.Contains($clarifierBoundary)) {
+    Write-Output "FAIL [index.html] 出口 $boundaryExit 卡片內文缺短版邊界句"
+    $errors++
+  }
+}
+$simplifiedChars = '签|货|进|机|资|们|这|么|个|证|发|时|间|对|该|会|从|还|开|关|应|办|区|钱|请|问|离|买|卖|车|见|说|职|则|难|马|来|经|听|习|学'
+foreach ($label462 in [regex]::Matches($indexText, 'data-label-462="([^"]*)"')) {
+  if ($label462.Groups[1].Value -match $simplifiedChars) {
+    Write-Output "FAIL [index.html] data-label-462 必須以繁體字書寫（C-3）：$($label462.Groups[1].Value)"
+    $errors++
+  }
+}
+# P0-10 全站不得再出現「找人聊」，也不得出現個案判定句型（SDD §1.1 第 7 條）
+foreach ($siteFile in (Get-ChildItem (Join-Path $dir '*.html')) + (Get-ChildItem (Join-Path $dir 'lang\*.html') -Recurse) + (Get-ChildItem (Join-Path $dir 'assets\*.js')) + (Get-ChildItem (Join-Path $dir 'assets\*.css'))) {
+  $siteFileText = [System.IO.File]::ReadAllText($siteFile.FullName, [System.Text.Encoding]::UTF8)
+  if ($siteFileText.Contains('找人聊')) { Write-Output "FAIL [$($siteFile.Name)] 「找人聊」已全站改為「看公開討論」（G5）"; $errors++ }
+  if ($siteFileText -match '你符合(資格|條件|申請)|你可以申請|這份工作可以集簽|這工作可以集簽') {
+    Write-Output "FAIL [$($siteFile.Name)] 不得出現個案判定句型（你符合／你可以申請／這份工作可以集簽）"
+    $errors++
+  }
+}
 foreach ($href462 in [regex]::Matches($indexText, 'data-href-462="([^"]+)"')) {
   $href462Value = $href462.Groups[1].Value
   if (-not $href462Value.StartsWith('lang/en/visa/')) {
@@ -2179,7 +2686,7 @@ if ($supportHubAt -lt 0 -or $searchSectionAt -le $supportHubAt) {
     $errors++
   }
 }
-foreach ($retiredHomeNeedle in @('aria-current="step"', 'aria-current="true"', 'class="route-guide"', 'class="direct-solution-grid"', 'id="self-assessment"', 'href="#self-assessment"', 'href="#common-problems"', 'id="problem-directory-title"', '上方 12 張問題卡或下方兩題引導')) {
+foreach ($retiredHomeNeedle in @('aria-current="step"', 'aria-current="true"', 'class="route-guide"', 'class="direct-solution-grid"', 'id="self-assessment"', 'href="#self-assessment"', 'href="#common-problems"', 'id="problem-directory-title"', '上方 12 張問題卡或下方兩題引導', 'class="home-zone-nav"', 'class="trust-strip"', 'class="free-badge"', '<section class="support-hub"', 'id="principles"', 'hero-cut-green', 'hero-cut-accent')) {
   if ($indexText.Contains($retiredHomeNeedle)) { Write-Output "FAIL [index.html] 已退場的首頁區塊或執行期屬性不得留在靜態 HTML：$retiredHomeNeedle"; $errors++ }
 }
 # CLARIFIER_SPEC §3.2：每個既有區塊的去向錨點都必須存在
@@ -2233,12 +2740,24 @@ if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// -
     'resultCount === 0',
     'hashchange',
     'JOB_QUIZ',
-    'JOB_FAMILY_ORDER'
+    'JOB_FAMILY_ORDER',
+    'aria-checked',
+    'data-passport-summary',
+    'data-label-462',
+    'data-label-default',
+    '"ArrowRight"',
+    'card.hidden = value !== "462"'
   )) {
     if (-not $clarifierScript.Value.Contains($clarifierScriptNeedle)) { Write-Output "FAIL [main.js] 釐清器或 AI 兜底缺安全界線：$clarifierScriptNeedle"; $errors++ }
   }
   if ([regex]::Matches($clarifierScript.Value, [regex]::Escape('"/api/assist"')).Count -ne 1 -or [regex]::Matches($clarifierScript.Value, 'fetch\(').Count -ne 1) {
     Write-Output 'FAIL [main.js] AI 兜底只能有一個 fetch 與一個 /api/assist 路由'
+    $errors++
+  }
+  # P0-9 實作 5：零結果只揭露「問一次 AI」按鈕，不自動 openAssist、不移焦點、不載入 Turnstile
+  $assistSearchListener = [regex]::Match($clarifierScript.Value, '(?s)window\.addEventListener\("whv:search", function \(event\) \{.*?\}\);')
+  if (-not $assistSearchListener.Success -or $assistSearchListener.Value.Contains('openAssist(') -or $assistSearchListener.Value.Contains('renderTurnstile(') -or $assistSearchListener.Value.Contains('.focus(') -or -not $assistSearchListener.Value.Contains('getElementById("site-search-ai")') -or -not $assistSearchListener.Value.Contains('searchAiSlot.hidden = false')) {
+    Write-Output 'FAIL [main.js] whv:search 零結果監聽只能揭露 #site-search-ai 按鈕，不得自動開啟 AI、移焦點或載入 Turnstile'
     $errors++
   }
   if ([regex]::Matches($clarifierScript.Value, '\bq:').Count -ne 6) {
@@ -2249,12 +2768,12 @@ if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// -
     if ($clarifierScript.Value.Contains($clarifierForbidden)) { Write-Output "FAIL [main.js] 釐清器不得保存狀態、寫入 HTML 字串或改寫網址：$clarifierForbidden"; $errors++ }
   }
 }
-foreach ($clarifierStyleNeedle in @('.clarifier-panel[hidden]', '.clarifier-exit[hidden]', '.clarifier-passport[hidden]', '.job-quiz[hidden]', '.clarifier-assist[hidden]', '.clarifier-assist-box[hidden]')) {
+foreach ($clarifierStyleNeedle in @('.clarifier-panel[hidden]', '.clarifier-exit[hidden]', '.clarifier-passport[hidden]', '.clarifier-passport-summary[hidden]', '.clarifier-chips .chip[aria-checked="true"]', '.job-quiz[hidden]', '.clarifier-assist[hidden]', '.clarifier-assist-box[hidden]')) {
   if (-not $styleText.Contains($clarifierStyleNeedle)) { Write-Output "FAIL [style.css] 釐清器 hidden 後援缺失：$clarifierStyleNeedle"; $errors++ }
 }
 $reducedMotionBlock = [regex]::Match($styleText, '(?s)@media \(prefers-reduced-motion: reduce\) \{.*?\n\}')
-if (-not $reducedMotionBlock.Success -or -not $reducedMotionBlock.Value.Contains('.clarifier-chips .chip')) {
-  Write-Output 'FAIL [style.css] 釐清器 chips 未納入 prefers-reduced-motion'
+if (-not $reducedMotionBlock.Success -or -not $reducedMotionBlock.Value.Contains('.clarifier-chips .chip') -or -not $reducedMotionBlock.Value.Contains('.safety-bar a, .home-entry-card, .clarifier-search-jump .btn { transition: none; transform: none; }')) {
+  Write-Output 'FAIL [style.css] 釐清器 chips、安全列、入口卡或固定搜尋鈕未納入 prefers-reduced-motion'
   $errors++
 }
 $printBlock = [regex]::Match($styleText, '(?s)@media print \{.*?\n\}')
@@ -2263,7 +2782,8 @@ if (-not $printBlock.Success -or -not $printBlock.Value.Contains('.clarifier-ass
   $errors++
 }
 $homeRouteOrder = @(
-  'class="support-hub"',
+  'class="safety-bar"',
+  'class="hero hero-compact"',
   'id="clarifier"',
   'id="journey-map"',
   'id="considering"',
@@ -2271,12 +2791,19 @@ $homeRouteOrder = @(
   'id="in-australia"',
   'id="next-step"',
   'id="job-quiz"',
+  'id="clarifier-search-open"',
   'class="site-search-home"',
   'id="assist"',
+  'class="home-entry-cards"',
   'id="communities"',
+  'id="journey-resume"',
+  'id="saved-pages"',
   'id="games"',
+  'class="site-footer"',
+  'class="foot-promise"',
   'id="source-model-title"',
-  'id="principles"'
+  'class="foot-principles"',
+  'class="disclaimer"'
 )
 $previousHomeRouteIndex = -1
 foreach ($homeRouteNeedle in $homeRouteOrder) {
@@ -2591,7 +3118,7 @@ if (-not $dplusScript.Success) {
     $errors++
   }
 }
-foreach ($indexSourceNeedle in @('id="source-model-title"', 'about.html#editorial-method', '官方資料整理・工具化・可回報修正', '不把未親歷的內容寫成親身經驗', '回報與修正', 'about.html#maintain', '資料性質說清楚')) {
+foreach ($indexSourceNeedle in @('id="source-model-title"', 'about.html#editorial-method', '官方來源可回查・風險先揭露・公開內容免費・資料性質說清楚', '不把未親歷的內容寫成親身經驗', '回報與修正', 'about.html#maintain', '資料性質說清楚')) {
   if (-not $indexText.Contains($indexSourceNeedle)) { Write-Output "FAIL [index.html] 首頁缺資料來源模型或修正入口：$indexSourceNeedle"; $errors++ }
 }
 foreach ($indexSalesNeedle in @('id="collab-home-title"', '想找 Jason', '私人合作可以直接寄 Email', '公開內容免費，客製合作可收費')) {
@@ -2613,8 +3140,13 @@ if (-not $toolsJs.Contains('澳打指南針 ・ 公開攻略免費 ・ 資料只
   Write-Output 'FAIL [tools.js] 行前海報未同步公開攻略免費定位'
   $errors++
 }
-foreach ($entryNeedle in @('我們想成為對打工度假者', '不替你草率做決定', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
+foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
   if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
+}
+# P0-8：使命句自首頁 hero 移到 about.html 開頭，且只在 about 出現
+if (-not $aboutText.Contains('我們想成為對打工度假者最友善的網站') -or $indexText.Contains('我們想成為對打工度假者')) {
+  Write-Output 'FAIL [about.html] 使命句「我們想成為對打工度假者最友善的網站」必須在 about.html 開頭且不再留在首頁'
+  $errors++
 }
 
 $legacyOmaraUrl = 'https://www.mara.gov.au/' + 'search-the-register-of-migration-agents/'

@@ -20,7 +20,9 @@
 → 以 `HMAC(CF-Connecting-IP)` 限流 → 每日總額度（`assist_daily_usage` 一天一列的 atomic 計數，超額 `429 assist_daily_cap`）
 → `MINIMAX_API_KEY` 為空、或 `ASSIST_BASE_URL` 不是 https、或主機不在 `ASSIST_ALLOWED_HOSTS`
 （`api.minimaxi.com`、`api.minimax.io`）即 `503 assist_not_configured`
-→ 呼叫 MiniMax OpenAI 相容 `chat/completions`（8 秒逾時，失敗 `502 assist_unavailable`）。
+→ 呼叫 MiniMax OpenAI 相容 `chat/completions`（`max_tokens` 1024、temperature 0、20 秒逾時，失敗 `502 assist_unavailable`）。
+2026-09-02 受控呼叫實測（D-2026-09-02-05）：MiniMax-M2.7 把推理放在 `content` 的 `<think>` 區塊，`max_tokens` 200 會被推理吃光而截斷成零連結；
+1024 加上系統提示規則 5（思考極短）後 24 題全部回傳有效站內連結，最長 7 秒、中位數約 5 秒。
 `kind` 仍是 `answer`／`official_exit`／`over_cap`／`refused`：`answer.answer` 是伺服器模板文字，`links` 只含
 白名單站內連結；模型沒有回任何有效 href 時改為 `refused`（固定兜底文案＋站內搜尋、各地社團目錄）。
 問題文字、模型回覆與 token 不寫 D1、不進 log；`assist.ts` 完全不使用 `console`，這條路由和 `/api/metrics`
@@ -50,6 +52,38 @@ npm run check
 ```
 
 需要手動啟動本機 API 時，先把 `.dev.vars.example` 複製為不受版控的 `.dev.vars`，只填 Cloudflare 官方測試值或本機隨機值，再執行 `npx wrangler dev --local`。
+
+## 正式啟用步驟（P0-4，只有站長能做；agent 不得代辦）
+
+前提：`npx wrangler whoami` 顯示你的 Cloudflare 帳號；`wrangler.jsonc` 的 `env.production` 區塊已備妥
+（正式 `ALLOWED_ORIGINS` 不含 localhost、`ENVIRONMENT` 為 `production`、自訂網域 `api.aussiewhvcompass.com`）。
+以下每一步都在 `worker/` 目錄執行；凡是要輸入 secret 的指令，只由站長本人在自己的終端機輸入，不貼進任何聊天或檔案。
+
+1. 建立正式 D1，把回傳的 `database_id` 填進 `wrangler.jsonc` `env.production.d1_databases[0].database_id`（取代全零）：
+   `npx wrangler d1 create aussie-whv-compass`
+2. 套用三支 migration 到正式 D1：
+   `npx wrangler d1 migrations apply DB --remote --env production`
+3. 在 Cloudflare 儀表板建立 Turnstile widget（hostname `www.aussiewhvcompass.com` 與 `aussiewhvcompass.com`，Managed 模式），
+   拿到 site key（公開）與 secret key（保密）。前端 action 固定為 `turnstile-spin-v2`，與 `TURNSTILE_EXPECTED_ACTION` 一致。
+4. 輸入三個 secret（互動式提示，不要用 echo 管線留在 shell 歷史）：
+   `npx wrangler secret put TURNSTILE_SECRET_KEY --env production`
+   `npx wrangler secret put RATE_LIMIT_HMAC_KEY --env production`（至少 32 個隨機位元組，例如 `openssl rand -base64 48`）
+   `npx wrangler secret put MINIMAX_API_KEY --env production`（api.minimaxi.com 的金鑰；填入前先確認 About 已放 MiniMax 資料處理揭露）
+5. 確認 `env.production.ratelimits[*].namespace_id` 在你的帳戶內唯一（沿用 1001–1004 即可，除非別的 Worker 已用），然後部署：
+   `npx wrangler deploy --env production`
+6. 煙霧測試（把 ORIGIN 換成正式站）：
+   `curl -s https://api.aussiewhvcompass.com/api/health`（應回 `ok:true`、`environment:"production"`）
+   `curl -s -X POST https://api.aussiewhvcompass.com/api/assist -H "Origin: https://www.aussiewhvcompass.com" -H "Content-Type: application/json" -d "{\"question\":\"二簽要幾天\",\"turnstileToken\":\"x\"}"`
+   （應回 Turnstile 驗證失敗的 4xx，證明 CORS、路由與 fail-closed 都在；沒有任何 500）
+   `curl -s -X POST https://api.aussiewhvcompass.com/api/assist -H "Origin: https://evil.example" -H "Content-Type: application/json" -d "{}"`（應回 403 `origin_not_allowed`）
+7. 前端開關：把 `assets/api-config.js` 的 `apiBaseUrl` 填 `https://api.aussiewhvcompass.com`、`turnstileSiteKey` 填 site key，
+   升全站資產版本（`scripts/build_seo.py` 的 `ASSET_VERSION`）並重跑三支 build 腳本與 `scripts/check.ps1`，commit、push。
+8. 線上驗收（cache-bust 開首頁）：搜尋零結果後出現「問一次 AI」；送出「二簽要幾天」應得到固定模板＋站內連結；
+   DevTools Network 只看到一次 `/api/assist`、`credentials: omit`；D1 `assist_daily_usage` 當日一列 count 加 1，沒有問題文字。
+   連續送第 11 次應 429（限流），當日第 201 次應 429 `assist_daily_cap`。
+9. 在 `docs/DECISIONS.md` 新增條目記錄回執（health 回應、D1 列、前端截圖），ROADMAP P0-4 與 P0-7 狀態才可改為「已上線」。
+
+回滾：把 `assets/api-config.js` 兩個值清空並 push，前端立即回到「尚未啟用」；Worker 可留著（無人呼叫即無費用）。
 
 ## 正式啟用前人工 gate
 

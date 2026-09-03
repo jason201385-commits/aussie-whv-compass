@@ -499,7 +499,7 @@ describe("assist router and server-composed answer", () => {
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: question },
       ],
-      max_tokens: 200,
+      max_tokens: 1024,
       temperature: 0,
     });
     await expect(storedCount("2026-09-12")).resolves.toBe(1);

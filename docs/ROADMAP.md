@@ -1,6 +1,6 @@
 # 澳打指南針 — 路線圖與待辦狀態（ROADMAP）
 
-> 版本 2.0｜最後更新 2026-09-02｜這是全部 P0／P1／P2 編號的**唯一來源**。
+> 版本 2.0｜最後更新 2026-09-03｜這是全部 P0／P1／P2 編號的**唯一來源**。
 > 任何規格檔（`SPEC.md`、`PERFORMANCE_AND_RETENTION_SPEC.md`、`CLARIFIER_SPEC.md`）
 > 只能引用這裡已存在的 ID；新增 ID 先在本表登記，`scripts/check.ps1` 會檢查。
 > 狀態敘述與證據不寫在這裡，寫在 `DECISIONS.md`，本表只留一行狀態與指標。
@@ -27,7 +27,11 @@
 | P0-4 | Cloudflare 最小後端正式資源 | 人工前置未完成 | 站長建立 Worker／D1／Turnstile／寄信並輸入 secrets | SDD §3.1、worker/README.md | 713f310（本機骨架） |
 | P0-5 | 五支腳本 render-blocking | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-5 | a823e88；D-2026-09-01-01 |
 | P0-6 | 無障礙倒退三項 | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-6 | a823e88；D-2026-09-01-01 |
-| P0-7 | 首頁單一漏斗釐清器 | 程式完成／本機驗證（首頁釐清器可上線；AI 兜底待 P0-4） | P0-4 與 `MINIMAX_API_KEY`；C-5 地區×需求推薦與 §6 指標設計未做（§3） | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
+| P0-7 | 首頁單一漏斗釐清器 | 程式完成／本機驗證（首頁釐清器可上線；AI 兜底待 P0-4） | P0-4 與 `MINIMAX_API_KEY`（線路已實測，D-2026-09-02-05）；C-5 併入 P1-21、§6 指標併入 P1-22、radiogroup 併入 P0-10 | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
+| P0-8 | 首屏重構（問題句 hero、階段 chips 進第一屏、安全出口單列、四格入口刪除） | 程式完成／本機驗證 | 驗收第 5 條 LCP 須部署後在正式站重量；驗收第 1 條後半（前兩階段第一個需求 chip 進 812px）本機未達，見 D-2026-09-03-02 | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
+| P0-9 | 搜尋強化（查詢改寫、意圖同義詞表、熱門 chip 綁錨點、462 英文頁進索引） | 程式完成／本機驗證 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
+| P0-10 | 釐清器口語文案與護照分支（台灣／中國護照用語切換、462 摘要卡、radiogroup、「看公開討論」） | 程式完成／本機驗證 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
+| P0-11 | 內容頁答案卡（取代 quick-answer hub 與證據卡的首屏版面，先做五個高風險頁） | 程式完成／本機驗證 | 其餘 7 頁待另開 ID | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
 | P1-1 | 採收季節月曆（work.html） | 已上線 | — | SPEC §1.2 | 3375363、eacc868 |
 | P1-2 | 我的行前海報 PNG 輸出 | 程式完成／本機驗證 | iPhone Safari 與 Android Chrome 實機下載 | SPEC §1.2 | 063f966 |
 | P1-3 | 動態剪紙 hero | 已上線 | — | SDD §4.3 | c720dec |
@@ -48,10 +52,15 @@
 | P1-18 | 危機優先開頭（五個恐慌頁） | 未開始 | 驗收改用實測 time-to-first-action（D-2026-09-02-02） | PERFORMANCE_AND_RETENTION_SPEC P1-18 | — |
 | P1-19 | 「網傳 vs 官網」對照塊 | 未開始 | — | PERFORMANCE_AND_RETENTION_SPEC P1-19 | — |
 | P1-20 | 「你上次看過之後改了什麼」 | 未開始 | 相依 `build_seo.py` 產出 freshness 資料 | PERFORMANCE_AND_RETENTION_SPEC P1-20 | — |
+| P1-21 | 社團目錄 JSON 與 communities.html 子頁（C-5 地區×需求推薦） | 未開始 | 相依 P0-10 | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
+| P1-22 | 釐清器與 AI 兜底指標（D+ 白名單擴充、GA4 事件表、判讀規則） | 未開始 | P0-3（CWA token、GA4 ID）與 P0-4（D+ 部署） | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
+| P1-23 | AI 兜底正式啟用（P0-4 啟用步驟、第一階段 links-only、red-team 驗收；intent 待命中率達標再重啟） | 程式完成／本機驗證（線路已實測，啟用待 P0-4） | P0-4（D1、Turnstile、secrets、`--env production` 部署） | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |
 | P2-4 | CJK 網頁字型載入策略 | 不排期／先量測 | 確認 LCP 元素是否受字型 swap 影響 | PERFORMANCE_AND_RETENTION_SPEC P2-4 | — |
+| P2-5 | 「想去哪／過什麼生活」與買車需求分流內容 | 未開始 | 內容需官方查證；不排名城市 | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
+| P2-6 | 工具子頁 tools.html（遊戲區移出首頁） | 未開始 | 相依 P0-8 | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
 
 ## 2. 未完成項目的需求摘要
 
@@ -99,10 +108,15 @@
 | `worker/` 其他 POST 路由缺逐路由 Origin 測試 | `worker/test/` | 2026-09-02 完整性批評 | 未處理：目前靠 `index.ts` 單一入口保證；新增路由時補測試 |
 | 首頁重建後 `check.ps1` 首頁區塊需同步 | `scripts/check.ps1` 首頁區塊 | P0-7 | 已處理：首頁區塊重寫為釐清器契約（D-2026-09-02-04） |
 | 首頁 34px 點擊目標（熱門搜尋 chips、六大職類連結） | `assets/style.css` 640px 區塊 | 2026-09-02 瀏覽器回放 | 已處理：行動版 `min-height: 44px` |
-| C-5 依地區×需求推薦社團 | 首頁 `#communities` | CLARIFIER_SPEC §5 | 未處理：目前只有地點／平台／州別篩選；出口只連到 `#communities` 不帶需求；下一輪設計 |
-| CLARIFIER_SPEC §6 釐清器專屬指標（各層完成率、出口點擊、AI 觸發率、超額次數） | `assets/main.js` D+ 鍵、`worker/src/repository.ts` | CLARIFIER_SPEC §6 | 未處理：先設計白名單 key，再實作；受 P0-3／P0-4 gate |
+| `cost.html` WA rego 免費查詢 URL 帶 `?527=` 參數，伺服器 302 改寫為 `?0`（瀏覽器可用、非瀏覽器工具進入重導） | `cost.html` 買車表 WA 列 | 2026-09-03 查核（states.md） | 待站長決定：改連不帶參數的 `https://online.transport.wa.gov.au/webExternal/registration/`（實作時瀏覽器開一次確認） |
+| `cost.html` QLD 列連總覽頁，14 天過戶與 safety certificate 規則在 `/transport/registration/transfer` 與 `/roadworthy` 子頁 | `cost.html` 買車表 QLD 列 | 2026-09-03 查核（states.md） | 待站長決定：改連 `/transfer`（八州表其他列皆為過戶頁） |
+| 首頁社團區 Facebook 搜尋轉接未登入回 Not Found | `index.html#communities` 兩個平台搜尋鈕 | 2026-09-02 查核（fairwork-community.md） | 未處理：按鈕旁加「需先登入 Facebook」並顯示查詢字串；併入 P1-21 |
+| `about.html` 隱私段落尚無 MiniMax 與 Turnstile 揭露 | `about.html#analytics` | D-2026-09-03-01 | 未處理：依 OPTIMIZATION_PLAN P1-23 揭露段落撰寫；填入 `MINIMAX_API_KEY` 前完成 |
+| 千問 UX 建議增補（`docs/UX-SUGGESTIONS.md`，UX-1～UX-10 與文案 D-1～D-3） | `docs/UX-SUGGESTIONS.md` | 2026-09-03 外部建議 | 待站長裁決：主 session 評估見該檔 §F（建議採納：麵包屑、其餘 7 頁的「30 秒版」一句、updated-tag 徽章化與柔化 CSS；不採納：新手一鍵開始（重複釐清器）、安全出口 FAB（P0-8 安全列已常駐）、漢堡選單（SDD §6 教訓 3）、section 預設折疊、閱讀進度條、信任數字列） |
+| C-5 依地區×需求推薦社團 | 首頁 `#communities` | CLARIFIER_SPEC §5 | 併入 P1-21（`OPTIMIZATION_PLAN.md`）；現況出口只連 `#communities` 不帶需求 |
+| CLARIFIER_SPEC §6 釐清器專屬指標（各層完成率、出口點擊、AI 觸發率、超額次數） | `assets/main.js` D+ 鍵、`worker/src/repository.ts` | CLARIFIER_SPEC §6 | 併入 P1-22（`OPTIMIZATION_PLAN.md`）；受 P0-3／P0-4 gate |
 | 無 JS 與 `prefers-reduced-motion` 只做靜態檢查，未在瀏覽器實測 | `index.html`、`assets/style.css` | 2026-09-02 完整性批評 | 未處理：下一次回放加 JS 停用與 reduce 模擬 |
 | AI 每日額度存 D1 一列聚合 vs CLARIFIER_SPEC §4「不寫 D1」字面 | `worker/src/assist.ts`、`migrations/0003` | 2026-09-02 完整性批評 | 待站長決定：接受「每日一列聚合計數」（不含任何問題文字）或改用 KV |
-| MiniMax 端點主機 `api.minimaxi.com` 與國際文件差異未驗證 | `worker/wrangler.jsonc` `ASSIST_BASE_URL` | 2026-09-02 完整性批評 | 待 P0-4 啟用前以真實 key 做一次受控呼叫；主機已鎖白名單 |
-| 釐清器護照選擇用三個 `aria-pressed` 切換，語意不如 `radiogroup`／`radio` | `index.html` 護照區、`assets/main.js` | Codex 審查 2026-09-02 | 未處理：下一輪改 `role="radiogroup"`＋`aria-checked`，同步 `check.ps1` |
+| MiniMax 端點主機 `api.minimaxi.com` 與國際文件差異未驗證 | `worker/wrangler.jsonc` `ASSIST_BASE_URL` | 2026-09-02 完整性批評 | 已處理：2026-09-02 晚間以本機環境既有 key 對 `api.minimaxi.com/v1/chat/completions` 做受控呼叫（D-2026-09-02-05）；發現推理 `<think>` 放在 `content`、`max_tokens` 200 會截斷成零連結，已改 1024 與 20 秒逾時並加提示規則 5；矩陣 4 組 24 題全部回傳有效站內連結 |
+| 釐清器護照選擇用三個 `aria-pressed` 切換，語意不如 `radiogroup`／`radio` | `index.html` 護照區、`assets/main.js` | Codex 審查 2026-09-02 | 併入 P0-10（`OPTIMIZATION_PLAN.md`） |
 | `check.ps1` 釐清器斷言多為字串存在，無法證明零請求與焦點行為 | `scripts/check.ps1`、vm 煙霧測試（暫存區） | Codex 審查 2026-09-02 | 未處理：把 `clarifier-smoke.js` 收進 `scripts/` 並掛進 `check.ps1` |

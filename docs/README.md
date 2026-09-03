@@ -1,6 +1,6 @@
 # docs/ 索引與閱讀路線
 
-> 版本 2.0｜最後更新 2026-09-02｜接手 agent 從這一頁開始，不要從「讀全文」開始。
+> 版本 2.0｜最後更新 2026-09-03｜接手 agent 從這一頁開始，不要從「讀全文」開始。
 > 五份核心文件各管一件事；同一個事實只寫在一個地方，其他地方用 ID 或章節號引用。
 
 ## 1. 文件分工
@@ -12,6 +12,8 @@
 | [`ROADMAP.md`](ROADMAP.md) | 全部 P0／P1／P2 編號的唯一登記與一行狀態；未完成項目的需求摘要；未編號的漂移與加固清單 | 開新項目、狀態改變 |
 | [`DECISIONS.md`](DECISIONS.md) | 按日期的決策與證據日誌：站長拍板、反方裁決、完成時的本機證據、取代關係 | 每次拍板、每次反方審查、每次完成 |
 | [`CLARIFIER_SPEC.md`](CLARIFIER_SPEC.md) | P0-7 首頁單一漏斗釐清器的專題規格：前提決策、邊界、漏斗骨架、AI 兜底、社團目錄、量測 | 釐清器設計與實作期間 |
+| [`OPTIMIZATION_PLAN.md`](OPTIMIZATION_PLAN.md) | 全站優化規格：首屏重構、搜尋強化、釐清器文案與護照分支、內容頁答案卡、社團目錄子頁、指標、AI 兜底啟用、內容分流（P0-8～P0-11、P1-21～P1-23、P2-5～P2-6） | 該領域的規格變動、工作項狀態改變 |
+| [`UX-SUGGESTIONS.md`](UX-SUGGESTIONS.md) | 外部模型（千問，2026-09-03）對 SDD／SPEC 的 UX 建議增補；建議性質，未合併；主 session 逐條評估附於該檔 §F，採納與否由站長在 DECISIONS 登錄 | 站長裁決後搬入對應文件或關閉 |
 | [`PERFORMANCE_AND_RETENTION_SPEC.md`](PERFORMANCE_AND_RETENTION_SPEC.md) | 效能、無障礙與留存的專題規格（P0-5、P0-6、P1-15～P1-20、P2-3、P2-4）與量測基準 | 該領域的規格變動 |
 | [`MEASUREMENT_SETUP.md`](MEASUREMENT_SETUP.md) | GA4 與 Search Console 的人工前置步驟 | 量測方式變動 |
 | [`ACCOMMODATION_PROVIDER_ONBOARDING.md`](ACCOMMODATION_PROVIDER_ONBOARDING.md) | 住宿 provider 授權、secret、商業關係、E2E 與公開開關 gate | provider 狀態變動 |
@@ -33,6 +35,7 @@
 | 新增或重組頁面 | `SDD.md` §2.1–§2.2；`SPEC.md` §1.1、§4 驗收；`scripts/build_seo.py`、`build_search.py`、`build_i18n.py` 的 `--check` |
 | 改互動工具 | `SPEC.md` §1.2 該工具那一列；`SDD.md` §3（storage keys、特徵偵測）、§4.5 無障礙 |
 | 首頁或釐清器（P0-7） | `CLARIFIER_SPEC.md` 全文；`DECISIONS.md` D-2026-09-02-01；`SDD.md` §3.2 |
+| 全站優化（P0-8～P0-11、P1-21～P1-23、P2-5～P2-6） | `OPTIMIZATION_PLAN.md` 全文；`DECISIONS.md` D-2026-09-02-05、D-2026-09-02-06；`CLARIFIER_SPEC.md` §0.1；AI 兜底啟用另讀 `worker/README.md` 正式啟用步驟 |
 | Worker／API | `SDD.md` §3.1；`worker/README.md`；`ROADMAP.md` P0-4 |
 | 效能、無障礙、留存 | `PERFORMANCE_AND_RETENTION_SPEC.md`；`ROADMAP.md` §3 |
 | 第三方入口、商業關係、社團 | `SDD.md` §3.2；`third-party-register.json`；`ACCOMMODATION_*.md` |

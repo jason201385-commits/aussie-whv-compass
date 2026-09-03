@@ -75,10 +75,17 @@ export const MIN_QUESTION_LENGTH = 4;
 export const MAX_QUESTION_LENGTH = 200;
 export const MAX_ANSWER_LENGTH = 600;
 export const MAX_ASSIST_LINKS = 3;
-export const DEFAULT_ASSIST_TIMEOUT_MS = 8_000;
+/**
+ * 2026-09-02 controlled calls against api.minimaxi.com (MiniMax-M2.7): the model
+ * emits its reasoning as a <think> block inside `content`; with max_tokens 200 the
+ * block alone exhausted the budget (finish_reason "length", no JSON) on 2 of 6
+ * questions, and cold latency ranged 4-16 s. 1024 tokens plus rule 5 of the prompt
+ * gave 6/6 routable replies with a 7 s worst case; the timeout keeps headroom.
+ */
+export const DEFAULT_ASSIST_TIMEOUT_MS = 20_000;
 const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
 const MAX_UPSTREAM_RESPONSE_BYTES = 64 * 1024;
-const UPSTREAM_MAX_TOKENS = 200;
+const UPSTREAM_MAX_TOKENS = 1024;
 const UPSTREAM_TEMPERATURE = 0;
 
 /** C0 controls (except tab, LF and CR, which the whitespace collapse already removed) and DEL. */
@@ -190,6 +197,7 @@ export const SYSTEM_PROMPT = [
   "2. href 必須與目錄一字不差；不得輸出目錄以外的網址、電話、聯絡方式或任何說明文字。",
   "3. 涉及個人簽證、法律、醫療、稅務的問題，只挑對應頁面的官方入口；你不做任何判定。",
   '4. 只輸出一個 JSON 物件：{"links":["<href>","<href>"]}。可另加 "intent" 一個短字串（伺服器會忽略）。不要加其他鍵、標題或程式碼框。',
+  "5. 不要輸出思考過程；如果一定要思考，控制在 30 字以內，然後立刻輸出 JSON。",
   "站內目錄（href｜名稱｜說明）：",
   ...SITE_CATALOGUE.map((entry) => `${entry.href}｜${entry.title}｜${entry.note}`),
 ].join("\n");

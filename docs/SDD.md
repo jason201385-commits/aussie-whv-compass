@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-09-02｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-09-03｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -160,7 +160,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 - **住宿搜尋**：只接受四個固定欄位、2 KiB body、固定類別限流、provider timeout、每平台最多 8 筆、
   目的網域與顯示欄位白名單；每個候選 provider 必須附有效 `displayAuthorization`（本站 origin、核准用途、
   查核日、有效期限），過期或缺漏不呼叫上游；不寫 D1、不記錄搜尋內容。
-- **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`MINIMAX_API_KEY` 空值或 `ASSIST_BASE_URL` 主機不在白名單（`api.minimaxi.com`／`api.minimax.io`）時 503 fail closed；透過 OpenAI 相容 chat completions（`ASSIST_MODEL`）呼叫，8 秒逾時，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
+- **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`MINIMAX_API_KEY` 空值或 `ASSIST_BASE_URL` 主機不在白名單（`api.minimaxi.com`／`api.minimax.io`）時 503 fail closed；透過 OpenAI 相容 chat completions（`ASSIST_MODEL`）呼叫（`max_tokens` 1024、temperature 0），20 秒逾時，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
 - **安全**：所有 `POST` 路由要求 `Origin` 存在且在白名單，否則 `403 origin_not_allowed`（`GET /api/health` 例外）；
   Turnstile token server-side 驗證；輸入長度、rate limit 與 SQL 皆白名單／prepared statement；
   限流鍵以只存在 Worker secret 的 HMAC 產生，原始 Email 或 IP 不作 binding key。
