@@ -216,3 +216,18 @@
   3. 主 session 自行複核五頁答案卡是否引入原頁面沒有的事實：逐頁比對 HEAD 版本的數字與外連，除規格要求的「417／462 適用」範圍標籤外，無新數字、無新外連。
   4. 已刪除的兩條 `check.ps1` 斷言確認有更嚴格的替代：搜尋隱私禁用清單由 4 項擴為 8 項（新增 `SEARCH_SYNONYMS`、`data-search-query`、`data-home-search-query`、`openAssist`）；`prefers-reduced-motion` 除原有 `.clarifier-chips .chip` 外新增安全列、入口卡、固定搜尋鈕。
 - 狀態：程式完成／本機驗證；部署與正式站 LCP 重量待站長。
+
+## D-2026-09-03-03 P0-8～P0-11 上線與線上回放
+
+- 決策：站長要求部署。`6c8b139` push 到 `main`，GitHub Pages 建置成功（build status `built`，commit 6c8b139，2026-09-03T12:53:13Z），正式站已服務 `20260903-49`。
+- 線上回放（正式站 `https://www.aussiewhvcompass.com/`，chrome-devtools 375×812×2 mobile，cache-bust 查詢字串）：
+  - 首頁：資產版本 `20260903-49`；h1「澳洲打工度假，你現在在哪一步？」top 242；安全列高 96px、5 個連結依序 `health.html#emergency`／`scam.html#help`／`scam.html#help`／`visa.html#apply`／`housing.html#housing-search-tool`；四個階段 chip top 378／378／426／426；`home-zone-nav` 與 `trust-strip` 皆已不存在；三張入口卡連 `#communities`／`#games`／`#saved-pages`；21 個出口；全站有「看公開討論」、無「找人聊」。
+  - 搜尋「二簽要幾天」：狀態列「已略過『要、嗎、怎麼』這類字，以『二簽』找到 9 個段落」，第 1 名 `visa.html#second`。8 個熱門 chip 全部是 `<a href>` 且錨點正確。
+  - 零結果（`qzxv不存在的詞`）：空狀態 DOM 順序為 標題 → 說明 → 4 個階段 chip → 5 個安全列入口 → AI 槽位 → GitHub 連結；`#assist-form` 仍 hidden、`aria-expanded=false`、頁面 0 個 turnstile script、0 筆 `/api/` 或 challenges 請求、焦點留在搜尋輸入框。
+  - 護照分支：選 462 後階段 chips 變「還在糾結／決定要去（等抽籤也算）／已經到澳／回程或留下」、需求 chips 與出口切換、摘要卡顯示（四行與七個連結含抽籤頁、functional-english 子頁、使館 WHV2026-27EN），整區無簡體字；切回 417 全部還原、摘要卡收起。
+  - `visa.html` 答案卡：主結論 30 字、3 個要點 15／15／17 字、主按鈕 `#postcode-tool` 目標為含輸入元件的 DIV、依據列預設收合（`檢查 open=false`）、逃生口存在、卡片 top 353 高 540px、第一個正文 h2 由改版前 2,937px 提前到 1,551px、無水平溢位、舊 hub 已移除。
+- **P0-8 驗收 5（LCP）：本輪未能取得有效量測，維持未完成。** 條件同基線（正式站、Slow 4G、4x CPU、375×812×3、冷快取），但改用 Chrome DevTools Performance trace，因為本環境的 `PerformanceObserver` 完全收不到 paint 與 LCP entry（`performance.getEntriesByType('paint')` 長度 0，`document.visibilityState` 為 visible 但分頁未合成畫面）。六次 trace 值：3,712／4,287／4,545／14,753／4,597／12,971 ms，全距 3,712–14,753 ＝中位數的約 242%，遠超 `PERFORMANCE_AND_RETENTION_SPEC.md` §1.0 的 25% 作廢門檻，**整批作廢**。方法也與基線（PerformanceObserver）不同，本來就不可直接比較。
+- **可靠的觀察（與量測噪音無關）**：LCP 元素已不是 h1。`LCPBreakdown` insight 明示 `The LCP element (H2 id='site-search-home-title', nodeId: 275) is text`；六次 trace 的 nodeId 出現 274／275／279 三種，代表 LCP 候選在本設計下不穩定（改版前基線是十次皆同一個 H1）。原因是 h1 縮為 24px 兩行後，繪製面積小於搜尋區 h2。
+- **新觀察：慢速情境下的 CLS。** 兩次慢速 trace 出現 CLS 0.29（其餘四次 0.00）。`CLSCulprits` insight 指出最大位移叢集分數 0.2916、受影響元素為 `SECTION id='search' class='site-search-home'`、根因為網路載入的字型 `fonts.gstatic.com/s/notosanstc/...woff2`。改版前基線五次 CLS 皆 0.00。判定：這是 CJK 字型晚到造成搜尋區重排，只在字型延遲十秒以上時出現，本輪無法區分是設計改動造成或環境噪音放大，**列為待清淨環境重驗**。
+- 待辦（列 `ROADMAP.md` §3）：在噪音較低的環境重跑 LCP 與 CLS 各 5 次（全距須 ≤ 中位數 25%）；若 CLS 0.29 可重現，處理搜尋區 h2 的字型重排（例如為該標題預留行高或改用 `size-adjust` 的 fallback 字型），並與 P2-4 的 CJK 字型策略一起評估。
+- 狀態：已上線（P0-8～P0-11）；LCP／CLS 量測未完成。

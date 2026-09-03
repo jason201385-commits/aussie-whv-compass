@@ -28,10 +28,10 @@
 | P0-5 | 五支腳本 render-blocking | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-5 | a823e88；D-2026-09-01-01 |
 | P0-6 | 無障礙倒退三項 | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-6 | a823e88；D-2026-09-01-01 |
 | P0-7 | 首頁單一漏斗釐清器 | 程式完成／本機驗證（首頁釐清器可上線；AI 兜底待 P0-4） | P0-4 與 `MINIMAX_API_KEY`（線路已實測，D-2026-09-02-05）；C-5 併入 P1-21、§6 指標併入 P1-22、radiogroup 併入 P0-10 | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
-| P0-8 | 首屏重構（問題句 hero、階段 chips 進第一屏、安全出口單列、四格入口刪除） | 程式完成／本機驗證 | 驗收第 5 條 LCP 須部署後在正式站重量；驗收第 1 條後半（前兩階段第一個需求 chip 進 812px）本機未達，見 D-2026-09-03-02 | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
-| P0-9 | 搜尋強化（查詢改寫、意圖同義詞表、熱門 chip 綁錨點、462 英文頁進索引） | 程式完成／本機驗證 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
-| P0-10 | 釐清器口語文案與護照分支（台灣／中國護照用語切換、462 摘要卡、radiogroup、「看公開討論」） | 程式完成／本機驗證 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
-| P0-11 | 內容頁答案卡（取代 quick-answer hub 與證據卡的首屏版面，先做五個高風險頁） | 程式完成／本機驗證 | 其餘 7 頁待另開 ID | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02 |
+| P0-8 | 首屏重構（問題句 hero、階段 chips 進第一屏、安全出口單列、四格入口刪除） | 已上線 | 驗收第 5 條 LCP 須部署後在正式站重量；驗收第 1 條後半（前兩階段第一個需求 chip 進 812px）本機未達，見 D-2026-09-03-02 | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
+| P0-9 | 搜尋強化（查詢改寫、意圖同義詞表、熱門 chip 綁錨點、462 英文頁進索引） | 已上線 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
+| P0-10 | 釐清器口語文案與護照分支（台灣／中國護照用語切換、462 摘要卡、radiogroup、「看公開討論」） | 已上線 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
+| P0-11 | 內容頁答案卡（取代 quick-answer hub 與證據卡的首屏版面，先做五個高風險頁） | 已上線 | 其餘 7 頁待另開 ID | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
 | P1-1 | 採收季節月曆（work.html） | 已上線 | — | SPEC §1.2 | 3375363、eacc868 |
 | P1-2 | 我的行前海報 PNG 輸出 | 程式完成／本機驗證 | iPhone Safari 與 Android Chrome 實機下載 | SPEC §1.2 | 063f966 |
 | P1-3 | 動態剪紙 hero | 已上線 | — | SDD §4.3 | c720dec |
@@ -113,6 +113,9 @@
 | 首頁社團區 Facebook 搜尋轉接未登入回 Not Found | `index.html#communities` 兩個平台搜尋鈕 | 2026-09-02 查核（fairwork-community.md） | 未處理：按鈕旁加「需先登入 Facebook」並顯示查詢字串；併入 P1-21 |
 | `about.html` 隱私段落尚無 MiniMax 與 Turnstile 揭露 | `about.html#analytics` | D-2026-09-03-01 | 未處理：依 OPTIMIZATION_PLAN P1-23 揭露段落撰寫；填入 `MINIMAX_API_KEY` 前完成 |
 | 千問 UX 建議增補（`docs/UX-SUGGESTIONS.md`，UX-1～UX-10 與文案 D-1～D-3） | `docs/UX-SUGGESTIONS.md` | 2026-09-03 外部建議 | 待站長裁決：主 session 評估見該檔 §F（建議採納：麵包屑、其餘 7 頁的「30 秒版」一句、updated-tag 徽章化與柔化 CSS；不採納：新手一鍵開始（重複釐清器）、安全出口 FAB（P0-8 安全列已常駐）、漢堡選單（SDD §6 教訓 3）、section 預設折疊、閱讀進度條、信任數字列） |
+| P0-8 驗收 5：正式站 LCP／CLS 未取得有效量測 | 正式站首頁 | D-2026-09-03-03 | 未處理：本環境 PerformanceObserver 收不到 paint、trace 全距達中位數 242%（3,712–14,753 ms）整批作廢；需在噪音較低的環境重跑各 5 次 |
+| LCP 元素已由 h1 變成 `H2#site-search-home-title`，且候選不穩定（nodeId 274／275／279） | `index.html` hero 與搜尋區 | D-2026-09-03-03 | 未處理：h1 縮為 24px 兩行後繪製面積小於搜尋區 h2；先重量再決定是否調整 hero 版面 |
+| 慢速情境 CLS 0.29（字型晚到造成 `SECTION#search` 重排） | `assets/style.css` 搜尋區、Google Fonts | D-2026-09-03-03 CLSCulprits | 未處理：改版前基線 5 次皆 0.00；待清淨環境重驗，若可重現則與 P2-4 CJK 字型策略一起處理 |
 | C-5 依地區×需求推薦社團 | 首頁 `#communities` | CLARIFIER_SPEC §5 | 併入 P1-21（`OPTIMIZATION_PLAN.md`）；現況出口只連 `#communities` 不帶需求 |
 | CLARIFIER_SPEC §6 釐清器專屬指標（各層完成率、出口點擊、AI 觸發率、超額次數） | `assets/main.js` D+ 鍵、`worker/src/repository.ts` | CLARIFIER_SPEC §6 | 併入 P1-22（`OPTIMIZATION_PLAN.md`）；受 P0-3／P0-4 gate |
 | 無 JS 與 `prefers-reduced-motion` 只做靜態檢查，未在瀏覽器實測 | `index.html`、`assets/style.css` | 2026-09-02 完整性批評 | 未處理：下一次回放加 JS 停用與 reduce 模擬 |
