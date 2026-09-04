@@ -1000,7 +1000,7 @@ if (-not (Test-Path $englishCostPath)) {
     if ($link.Value -notmatch 'rel="[^"]*noopener[^"]*"') { Write-Output 'FAIL [lang/en/cost/] 新分頁連結缺 noopener'; $errors++ }
   }
   foreach ($commercialUrl in @(
-    'https://www.aldi.com.au/store-finder/',
+    'https://www.aldi.com.au/storelocator',
     'https://www.coles.com.au/on-special',
     'https://www.woolworths.com.au/shop/browse/specials',
     'https://www.salvosstores.com.au/stores',
@@ -2720,6 +2720,41 @@ if (-not $indexMainBlock.Success -or [regex]::Matches($indexMainBlock.Value, '<h
   Write-Output 'FAIL [index.html] 首頁 main 內每個 h2 都必須有 id（站內搜尋索引依賴）'
   $errors++
 }
+# AI 兜底只會回 SITE_CATALOGUE 與 OFFICIAL_EXIT_LINKS 裡的 href，所以每個目標都必須真的存在。
+# 頁面改版把某個區塊 id 改掉時，模型會把人送到空白處，而且不會有任何錯誤訊息。
+$assistCatalogueSource = [System.IO.File]::ReadAllText((Join-Path $dir 'worker/src/assist.ts'), [System.Text.Encoding]::UTF8)
+$catalogueTargets = New-Object System.Collections.Generic.HashSet[string]
+foreach ($catalogueMatch in [regex]::Matches($assistCatalogueSource, 'href: "([^"]+)"')) {
+  [void]$catalogueTargets.Add($catalogueMatch.Groups[1].Value)
+}
+$officialExitBlock = [regex]::Match($assistCatalogueSource, '(?s)OFFICIAL_EXIT_LINKS = \{.*?\} as const;')
+if ($officialExitBlock.Success) {
+  foreach ($exitMatch in [regex]::Matches($officialExitBlock.Value, '"([a-z0-9-]+\.html(?:#[A-Za-z0-9_-]+)?)"')) {
+    [void]$catalogueTargets.Add($exitMatch.Groups[1].Value)
+  }
+}
+if ($catalogueTargets.Count -lt 30) {
+  Write-Output "FAIL [worker/src/assist.ts] AI 目錄目標只抓到 $($catalogueTargets.Count) 個，應為 30 個以上"
+  $errors++
+}
+foreach ($catalogueTarget in $catalogueTargets) {
+  $targetParts = $catalogueTarget -split '#', 2
+  $targetPage = if ($targetParts[0]) { $targetParts[0] } else { 'index.html' }
+  $targetPath = Join-Path $dir $targetPage
+  if (-not (Test-Path $targetPath)) {
+    Write-Output "FAIL [assist.ts] AI 目錄指向不存在的頁面：$catalogueTarget"
+    $errors++
+    continue
+  }
+  if ($targetParts.Count -eq 2 -and $targetParts[1]) {
+    $targetText = [System.IO.File]::ReadAllText($targetPath, [System.Text.Encoding]::UTF8)
+    if (-not $targetText.Contains("id=`"$($targetParts[1])`"")) {
+      Write-Output "FAIL [assist.ts] AI 目錄指向不存在的錨點：$catalogueTarget"
+      $errors++
+    }
+  }
+}
+
 # 敏感題攔截：客戶端（送出前）與伺服端（fail closed）必須是同一組樣式。
 # 客戶端漏接時伺服端雖然仍會擋下模型，但問題文字已經離開瀏覽器，about.html 的揭露就不成立。
 $assistTsPath = Join-Path $dir 'worker/src/assist.ts'

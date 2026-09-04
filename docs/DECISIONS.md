@@ -335,3 +335,43 @@
   在本次修正前其實只有一部分成立（受傷完全不在任何一份樣式裡）；現在才與實作一致。
 - 狀態：已上線。P1-23 的 red-team 驗收由本條完成；命中率觀察仍待累積真實提問。
 
+## D-2026-09-04-04 全站外部連結健檢：六條死連結
+
+- 決策：把站上 436 條外部連結全掃一次，修掉瀏覽器實測為 404／410 的六條；
+  無法再查證的精確排程依編輯守則改寫，不保留。
+- 理由：本站的核心承諾是「說清楚資料從哪裡來，以及你如何自己回查」。
+  來源連結死掉時，讀者按下去只會看到 404，等於承諾不成立——而且死在最要緊的稅務與 super 段落。
+- 方法：抽出所有 `href="http(s)://..."`（436 條、去重），以 HEAD→GET 回退檢查；
+  非 2xx 的一律再用真實瀏覽器複驗，排除只是 bot 阻擋的 403（scamwatch、ACCC、carsales、domain 等 26 條）
+  與自己掃太快造成的 429（flatmates、realestate 各 2 條）。`fonts.googleapis.com`／`fonts.gstatic.com` 是
+  preconnect 的 origin 不是頁面，也不算。
+- 實際壞掉的六條與處置：
+
+  | 位置 | 原連結 | 狀態 | 改成 |
+  |---|---|---|---|
+  | `leave.html` 報稅來源 | ATO `lodge-an-early-tax-return` | 404（瀏覽器顯示 ATO 自己的 404 頁） | `lodge-your-tax-return-before-leaving-australia`，標籤同步改 |
+  | `leave.html` super 來源 | ATO `super-health-check` | 404，該頁已從 ATO 站上移除 | `growing-and-keeping-track-of-your-super/keeping-track-of-your-super`（實查內文有 multiple super accounts／consolidate／myGov，正是本段主張），標籤改為 ATO Keeping track of your super |
+  | `leave.html` super 來源 | ATO `paying-super-contributions/payday-super` | 404 | `super-for-employers/payday-super`（少一層） |
+  | `lang/en/prep/` TFN 來源 | ATO `payg-withholding-schedule-5-.../tax-file-number-tfn-declarations` | 404 | `forms-and-instructions/tfn-declaration` |
+  | `lang/en/cost/` NT 交通 | `nt.gov.au/driving/public-transport-cycling-walking/public-transport` | 404 | `nt.gov.au/driving/public-transport-cycling` |
+  | `lang/en/cost/` Aldi | `aldi.com.au/store-finder/` | 404 | `aldi.com.au/storelocator` |
+
+- `english.html` 布里斯本那條另外處理：市府活動頁回 **410 Gone**，所以「每週二、四、五、日」這個排程
+  已經沒有任何可回查的來源。依 Hard Constraint #15 不保留無法查證的精確數字，改寫為
+  「有志工帶的免費 conversation group，場次與星期會調整，出發前先查市府活動頁」，
+  連結改指市府現行的 What's on in Brisbane。保留場館名稱（可查證），刪掉排程（不可查證）。
+- 一併更新 `scripts/check.ps1` 兩處釘死的 URL（WA rego、Aldi），否則驗收會擋住正確的新網址。
+- **掃描過程本身也修正了一個判準**：第一版腳本把 403／429／連不上都算成死連結，全是誤判；
+  改成只看 404／410 之後，又冒出四條「404」——ABN Lookup、AUSTRAC Remittance Sector Register、
+  Google Analytics 說明頁、Red Cross 店舖查詢——**用真實瀏覽器開全部正常**。
+  結論：**狀態碼證明不了一個頁面死了**，這些站的 WAF 就是對非瀏覽器回 404。
+  所以腳本最終只產出「待人工複驗的候選」，由人用瀏覽器確認後才動連結；
+  已確認活著的主機記在 `CONFIRMED_ALIVE` 並註明確認日期。
+- 產出：`scripts/check_links.mjs`（Node、無新依賴、不掛進 `check.ps1`——`check.ps1` 要離線可重現）。
+  用法與判讀寫在 `README.md` §4a。目前 355 條全數通過，43 條列為 bot 阻擋。
+- 影響：這類漂移會持續發生（政府網站改版），現在至少可以隨時重跑一次。已列入 `ROADMAP.md` §3。
+- 同一次順手補上的內部守門：`check.ps1` 現在會把 `SITE_CATALOGUE` 與 `OFFICIAL_EXIT_LINKS` 的
+  44 個目標逐一對照實體頁面與區塊 id。AI 只會回這些 href，頁面改版把某個 id 改掉時，
+  模型會把人送到空白處而且不會有任何錯誤訊息。目前 44 個全部存在。
+- 狀態：已修，`ALL CHECKS PASSED (15 pages)`、`LINK CHECK PASSED (355 external links)`。
+
