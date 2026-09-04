@@ -307,7 +307,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260904-52";
+      script.src = "assets/search-index.js?v=20260904-53";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -1394,7 +1394,7 @@
     var SENSITIVE_EN_VIOLENCE =
       "assault|violen|\\brape|harass|molest|beat me|hit me|punch|drugged";
     var SENSITIVE_EN_COERCION =
-      "threat|blackmail|extort|won'?t let me (?:leave|go)|not allowed to leave|held against my will|locked me in";
+      "threat|blackmail|extort|(?:won['’]?t|wont|will not) let me (?:leave|go)|not allowed to leave|held against my will|locked me in";
     var SENSITIVE_EN_DOCUMENTS =
       "passport[^.?!]{0,24}(?:taken|confiscated|withheld|kept|back|returned)|(?:took|taken|confiscat|withh|keeping|holding|has|refus)[a-z]*[^.?!]{0,16}passport";
     var SENSITIVE_EN_MONEY =

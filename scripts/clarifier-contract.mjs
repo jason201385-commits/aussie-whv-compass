@@ -1240,6 +1240,7 @@ if (!harnessError) {
       "我被詐騙了",
       "my boss took my passport",
       "my employer won't let me leave the farm",
+      "my employer won’t let me leave the farm",
       "I got scammed by a fake landlord",
     ]) {
       const answer = submit(text);

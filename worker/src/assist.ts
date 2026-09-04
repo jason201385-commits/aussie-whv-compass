@@ -131,7 +131,7 @@ const SENSITIVE_EN_SELF_HARM =
 const SENSITIVE_EN_VIOLENCE =
   "assault|violen|\\brape|harass|molest|beat me|hit me|punch|drugged";
 const SENSITIVE_EN_COERCION =
-  "threat|blackmail|extort|won'?t let me (?:leave|go)|not allowed to leave|held against my will|locked me in";
+  "threat|blackmail|extort|(?:won['’]?t|wont|will not) let me (?:leave|go)|not allowed to leave|held against my will|locked me in";
 const SENSITIVE_EN_DOCUMENTS =
   "passport[^.?!]{0,24}(?:taken|confiscated|withheld|kept|back|returned)|(?:took|taken|confiscat|withh|keeping|holding|has|refus)[a-z]*[^.?!]{0,16}passport";
 const SENSITIVE_EN_MONEY =
