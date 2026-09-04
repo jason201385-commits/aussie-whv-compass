@@ -273,5 +273,29 @@
   `observability.enabled` 維持 `false`，即時查問題用 `wrangler tail --env production`，沒有可事後查的請求日誌，
   這是資料最小化的刻意取捨。
 - 回滾：把 `assistEnabled` 改成 `false` 並 push，前端立刻回到「尚未啟用」；Worker 留著無人呼叫即無費用。
-- 狀態：已上線；線上端到端驗收（正式站實際問一次、拿到站內連結）於本條目下方補列。
+- 狀態：已上線。
+
+## D-2026-09-04-02 上線驗收，以及線上實測抓到的個案判定漏接
+
+- 線上前端（正式站，`?e2e=1`）：`WHV_API_CONFIG` 四支旗標為
+  `assistEnabled:true`／`contactSubmitEnabled:false`／`dplusMetricsEnabled:false`／`accommodationSearchEnabled:false`；
+  `#assist` 讓 `assist-box` 顯示、`assist-off` 收起、`aria-expanded="true"`，並在此時才載入 Turnstile 腳本。
+- 線上後端（部署版本 `a047d826-e7a4-4c85-a285-759da5ac2bef`，帶允許的 Origin、故意用假 token）：
+  - 「我可以申請二簽嗎？」→ `official_exit`，固定判定文案＋`visa.html#apply`、`pr.html#overview`
+  - 「被雇主扣護照了」→ 固定安全文案＋`health.html#emergency`、`scam.html#help`
+  - 「二簽要幾天」→ 400 `turnstile_failed`（一般問題確實要通過人機驗證才會走到模型）
+  前兩者依設計在 Turnstile 之前就短路，所以假 token 也能驗證，這正是 SDD §3.1 寫的行為。
+- 模型段（用正式 `SYSTEM_PROMPT` 直接對 `api.minimaxi.com` 實測，MiniMax-M2.7，2026-09-04）：
+  四題都 200，`<think>` 區塊如預期出現在 `content` 內並被 `parseModelReply` 剝除；模型只回目錄 href，
+  例如「二簽要幾天」→ `["visa.html","visa.html#apply"]`，組出的句子完全來自固定模板。
+- **實測抓到的缺陷（已修）**：`ASSIST_DETERMINATION` 只比對連續字串，
+  「我可以申請二簽嗎」這種把受詞夾在動詞與「嗎」之間的問法整串比不到，會被當成一般導覽題送進模型——
+  而 SDD §3.1 明文把「能不能申請」列為個案判定。已改為容許中間 8 字以內的受詞
+  （`(?:可以|可不可|能|能夠)申請[^，。？?!！]{0,8}(?:嗎|吗)`、`符合…嗎`、`有…資格嗎`），
+  並在 `worker/test/assist.test.ts` 補 4 個正例與 3 個負例（`二簽要幾天`、`申請流程要準備哪些文件？` 等仍走模型）。
+  取捨：寧可把「像資格題」的問法多送到官方出口，也不要讓 AI 碰個案判定。
+- **仍未驗證的一段**：帶真實 Turnstile token 的完整端到端（真的問一次、拿到站內連結）。
+  自動化瀏覽器拿不到 token——那正是 Turnstile 在做它該做的事，不應該去繞過。
+  這一段要站長自己開瀏覽器問一次才算數；驗收點見 `ROADMAP.md` §3。
+- 狀態：已上線，待站長本人以真實瀏覽器完成最後一段驗收。
 

@@ -99,6 +99,8 @@
 
 | 項目 | 位置 | 來源 | 狀態（2026-09-02） |
 |---|---|---|---|
+| AI 兜底完整端到端（真實 Turnstile token → 模型 → 站內連結）尚未驗證 | 正式站首頁 `#assist` | D-2026-09-04-02 | 待站長本人以真實瀏覽器問一次；自動化瀏覽器拿不到 token，不得繞過人機驗證 |
+| AI 兜底命中率與 red-team 驗收未做 | `worker/src/assist.ts` 目錄與 prompt | P1-23 | 上線後觀察；命中率不佳再考慮重啟 intent 欄位 |
 | 全站 nav 不一致（`market.html`、`simulator.html` 曾自加第 13 個連結） | `scripts/check.ps1` nav 規則 | 2026-09-02 漂移稽核 | 已處理：站長決定工具頁不進 nav，15 頁統一 12 連結，`check.ps1` 改為強制（D-2026-09-02-03） |
 | GA4 填入 ID 前必須排除詐騙、健康頁的 page view | `assets/analytics.js` | Codex 反方審查 2026-09-02 | 已處理：`SENSITIVE_PATHS`＋`scripts/test_analytics.cjs`；範圍為整頁清單，見 SPEC §1.5 |
 | `check.ps1` 未斷言 `defer` | `scripts/check.ps1` | Codex 反方審查 2026-09-02 | 已處理：根層＋`lang/` 全部頁面的本機 script 必須含 `defer` |

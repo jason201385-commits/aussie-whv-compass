@@ -384,6 +384,11 @@ describe("assist determination classifier", () => {
       ["雇主付現金不給薪資單合法嗎？", ["work.html#verify", "scam.html#help"]],
       ["Is it legal for my boss to pay me 15 dollars an hour?", ["work.html#verify", "scam.html#help"]],
       ["這樣合不合法？", ["work.html#verify", "scam.html#help"]],
+      // 受詞夾在動詞與「嗎」之間的問法（線上實測 2026-09-04 漏接）。
+      ["我可以申請二簽嗎？", ["visa.html#apply", "pr.html#overview"]],
+      ["我能申請第三簽嗎", ["visa.html#apply", "pr.html#overview"]],
+      ["我符合二簽的資格嗎？", ["visa.html#apply", "pr.html#overview"]],
+      ["這樣有二簽資格嗎？", ["visa.html#apply", "pr.html#overview"]],
       // No topic hint at all: one official entry per topic.
       ["這樣有資格嗎？", ["visa.html#apply", "health.html#doctor", "cost.html#tax", "work.html#verify"]],
     ];
@@ -411,6 +416,8 @@ describe("assist determination classifier", () => {
     for (const text of [
       question,
       "417 簽證的申請流程在哪一頁？",
+      "申請流程要準備哪些文件？",
+      "二簽要幾天",
       "報稅要準備什麼文件？",
       "看醫生要先買哪種保險？",
       "Where is the harvest calendar?",
