@@ -655,6 +655,35 @@ foreach ($p in $allPages) {
   }
 }
 
+# 字體策略（ROADMAP §3）：中日韓字體很大，用 swap 會在字體晚到時整段重排（實測 CLS 0.29）。
+# 一律 display=optional——沒能在極短的阻擋期內就緒就整頁沿用備援，結構上不會有換字位移。
+# 這是刻意的取捨：第一次到訪的人可能看到系統字體，換得的是不會跳版。
+$fontTargets = @(Get-ChildItem (Join-Path $dir '*.html')) + @(Get-ChildItem (Join-Path $dir 'lang') -Recurse -Filter '*.html')
+foreach ($fontFile in $fontTargets) {
+  $fontText = [System.IO.File]::ReadAllText($fontFile.FullName, [System.Text.Encoding]::UTF8)
+  $fontRelativePath = $fontFile.FullName.Substring($dir.Length).TrimStart([char]92, [char]47)
+  if ($fontText.Contains('display=swap')) {
+    Write-Output "FAIL [$fontRelativePath] 字體不得用 display=swap（會造成中日韓字體晚到時的重排）"
+    $errors++
+  }
+  if ($fontText.Contains('fonts.googleapis.com/css2') -and -not $fontText.Contains('display=optional')) {
+    Write-Output "FAIL [$fontRelativePath] 載入 Google Fonts 就必須帶 display=optional"
+    $errors++
+  }
+}
+if ((Get-Content -Raw -Encoding UTF8 (Join-Path $dir 'scripts/build_i18n.py')).Contains('display=swap')) {
+  Write-Output 'FAIL [scripts/build_i18n.py] 產生器仍會輸出 display=swap'
+  $errors++
+}
+# optional 代表多數首次到訪者看到的是備援，所以兩條堆疊都必須自己指定到中日韓字體。
+$fontStackText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets/style.css'), [System.Text.Encoding]::UTF8)
+foreach ($fontFallback in @('"PingFang TC"', '"Microsoft JhengHei"', '"Songti TC"', '"PMingLiU"')) {
+  if (-not $fontStackText.Contains($fontFallback)) {
+    Write-Output "FAIL [assets/style.css] 字體備援缺中日韓字體：$fontFallback"
+    $errors++
+  }
+}
+
 # defer 斷言（ROADMAP §3、P0-5）：根目錄（含 404）與 lang/ 每一頁的本機 <script src> 都必須帶 defer，避免修復被回歸
 $deferTargets = @(Get-ChildItem (Join-Path $dir '*.html')) + @(Get-ChildItem (Join-Path $dir 'lang') -Recurse -Filter '*.html')
 foreach ($deferFile in $deferTargets) {

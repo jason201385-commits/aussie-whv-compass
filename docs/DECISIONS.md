@@ -385,3 +385,31 @@
   模型會把人送到空白處而且不會有任何錯誤訊息。目前 44 個全部存在。
 - 狀態：已修，`ALL CHECKS PASSED (15 pages)`、`LINK CHECK PASSED (355 external links)`。
 
+## D-2026-09-04-05 字體改用 font-display: optional
+
+- 決策：站長拍板，Google Fonts 的載入參數從 `display=swap` 改為 `display=optional`，
+  並把 serif 堆疊的中日韓備援補齊。
+- 理由：`swap` 的定義就是「先用備援、字體到了再換」，換的那一刻整段中日韓文字重排。
+  2026-09-03 改版後的量測看到慢速情境 CLS 0.29（改版前基線五次皆 0.00），
+  DevTools 的 CLSCulprits 直接指認是 `fonts.gstatic.com` 的 Noto 字體造成 `SECTION#search` 重排。
+  `optional` 沒有 swap 期——字體沒能在極短的阻擋期內就緒，該次載入就整頁沿用備援，
+  **結構上不會有換字位移**，不必依賴任何一次量測是否可信。
+- 前一輪為什麼沒改：那批 LCP／CLS 量測全距達中位數 242%，我自己依 PERF spec §1.0 判定作廢，
+  不拿作廢的數據去改設計。這次改的依據不是那個數字，是 `optional` 的定義本身；
+  站長也已知悉並接受隨之而來的取捨。
+- 取捨（站長已知悉）：第一次到訪、且字體沒能即時就緒的人，整頁看到的是系統字體；
+  之後帶快取再訪就會套用。serif 是本站的強調字體，所以這個取捨看得出來。
+- 連帶處理：`optional` 讓「看到備援」變成常態，所以備援不能停在沒有中文字符的字體上。
+  `--font-sans` 原本就有 `PingFang TC`／`Microsoft JhengHei`；
+  `--font-serif` 原本只到 `Noto Serif TC` 就接通用 `serif`，已補 `Songti TC`（macOS／iOS）、
+  `Noto Serif CJK TC`（Android／Linux）、`PMingLiU`（Windows）。
+- 範圍：根目錄 16 頁與 `lang/` 45 頁共 62 處，`scripts/build_i18n.py` 的模板同步改，
+  否則下次重建會把 `swap` 寫回去。
+- 驗證：Google Fonts 端實際回傳 636 個 `@font-face` 全為 `font-display: optional`。
+  `scripts/check.ps1` 新增四條斷言：任何頁面不得出現 `display=swap`、
+  載入 Google Fonts 就必須帶 `display=optional`、產生器不得輸出 `swap`、
+  兩條字體堆疊必須含指定的中日韓備援。
+- 影響：ROADMAP §3 的「慢速 CLS 0.29」與「字型策略」兩項改由本條處理；
+  LCP 元素改變仍待乾淨環境重測。
+- 狀態：已上線。
+

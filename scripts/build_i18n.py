@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260904-53"
+ASSET_VERSION = "20260904-54"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -133,7 +133,7 @@ def head(title: str, description: str, canonical: str, language: str, data: dict
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@700;900&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@700;900&amp;display=optional">
 <link rel="stylesheet" href="/assets/style.css?v={ASSET_VERSION}">
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2'&gt;&lt;circle cx='12' cy='12' r='10'/&gt;&lt;path d='M16 8l-2 6-6 2 2-6z'/&gt;&lt;/svg&gt;">'''
 

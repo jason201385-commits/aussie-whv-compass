@@ -5,7 +5,12 @@
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
     "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  --font-serif: Georgia, "Times New Roman", "Noto Serif TC", serif;
+  /* 字體以 font-display: optional 載入：沒能在極短的阻擋期內就緒就整頁沿用備援，
+     不會中途換字造成位移。所以備援必須自己指定到中日韓，不能停在 Georgia／Times
+     這種沒有中文字符的字體上。macOS／iOS 走 Songti TC，Windows 走新細明體，
+     Android／Linux 走 Noto Serif CJK TC。 */
+  --font-serif: Georgia, "Times New Roman", "Noto Serif TC", "Songti TC",
+    "Noto Serif CJK TC", "PMingLiU", serif;
   --bg: #e8f0f3;            /* 淡藍布底 */
   --surface: #fffdf5;       /* 奶油紙張 */
   --ink: #27342e;
