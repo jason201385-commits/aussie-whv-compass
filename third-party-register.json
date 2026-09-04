@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-31",
+  "generatedAt": "2026-09-04",
   "canonicalOrigin": "https://www.aussiewhvcompass.com",
   "editorialPolicyUrl": "https://www.aussiewhvcompass.com/about.html#recommendation-policy",
   "currentState": {
@@ -24,14 +24,14 @@
       "type": "third-party-community",
       "name": "西澳 Perth 享受生活互相交流",
       "destinationHost": "line.me",
-      "placement": "https://www.aussiewhvcompass.com/#perth-community",
+      "placement": "https://www.aussiewhvcompass.com/communities.html#perth-line-life",
       "purpose": "general-life-and-activity-exchange-only",
       "relationship": "moderator-approved-link-sharing",
       "compensation": "none",
       "siteOperated": false,
       "siteModerated": false,
       "qualifiedProfessionalReferral": false,
-      "checkedAt": "2026-08-29",
+      "checkedAt": "2026-09-04",
       "editorialStatus": "listed-with-third-party-boundary"
     },
     {
@@ -151,6 +151,36 @@
       "commercialReferral": false,
       "checkedAt": "2026-08-30",
       "editorialStatus": "official-register-exit"
+    },
+    {
+      "id": "community-search-navigation-group",
+      "type": "platform-search-navigation",
+      "name": "社群平台搜尋轉接（Facebook、Reddit）",
+      "destinationHost": "facebook.com, reddit.com",
+      "placement": "https://www.aussiewhvcompass.com/communities.html",
+      "purpose": "build-a-search-link-only-no-listing-or-endorsement",
+      "relationship": "search-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "qualifiedProfessionalReferral": false,
+      "checkedAt": "2026-09-04",
+      "editorialStatus": "search-navigation-only"
+    },
+    {
+      "id": "public-forums-navigation-group",
+      "type": "public-forum-navigation",
+      "name": "各州公開討論區（Reddit 城市版）",
+      "destinationHost": "reddit.com",
+      "placement": "https://www.aussiewhvcompass.com/communities.html",
+      "purpose": "navigation-to-public-local-forums-not-whv-specific",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "qualifiedProfessionalReferral": false,
+      "checkedAt": "2026-09-04",
+      "editorialStatus": "listed-with-third-party-boundary"
     }
   ],
   "correctionPolicy": {

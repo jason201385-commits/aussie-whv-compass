@@ -1,0 +1,913 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-04",
+  "canonicalOrigin": "https://www.aussiewhvcompass.com",
+  "directoryUrl": "https://www.aussiewhvcompass.com/communities.html",
+  "editorialPolicyUrl": "https://www.aussiewhvcompass.com/about.html#recommendation-policy",
+  "boundary": "本站不經營、不管理、不背書任何社群，也不代為聯繫。列出不等於推薦或品質保證。",
+  "entryTypeRules": {
+    "general": [
+      "direct-link",
+      "directory-page",
+      "platform-search",
+      "explain-only"
+    ],
+    "transactional": [
+      "directory-page",
+      "platform-search",
+      "explain-only"
+    ],
+    "high-risk-intermediary": [
+      "platform-search",
+      "explain-only"
+    ]
+  },
+  "expiryDays": {
+    "direct-link": 90,
+    "directory-page": 180,
+    "platform-search": 180,
+    "explain-only": 365
+  },
+  "needs": [
+    "life",
+    "arrival",
+    "housing",
+    "car",
+    "secondhand",
+    "job",
+    "farm-visa-intel",
+    "english",
+    "travel-buddy",
+    "region-choice",
+    "whv-462-zh"
+  ],
+  "forbiddenNeeds": [
+    "emergency",
+    "mental-health",
+    "scam-victim",
+    "visa-case",
+    "legal",
+    "tax",
+    "medical",
+    "insurance",
+    "migration-agent"
+  ],
+  "entries": [
+    {
+      "id": "perth-line-life",
+      "name": "西澳 Perth 享受生活互相交流",
+      "platform": "line",
+      "region": {
+        "state": "WA",
+        "city": "Perth",
+        "scope": "city"
+      },
+      "needs": [
+        "life"
+      ],
+      "languages": [
+        "zh-Hant"
+      ],
+      "audience": [
+        "whv"
+      ],
+      "access": "open",
+      "entryType": "directory-page",
+      "entryUrl": "index.html#perth-community",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#perth-line-life",
+      "registerId": "perth-line-community",
+      "relationship": "moderator-approved-link-sharing",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "moderator-approved",
+      "moderationSignals": [
+        "群規公開",
+        "版主同意本站分享入口"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "邀請連結全站只出現在首頁那張卡（含完整界線文字）；本頁只指向該卡，不重複邀請網址",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "no-site-support",
+        "no-private-transfer",
+        "verify-before-trust",
+        "invite-lives-on-home-card"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-wa-perth",
+      "name": "r/perth",
+      "platform": "reddit",
+      "region": {
+        "state": "WA",
+        "city": "Perth",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/perth/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-wa-perth",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "瀏覽器開啟確認為在營運的公開版，有近期貼文",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-nsw-sydney",
+      "name": "r/sydney",
+      "platform": "reddit",
+      "region": {
+        "state": "NSW",
+        "city": "Sydney",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/sydney/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-nsw-sydney",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-vic-melbourne",
+      "name": "r/melbourne",
+      "platform": "reddit",
+      "region": {
+        "state": "VIC",
+        "city": "Melbourne",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/melbourne/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-vic-melbourne",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-qld-brisbane",
+      "name": "r/brisbane",
+      "platform": "reddit",
+      "region": {
+        "state": "QLD",
+        "city": "Brisbane",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/brisbane/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-qld-brisbane",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-sa-adelaide",
+      "name": "r/Adelaide",
+      "platform": "reddit",
+      "region": {
+        "state": "SA",
+        "city": "Adelaide",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/Adelaide/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-sa-adelaide",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-act-canberra",
+      "name": "r/canberra",
+      "platform": "reddit",
+      "region": {
+        "state": "ACT",
+        "city": "Canberra",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/canberra/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-act-canberra",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-nt-darwin",
+      "name": "r/darwin",
+      "platform": "reddit",
+      "region": {
+        "state": "NT",
+        "city": "Darwin",
+        "scope": "city"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/darwin/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-nt-darwin",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-tas-hobart",
+      "name": "r/tasmania",
+      "platform": "reddit",
+      "region": {
+        "state": "TAS",
+        "city": "Hobart",
+        "scope": "state"
+      },
+      "needs": [
+        "life",
+        "region-choice"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "direct-link",
+      "entryUrl": "https://www.reddit.com/r/tasmania/",
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-tas-hobart",
+      "registerId": "public-forums-navigation-group",
+      "relationship": "public-forum-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "public-subreddit",
+      "moderationSignals": [
+        "公開版規",
+        "有版主與置頂討論串"
+      ],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "HTTP 200，公開可讀",
+      "expiresAt": "2026-12-03",
+      "editorialStatus": "listed-with-third-party-boundary",
+      "riskNotes": [
+        "not-whv-specific",
+        "no-site-support",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-08-29",
+      "history": []
+    },
+    {
+      "id": "reddit-whv-search",
+      "name": "Reddit 公開社群搜尋",
+      "platform": "reddit",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "life",
+        "arrival",
+        "region-choice",
+        "travel-buddy"
+      ],
+      "languages": [
+        "en"
+      ],
+      "audience": [
+        "general-public"
+      ],
+      "access": "open",
+      "entryType": "platform-search",
+      "entryUrl": "https://www.reddit.com/search/?q=working%20holiday&type=communities",
+      "searchTemplate": {
+        "urlTemplate": "https://www.reddit.com/search/?q={query}&type=communities",
+        "queries": {
+          "zh-Hant": "{region} working holiday",
+          "en": "{region} working holiday"
+        }
+      },
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#reddit-whv-search",
+      "registerId": "community-search-navigation-group",
+      "relationship": "search-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "platform-search",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "搜尋 URL 免登入 HTTP 200",
+      "expiresAt": "2027-03-03",
+      "editorialStatus": "search-navigation-only",
+      "riskNotes": [
+        "search-result-not-endorsement",
+        "verify-before-trust",
+        "no-site-support"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    },
+    {
+      "id": "facebook-life-search",
+      "name": "Facebook 生活與在地社團搜尋",
+      "platform": "facebook",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "life",
+        "arrival",
+        "english",
+        "travel-buddy"
+      ],
+      "languages": [
+        "zh-Hant",
+        "en"
+      ],
+      "audience": [
+        "whv"
+      ],
+      "access": "login-required",
+      "entryType": "platform-search",
+      "entryUrl": "https://www.facebook.com/search/groups/?q=Australia%20working%20holiday",
+      "searchTemplate": {
+        "urlTemplate": "https://www.facebook.com/search/groups/?q={query}",
+        "queries": {
+          "zh-Hant": "{region} 打工度假",
+          "en": "{region} working holiday"
+        }
+      },
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#facebook-life-search",
+      "registerId": "community-search-navigation-group",
+      "relationship": "search-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "platform-search",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "未登入時平台回 Not Found，已在卡片標明需先登入並顯示查詢字串",
+      "expiresAt": "2027-03-03",
+      "editorialStatus": "search-navigation-only",
+      "riskNotes": [
+        "facebook-login-required",
+        "search-result-not-endorsement",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    },
+    {
+      "id": "facebook-job-search",
+      "name": "Facebook 找工作社團搜尋",
+      "platform": "facebook",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "job",
+        "farm-visa-intel"
+      ],
+      "languages": [
+        "zh-Hant",
+        "en"
+      ],
+      "audience": [
+        "whv"
+      ],
+      "access": "login-required",
+      "entryType": "platform-search",
+      "entryUrl": "https://www.facebook.com/search/groups/?q=Australia%20backpacker%20jobs",
+      "searchTemplate": {
+        "urlTemplate": "https://www.facebook.com/search/groups/?q={query}",
+        "queries": {
+          "zh-Hant": "{region} 打工度假 工作",
+          "en": "{region} backpacker jobs"
+        }
+      },
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#facebook-job-search",
+      "registerId": "community-search-navigation-group",
+      "relationship": "search-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "high-risk-intermediary",
+      "governanceLevel": "platform-search",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "未登入時平台回 Not Found，已在卡片標明需先登入並顯示查詢字串",
+      "expiresAt": "2027-03-03",
+      "editorialStatus": "search-navigation-only",
+      "riskNotes": [
+        "never-pay-for-a-job",
+        "check-employer-before-work",
+        "facebook-login-required",
+        "search-result-not-endorsement"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介",
+        "不是職缺保證"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    },
+    {
+      "id": "facebook-housing-search",
+      "name": "Facebook 租屋與合租社團搜尋",
+      "platform": "facebook",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "housing"
+      ],
+      "languages": [
+        "zh-Hant",
+        "en"
+      ],
+      "audience": [
+        "whv"
+      ],
+      "access": "login-required",
+      "entryType": "platform-search",
+      "entryUrl": "https://www.facebook.com/search/groups/?q=Australia%20share%20house",
+      "searchTemplate": {
+        "urlTemplate": "https://www.facebook.com/search/groups/?q={query}",
+        "queries": {
+          "zh-Hant": "{region} 租屋 合租",
+          "en": "{region} share house rent"
+        }
+      },
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#facebook-housing-search",
+      "registerId": "community-search-navigation-group",
+      "relationship": "search-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "high-risk-intermediary",
+      "governanceLevel": "platform-search",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "未登入時平台回 Not Found，已在卡片標明需先登入並顯示查詢字串",
+      "expiresAt": "2027-03-03",
+      "editorialStatus": "search-navigation-only",
+      "riskNotes": [
+        "never-pay-before-inspection",
+        "no-private-transfer",
+        "facebook-login-required",
+        "search-result-not-endorsement"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介",
+        "不是房源保證"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    },
+    {
+      "id": "facebook-marketplace-search",
+      "name": "Facebook 二手與買車社團搜尋",
+      "platform": "facebook",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "car",
+        "secondhand"
+      ],
+      "languages": [
+        "zh-Hant",
+        "en"
+      ],
+      "audience": [
+        "whv"
+      ],
+      "access": "login-required",
+      "entryType": "platform-search",
+      "entryUrl": "https://www.facebook.com/search/groups/?q=Australia%20backpacker%20car%20sale",
+      "searchTemplate": {
+        "urlTemplate": "https://www.facebook.com/search/groups/?q={query}",
+        "queries": {
+          "zh-Hant": "{region} 二手 買賣",
+          "en": "{region} backpacker car sale"
+        }
+      },
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#facebook-marketplace-search",
+      "registerId": "community-search-navigation-group",
+      "relationship": "search-navigation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "transactional",
+      "governanceLevel": "platform-search",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "未登入時平台回 Not Found，已在卡片標明需先登入並顯示查詢字串",
+      "expiresAt": "2027-03-03",
+      "editorialStatus": "search-navigation-only",
+      "riskNotes": [
+        "inspect-before-paying",
+        "check-rego-and-transfer",
+        "no-private-transfer",
+        "search-result-not-endorsement"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介",
+        "不是車況保證"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    },
+    {
+      "id": "farm-visa-intel-explain",
+      "name": "集簽情報：為什麼這裡只給判斷方法",
+      "platform": "none",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "farm-visa-intel"
+      ],
+      "languages": [
+        "zh-Hant"
+      ],
+      "audience": [
+        "whv"
+      ],
+      "access": "open",
+      "entryType": "explain-only",
+      "entryUrl": null,
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#farm-visa-intel-explain",
+      "registerId": null,
+      "relationship": "editorial-explanation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "high-risk-intermediary",
+      "governanceLevel": "editorial",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "本站編輯內容，不指向任何特定社群",
+      "expiresAt": "2027-09-04",
+      "editorialStatus": "editorial-explanation-only",
+      "riskNotes": [
+        "never-pay-for-a-job",
+        "check-employer-before-work",
+        "verify-before-trust"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    },
+    {
+      "id": "whv-462-zh-explain",
+      "name": "462 中國護照：社群長什麼樣、怎麼判斷",
+      "platform": "none",
+      "region": {
+        "state": "AU",
+        "city": null,
+        "scope": "national"
+      },
+      "needs": [
+        "whv-462-zh"
+      ],
+      "languages": [
+        "zh-Hant"
+      ],
+      "audience": [
+        "whv-462"
+      ],
+      "access": "open",
+      "entryType": "explain-only",
+      "entryUrl": null,
+      "placementUrl": "https://www.aussiewhvcompass.com/communities.html#whv-462-zh-explain",
+      "registerId": null,
+      "relationship": "editorial-explanation-only",
+      "compensation": "none",
+      "siteOperated": false,
+      "siteModerated": false,
+      "riskClass": "general",
+      "governanceLevel": "editorial",
+      "moderationSignals": [],
+      "checkedAt": "2026-09-04",
+      "checkedHow": "本站編輯內容，不指向任何特定社群；領保原句見卡片來源列",
+      "expiresAt": "2027-09-04",
+      "editorialStatus": "editorial-explanation-only",
+      "riskNotes": [
+        "verify-before-trust",
+        "no-private-transfer",
+        "consular-line-is-official"
+      ],
+      "notWhatItIs": [
+        "不是本站客服",
+        "不是緊急支援",
+        "不是專業轉介"
+      ],
+      "listedSince": "2026-09-04",
+      "history": []
+    }
+  ],
+  "riskNoteText": {
+    "no-site-support": "本站不在群裡，也不代你聯繫或處理糾紛。",
+    "no-private-transfer": "不要在看到本人或現場之前先私下匯款或付訂金。",
+    "verify-before-trust": "群裡的說法是個人經驗，不是官方規定；重要的事回官方頁確認。",
+    "not-whv-specific": "這是當地的一般公開討論區，不是打工度假專屬社群。",
+    "search-result-not-endorsement": "本站只建立搜尋連結，搜尋結果不是本站挑選或背書的。",
+    "facebook-login-required": "Facebook 的社團搜尋需要先登入，未登入會顯示找不到頁面。",
+    "never-pay-for-a-job": "沒有任何合法工作需要你先付錢才能上工。",
+    "check-employer-before-work": "上工前先查雇主 ABN 與薪資條件，不要只憑群裡的推薦。",
+    "never-pay-before-inspection": "沒看過房、沒見過人之前不要付訂金或押金。",
+    "inspect-before-paying": "先看車、先查過戶與 rego，再談錢。",
+    "check-rego-and-transfer": "成交前查清楚 rego 狀態與過戶期限，各州規定不同。",
+    "consular-line-is-official": "領事保護專線是官方管道；接到自稱公檢法的電話要先掛掉再自己回撥官方號碼。",
+    "invite-lives-on-home-card": "邀請連結只放在首頁那張卡上，那裡有完整的界線說明；本頁只帶你過去。"
+  }
+}

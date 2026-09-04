@@ -1069,8 +1069,8 @@ if (!harnessError) {
     const exitAgain = h.click(exitChip);
     expect(exitAgain.defaultPrevented && h.document.activeElement === h.byId("exit-considering-cost"), "同出口再點一次也要重新聚焦");
 
-    const outside = h.document.querySelector('.home-entry-cards a[href="#communities"]');
-    h.setHash("#communities");
+    const outside = h.document.querySelector('.home-entry-cards a[href="#games"]');
+    h.setHash("#games");
     const outsideAgain = h.click(outside);
     expect(!outsideAgain.defaultPrevented, "釐清器外的同 hash 連結不攔截");
   });

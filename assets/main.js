@@ -307,7 +307,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260904-56";
+      script.src = "assets/search-index.js?v=20260904-57";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -575,6 +575,108 @@
       communityInput.focus();
     });
     renderCommunityEntries();
+  }
+
+  // ---------- 社團目錄頁：地區 × 需求篩選；不寫儲存、不改網址、不送出任何東西 ----------
+  var communityGrid = document.getElementById("community-grid");
+  if (communityGrid) {
+    // 平台搜尋的查詢字串用主要城市，比州名找得到更多在地群。
+    var COMMUNITY_REGION_TERMS = {
+      WA: "Perth", NT: "Darwin", QLD: "Brisbane", SA: "Adelaide",
+      NSW: "Sydney", ACT: "Canberra", VIC: "Melbourne", TAS: "Hobart"
+    };
+    var communityCards = Array.prototype.slice.call(communityGrid.querySelectorAll("[data-community-state]"));
+    var communityStateChips = Array.prototype.slice.call(document.querySelectorAll("[data-community-state][aria-pressed]"));
+    var communityNeedChips = Array.prototype.slice.call(document.querySelectorAll("[data-community-need][aria-pressed]"));
+    var communityDirEmpty = document.getElementById("community-empty");
+    var communityDirStatus = document.getElementById("community-filter-status");
+    var communityState = "all";
+    var communityNeed = "all";
+
+    function communityChipValue(chip, kind) {
+      return chip.getAttribute("data-community-" + kind) || "all";
+    }
+
+    function communitySyncChips(chips, kind, value) {
+      chips.forEach(function (chip) {
+        chip.setAttribute("aria-pressed", communityChipValue(chip, kind) === value ? "true" : "false");
+      });
+    }
+
+    // 平台搜尋卡：依所選地區改寫查詢字串與連結，並把字串顯示出來，
+    // 使用者按下去之前就看得到本站幫他送了什麼。
+    function communityApplySearchTerm(card) {
+      var template = card.getAttribute("data-community-url-template");
+      var query = card.getAttribute("data-community-query");
+      if (!template || !query) return;
+      var term = communityState !== "all" && COMMUNITY_REGION_TERMS[communityState]
+        ? COMMUNITY_REGION_TERMS[communityState]
+        : "澳洲";
+      var filled = query.split("{region}").join(term);
+      var link = card.querySelector("[data-community-entry]");
+      if (link) link.setAttribute("href", template.split("{query}").join(encodeURIComponent(filled)));
+      var shown = card.querySelector("[data-community-query-text]");
+      if (shown) shown.textContent = filled;
+    }
+
+    function communityMatches(card) {
+      var state = card.getAttribute("data-community-state") || "";
+      var needs = (card.getAttribute("data-community-need") || "").split(" ");
+      // 全國性的入口（平台搜尋與說明卡）在任何地區都成立，不因選了州就消失。
+      var stateOk = communityState === "all" || state === communityState || state === "AU";
+      var needOk = communityNeed === "all" || needs.indexOf(communityNeed) !== -1;
+      return stateOk && needOk;
+    }
+
+    function communityApplyFilter() {
+      var shown = 0;
+      communityCards.forEach(function (card) {
+        var visible = communityMatches(card);
+        card.hidden = !visible;
+        if (visible) {
+          shown += 1;
+          communityApplySearchTerm(card);
+        }
+      });
+      if (communityDirEmpty) communityDirEmpty.hidden = shown !== 0;
+      if (communityDirStatus) {
+        communityDirStatus.textContent = shown === 0
+          ? "這個組合沒有已查核的公開入口。"
+          : "符合的公開入口：" + shown + " 個。高風險需求只會出現平台搜尋或說明卡。";
+      }
+    }
+
+    communityStateChips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        communityState = communityChipValue(chip, "state");
+        communitySyncChips(communityStateChips, "state", communityState);
+        communityApplyFilter();
+      });
+    });
+    communityNeedChips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        communityNeed = communityChipValue(chip, "need");
+        communitySyncChips(communityNeedChips, "need", communityNeed);
+        communityApplyFilter();
+      });
+    });
+
+    // 釐清器的「看公開討論」出口會帶 ?region=&need= 進來；只讀不寫，不改網址。
+    try {
+      var communityParams = new URLSearchParams(location.search);
+      var paramState = (communityParams.get("region") || "").toUpperCase();
+      var paramNeed = communityParams.get("need") || "";
+      if (paramState && communityStateChips.some(function (chip) { return communityChipValue(chip, "state") === paramState; })) {
+        communityState = paramState;
+      }
+      if (paramNeed && communityNeedChips.some(function (chip) { return communityChipValue(chip, "need") === paramNeed; })) {
+        communityNeed = paramNeed;
+      }
+    } catch (e) { /* 沒有 URLSearchParams 就維持全部顯示 */ }
+
+    communitySyncChips(communityStateChips, "state", communityState);
+    communitySyncChips(communityNeedChips, "need", communityNeed);
+    communityApplyFilter();
   }
 
   // ---------- 最近閱讀：只記錄白名單頁名，作為首頁的回訪續接 ----------

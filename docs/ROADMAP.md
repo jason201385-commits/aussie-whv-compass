@@ -52,7 +52,7 @@
 | P1-18 | 危機優先開頭（五個恐慌頁） | 未開始 | 驗收改用實測 time-to-first-action（D-2026-09-02-02） | PERFORMANCE_AND_RETENTION_SPEC P1-18 | — |
 | P1-19 | 「網傳 vs 官網」對照塊 | 未開始 | — | PERFORMANCE_AND_RETENTION_SPEC P1-19 | — |
 | P1-20 | 「你上次看過之後改了什麼」 | 未開始 | 相依 `build_seo.py` 產出 freshness 資料 | PERFORMANCE_AND_RETENTION_SPEC P1-20 | — |
-| P1-21 | 社團目錄 JSON 與 communities.html 子頁（C-5 地區×需求推薦） | 未開始 | 相依 P0-10 | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
+| P1-21 | 社團目錄 JSON 與 communities.html 子頁（C-5 地區×需求推薦） | 已上線（2026-09-04） | 首頁 `#communities` 尚未縮成入口卡 | OPTIMIZATION_PLAN.md | D-2026-09-04-08 | D-2026-09-02-06 |
 | P1-22 | 釐清器與 AI 兜底指標（D+ 白名單擴充、GA4 事件表、判讀規則） | 未開始 | P0-3（CWA token、GA4 ID）與 P0-4（D+ 部署） | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
 | P1-23 | AI 兜底正式啟用（第一階段 links-only；intent 待命中率達標再重啟） | 已上線（2026-09-04） | red-team 驗收與命中率觀察仍待做 | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06、D-2026-09-04-01 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
@@ -99,6 +99,7 @@
 
 | 項目 | 位置 | 來源 | 狀態（2026-09-02） |
 |---|---|---|---|
+| 首頁 `#communities` 尚未縮成入口卡，與 `communities.html` 資料重複 | `index.html` `#communities` | D-2026-09-04-08 | 未處理：該區有大量既有斷言，拆它要一併重寫；目前靠 check.ps1 的 JSON↔HTML 比對與 LINE 唯一性規則擋漂移 |
 | 住宿站內房源顯示仍等五家書面授權 | `assets/api-config.js` `accommodationSearchEnabled` | D-2026-09-04-06 | 程式已完備，只差授權；申請順序與現實評估見 `ACCOMMODATION_PROVIDER_ONBOARDING.md` §申請執行順序 |
 | 外部連結沒有定期健檢，政府網站改版會靜默把來源變成 404 | 全站外部連結 | D-2026-09-04-04 | 已處理（2026-09-04）：`scripts/check_links.mjs` 可隨時重跑，355 條通過、修了 6 條死連結；**尚未排程化**，目前仍要有人記得跑 |
 | AI 兜底完整端到端（真實 Turnstile token → 模型 → 站內連結）尚未驗證 | 正式站首頁 `#assist` | D-2026-09-04-02 | 待站長本人以真實瀏覽器問一次；自動化瀏覽器拿不到 token，不得繞過人機驗證 |

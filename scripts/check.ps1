@@ -156,9 +156,9 @@ foreach ($p in $pages) {
     $links = ($nav -split '<a ').Count - 1
     $expectedNavLinks = 12
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
-    if ($nav -match 'href="(?:simulator|market)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html 或 market.html（站長 2026-09-02 決定）"; $errors++ }
+    if ($nav -match 'href="(?:simulator|market|communities)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html 或 communities.html（站長 2026-09-02 決定；社團目錄同規則）"; $errors++ }
   }
-  $offNavPages = @('simulator.html', 'market.html')
+  $offNavPages = @('simulator.html', 'market.html', 'communities.html')
   if ($p -in $offNavPages) {
     if ([regex]::Matches($t, 'aria-current="page"').Count -ne 0) {
       Write-Output "FAIL [$p] 不在全站 nav 的工具頁不得標 aria-current=page"; $errors++
@@ -1951,7 +1951,7 @@ if (-not (Test-Path $contentStatusPath)) {
     if ($contentStatus.schemaVersion -ne 2 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
     if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
     if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
-    if (@($contentStatus.primaryPages).Count -ne 15) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 15）"; $errors++ }
+    if (@($contentStatus.primaryPages).Count -ne 16) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 16）"; $errors++ }
     if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
     if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
     $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceCardStatus -eq 'checked' })
@@ -2316,8 +2316,8 @@ if (-not $entryCards.Success) {
   $errors++
 } else {
   $entryHrefs = @([regex]::Matches($entryCards.Value, '<a class="home-entry-card"[^>]*href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
-  if ($entryHrefs.Count -ne 3 -or ($entryHrefs -join ',') -ne '#communities,#games,#journey-resume') {
-    Write-Output "FAIL [index.html] 入口卡必須恰好三張且依序連 #communities、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
+  if ($entryHrefs.Count -ne 3 -or ($entryHrefs -join ',') -ne 'communities.html,#games,#journey-resume') {
+    Write-Output "FAIL [index.html] 入口卡必須恰好三張且依序連 communities.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
     $errors++
   }
   foreach ($entryCardNeedle in @('找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
@@ -2522,7 +2522,7 @@ foreach ($stage in $clarifierStages) {
       Write-Output "FAIL [index.html] 出口 $clarifierExitId 必須恰好一個帶 data-label-462 的 h3 標題"
       $errors++
     }
-    if (-not $clarifierExitBlock.Value.Contains('<a href="#communities">看公開討論</a></p>')) {
+    if (-not [regex]::IsMatch($clarifierExitBlock.Value, '<a href="communities[.]html[?]need=[a-z-]+">看公開討論</a></p>')) {
       Write-Output "FAIL [index.html] 出口 $clarifierExitId 缺「看公開討論」連結"
       $errors++
     }
@@ -3095,6 +3095,137 @@ if ($lineInviteLocations.Count -ne 1 -or $lineInviteLocations[0] -ne 'index.html
   Write-Output "FAIL LINE 邀請只能出現在首頁生活交流區；目前：$(($lineInviteLocations) -join ', ')"
   $errors++
 }
+# ---- 社團目錄（P1-21）：community-directory.json 是單一事實來源，communities.html 是手寫鏡像 ----
+$directoryPath = Join-Path $dir 'community-directory.json'
+$directoryHtmlPath = Join-Path $dir 'communities.html'
+if (-not (Test-Path $directoryPath) -or -not (Test-Path $directoryHtmlPath)) {
+  Write-Output 'FAIL 缺 community-directory.json 或 communities.html'
+  $errors++
+} else {
+  $directory = Get-Content -Raw -Encoding UTF8 $directoryPath | ConvertFrom-Json
+  $directoryRegister = Get-Content -Raw -Encoding UTF8 (Join-Path $dir 'third-party-register.json') | ConvertFrom-Json
+  $directoryHtml = [System.IO.File]::ReadAllText($directoryHtmlPath, [System.Text.Encoding]::UTF8)
+  $directoryToday = Get-Date
+  $allowedTypes = @{
+    'general' = @('direct-link', 'directory-page', 'platform-search', 'explain-only')
+    'transactional' = @('directory-page', 'platform-search', 'explain-only')
+    'high-risk-intermediary' = @('platform-search', 'explain-only')
+  }
+  $registerIds = @($directoryRegister.entries | ForEach-Object { $_.id })
+  $lineLinkCount = 0
+  foreach ($entry in $directory.entries) {
+    # 1. 需求值域，且不得出現禁用需求（緊急、心理、簽證個案、詐騙受害等一律不導向社群）
+    foreach ($entryNeed in $entry.needs) {
+      if ($directory.needs -notcontains $entryNeed) {
+        Write-Output "FAIL [community-directory.json] $($entry.id) 的需求值不在值域：$entryNeed"
+        $errors++
+      }
+      if ($directory.forbiddenNeeds -contains $entryNeed) {
+        Write-Output "FAIL [community-directory.json] $($entry.id) 使用了禁用需求值：$entryNeed"
+        $errors++
+      }
+    }
+    # 2. entryType 與 riskClass 的相容矩陣：高風險永遠不得直連
+    if ($allowedTypes[$entry.riskClass] -notcontains $entry.entryType) {
+      Write-Output "FAIL [community-directory.json] $($entry.id) 的 $($entry.riskClass) 不允許 entryType=$($entry.entryType)"
+      $errors++
+    }
+    # 3. 直連必須在第三方關係登錄表裡有對應
+    if ($entry.entryType -eq 'direct-link' -and $registerIds -notcontains $entry.registerId) {
+      Write-Output "FAIL [community-directory.json] $($entry.id) 是直連，但 registerId 不在 third-party-register.json：$($entry.registerId)"
+      $errors++
+    }
+    # 4. 逾期的直連不得繼續在頁面上給出入口
+    if ($entry.entryType -eq 'direct-link' -and [datetime]::Parse($entry.expiresAt) -lt $directoryToday) {
+      if ($directoryHtml.Contains($entry.entryUrl)) {
+        Write-Output "FAIL [communities.html] $($entry.id) 查核已於 $($entry.expiresAt) 逾期，頁面不得再出現 entryUrl；請改為平台搜尋轉接"
+        $errors++
+      }
+    }
+    # 5. 風險提示下限：每筆至少兩句，且句子必須在 riskNoteText 裡有定義
+    if ($entry.riskNotes.Count -lt 2) {
+      Write-Output "FAIL [community-directory.json] $($entry.id) 的 riskNotes 少於 2 句"
+      $errors++
+    }
+    foreach ($noteId in $entry.riskNotes) {
+      if (-not $directory.riskNoteText.PSObject.Properties.Name.Contains($noteId)) {
+        Write-Output "FAIL [community-directory.json] $($entry.id) 引用了沒有文字的風險提示：$noteId"
+        $errors++
+      }
+    }
+    # 6. JSON 與 HTML 必須同步：id、entryType、到期日、入口網址
+    if (-not $directoryHtml.Contains('id="' + $entry.id + '"')) {
+      Write-Output "FAIL [communities.html] 缺少 JSON 裡的登錄：$($entry.id)"
+      $errors++
+    }
+    if (-not $directoryHtml.Contains('data-community-type="' + $entry.entryType + '"')) {
+      Write-Output "FAIL [communities.html] 缺少 entryType 標記：$($entry.entryType)"
+      $errors++
+    }
+    if (-not $directoryHtml.Contains($entry.expiresAt)) {
+      Write-Output "FAIL [communities.html] $($entry.id) 的到期日未顯示在頁面上：$($entry.expiresAt)"
+      $errors++
+    }
+    if ($entry.entryUrl -and -not $directoryHtml.Replace('&amp;', '&').Contains($entry.entryUrl)) {
+      Write-Output "FAIL [communities.html] $($entry.id) 的入口網址與 JSON 不一致"
+      $errors++
+    }
+    if ($entry.entryUrl -and $entry.entryUrl.Contains('line.me/ti/')) { $lineLinkCount++ }
+    # 7. 每張卡都要有邊界句
+    if (-not $directoryHtml.Contains('不是本站客服・不是緊急支援・不是專業轉介')) {
+      Write-Output 'FAIL [communities.html] 卡片缺少「不是本站客服・不是緊急支援・不是專業轉介」邊界句'
+      $errors++
+    }
+  }
+  # LINE 邀請連結全站唯一（既有規則，這裡確認目錄沒有再增加）
+  if ($lineLinkCount -gt 1) {
+    Write-Output "FAIL [community-directory.json] LINE 邀請連結只能有一筆，目前 $lineLinkCount 筆"
+    $errors++
+  }
+  # 高風險需求在頁面上永遠不得出現直連卡
+  foreach ($highRiskNeed in @('job', 'housing', 'farm-visa-intel')) {
+    foreach ($entry in $directory.entries) {
+      if ($entry.needs -contains $highRiskNeed -and $entry.entryType -eq 'direct-link') {
+        Write-Output "FAIL [community-directory.json] 高風險需求 $highRiskNeed 不得有直連：$($entry.id)"
+        $errors++
+      }
+    }
+  }
+  # 頁面固定聲明
+  foreach ($directoryNeedle in @(
+    '高風險需求只提供平台搜尋轉接',
+    '本站不經營、不管理、不背書任何社群',
+    'id="community-grid"',
+    'id="community-filter-status"',
+    'community.yml',
+    '沒有 JavaScript 時下方會列出全部入口'
+  )) {
+    if (-not $directoryHtml.Contains($directoryNeedle)) {
+      Write-Output "FAIL [communities.html] 缺固定聲明或元件：$directoryNeedle"
+      $errors++
+    }
+  }
+  # Facebook 的搜尋轉接一定要標明需先登入（未登入會顯示找不到頁面）
+  if ($directoryHtml.Contains('facebook.com/search/groups') -and -not $directoryHtml.Contains('Facebook 的社團搜尋需要先登入')) {
+    Write-Output 'FAIL [communities.html] Facebook 搜尋轉接必須標明需先登入'
+    $errors++
+  }
+  # 回報表單只收公開入口
+  $communityTemplatePath = Join-Path $dir '.github/ISSUE_TEMPLATE/community.yml'
+  if (-not (Test-Path $communityTemplatePath)) {
+    Write-Output 'FAIL 缺 .github/ISSUE_TEMPLATE/community.yml'
+    $errors++
+  } else {
+    $communityTemplate = Get-Content -Raw -Encoding UTF8 $communityTemplatePath
+    foreach ($templateNeedle in @('只收', '邀請連結', '微信', '截圖')) {
+      if (-not $communityTemplate.Contains($templateNeedle)) {
+        Write-Output "FAIL [.github/ISSUE_TEMPLATE/community.yml] 缺公開入口界線說明：$templateNeedle"
+        $errors++
+      }
+    }
+  }
+}
+
 foreach ($communityNeedle in @('id="perth-community"', '群組非本站營運', '也不是工作、租屋、交易、緊急支援', '簽證、法律、醫療等專業轉介管道', '無付費、無佣金，本站不管理群組')) {
   if (-not $indexText.Contains($communityNeedle)) { Write-Output "FAIL [index.html] LINE 第三方生活社群缺邊界：$communityNeedle"; $errors++ }
 }
@@ -3117,13 +3248,13 @@ if (-not (Test-Path $thirdPartyRegisterPath)) {
 } else {
   try {
     $thirdPartyRegister = [System.IO.File]::ReadAllText($thirdPartyRegisterPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-    if ($thirdPartyRegister.schemaVersion -ne 1 -or $thirdPartyRegister.generatedAt -ne '2026-08-31') {
+    if ($thirdPartyRegister.schemaVersion -ne 1 -or $thirdPartyRegister.generatedAt -ne '2026-09-04') {
       Write-Output 'FAIL [third-party-register.json] schemaVersion／generatedAt 錯誤'; $errors++
     }
     foreach ($inactiveField in @('paidPlacementActive', 'affiliateLinksActive', 'commercialReferralActive', 'sponsoredRankingAllowed')) {
       if ($thirdPartyRegister.currentState.$inactiveField -ne $false) { Write-Output "FAIL [third-party-register.json] P1-11 現況不得冒充已啟用：$inactiveField"; $errors++ }
     }
-    $registerIds = @($thirdPartyRegister.entries | ForEach-Object { $_.id })
+    $registerIds = @($directoryRegister.entries | ForEach-Object { $_.id })
     foreach ($requiredRegisterId in @('perth-line-community', 'public-local-reddit-communities', 'second-hand-marketplace-navigation', 'commercial-navigation-platforms', 'omara-official-register')) {
       if ($registerIds -notcontains $requiredRegisterId) { Write-Output "FAIL [third-party-register.json] 缺現行第三方關係：$requiredRegisterId"; $errors++ }
     }

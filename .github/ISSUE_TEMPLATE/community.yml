@@ -1,0 +1,85 @@
+name: 回報或推薦公開社群入口
+description: 入口失效、群被轉手，或你知道一個公開又穩定的在地社群，用這張表告訴我們。
+title: "[社團] 州別 + 一句話說明"
+labels: ["社團目錄", "需要查證"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        這張表只收**公開入口**。本站不經營、不管理、不背書任何社群，也不代為聯繫或處理糾紛。
+
+        **請不要提供**：LINE、WhatsApp、Telegram、Discord 的邀請連結，微信 QR code，群內對話截圖，或任何人的姓名、電話、Email、住址。
+        邀請連結會被轉手、被翻群，本站不接受；公開可查的頁面才收。
+
+        這會建立一則公開 GitHub Issue，並連同你的 GitHub 帳號顯示。
+
+        **找工作、租屋、集簽情報**這三類本站永遠只提供平台搜尋轉接，不列特定社團。這類推薦不會被採用，但回報「某個搜尋入口壞了」很有用。
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 你要做什麼？
+      options:
+        - 回報現有入口失效或內容變質
+        - 推薦一個新的公開入口
+        - 回報平台搜尋轉接壞掉
+    validations:
+      required: true
+  - type: dropdown
+    id: state
+    attributes:
+      label: 州別
+      options:
+        - WA 西澳
+        - NT 北領地
+        - QLD 昆士蘭
+        - SA 南澳
+        - NSW 新南威爾斯
+        - ACT 首都特區
+        - VIC 維多利亞
+        - TAS 塔斯馬尼亞
+        - 全澳／不分地區
+    validations:
+      required: true
+  - type: dropdown
+    id: need
+    attributes:
+      label: 對應需求
+      options:
+        - 生活與在地
+        - 剛落地
+        - 選第一站
+        - 找旅伴
+        - 練英文
+        - 買車
+        - 二手
+        - 462 中國護照
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: 公開入口網址
+      description: 必須是不用登入就能看到「這個社群存在」的公開頁面。已存在的入口請貼目錄頁上的那一個。
+      placeholder: 例：https://www.reddit.com/r/perth/
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: 為什麼值得列、或哪裡出問題了
+      description: 有版主嗎？群規公開嗎？多久沒人發言？被廣告洗版了嗎？被轉成商業帳號了嗎？
+      placeholder: 例：這個群三個月前換了管理員，現在整版都是代辦廣告。
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 送出前確認
+      options:
+        - label: 我提供的是公開可查的網址，不是邀請連結或 QR code。
+          required: true
+        - label: 我沒有貼任何人的姓名、聯絡方式、截圖或個資。
+          required: true
+        - label: 我理解列入目錄不代表本站推薦或保證安全。
+          required: true

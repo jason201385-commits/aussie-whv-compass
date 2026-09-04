@@ -468,3 +468,38 @@
   `scam.html#help`，**0 次 `/api/assist` 請求**；關閉 → 輸入與答案清空、焦點回到導覽鈕；再開 → 無殘留。
   `clarifier-contract.mjs` 25 cases 仍過（首頁行為未變）。
 - 狀態：已上線。
+
+## D-2026-09-04-08 P1-21 社團目錄：`community-directory.json` 與 `communities.html`
+
+- 決策：新增社團目錄頁與機器可讀的單一事實來源，依「地區 × 需求」列出公開入口；
+  風險分級決定入口型態，**找工作、租屋、集簽情報永遠只有平台搜尋或說明卡，不得直連**。
+- 為什麼先做這個：站長說過「最終目的是讓活人可以彼此連結」，這是唯一直接服務那句話、
+  又完全不依賴任何外部授權的項目（住宿要等五家點頭，這個不用）。
+- 上線內容 16 筆：1 筆 LINE（版主同意）、8 筆各州公開討論區、5 筆平台搜尋轉接、2 筆只說明。
+  **沒有任何新的直連**——直連需要版主同意，那只有站長取得得到。
+- 查核（2026-09-04 全部實測）：
+  - 8 個 Reddit 城市版全部 HTTP 200，r/perth 以瀏覽器確認有近期貼文，是在營運的公開版。
+    **這修正了規格裡「Reddit 對本機所有工具封鎖」的舊狀況**，所以不必降級成 candidate。
+  - `line.me/tw/explore` 現在回 **Page not found**——2026-09-03 查核時可用的官方目錄網址已失效，
+    所以沒有 LINE 目錄入口，只保留那一個已獲版主同意的群。
+  - Facebook 社團搜尋未登入仍回 Not Found，所有 Facebook 卡都標明需先登入並顯示查詢字串。
+- **邀請連結的處置**：既有規則要求 LINE 邀請連結全站只出現在首頁。與其放寬這條安全規則，
+  目錄頁的 Perth 卡改成 `directory-page`，指向 `index.html#perth-community`——
+  使用者會先讀到那張卡的完整界線文字，才看到邀請連結。比直接複製一份邀請網址更好。
+- 分流實測（`?region=WA&need=<x>`）：`life` → LINE ＋ r/perth ＋兩個全國搜尋；`job` → 只有平台搜尋；
+  `farm-visa-intel` → 平台搜尋＋說明卡；`whv-462-zh` → 只有說明卡；`housing` → 只有平台搜尋。
+- 守門（`check.ps1` 新增一整個區塊）：需求值域與禁用需求、entryType × riskClass 相容矩陣、
+  直連必須有登錄表對應、**逾期直連不得繼續出現 entryUrl**、風險提示下限與文字必須有定義、
+  JSON 與 HTML 的 id／entryType／到期日／入口網址逐項比對、高風險需求不得直連、
+  頁面固定聲明、Facebook 需登入標示、回報表單的公開入口界線。
+  規格驗收條件 2 已實測：把一筆直連的 `expiresAt` 改成過去日期而 HTML 未改，check.ps1 確實 FAIL 兩條；還原後通過。
+- 釐清器 23 個出口的「看公開討論」改帶 `?need=`。**需求 chips 維持同頁錨點**——
+  我一開始把它們也改成跨頁，被守門擋下來才想起那是 no-JS 契約：chips 必須留在同一頁。
+  防詐騙與健康類出口刻意只帶 `need=life`，不把那種處境的人導去找工作或租屋的群。
+- 首頁 `#communities` 這一輪**沒有**縮成入口卡（規格原本這樣寫）：那區有大量既有斷言，
+  拆它是另一件事。現在是首頁快覽＋完整目錄頁並存，兩邊資料重複的風險由 `check.ps1` 的
+  JSON↔HTML 比對與 LINE 唯一性規則擋著。已列入 `ROADMAP.md` §3。
+- 其他：`.github/ISSUE_TEMPLATE/community.yml`（只收公開入口，明文拒絕邀請連結、微信 QR、截圖與個資）；
+  `third-party-register.json` 新增 `community-search-navigation-group` 與 `public-forums-navigation-group`；
+  頁面進 `build_seo.py`／`build_search.py`／sitemap／llms.txt／SPEC §1.1，但**不進全站 nav**（同工具頁規則）。
+- 狀態：已上線，`ALL CHECKS PASSED (16 pages)`。
