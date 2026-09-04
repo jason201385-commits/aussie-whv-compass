@@ -229,7 +229,8 @@ li { margin: .4em 0; }
   font-weight: 700;
 }
 .site-search-open,
-.site-search-close {
+.site-search-close,
+.assist-nav-open {
   min-width: 44px;
   min-height: 44px;
   border: 1.5px solid var(--ink);
@@ -247,9 +248,17 @@ li { margin: .4em 0; }
   cursor: pointer;
 }
 .site-search-open:hover,
-.site-search-close:hover { background: var(--gold-soft); }
+.site-search-close:hover,
+.assist-nav-open:hover { background: var(--gold-soft); }
 .site-search-open .icon,
-.site-search-close .icon { width: 20px; height: 20px; }
+.site-search-close .icon,
+.assist-nav-open .icon { width: 20px; height: 20px; }
+/* AI 是兜底，不是主要動作：外框比搜尋淡一階，避免它看起來像第一順位。 */
+.assist-nav-open {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--ink) 55%, transparent);
+  color: var(--ink-soft);
+}
 
 /* ---------- 全站搜尋 ---------- */
 .site-search-dialog {
@@ -263,7 +272,21 @@ li { margin: .4em 0; }
   box-shadow: 0 28px 80px color-mix(in srgb, #000 42%, transparent);
   overflow: auto;
 }
-.site-search-dialog::backdrop { background: color-mix(in srgb, var(--ink) 66%, transparent); backdrop-filter: blur(4px); }
+.site-search-dialog::backdrop,
+.assist-dialog::backdrop { background: color-mix(in srgb, var(--ink) 66%, transparent); backdrop-filter: blur(4px); }
+.assist-dialog {
+  width: min(640px, calc(100% - 32px));
+  max-height: min(82vh, 720px);
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  box-shadow: 0 28px 80px color-mix(in srgb, #000 42%, transparent);
+  overflow: auto;
+}
+.assist-dialog .clarifier-assist { margin: 0; padding: 18px 22px 22px; border: 0; background: none; }
+.assist-dialog .clarifier-assist[hidden] { display: none; }
 .site-search-head {
   position: sticky;
   top: 0;

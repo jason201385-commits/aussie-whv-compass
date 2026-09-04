@@ -307,7 +307,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260904-55";
+      script.src = "assets/search-index.js?v=20260904-56";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -1358,7 +1358,84 @@
     });
   }
 
-  // ---------- 首頁 AI 兜底（apiBaseUrl 與 turnstileSiteKey 都設定時才啟用） ----------
+  // ---------- 站內 AI 兜底（apiBaseUrl 與 turnstileSiteKey 都設定時才啟用） ----------
+  // 首頁把它寫在漏斗裡；其餘頁面由這裡注入同一份標記到一個 dialog，
+  // 元素 id 完全一致，所以底下整段邏輯（敏感題攔截、Turnstile、模板組字）兩邊共用一份。
+  // 作法比照站內搜尋：不在 60 份 HTML 裡複製同一段標記。
+  var assistDialog = null;
+  if (!document.querySelector("[data-assist]")) {
+    // 逐一建立節點，不寫 HTML 字串：釐清器區塊本來就禁止（check.ps1 會擋），
+    // 這裡照同一條規矩走，不因為「字串是我自己寫的」就破例。
+    var assistEl = function (tag, attrs, text) {
+      var node = document.createElement(tag);
+      if (attrs) {
+        for (var name in attrs) {
+          if (Object.prototype.hasOwnProperty.call(attrs, name)) node.setAttribute(name, attrs[name]);
+        }
+      }
+      if (text) node.textContent = text;
+      return node;
+    };
+    var assistIcon = function (symbol) {
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "icon");
+      svg.setAttribute("aria-hidden", "true");
+      var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttribute("href", symbol);
+      svg.appendChild(use);
+      return svg;
+    };
+    // 站內連結一律帶 index.html：非首頁用裸錨點會指到不存在的位置。
+    var assistLine = function (className, lead, href, linkText) {
+      var p = assistEl("p", { "class": className }, lead);
+      p.appendChild(assistEl("a", { href: href }, linkText));
+      return p;
+    };
+
+    assistDialog = assistEl("dialog", { "class": "assist-dialog", id: "assist-dialog", "aria-labelledby": "assist-title" });
+
+    var assistHead = assistEl("div", { "class": "site-search-head" });
+    var assistHeadText = document.createElement("div");
+    assistHeadText.appendChild(assistEl("span", { "class": "section-eyebrow" }, "LAST RESORT"));
+    assistHeadText.appendChild(assistEl("h2", { id: "assist-title" }, "問一次站內 AI"));
+    var assistHeadClose = assistEl("button", { "class": "site-search-close", id: "assist-dialog-close", type: "button", "aria-label": "關閉 AI 兜底" });
+    assistHeadClose.appendChild(assistIcon("#i-x"));
+    assistHead.appendChild(assistHeadText);
+    assistHead.appendChild(assistHeadClose);
+
+    var assistPanel = assistEl("section", { "class": "clarifier-assist", id: "assist", "data-assist": "", hidden: "" });
+    var assistOffLine = assistLine("clarifier-assist-off", "站內 AI 兜底尚未啟用；可用上方搜尋，或到", "index.html#communities", "各地社團");
+    assistOffLine.setAttribute("id", "assist-off");
+    assistOffLine.setAttribute("hidden", "");
+    assistOffLine.appendChild(document.createTextNode("問人。"));
+    // id: "assist-off" 由上一行 setAttribute 指定（assistLine 只負責文字與連結）。
+    assistPanel.appendChild(assistOffLine);
+
+    var assistBoxEl = assistEl("div", { "class": "clarifier-assist-box", id: "assist-box", hidden: "" });
+    assistBoxEl.appendChild(assistLine("clarifier-safety", "急事不要等 AI，先走", "index.html#support-hub", "安全出口"));
+    assistBoxEl.appendChild(assistEl("button", { "class": "btn secondary", id: "assist-open", type: "button", "aria-expanded": "false", "aria-controls": "assist-form" }, "問一次 AI"));
+
+    var assistFormEl = assistEl("form", { "class": "clarifier-assist-form", id: "assist-form", novalidate: "", hidden: "" });
+    assistFormEl.appendChild(assistEl("p", { "class": "warn clarifier-assist-disclosure", id: "assist-disclosure" },
+      "你的問題會送到第三方模型（MiniMax）產生回覆；本站伺服器不保存問題文字，但供應商可能依其條款處理。請不要輸入姓名、護照、帳號或他人資料。"));
+    assistFormEl.appendChild(assistEl("label", { "for": "assist-input" }, "用一句話說你的情況"));
+    assistFormEl.appendChild(assistEl("textarea", { id: "assist-input", rows: "2", maxlength: "200", autocomplete: "off" }));
+    assistFormEl.appendChild(assistEl("div", { "class": "turnstile-slot", id: "assist-turnstile", hidden: "" }));
+    var assistActions = assistEl("div", { "class": "clarifier-assist-actions" });
+    assistActions.appendChild(assistEl("button", { "class": "btn", id: "assist-submit", type: "submit" }, "送出"));
+    assistActions.appendChild(assistEl("button", { "class": "btn ghost", id: "assist-cancel", type: "button" }, "不送了"));
+    assistFormEl.appendChild(assistActions);
+    assistBoxEl.appendChild(assistFormEl);
+
+    assistBoxEl.appendChild(assistEl("p", { "class": "clarifier-assist-status", id: "assist-status", role: "status", "aria-live": "polite" }));
+    assistBoxEl.appendChild(assistEl("div", { "class": "clarifier-assist-answer", id: "assist-answer", tabindex: "-1", hidden: "" }));
+    assistBoxEl.appendChild(assistEl("p", { "class": "fact-meta" }, "AI 只給站內連結與一句導引，不做簽證、法律、醫療、稅務判定。"));
+
+    assistPanel.appendChild(assistBoxEl);
+    assistDialog.appendChild(assistHead);
+    assistDialog.appendChild(assistPanel);
+    document.body.appendChild(assistDialog);
+  }
   var assistSection = document.querySelector("[data-assist]");
   if (assistSection) {
     var assistOff = document.getElementById("assist-off");
@@ -1639,6 +1716,64 @@
       window.addEventListener("hashchange", function () {
         if ("#assist" === location.hash) openAssist();
       });
+
+      // 全站入口：只有在 AI 真的啟用時才出現（未啟用時不放一顆按不動的鈕）。
+      // 首頁把 hash 設成 #assist 交給上面的 handler；其餘頁面開注入的 dialog。
+      if (navInner && assistSettings()) {
+        var assistNavOpen = document.createElement("button");
+        assistNavOpen.className = "assist-nav-open";
+        assistNavOpen.id = "assist-nav-open";
+        assistNavOpen.type = "button";
+        assistNavOpen.setAttribute("aria-label", "問一次站內 AI");
+        if (assistDialog) {
+          assistNavOpen.setAttribute("aria-haspopup", "dialog");
+          assistNavOpen.setAttribute("aria-controls", "assist-dialog");
+        }
+        var assistNavSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        assistNavSvg.setAttribute("class", "icon");
+        assistNavSvg.setAttribute("aria-hidden", "true");
+        var assistNavUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        assistNavUse.setAttribute("href", "#i-chat");
+        assistNavSvg.appendChild(assistNavUse);
+        assistNavOpen.appendChild(assistNavSvg);
+        var assistNavLabel = document.createElement("span");
+        assistNavLabel.textContent = "問 AI";
+        assistNavOpen.appendChild(assistNavLabel);
+        assistNavOpen.addEventListener("click", function () {
+          if (!assistDialog) {
+            // 不自己捲動：openAssist() 會把焦點移到輸入框，瀏覽器自然會把它帶進視野。
+            openAssist();
+            return;
+          }
+          if (!assistDialog.open) assistDialog.showModal();
+          openAssist();
+        });
+        var assistNavSearch = navInner.querySelector(".site-search-open");
+        if (assistNavSearch && assistNavSearch.nextSibling) navInner.insertBefore(assistNavOpen, assistNavSearch.nextSibling);
+        else if (assistNavSearch) navInner.appendChild(assistNavOpen);
+        else navInner.insertBefore(assistNavOpen, navInner.querySelector(".nav-links") || null);
+      }
+
+      if (assistDialog) {
+        // 關閉時清掉問題、答案與 token，下次開啟不留上一次的內容（伺服器本來就不保存）。
+        // 不只掛在 close 事件上：關閉鈕自己先重置，Esc 走 cancel／close，三條路都會到。
+        var resetAssistDialog = function () {
+          cancelAssist();
+          if (assistAnswer) { assistAnswer.textContent = ""; assistAnswer.hidden = true; }
+          setAssistStatus("");
+        };
+        var assistDialogClose = document.getElementById("assist-dialog-close");
+        if (assistDialogClose) {
+          assistDialogClose.addEventListener("click", function () {
+            resetAssistDialog();
+            assistDialog.close();
+            var assistNavButton = document.getElementById("assist-nav-open");
+            if (assistNavButton) assistNavButton.focus();
+          });
+        }
+        assistDialog.addEventListener("cancel", resetAssistDialog);
+        assistDialog.addEventListener("close", resetAssistDialog);
+      }
     }
   }
 

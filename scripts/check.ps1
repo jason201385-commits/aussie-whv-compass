@@ -2803,6 +2803,51 @@ foreach ($catalogueTarget in $catalogueTargets) {
   }
 }
 
+# 全域 AI 入口：首頁把助理寫在漏斗裡，其餘頁面由 main.js 注入同一份標記到 dialog。
+# 注入版裡的站內連結必須是 index.html#... 的形式——寫成裸錨點在非首頁會指到不存在的位置。
+# 這裡刻意用字串比對而非正規表達式，避免跨行樣式在維護時被改壞。
+$assistInjectedStart = $mainJs.IndexOf('assistDialog = assistEl("dialog"')
+$assistInjectedStop = $mainJs.IndexOf('document.body.appendChild(assistDialog)')
+if ($assistInjectedStart -lt 0 -or $assistInjectedStop -le $assistInjectedStart) {
+  Write-Output 'FAIL [main.js] 找不到全域 AI 兜底的注入區塊'
+  $errors++
+} else {
+  $assistInjectedText = $mainJs.Substring($assistInjectedStart, $assistInjectedStop - $assistInjectedStart)
+  foreach ($assistInjectedId in @('id: "assist"', '"data-assist"', '"assist-off"', 'id: "assist-box"', 'id: "assist-open"', 'id: "assist-form"', 'id: "assist-input"', 'id: "assist-turnstile"', 'id: "assist-submit"', 'id: "assist-cancel"', 'id: "assist-status"', 'id: "assist-answer"', 'id: "assist-dialog-close"')) {
+    if (-not $assistInjectedText.Contains($assistInjectedId)) {
+      Write-Output "FAIL [main.js] 注入版 AI 兜底缺元素，與首頁內嵌版不一致：$assistInjectedId"
+      $errors++
+    }
+  }
+  foreach ($assistInjectedHref in @('"index.html#communities"', '"index.html#support-hub"')) {
+    if (-not $assistInjectedText.Contains($assistInjectedHref)) {
+      Write-Output "FAIL [main.js] 注入版 AI 兜底的站內連結必須帶 index.html：$assistInjectedHref"
+      $errors++
+    }
+  }
+  # 注入區塊不得改用 HTML 字串：那會繞過釐清器「不寫入 HTML 字串」的既有規則。
+  foreach ($assistInjectedForbidden in @('innerHTML', 'insertAdjacentHTML', 'outerHTML')) {
+    if ($assistInjectedText.Contains($assistInjectedForbidden)) {
+      Write-Output "FAIL [main.js] 注入版 AI 兜底必須用 DOM API 建構，不得用：$assistInjectedForbidden"
+      $errors++
+    }
+  }
+}
+# 導覽列的 AI 入口只有在 AI 真的啟用時才建立，且排在搜尋鈕之後（AI 是兜底，不是主要動作）。
+$assistNavStart = $mainJs.IndexOf('if (navInner && assistSettings())')
+if ($assistNavStart -lt 0) {
+  Write-Output 'FAIL [main.js] 導覽列 AI 入口必須以 assistSettings() 為條件，未啟用時不得出現'
+  $errors++
+} else {
+  $assistNavText = $mainJs.Substring($assistNavStart, [Math]::Min(2600, $mainJs.Length - $assistNavStart))
+  foreach ($assistNavNeedle in @('assist-nav-open', 'navInner.querySelector(".site-search-open")', 'assistDialog.showModal()')) {
+    if (-not $assistNavText.Contains($assistNavNeedle)) {
+      Write-Output "FAIL [main.js] 導覽列 AI 入口缺必要行為：$assistNavNeedle"
+      $errors++
+    }
+  }
+}
+
 # 敏感題攔截：客戶端（送出前）與伺服端（fail closed）必須是同一組樣式。
 # 客戶端漏接時伺服端雖然仍會擋下模型，但問題文字已經離開瀏覽器，about.html 的揭露就不成立。
 $assistTsPath = Join-Path $dir 'worker/src/assist.ts'
@@ -2841,7 +2886,7 @@ if (-not (Test-Path $assistTsPath)) {
 
 # main.js 釐清器：hash 驅動、零儲存；AI 兜底只有一個 fetch，且雙設定齊全才啟用
 $clarifierScript = [regex]::Match($mainJs, '(?s)// ---------- 首頁釐清器.*?// ---------- D\+ 匿名彙總量測')
-if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 首頁 AI 兜底')) {
+if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 站內 AI 兜底')) {
   Write-Output 'FAIL [main.js] 缺首頁釐清器／AI 兜底功能塊或標記順序錯誤'
   $errors++
 } else {
@@ -2862,6 +2907,9 @@ if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// -
     'JOB_FAMILY_ORDER',
     'aria-checked',
     'data-passport-summary',
+    'assist-dialog',
+    'assist-nav-open',
+    'if (!document.querySelector("[data-assist]"))',
     'data-label-462',
     'data-label-default',
     '"ArrowRight"',

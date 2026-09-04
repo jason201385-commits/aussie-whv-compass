@@ -346,6 +346,7 @@ class Document extends DomNode {
   }
 
   createElement(tagName) { return new Element(this, tagName); }
+  createElementNS(_namespace, tagName) { return new Element(this, tagName); }
   createTextNode(text) { return new TextNode(this, String(text)); }
 
   getElementById(id) {
