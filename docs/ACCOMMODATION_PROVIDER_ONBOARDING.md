@@ -58,12 +58,15 @@
 ### 建議順序
 
 **1. Domain（最可行，先做這個）**
-- 起點：`https://developer.domain.com.au/`——自助式開發者入口，可以自己建 project，
-  需要的是 **Agents & Listings** 這個 API package。
-- 為什麼先做：五家裡唯一可以自己註冊、自己看到文件與端點、不必先有業務窗口的。
-- 心理準備：拿到 key 不等於可以公開顯示。Domain 要 Approved Purpose、公開畫面 review、
-  澳洲境內資料處理、no-index、`Powered by Domain` 標示、engagement events、只能導回 Domain。
-  這些條件本站都做得到，但畫面 review 是人工的，會來回。
+- 起點：`https://developer.domain.com.au/account/login`（GitHub／Google／email 皆可）。
+  要的 package 是 **Agents & Listings**，租屋端點是 `POST /v1/listings/residential/_search`。
+- 為什麼先做：五家裡唯一**帳號與 sandbox 可以自助完成**、不必先有業務窗口的。
+- **但不要以為全程自助**（2026-09-04 讀條款後更正）：API Product 分 Free 與 Paid，
+  Paid 要簽 Product Schedule，而 Approved Purpose 就寫在 Schedule 的 Item 4；
+  定義另有「或以其他方式通知你」的但書。屬於哪一種要登入看到 plan 才知道。
+- 心理準備：拿到 key 不等於可以公開顯示。第 17.1 條有五項義務，
+  其中**回報 listing／image／map／video view 事件**這條與本站資料最小化立場衝突，需站長拍板。
+  逐條對照與作業單見 `ACCOMMODATION_PROVIDER_APPLICATION_PACK.md` §Domain 申請作業單。
 
 **2. Hostelworld（次可行）**
 - 起點：`https://partners.hostelworld.com/`——先申請 Partnerize affiliate。
