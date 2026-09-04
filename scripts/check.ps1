@@ -1693,12 +1693,29 @@ foreach ($housingToolPage in @(
     'id="housing-flatmates-link"',
     'id="housing-rea-link"',
     'id="housing-domain-link"',
+    'class="housing-route-strip" role="group"',
+    '<div class="housing-route-track" id="housing-primary-routes">',
+    'id="housing-route-order-note"',
+    'id="housing-route-swipe-hint"',
     $housingToolPage.Script
   )) {
     if (-not $housingToolPage.Text.Contains($housingToolNeedle)) {
       Write-Output "FAIL [$($housingToolPage.Name)] 住宿五平台搜尋缺標記或程式：$housingToolNeedle"
       $errors++
     }
+  }
+  # 五個入口必須都在同一條滑動列裡，不得再收進 <details>。
+  if ($housingToolPage.Text.Contains('housing-other-routes')) {
+    Write-Output "FAIL [$($housingToolPage.Name)] 住宿入口不得再有收合面板，五個平台要在同一條滑動列"
+    $errors++
+  }
+  $housingRouteTrack = [regex]::Match($housingToolPage.Text, '(?s)<div class="housing-route-track" id="housing-primary-routes">.*?</div>\s*</div>')
+  if (-not $housingRouteTrack.Success) {
+    Write-Output "FAIL [$($housingToolPage.Name)] 找不到住宿入口滑動列的內容"
+    $errors++
+  } elseif ([regex]::Matches($housingRouteTrack.Value, 'data-housing-platform="').Count -ne 5) {
+    Write-Output "FAIL [$($housingToolPage.Name)] 滑動列裡必須是五個平台入口（no-JS 也要看得到全部）"
+    $errors++
   }
   if (-not $housingToolPage.Text.Contains('id="housing-search-tool" aria-labelledby="housing-search-title" hidden')) {
     Write-Output "FAIL [$($housingToolPage.Name)] 住宿工具必須預設隱藏，只在 JavaScript 成功後揭露"
@@ -1728,6 +1745,8 @@ if (-not $housingToolScript.Success) {
     'credentials: "omit"',
     'referrerPolicy: "no-referrer"',
     'licensed-api-plus-external-links',
+    'housing-route-primary',
+    'housing-route-secondary',
     'housingLiveList.replaceChildren()',
     'prefers-reduced-motion'
   )) {

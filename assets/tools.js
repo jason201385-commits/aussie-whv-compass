@@ -853,8 +853,6 @@
     var housingFallbackNote = document.getElementById("housing-fallback-note");
     var housingRouteTitle = document.getElementById("housing-route-title");
     var housingPrimaryRoutes = document.getElementById("housing-primary-routes");
-    var housingOtherRoutes = document.getElementById("housing-other-routes");
-    var housingOtherRoutesPanel = document.getElementById("housing-other-routes-panel");
     var housingLivePanel = document.getElementById("housing-live-panel");
     var housingLiveStatus = document.getElementById("housing-live-status");
     var housingLiveList = document.getElementById("housing-live-list");
@@ -1049,9 +1047,10 @@
       if (housingRouteTitle) housingRouteTitle.textContent = housingEnglish
         ? (config.primary.length === 1 ? "Open this platform first" : "Open these platforms first")
         : (config.primary.length === 1 ? "先開這個平台" : "先開這些平台");
-      if (housingPrimaryRoutes && housingOtherRoutes) {
+      // 五個入口排成同一條可橫向滑動的列：最符合本次住宿類型的排前面並標成主要，
+      // 其餘接在後面。順序仍是「依住宿類型與連結可帶入的條件」，不是價格或付費排名。
+      if (housingPrimaryRoutes) {
         housingPrimaryRoutes.replaceChildren();
-        housingOtherRoutes.replaceChildren();
         config.primary.forEach(function (platform) {
           if (!housingLinks[platform]) return;
           housingLinks[platform].className = "support-link housing-route-primary";
@@ -1059,10 +1058,11 @@
         });
         config.other.forEach(function (platform) {
           if (!housingLinks[platform]) return;
-          housingLinks[platform].className = "support-link";
-          housingOtherRoutes.appendChild(housingLinks[platform]);
+          housingLinks[platform].className = "support-link housing-route-secondary";
+          housingPrimaryRoutes.appendChild(housingLinks[platform]);
         });
-        if (housingOtherRoutesPanel) housingOtherRoutesPanel.hidden = config.other.length === 0;
+        var housingRouteStrip = housingPrimaryRoutes.closest(".housing-route-strip");
+        if (housingRouteStrip) housingRouteStrip.scrollLeft = 0;
       }
       return config;
     };

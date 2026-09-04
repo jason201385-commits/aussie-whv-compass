@@ -413,3 +413,31 @@
   LCP 元素改變仍待乾淨環境重測。
 - 狀態：已上線。
 
+## D-2026-09-04-06 住宿五平台入口改為單一滑動列
+
+- 決策：把住宿入口從「推薦 2–3 個 ＋ 其餘收在 `<details>`」改成**同一條可橫向滑動的列**，
+  五個平台永遠都在，最符合本次住宿類型的排前面並標成主要，其餘接在後面。
+- 起因：站長看著 `housing.html#book` 問「沒辦法讓人在我的網頁裡看到嗎？主要是可以一口氣看到五家的滑動概念」。
+- **釐清兩件不同的事**：
+  1. 「站內看到**房源**」＝ 需要五家的書面授權（`ACCOMMODATION_PROVIDER_ONBOARDING.md`），
+     程式其實早就寫好了（`#housing-live-list`、`tools.js` 的分組渲染、Worker `/api/accommodation/search`），
+     開關是 `accommodationSearchEnabled`。卡的是授權，不是程式。
+  2. 「一口氣看到五家」＝ 版面問題，今天就能解，不需要任何授權。本條只做第 2 件。
+- 為什麼不是把五家攤平成一排：原本的兩層**不是隨機分的**，是依使用者選的住宿類型排
+  （短住→Booking／Hostelworld、合租→Flatmates、整租→realestate／Domain）。
+  攤平會弄丟「該先開哪個」的建議，那正好與本站主張相反。
+  滑動列同時保住兩件事：五家一次看得到，順序仍看得出建議。
+- 實作：`.housing-route-strip` 是捲動容器、`.housing-route-track` 是 flex 軌道；
+  卡片寬度刻意讓下一張露出一角當作「還能往右滑」的提示。移除 `<details class="housing-other-routes">`，
+  `tools.js` 改為把 primary 與 other 依序放進同一個容器，分別標 `housing-route-primary`／`housing-route-secondary`。
+  換住宿類型時把捲動位置歸零。
+- **一個做錯又修掉的細節**：`flex-basis` 的百分比是相對於 flex 容器（內層 track），不是外層捲動容器，
+  而 track 的寬度由內容決定——手機上算出 653px 的卡片，比畫面還寬。改用 `vw` 直接相對視窗。
+- 驗證：`scripts/test_housing_search.mjs` 17 cases，新斷言鎖住三種住宿類型下的完整順序與 primary／secondary 標記
+  （例如 share → flatmates, booking, hostelworld, rea, domain）。
+  `check.ps1` 要求兩個住宿頁都有滑動列、軌道裡剛好五個 `data-housing-platform`、
+  且不得再出現 `housing-other-routes`（避免退回收合版面）。
+  瀏覽器實測：桌機卡片 264px、可捲動；502px 寬時卡片 300px、下一張露出 96px、頁面本身不橫向溢位。
+- 不變的部分：`housing-route-order-note`「依住宿類型與連結可帶入的條件排列，不是價格、品質或付費排名」照舊；
+  no-JS 時 HTML 本來就含五個入口，滑動列不影響。
+- 狀態：已上線。

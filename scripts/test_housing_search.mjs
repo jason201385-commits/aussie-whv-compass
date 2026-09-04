@@ -38,6 +38,11 @@ class FakeElement {
 
   scrollIntoView() {}
 
+  closest(selector) {
+    // 只有入口容器會用到：回一個可寫 scrollLeft 的替身，代表外層滑動列。
+    return selector === ".housing-route-strip" ? this.fakeStrip || (this.fakeStrip = { scrollLeft: 0 }) : null;
+  }
+
   focus() {
     this.focused = true;
   }
@@ -76,8 +81,6 @@ function createHarness(lang = "zh-Hant", options = {}) {
   add("housing-fallback-note");
   add("housing-route-title");
   add("housing-primary-routes");
-  add("housing-other-routes");
-  add("housing-other-routes-panel");
   add("housing-live-panel", { hidden: true });
   add("housing-live-status");
   add("housing-live-list", { hidden: true });
@@ -183,16 +186,34 @@ chips[1].dispatch("click");
 assert.equal(elements["housing-search-summary"].textContent, "已為「短住／Darwin NT 0800」排好適合的入口。");
 assert.equal(elements["housing-domain-link"].href, "https://www.domain.com.au/rent/darwin-nt-0800/");
 
+// 五個入口在同一條滑動列裡：最符合這次住宿類型的排前面並標成 housing-route-primary，
+// 其餘接在後面標成 housing-route-secondary。順序是建議，不是價格或付費排名。
+const routeOrder = () =>
+  elements["housing-primary-routes"].children.map(
+    (child) => Object.keys(elements).find((id) => elements[id] === child).replace(/^housing-|-link$/g, ""),
+  );
+const routeClasses = () => elements["housing-primary-routes"].children.map((child) => child.className);
+
 elements["housing-intent"].value = "share";
 elements["housing-intent"].dispatch("change");
-assert.equal(elements["housing-primary-routes"].children.length, 1);
-assert.equal(elements["housing-primary-routes"].children[0], elements["housing-flatmates-link"]);
+assert.equal(elements["housing-primary-routes"].children.length, 5, "五個平台都要留在同一條列裡");
+assert.deepEqual(routeOrder(), ["flatmates", "booking", "hostelworld", "rea", "domain"]);
+assert.deepEqual(routeClasses(), [
+  "support-link housing-route-primary",
+  "support-link housing-route-secondary",
+  "support-link housing-route-secondary",
+  "support-link housing-route-secondary",
+  "support-link housing-route-secondary",
+]);
 assert.match(elements["housing-search-summary"].textContent, /Share House 單房/);
 
 elements["housing-intent"].value = "whole";
 elements["housing-intent"].dispatch("change");
-assert.equal(elements["housing-primary-routes"].children[0], elements["housing-rea-link"]);
-assert.equal(elements["housing-primary-routes"].children[1], elements["housing-domain-link"]);
+assert.equal(elements["housing-primary-routes"].children.length, 5);
+assert.deepEqual(routeOrder(), ["rea", "domain", "booking", "hostelworld", "flatmates"]);
+assert.equal(elements["housing-primary-routes"].children[0].className, "support-link housing-route-primary");
+assert.equal(elements["housing-primary-routes"].children[1].className, "support-link housing-route-primary");
+assert.equal(elements["housing-primary-routes"].children[2].className, "support-link housing-route-secondary");
 
 elements["housing-intent"].value = "rural";
 elements["housing-intent"].dispatch("change");

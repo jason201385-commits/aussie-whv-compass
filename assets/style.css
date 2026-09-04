@@ -2238,7 +2238,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .tool select:focus-visible, .tool input:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- 住宿五平台快速搜尋 ---------- */
-.housing-search-tool[hidden], .housing-search-results[hidden], .housing-live-panel[hidden], .housing-live-list[hidden], .housing-other-routes[hidden] { display: none; }
+.housing-search-tool[hidden], .housing-search-results[hidden], .housing-live-panel[hidden], .housing-live-list[hidden] { display: none; }
 .housing-search-fields {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2342,13 +2342,31 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
   margin-top: 14px;
 }
 .housing-search-results .support-link { min-height: 108px; }
+/* 五個平台入口排成一條可橫向滑動的列：一次看得完，順序仍是「最符合這次住宿類型的排前面」。
+   卡片寬度刻意讓下一張露出一角，使用者才看得出還能往右滑。 */
+.housing-route-strip {
+  margin-top: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  padding-bottom: 8px;
+}
+.housing-route-track {
+  display: flex;
+  gap: 12px;
+  min-width: min-content;
+}
+.housing-route-track > .support-link {
+  flex: 0 0 clamp(216px, 24vw, 268px);
+  scroll-snap-align: start;
+  margin-top: 0;
+}
 .housing-search-results .housing-route-primary {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--gold-soft) 58%, var(--bg));
   box-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 32%, transparent);
 }
-.housing-other-routes { margin-top: 14px; }
-.housing-other-routes > summary { min-height: 48px; display: flex; align-items: center; font-weight: 900; cursor: pointer; }
 .housing-fallback { margin: 18px 0 26px; }
 .housing-fallback > summary { font-weight: 900; }
 .housing-fallback[open] > summary { margin-bottom: 12px; }
@@ -3141,6 +3159,7 @@ main [id] { scroll-margin-top: 170px; }
   .housing-live-panel { padding: 15px; }
   .housing-search-results .support-grid { grid-template-columns: 1fr; }
   .housing-search-results .support-link { min-height: 76px; }
+  .housing-route-track > .support-link { flex-basis: min(78vw, 300px); min-height: 96px; }
   .safety-bar { margin-top: 10px; }
   .hero { margin-top: 8px; padding: 10px 14px; border-radius: 18px; }
   .hero h1 { padding-right: 0; }

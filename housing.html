@@ -29,7 +29,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260904-54" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260904-55" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -88,7 +88,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20260904-54">
+<link rel="stylesheet" href="assets/style.css?v=20260904-55">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body data-i18n-topic="housing">
@@ -242,7 +242,8 @@
       </section>
       <h4 class="housing-route-title" id="housing-route-title">先開最符合需求的平台</h4>
       <p class="housing-search-limit" id="housing-route-order-note">依住宿類型與連結可帶入的條件排列，不是價格、品質或付費排名。目前皆為無分潤外連。</p>
-      <div class="support-grid housing-primary-routes" id="housing-primary-routes" aria-label="最符合需求的住宿平台入口">
+      <div class="housing-route-strip" role="group" aria-label="住宿平台入口，可左右滑動一次看完五家">
+        <div class="housing-route-track" id="housing-primary-routes">
         <a class="support-link" data-housing-platform="hostelworld" id="housing-hostelworld-link" href="https://www.hostelworld.com/hostels/oceania/australia/" target="_blank" rel="noopener noreferrer nofollow">
           <svg class="icon" aria-hidden="true"><use href="#i-luggage"/></svg>
           <span><strong>Hostelworld</strong><small id="housing-hostelworld-note">青旅與短住；部分地點需進站後再搜尋</small></span>
@@ -263,11 +264,9 @@
           <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
           <span><strong>Domain</strong><small id="housing-domain-note">正式整租；有州別與郵遞區號時才建立地點連結</small></span>
         </a>
+        </div>
       </div>
-      <details class="housing-other-routes" id="housing-other-routes-panel">
-        <summary>查看其他平台入口</summary>
-        <div class="support-grid" id="housing-other-routes" aria-label="其他住宿平台入口"></div>
-      </details>
+      <p class="housing-search-limit" id="housing-route-swipe-hint">五個平台在同一條裡，左右滑動就能一次看完；排在前面的是最符合你剛才選的住宿類型，後面幾個是同一份清單的其他選擇。</p>
       <p class="housing-search-limit">入口不是本站房源，也不是即時空房證明。平台可能改寫或忽略部分條件；開啟後請再確認地點、日期、總價、空房與取消條款。</p>
     </div>
   </section>
@@ -403,11 +402,11 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260904-54" defer></script>
-<script src="assets/analytics.js?v=20260904-54" defer></script>
-<script src="assets/i18n.js?v=20260904-54" defer></script>
-<script src="assets/api-config.js?v=20260904-54" defer></script>
-<script src="assets/main.js?v=20260904-54" defer></script>
-<script src="assets/tools.js?v=20260904-54" defer></script>
+<script src="assets/analytics-config.js?v=20260904-55" defer></script>
+<script src="assets/analytics.js?v=20260904-55" defer></script>
+<script src="assets/i18n.js?v=20260904-55" defer></script>
+<script src="assets/api-config.js?v=20260904-55" defer></script>
+<script src="assets/main.js?v=20260904-55" defer></script>
+<script src="assets/tools.js?v=20260904-55" defer></script>
 </body>
 </html>

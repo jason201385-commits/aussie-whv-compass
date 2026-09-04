@@ -48,3 +48,62 @@
 - **程式 gate**：只有 Hostelworld、Booking.com、Domain 可成為目前的授權 adapter candidate；realestate.com.au 與 Flatmates 固定為 external-link-only。若未來真的取得足以改變此判斷的正式書面授權，必須經 code review 才能新增 candidate，不接受只塞 key 或 runtime adapter。
 
 可貼入表單的網站說明、用途文字、人工欄位與授權證據清單見 `docs/ACCOMMODATION_PROVIDER_APPLICATION_PACK.md`。
+
+
+## 申請執行順序與現實評估（2026-09-04 查核）
+
+上面的表寫「要過哪些關」，這一節寫「先做哪一個、要準備什麼、值不值得花時間」。
+每個入口都在 2026-09-04 用瀏覽器開過。**簽約與註冊帳號一律由站長本人做，agent 不代辦。**
+
+### 建議順序
+
+**1. Domain（最可行，先做這個）**
+- 起點：`https://developer.domain.com.au/`——自助式開發者入口，可以自己建 project，
+  需要的是 **Agents & Listings** 這個 API package。
+- 為什麼先做：五家裡唯一可以自己註冊、自己看到文件與端點、不必先有業務窗口的。
+- 心理準備：拿到 key 不等於可以公開顯示。Domain 要 Approved Purpose、公開畫面 review、
+  澳洲境內資料處理、no-index、`Powered by Domain` 標示、engagement events、只能導回 Domain。
+  這些條件本站都做得到，但畫面 review 是人工的，會來回。
+
+**2. Hostelworld（次可行）**
+- 起點：`https://partners.hostelworld.com/`——先申請 Partnerize affiliate。
+- 兩關：affiliate 核准是第一關，**feed／XSAPI 是逐案核准的第二關**。
+  第一關過了只代表可以放推薦連結，不代表可以在站內顯示房源。
+- 心理準備：第二關要說明本站不是 meta search／比價站，因為他們的條款對這類用途有限制。
+
+**3. Booking.com（門檻最高，但不是不可能）**
+- 起點：`https://developers.booking.com/demand/docs/getting-started/prerequisites`。
+  該頁的檢查表第一項就是註冊成為 Managed Affiliate Partner，
+  Partner Centre 的存取權是「簽約後由你的 Booking.com 客戶經理提供」。
+- 也就是說：**這不是自助註冊，是要有業務窗口願意接你**。通常會看流量規模。
+- 平行路線：CJ affiliate（`https://public.cj.com/signup/publisher`）可以先申請，
+  但那只給推薦連結與分潤，**不會給你站內顯示 inventory 的權利**。兩件事不要混為一談。
+
+**4. realestate.com.au（預期會被拒，最後再試）**
+- 起點：`https://partner.realestate.com.au/`。
+- 問題在於他們的 Partner Platform 主要服務 REA 自己的客戶與其授權的服務商，
+  不是給第三方做消費者聚合。要走這條得針對本站用途另外談書面許可。
+- 建議：等前三家至少有一家成功、手上有實際流量數字之後再談，成功率會高一點。
+
+**5. Flatmates（現行條款直接擋住，不要花時間）**
+- 起點：`https://flatmates.com.au/info/terms`。
+- 現行條款明文禁止 screen scraping、database scraping 與類似行為。
+  沒有公開的 API 或 feed 方案，等於**只能靠一對一談出書面許可或正式合約**。
+- 建議：先不投入。合租房源正是 WHV 最需要的一塊，但這一家的成本效益最差。
+
+### 每次申請前先準備好這幾樣
+
+- 網站定位一句話：免費開源的澳洲打工度假指南，不做代辦、不做比價排名、不收房源刊登費。
+- 流量與受眾數字（**目前沒有**——P0-3 的 Cloudflare Web Analytics 與 GA4 還沒啟用，
+  這會直接影響 Booking 與 REA 的意願，所以 P0-3 其實是這件事的前置）。
+- 打算怎麼顯示：按平台分組、不做跨平台排名、不宣稱全市場覆蓋、總價與空房一律導回平台確認。
+- 商業關係怎麼揭露：目前五個都是無分潤外連；日後有分潤會標在平台名稱旁，不藏在頁尾。
+- 技術面已備妥：Worker adapter 介面、`displayAuthorization` 欄位、白名單化的顯示欄位、
+  不寫 D1、不記錄搜尋內容——這些在申請時是加分項，可以直接說明。
+
+### 判斷停損
+
+如果三個月內沒有任何一家給出「可以在 aussiewhvcompass.com 顯示搜尋結果」的書面許可，
+就把 `accommodationSearchEnabled` 這條路線收起來，把力氣放回入口體驗本身
+（現在的滑動列已經把五家的條件都預先帶好，這本來就是使用者最有感的部分）。
+**不要為了做出「站內看得到房源」而去繞過任何一家的條款——那會同時毀掉本站的可信度與 P0-4 的整套治理設計。**
