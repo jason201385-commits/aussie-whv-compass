@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-09-03｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-09-04｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -166,8 +166,11 @@ footer（免責聲明）→ 五支 `<script src defer>`。
   限流鍵以只存在 Worker secret 的 HMAC 產生，原始 Email 或 IP 不作 binding key。
   Cloudflare Rate Limiting 是 edge-local、最終一致，只作防濫用。基礎設施仍會為傳輸與防濫用處理必要連線資料，
   隱私文案不得寫成供應商完全看不到。
-- **狀態**：以上為程式完成／本機驗證；正式 D1 ID 是全零阻擋值，health route 明示 `local-scaffold`，
-  正式啟用屬 P0-4。證據見 `DECISIONS.md` D-2026-08-30-02、D-2026-08-31-02。
+- **狀態**：2026-09-04 已部署正式環境（`aussie-whv-compass-api`，自訂網域 `api.aussiewhvcompass.com`，
+  D1 `aussie-whv-compass` 位於 OC 區、三支 migration 已套用，三個 secret 已設定）。
+  `GET /api/health` 依 `ENVIRONMENT` 回報狀態，正式站回 `deploymentState: "live"`（不再硬寫 `local-scaffold`）。
+  **只有 AI 兜底對外開啟**；站內聯絡送出、D+ 量測與住宿搜尋各自有前端旗標且維持關閉。
+  證據見 `DECISIONS.md` D-2026-08-30-02、D-2026-08-31-02、D-2026-09-04-01。
 
 ### 3.2 商業合作與第三方入口治理
 

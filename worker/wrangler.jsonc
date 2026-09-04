@@ -86,7 +86,7 @@
         {
           "binding": "DB",
           "database_name": "aussie-whv-compass",
-          "database_id": "00000000-0000-0000-0000-000000000000",
+          "database_id": "2a447420-1c12-4771-b4ac-17e8d32a2844",
           "migrations_dir": "migrations"
         }
       ],

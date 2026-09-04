@@ -3059,11 +3059,43 @@ if (-not (Test-Path $apiConfigPath)) {
   $errors++
 } else {
   $apiConfigText = [System.IO.File]::ReadAllText($apiConfigPath, [System.Text.Encoding]::UTF8)
-  foreach ($apiConfigNeedle in @('apiBaseUrl: ""', 'turnstileSiteKey: ""', 'accommodationSearchEnabled: false', 'Public values only', 'P0-4')) {
-    if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] P0-4 前必須 fail closed：$apiConfigNeedle"; $errors++ }
+  # 只放公開值：apiBaseUrl 必須是空字串或純 https origin，turnstileSiteKey 必須是空字串或公開 site key。
+  $apiBaseMatch = [regex]::Match($apiConfigText, 'apiBaseUrl: "([^"]*)"')
+  if (-not $apiBaseMatch.Success -or ($apiBaseMatch.Groups[1].Value -ne '' -and $apiBaseMatch.Groups[1].Value -notmatch '^https://[a-z0-9.-]+$')) {
+    Write-Output 'FAIL [api-config.js] apiBaseUrl 必須是空字串或純 https origin（不得帶路徑、查詢、雜湊或帳密）'
+    $errors++
+  }
+  $siteKeyMatch = [regex]::Match($apiConfigText, 'turnstileSiteKey: "([^"]*)"')
+  if (-not $siteKeyMatch.Success -or ($siteKeyMatch.Groups[1].Value -ne '' -and $siteKeyMatch.Groups[1].Value -notmatch '^0x[A-Za-z0-9_-]{10,30}$')) {
+    Write-Output 'FAIL [api-config.js] turnstileSiteKey 必須是空字串或公開 site key 格式'
+    $errors++
+  }
+  if ($apiConfigText -match '(?i)secret') {
+    Write-Output 'FAIL [api-config.js] 前端設定檔不得出現 secret 字樣'
+    $errors++
+  }
+  # 每個 API 功能各有旗標：填 apiBaseUrl 不得順手打開別的功能。
+  foreach ($apiConfigNeedle in @('assistEnabled:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'Public values only', 'P0-4')) {
+    if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] 缺功能旗標或來源註記：$apiConfigNeedle"; $errors++ }
+  }
+  # 尚未備妥正式資源的功能必須維持關閉（交易信、D+ 部署、住宿平台授權）。
+  foreach ($apiConfigOff in @('contactSubmitEnabled: false', 'dplusMetricsEnabled: false', 'accommodationSearchEnabled: false')) {
+    if (-not $apiConfigText.Contains($apiConfigOff)) { Write-Output "FAIL [api-config.js] 尚未備妥資源的功能必須維持關閉：$apiConfigOff"; $errors++ }
   }
   foreach ($apiSecretName in @('TURNSTILE_SECRET_KEY', 'RATE_LIMIT_HMAC_KEY', 'API_KEY')) {
     if ($apiConfigText.Contains($apiSecretName)) { Write-Output "FAIL [api-config.js] 前端不得出現 secret 名稱或值：$apiSecretName"; $errors++ }
+  }
+}
+# 每個功能只讀自己的旗標，不得共用 apiBaseUrl 當總開關
+foreach ($gatePair in @(
+  @('function assistSettings()', 'config.assistEnabled !== true'),
+  @('function getApiSettings()', 'config.contactSubmitEnabled !== true'),
+  @('function sendDplusMetric(', 'dplusConfig.dplusMetricsEnabled !== true')
+)) {
+  $gateBody = [regex]::Match($mainJs, '(?s)' + [regex]::Escape($gatePair[0]) + '.{0,600}')
+  if (-not $gateBody.Success -or -not $gateBody.Value.Contains($gatePair[1])) {
+    Write-Output ("FAIL [main.js] {0} 必須自行檢查旗標 {1}" -f $gatePair[0], $gatePair[1])
+    $errors++
   }
 }
 foreach ($rootPage in $pages + '404.html') {

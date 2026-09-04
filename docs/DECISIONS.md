@@ -1,6 +1,6 @@
 # 澳打指南針 — 決策與證據日誌（DECISIONS）
 
-> 版本 2.0｜最後更新 2026-09-03｜按日期遞增的決策紀錄（ADR 風格）。
+> 版本 2.0｜最後更新 2026-09-04｜按日期遞增的決策紀錄（ADR 風格）。
 > 規格檔只寫「現在是什麼」；為什麼變成這樣、誰在哪一天拍板、當時的本機證據與反方裁決，
 > 全部寫在這裡。新增條目只能往後加，不改舊條目；要推翻舊決策就寫新條目並標「取代 D-…」。
 > 條目格式：決策／理由／證據／影響／狀態。commit 以短 hash 指向 `main` 歷史。
@@ -231,3 +231,47 @@
 - **新觀察：慢速情境下的 CLS。** 兩次慢速 trace 出現 CLS 0.29（其餘四次 0.00）。`CLSCulprits` insight 指出最大位移叢集分數 0.2916、受影響元素為 `SECTION id='search' class='site-search-home'`、根因為網路載入的字型 `fonts.gstatic.com/s/notosanstc/...woff2`。改版前基線五次 CLS 皆 0.00。判定：這是 CJK 字型晚到造成搜尋區重排，只在字型延遲十秒以上時出現，本輪無法區分是設計改動造成或環境噪音放大，**列為待清淨環境重驗**。
 - 待辦（列 `ROADMAP.md` §3）：在噪音較低的環境重跑 LCP 與 CLS 各 5 次（全距須 ≤ 中位數 25%）；若 CLS 0.29 可重現，處理搜尋區 h2 的字型重排（例如為該標題預留行高或改用 `size-adjust` 的 fallback 字型），並與 P2-4 的 CJK 字型策略一起評估。
 - 狀態：已上線（P0-8～P0-11）；LCP／CLS 量測未完成。
+
+## D-2026-09-04-01 AI 兜底正式上線（P0-4、P1-23、P0-7 的最後一哩）
+
+- 決策：在站長的 Cloudflare 帳號上建立正式資源並部署 Worker，把首頁 AI 兜底對外開啟；
+  同時把「填 `apiBaseUrl` 等於全開」的隱性耦合拆成每個功能各一支旗標。
+- 理由：站長把目標訂為「在這個網站建立可以問問題的 AI 機器人」。原本擋著的四件事（D1 全零佔位、
+  三個 secret、Turnstile widget、`--env production` 部署）在 wrangler 已登入且 zone 同帳號的前提下都做得到；
+  真正需要授權的是「在你帳號上開一個對外付費端點」這個決定本身，不是能力。
+- 先修掉的三個既有缺陷（部署前）：
+  1. `/api/health` 硬寫 `deploymentState: "local-scaffold"`，一上正式站就會說謊 →
+     改為依 `ENVIRONMENT` 推導，並補 `worker/test/http.test.ts` 一條 production 斷言（Hard Constraint #11）。
+  2. `worker/README.md` 步驟 3 要求 Turnstile widget 同時填 www 與裸網域，但 `src/turnstile.ts:77`
+     是嚴格單一 hostname 相等比對 → 收斂文件到程式碼（只填 `www`；裸網域 301 導向 www）。
+  3. `about.html` 完全沒有 MiniMax 資料處理揭露，而 runbook 步驟 4 自己規定「填 key 前必須先有揭露」→
+     新增 `#ai-assist` 段落（送出什麼、保存什麼、哪些問題不送、模型文字永不顯示、使用者自己的界線），
+     並依 SDD §3.1 不寫成「供應商完全看不到」。
+- 建立的資源（2026-09-04）：
+  - D1 `aussie-whv-compass`，`2a447420-1c12-4771-b4ac-17e8d32a2844`，region OC；三支 migration 皆 `✅`。
+  - Turnstile widget `aussie-whv-compass`，Managed，hostname 只有 `www.aussiewhvcompass.com`；
+    site key 是公開值並進 `assets/api-config.js`，secret 只進 Worker secret。
+  - Worker `aussie-whv-compass-api`，`--env production`，版本 `a61126d1-1948-4bc9-8887-ced956714414`，
+    自訂網域 `api.aussiewhvcompass.com`，cron `17 3 * * *`。
+  - 三個 secret（`TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`MINIMAX_API_KEY`）以管線送入
+    `wrangler secret put`，未經 echo、未寫檔、未進 commit、未進對話（Hard Constraint #1／#2）。
+    HMAC key 為當場產生的 48 bytes。
+- 煙霧測試回執（2026-09-04，`--resolve` 繞過本機 DNS 快取）：
+  - `GET /api/health` → 200 `{"ok":true,"environment":"production","deploymentState":"live"}`
+  - `POST /api/assist`＋允許的 Origin＋假 token → 400 `turnstile_failed`（CORS、路由、Turnstile 三者都活著）
+  - `POST /api/assist`＋`https://evil.example` → 403 `origin_not_allowed`
+- 前端只開一個功能：`assets/api-config.js` 從「兩個空字串」改成四支獨立旗標。
+  `assistEnabled: true`；`contactSubmitEnabled`、`dplusMetricsEnabled`、`accommodationSearchEnabled` 維持 `false`。
+  **理由：原本聯絡表單的 `getApiSettings()` 與 AI 的 `assistSettings()` 共用同一個條件（`apiBaseUrl` ＋ site key），
+  只填 `apiBaseUrl` 會連帶把「站內聯絡送出」打開**——那需要尚未建立的交易信資源，而且會讓 `about.html`
+  仍寫著的「站內安全送出尚未啟用」變成假話。`sendDplusMetric()` 同理。
+- 驗收與回歸：`scripts/clarifier-contract.mjs` 新增「出貨設定」案例（斷言只有 AI 被打開、載入時零請求、
+  零 Turnstile），另兩個舊案例改為明寫 `assistEnabled: false` 而不是依賴 api-config 仍為空；
+  `scripts/check.ps1` 的 api-config 區塊從「兩個值必須為空」改寫為「格式必須是公開值＋四支旗標齊全＋
+  未備妥資源的三支必須 false＋三個 gate 各自讀自己的旗標」——比舊斷言嚴格，不是放寬。
+- 影響：ROADMAP P0-4／P0-7／P1-8／P1-23 轉「已上線」；P1-9、P1-10 仍以旗標關閉等資源。
+  `observability.enabled` 維持 `false`，即時查問題用 `wrangler tail --env production`，沒有可事後查的請求日誌，
+  這是資料最小化的刻意取捨。
+- 回滾：把 `assistEnabled` 改成 `false` 並 push，前端立刻回到「尚未啟用」；Worker 留著無人呼叫即無費用。
+- 狀態：已上線；線上端到端驗收（正式站實際問一次、拿到站內連結）於本條目下方補列。
+

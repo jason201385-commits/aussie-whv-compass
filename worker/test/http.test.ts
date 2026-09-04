@@ -3,9 +3,13 @@ import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test"
 import { describe, expect, it } from "vitest";
 import worker, { type AppEnv } from "../src/index";
 
-async function dispatch(request: Request): Promise<Response> {
+async function dispatch(
+  request: Request,
+  overrides: Partial<AppEnv> = {},
+): Promise<Response> {
   const ctx = createExecutionContext();
-  const response = await worker.fetch(request, env as unknown as AppEnv, ctx);
+  const testEnv = { ...(env as unknown as AppEnv), ...overrides };
+  const response = await worker.fetch(request, testEnv, ctx);
   await waitOnExecutionContext(ctx);
   return response;
 }
@@ -25,6 +29,24 @@ describe("Worker HTTP boundary", () => {
     );
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(body).toMatchObject({ ok: true, deploymentState: "local-scaffold" });
+  });
+
+  // health must not keep reporting the scaffold state once it runs in production.
+  it("reports the live deployment state when ENVIRONMENT is production", async () => {
+    const response = await dispatch(
+      new Request("https://api.example.test/api/health", {
+        headers: { Origin: "https://www.aussiewhvcompass.com" },
+      }),
+      { ENVIRONMENT: "production" },
+    );
+    const body = await response.json<Record<string, unknown>>();
+
+    expect(response.status).toBe(200);
+    expect(body).toMatchObject({
+      ok: true,
+      environment: "production",
+      deploymentState: "live",
+    });
   });
 
   it("rejects an unknown browser origin without reflecting it", async () => {

@@ -958,8 +958,8 @@ await runCase("behavior: main.js evaluates against the index.html DOM stand-in",
 });
 
 if (!harnessError) {
-  await runCase("behavior: 初始狀態（空 hash）：面板與出口全收起、護照組顯示、靜態句隱藏、摘要卡收起、#assist 顯示為未啟用", () => {
-    const h = createHarness();
+  await runCase("behavior: 初始狀態（空 hash，AI 旗標關閉）：面板與出口全收起、護照組顯示、靜態句隱藏、摘要卡收起、#assist 顯示為未啟用", () => {
+    const h = createHarness({ config: { assistEnabled: false } });
     const rootEl = h.document.querySelector("[data-clarifier]");
     expect(rootEl.dataset.enhanced === "true" && rootEl.dataset.stage === "" && rootEl.dataset.passport === "", "data-enhanced/stage/passport 初始值");
     expect(h.panelVisibility() === "", `初始不得有面板展開：${h.panelVisibility()}`);
@@ -972,7 +972,7 @@ if (!harnessError) {
     expect(h.byId("clarifier-title").getAttribute("tabindex") === "-1", "#clarifier-title 必須可程式聚焦");
     STAGES.forEach((stage) => expect(h.byId(stage + "-title").getAttribute("tabindex") === "-1", `#${stage}-title 必須 tabindex=-1`));
     expect(h.document.activeElement === null, "初始不得搶焦點");
-    expect(!h.byId("assist").hidden && !h.byId("assist-off").hidden && h.byId("assist-box").hidden, "api-config 未設定時 #assist 只顯示未啟用一句");
+    expect(!h.byId("assist").hidden && !h.byId("assist-off").hidden && h.byId("assist-box").hidden, "assistEnabled 為 false 時 #assist 只顯示未啟用一句");
     expect(h.byId("assist-form").hidden && !h.document.getElementById("turnstile-api-script"), "未啟用時不得載入 Turnstile");
     expect(h.fetchCalls.length === 0, "載入不得發出任何 fetch");
     expect(Object.keys(h.stored).length === 0, "首頁載入不得寫入任何儲存鍵");
@@ -1153,8 +1153,23 @@ if (!harnessError) {
     expect(!outside.defaultPrevented, "radiogroup 之外的方向鍵不攔截");
   });
 
-  await runCase("behavior: 搜尋零結果（AI 未啟用）：階段 4＋安全 5 皆為 <a>，問一次 AI 槽位保持 hidden，零 fetch、零 Turnstile", async () => {
+  // 出貨守門：實際 assets/api-config.js 的值必須「只打開 AI 兜底」，其餘 API 功能維持關閉。
+  await runCase("behavior: 出貨設定（assets/api-config.js 原值）：AI 兜底開、聯絡送出與 D+ 與住宿搜尋皆關、載入時零請求", () => {
     const h = createHarness();
+    const config = h.window.WHV_API_CONFIG;
+    expect(config.assistEnabled === true, "出貨設定必須啟用 AI 兜底");
+    expect(/^https:\/\/[a-z0-9.-]+$/.test(config.apiBaseUrl), `apiBaseUrl 必須是純 https origin：${config.apiBaseUrl}`);
+    expect(typeof config.turnstileSiteKey === "string" && config.turnstileSiteKey.startsWith("0x"), "turnstileSiteKey 必須是公開 site key");
+    expect(config.contactSubmitEnabled === false, "站內聯絡送出必須維持關閉");
+    expect(config.dplusMetricsEnabled === false, "D+ 量測必須維持關閉");
+    expect(config.accommodationSearchEnabled === false, "住宿搜尋必須維持關閉");
+    expect(!h.byId("assist-box").hidden && h.byId("assist-off").hidden, "出貨設定下 #assist 應顯示可用");
+    expect(h.fetchCalls.length === 0, `載入時不得發出任何請求：${h.fetchCalls.map((c) => c.url).join(",")}`);
+    expect(!h.document.getElementById("turnstile-api-script"), "載入時不得載入 Turnstile");
+  });
+
+  await runCase("behavior: 搜尋零結果（AI 旗標關閉）：階段 4＋安全 5 皆為 <a>，問一次 AI 槽位保持 hidden，零 fetch、零 Turnstile", async () => {
+    const h = createHarness({ config: { assistEnabled: false } });
     h.window.openWhvSearch("qzxv 不存在的詞");
     await tick(); await tick();
     const results = h.byId("site-search-results");
@@ -1165,7 +1180,7 @@ if (!harnessError) {
     const safety = empty.querySelectorAll(".site-search-safety a.chip");
     expect(safety.map((a) => a.getAttribute("href")).join(",") === SAFETY_HREFS.join(","), `零結果安全列：${safety.map((a) => a.getAttribute("href")).join(",")}`);
     const aiSlot = h.byId("site-search-ai");
-    expect(aiSlot && aiSlot.hidden, "AI 未啟用時「問一次 AI」槽位必須保持 hidden");
+    expect(aiSlot && aiSlot.hidden, "assistEnabled 為 false 時「問一次 AI」槽位必須保持 hidden");
     expect(aiSlot.querySelector('a[href="#assist"]').textContent === "問一次 AI", "槽位裡是連到 #assist 的「問一次 AI」");
     expect(empty.querySelector('a[href^="https://github.com/"][target="_blank"][rel="noopener noreferrer"]'), "GitHub 回報連結必須 noopener");
     expect(h.byId("assist-form").hidden && !h.document.getElementById("turnstile-api-script"), "零結果不得開啟 AI 表單或載入 Turnstile");
@@ -1174,7 +1189,7 @@ if (!harnessError) {
   });
 
   await runCase("behavior: 搜尋零結果（AI 已啟用）：只揭露「問一次 AI」不 openAssist；明確點擊後才開表單並載入 Turnstile；仍零 /api/assist", async () => {
-    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA" } });
+    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true } });
     expect(!h.byId("assist-box").hidden && h.byId("assist-off").hidden, "已設定時顯示 assist-box");
     h.window.openWhvSearch("qzxv 不存在的詞");
     await tick(); await tick();

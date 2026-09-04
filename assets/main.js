@@ -307,7 +307,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260903-49";
+      script.src = "assets/search-index.js?v=20260904-50";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -1385,7 +1385,8 @@
     function assistSettings() {
       var config = window.WHV_API_CONFIG;
       var apiBaseUrl = getPublicApiBaseUrl();
-      if (!apiBaseUrl || !config || typeof config.turnstileSiteKey !== "string") return null;
+      if (!config || config.assistEnabled !== true) return null;
+      if (!apiBaseUrl || typeof config.turnstileSiteKey !== "string") return null;
       if (!config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
       return { baseUrl: apiBaseUrl, siteKey: config.turnstileSiteKey };
     }
@@ -1618,6 +1619,8 @@
 
   function sendDplusMetric(metricKey) {
     if (DPLUS_METRIC_KEYS.indexOf(metricKey) === -1) return Promise.resolve(false);
+    var dplusConfig = window.WHV_API_CONFIG;
+    if (!dplusConfig || dplusConfig.dplusMetricsEnabled !== true) return Promise.resolve(false);
     var apiBaseUrl = getPublicApiBaseUrl();
     if (!apiBaseUrl) return Promise.resolve(false);
     return fetch(apiBaseUrl + "/api/metrics", {
@@ -1868,7 +1871,8 @@
     function getApiSettings() {
       var config = window.WHV_API_CONFIG;
       var apiBaseUrl = getPublicApiBaseUrl();
-      if (!apiBaseUrl || !config || typeof config.turnstileSiteKey !== "string") return null;
+      if (!config || config.contactSubmitEnabled !== true) return null;
+      if (!apiBaseUrl || typeof config.turnstileSiteKey !== "string") return null;
       if (!config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
       return { baseUrl: apiBaseUrl, siteKey: config.turnstileSiteKey };
     }

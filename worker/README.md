@@ -35,13 +35,20 @@
 - 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`MINIMAX_API_KEY` 或寄信憑證。
 - AI 兜底的公開設定是 `wrangler.jsonc` 的 `ASSIST_DAILY_CAP`（每 Perth 日 200 次）、`ASSIST_MODEL`、
   `ASSIST_BASE_URL`（只接受 https，且主機必須在 `ASSIST_ALLOWED_HOSTS` 內）；secret 只有 `MINIMAX_API_KEY`。
-  三者任一為空或主機不在名單就 fail closed，不會有任何對外呼叫，也不會把 key 或問題送到別的主機。前端 `assets/api-config.js` 的 `apiBaseUrl` 與 `turnstileSiteKey` 仍為空，所以正式站目前零 request。
-- `wrangler.jsonc` 的 D1 `database_id` 是不可部署的全零佔位值。P0-4 完成後才由站長建立正式資源並在 Cloudflare 受保護設定輸入 secrets。
-- Rate Limit `namespace_id=1001`～`1004` 是本機設定範本；正式啟用前要由站長確認帳戶內唯一值。
+  三者任一為空或主機不在名單就 fail closed，不會有任何對外呼叫，也不會把 key 或問題送到別的主機。
+  **2026-09-04 起正式站已啟用**：`assets/api-config.js` 的 `apiBaseUrl` 指向 `https://api.aussiewhvcompass.com`、
+  `turnstileSiteKey` 為公開 site key、`assistEnabled: true`。其餘 API 功能（`contactSubmitEnabled`、
+  `dplusMetricsEnabled`、`accommodationSearchEnabled`）各有旗標且維持 `false`——填 `apiBaseUrl` 不等於全開。
+- `env.production` 的 D1 `database_id` 已是正式資源；**頂層那份仍刻意保留全零佔位值**，
+  讓沒有帶 `--env production` 的 `wrangler deploy` 依舊失敗，不會誤把 dev 形狀的 Worker 推上去。
+- Rate Limit `namespace_id=1001`～`1004` 已隨 `--env production` 部署，帳戶內未與其他 Worker 衝突。
 - 住宿搜尋不寫 D1，不保存地點、日期、人數或房源快照；request log 只有 method、pathname、status 與隨機 request ID。
 - AI 兜底只寫 `assist_daily_usage(day, count)` 一列計數；不保存問題、回覆、token 或 IP；上游失敗只回固定的 `502 assist_unavailable`，不寫任何 log。
-- 正式 Turnstile widget 與 site key 仍未建立；`turnstile-spin` 的遠端 wizard 暫停到 P0-4。
+- 正式 Turnstile widget 已建立（Managed 模式，hostname 只有 `www.aussiewhvcompass.com`）；site key 是公開值，
+  secret 只存在 Worker secret。
 - `workers_dev` 與 preview URL 都關閉；本機 dry-run 不等於已部署。
+- `observability.enabled` 維持 `false`（資料最小化）。要看即時日誌用 `npx wrangler tail --env production`；
+  沒有持久化的請求日誌可事後查，這是刻意的取捨。
 
 ## 本機驗證
 
@@ -53,7 +60,13 @@ npm run check
 
 需要手動啟動本機 API 時，先把 `.dev.vars.example` 複製為不受版控的 `.dev.vars`，只填 Cloudflare 官方測試值或本機隨機值，再執行 `npx wrangler dev --local`。
 
-## 正式啟用步驟（P0-4，只有站長能做；agent 不得代辦）
+## 正式啟用步驟（P0-4）
+
+> **這道閘門是「授權」，不是「能力」。** 在 wrangler 已登入、且 `aussiewhvcompass.com` 這個 zone
+> 就在同一個 Cloudflare 帳號的前提下，步驟 1、2、3、5 agent 技術上執行得了。
+> 需要站長明確授權的是**決定**本身：這會在站長帳號上開一個對外的付費 AI 端點，已被呼叫掉的用量收不回來。
+> 未取得授權前不得執行；執行時凡是 secret 一律只以管線送進 `wrangler secret put`，
+> 不 echo、不寫檔、不進 commit、不進對話（Hard Constraint #1／#2）。
 
 前提：`npx wrangler whoami` 顯示你的 Cloudflare 帳號；`wrangler.jsonc` 的 `env.production` 區塊已備妥
 （正式 `ALLOWED_ORIGINS` 不含 localhost、`ENVIRONMENT` 為 `production`、自訂網域 `api.aussiewhvcompass.com`）。
@@ -63,8 +76,11 @@ npm run check
    `npx wrangler d1 create aussie-whv-compass`
 2. 套用三支 migration 到正式 D1：
    `npx wrangler d1 migrations apply DB --remote --env production`
-3. 在 Cloudflare 儀表板建立 Turnstile widget（hostname `www.aussiewhvcompass.com` 與 `aussiewhvcompass.com`，Managed 模式），
-   拿到 site key（公開）與 secret key（保密）。前端 action 固定為 `turnstile-spin-v2`，與 `TURNSTILE_EXPECTED_ACTION` 一致。
+3. 建立 Turnstile widget（Managed 模式），拿到 site key（公開）與 secret key（保密）。
+   **hostname 只填 `www.aussiewhvcompass.com` 一個**：`src/turnstile.ts` 對 siteverify 回傳的 `hostname`
+   做嚴格相等比對（單一值，不是清單），而裸網域 `aussiewhvcompass.com` 會 301 導到 `www`，
+   widget 不會在裸網域上繪製，多填一個 hostname 只會讓設定與程式碼失去對應。
+   前端 action 固定為 `turnstile-spin-v2`，與 `TURNSTILE_EXPECTED_ACTION` 一致。
 4. 輸入三個 secret（互動式提示，不要用 echo 管線留在 shell 歷史）：
    `npx wrangler secret put TURNSTILE_SECRET_KEY --env production`
    `npx wrangler secret put RATE_LIMIT_HMAC_KEY --env production`（至少 32 個隨機位元組，例如 `openssl rand -base64 48`）
@@ -83,7 +99,9 @@ npm run check
    連續送第 11 次應 429（限流），當日第 201 次應 429 `assist_daily_cap`。
 9. 在 `docs/DECISIONS.md` 新增條目記錄回執（health 回應、D1 列、前端截圖），ROADMAP P0-4 與 P0-7 狀態才可改為「已上線」。
 
-回滾：把 `assets/api-config.js` 兩個值清空並 push，前端立即回到「尚未啟用」；Worker 可留著（無人呼叫即無費用）。
+回滾：把 `assets/api-config.js` 的 `assistEnabled` 改成 `false` 並 push，前端立即回到「尚未啟用」
+（`apiBaseUrl` 與 site key 可以留著，旗標才是開關）；Worker 可留著，無人呼叫即無費用。
+要連 Worker 一起收掉再執行 `npx wrangler delete --env production`。
 
 ## 正式啟用前人工 gate
 

@@ -1,6 +1,6 @@
 # 澳打指南針 — 路線圖與待辦狀態（ROADMAP）
 
-> 版本 2.0｜最後更新 2026-09-03｜這是全部 P0／P1／P2 編號的**唯一來源**。
+> 版本 2.0｜最後更新 2026-09-04｜這是全部 P0／P1／P2 編號的**唯一來源**。
 > 任何規格檔（`SPEC.md`、`PERFORMANCE_AND_RETENTION_SPEC.md`、`CLARIFIER_SPEC.md`）
 > 只能引用這裡已存在的 ID；新增 ID 先在本表登記，`scripts/check.ps1` 會檢查。
 > 狀態敘述與證據不寫在這裡，寫在 `DECISIONS.md`，本表只留一行狀態與指標。
@@ -24,10 +24,10 @@
 | P0-1 | 贊助整合（BMC＋綠界） | 人工前置未完成 | 站長完成 BMC 付款設定與綠界公開連結 | ROADMAP §2.1 | DECISIONS D-2026-08-29-02 |
 | P0-2 | 自訂網域 `www.aussiewhvcompass.com` | 已上線 | — | SDD §2 | f563578、02d7e01 |
 | P0-3 | Search Console 與量測人工前置 | 人工前置未完成 | 站長 DNS 驗證、sitemap 提交；GA4／CWA 依 D-2026-09-02-01 | MEASUREMENT_SETUP.md、SPEC §1.5 | — |
-| P0-4 | Cloudflare 最小後端正式資源 | 人工前置未完成 | 站長建立 Worker／D1／Turnstile／寄信並輸入 secrets | SDD §3.1、worker/README.md | 713f310（本機骨架） |
+| P0-4 | Cloudflare 最小後端正式資源 | 已上線（AI 兜底所需部分）；寄信資源仍未建立 | 站內聯絡送出仍待交易信資源 | SDD §3.1、worker/README.md | 713f310（本機骨架）；D-2026-09-04-01 |
 | P0-5 | 五支腳本 render-blocking | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-5 | a823e88；D-2026-09-01-01 |
 | P0-6 | 無障礙倒退三項 | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-6 | a823e88；D-2026-09-01-01 |
-| P0-7 | 首頁單一漏斗釐清器 | 程式完成／本機驗證（首頁釐清器可上線；AI 兜底待 P0-4） | P0-4 與 `MINIMAX_API_KEY`（線路已實測，D-2026-09-02-05）；C-5 併入 P1-21、§6 指標併入 P1-22、radiogroup 併入 P0-10 | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
+| P0-7 | 首頁單一漏斗釐清器 | 已上線（含 AI 兜底，2026-09-04） | P0-4 與 `MINIMAX_API_KEY`（線路已實測，D-2026-09-02-05）；C-5 併入 P1-21、§6 指標併入 P1-22、radiogroup 併入 P0-10 | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
 | P0-8 | 首屏重構（問題句 hero、階段 chips 進第一屏、安全出口單列、四格入口刪除） | 已上線 | 驗收第 5 條 LCP 須部署後在正式站重量；驗收第 1 條後半（前兩階段第一個需求 chip 進 812px）本機未達，見 D-2026-09-03-02 | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
 | P0-9 | 搜尋強化（查詢改寫、意圖同義詞表、熱門 chip 綁錨點、462 英文頁進索引） | 已上線 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
 | P0-10 | 釐清器口語文案與護照分支（台灣／中國護照用語切換、462 摘要卡、radiogroup、「看公開討論」） | 已上線 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
@@ -39,9 +39,9 @@
 | P1-5 | 分層證據卡與內容狀態 | 部分完成（9 頁） | — | SDD §4.3 | 9647d89 |
 | P1-6 | 簡約檸檬圖文系統 | 部分完成（4 頁） | — | SDD §4.3 | d89fc60 |
 | P1-7 | SEO、AI 探索與內容權利 | 已上線 | — | SPEC §1.4 | 2ddf0f5、1902cca |
-| P1-8 | Cloudflare Worker／D1 基礎 | 程式完成／本機驗證 | P0-4 | SDD §3.1 | 713f310；D-2026-08-30-02 |
-| P1-9 | 私人需求單與 CRM | 程式完成／本機驗證 | P0-4 | SPEC §1.2 | 730015a；D-2026-08-30-02 |
-| P1-10 | D+ 聚合量測 | 程式完成／本機驗證 | P0-4 | SPEC §1.5 | 9822e11；D-2026-08-30-02 |
+| P1-8 | Cloudflare Worker／D1 基礎 | 已上線 | — | SDD §3.1 | 713f310；D-2026-08-30-02、D-2026-09-04-01 |
+| P1-9 | 私人需求單與 CRM | 程式完成／本機驗證（Worker 已上線，前端 `contactSubmitEnabled` 維持 false） | 交易信資源與退信處理 | SPEC §1.2 | 730015a；D-2026-08-30-02 |
+| P1-10 | D+ 聚合量測 | 程式完成／本機驗證（Worker 已上線，前端 `dplusMetricsEnabled` 維持 false） | 併入 P1-22 一起開 | SPEC §1.5 | 9822e11；D-2026-08-30-02 |
 | P1-11 | 商業合作與第三方入口治理 | 已上線 | — | SDD §3.2 | 37031d9 |
 | P1-12 | 第一輪公開使用者回饋修正 | 已上線 | — | DECISIONS D-2026-08-30-03 | cf86d79、fbc9924 |
 | P1-13 | 住宿合法混合搜尋 | 程式完成／本機驗證（公開開關 false） | provider 書面授權（ACCOMMODATION_PROVIDER_ONBOARDING.md） | SPEC §1.2 | 51df889、8f86623、d5c9233、af41208 |
@@ -54,7 +54,7 @@
 | P1-20 | 「你上次看過之後改了什麼」 | 未開始 | 相依 `build_seo.py` 產出 freshness 資料 | PERFORMANCE_AND_RETENTION_SPEC P1-20 | — |
 | P1-21 | 社團目錄 JSON 與 communities.html 子頁（C-5 地區×需求推薦） | 未開始 | 相依 P0-10 | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
 | P1-22 | 釐清器與 AI 兜底指標（D+ 白名單擴充、GA4 事件表、判讀規則） | 未開始 | P0-3（CWA token、GA4 ID）與 P0-4（D+ 部署） | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
-| P1-23 | AI 兜底正式啟用（P0-4 啟用步驟、第一階段 links-only、red-team 驗收；intent 待命中率達標再重啟） | 程式完成／本機驗證（線路已實測，啟用待 P0-4） | P0-4（D1、Turnstile、secrets、`--env production` 部署） | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06 |
+| P1-23 | AI 兜底正式啟用（第一階段 links-only；intent 待命中率達標再重啟） | 已上線（2026-09-04） | red-team 驗收與命中率觀察仍待做 | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06、D-2026-09-04-01 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |
@@ -89,7 +89,11 @@
 
 ### 2.4 P0-3、P0-4 的人工前置清單
 
-見 `SPEC.md` §0 執行者邊界與 `MEASUREMENT_SETUP.md`、`worker/README.md`。agent 不得代辦帳號、付款、DNS 驗證碼、secret。
+見 `SPEC.md` §0 執行者邊界與 `MEASUREMENT_SETUP.md`、`worker/README.md`。
+**agent 不得代辦的仍然是：註冊帳號、付款、輸入密碼或 OTP、DNS 驗證碼、把金鑰值貼進對話或檔案。**
+2026-09-04 更正一項舊敘述：建立 D1／Turnstile widget／執行 `wrangler deploy` 與 `wrangler secret put`
+（值以管線送入、不經過對話）在 wrangler 已登入時 agent 執行得了，**閘門是站長的授權決定，不是能力限制**
+（D-2026-09-04-01）。P0-3 的 CWA beacon token、GA4 ID 與 Search Console 仍是站長手動項目。
 
 ## 3. 已知漂移與小型加固（未編號，先到先做）
 

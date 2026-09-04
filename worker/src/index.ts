@@ -76,7 +76,7 @@ function createFetchHandler(dependencies: AppDependencies) {
           ok: true,
           service: "aussie-whv-compass-api",
           environment: env.ENVIRONMENT,
-          deploymentState: "local-scaffold",
+          deploymentState: env.ENVIRONMENT === "production" ? "live" : "local-scaffold",
           requestId,
         });
       } else if (request.method === "POST" && url.pathname === "/api/contact") {
