@@ -1747,7 +1747,7 @@ foreach ($carNeedle in @(
   'https://www.gumtree.com.au/s-cars-vans-utes/perth/c18320l3008303',
   'https://www.facebook.com/marketplace/perth/vehicles',
   'https://www.ppsr.gov.au/carcheck',
-  'https://online.transport.wa.gov.au/webExternal/registration/?527=',
+  'https://online.transport.wa.gov.au/webExternal/registration/',
   'https://transport.wa.gov.au/licensing/vehicle/buy-sell-transfer',
   'https://www.carsales.com.au/sell-my-car/',
   'https://www.gumtree.com.au/cars/sell-my-car',
@@ -2720,6 +2720,42 @@ if (-not $indexMainBlock.Success -or [regex]::Matches($indexMainBlock.Value, '<h
   Write-Output 'FAIL [index.html] 首頁 main 內每個 h2 都必須有 id（站內搜尋索引依賴）'
   $errors++
 }
+# 敏感題攔截：客戶端（送出前）與伺服端（fail closed）必須是同一組樣式。
+# 客戶端漏接時伺服端雖然仍會擋下模型，但問題文字已經離開瀏覽器，about.html 的揭露就不成立。
+$assistTsPath = Join-Path $dir 'worker/src/assist.ts'
+if (-not (Test-Path $assistTsPath)) {
+  Write-Output 'FAIL 缺 worker/src/assist.ts'
+  $errors++
+} else {
+  $assistTs = [System.IO.File]::ReadAllText($assistTsPath, [System.Text.Encoding]::UTF8)
+  $sensitiveGroups = [regex]::Matches($assistTs, '(?s)const (SENSITIVE_[A-Z_]+) =(.*?);?
+')
+  if ($sensitiveGroups.Count -lt 10) {
+    Write-Output "FAIL [worker/src/assist.ts] 敏感題分組樣式只有 $($sensitiveGroups.Count) 組，應為 12 組以上"
+    $errors++
+  }
+  foreach ($sensitiveGroup in $sensitiveGroups) {
+    $groupName = $sensitiveGroup.Groups[1].Value
+    foreach ($groupLiteral in [regex]::Matches($sensitiveGroup.Groups[2].Value, '"([^"]*)"')) {
+      if (-not $mainJs.Contains($groupLiteral.Groups[1].Value)) {
+        Write-Output "FAIL [assets/main.js] 敏感題樣式未與 assist.ts 同步：$groupName"
+        $errors++
+      }
+    }
+  }
+  if (-not $mainJs.Contains('var ASSIST_SENSITIVE = new RegExp(')) {
+    Write-Output 'FAIL [assets/main.js] 客戶端敏感題樣式必須由同一組具名字串組出，不得寫成單一字面值'
+    $errors++
+  }
+  # 000 只在不與其他數字相連時才算緊急電話，否則「準備 30000 台幣」會誤觸急難文案。
+  foreach ($emergencyGuard in @('(?:^|[^0-9])000(?:[^0-9]|$)')) {
+    if (-not $mainJs.Contains($emergencyGuard) -or -not $assistTs.Contains($emergencyGuard)) {
+      Write-Output 'FAIL 緊急電話 000 必須加數字邊界，兩端都要有'
+      $errors++
+    }
+  }
+}
+
 # main.js 釐清器：hash 驅動、零儲存；AI 兜底只有一個 fetch，且雙設定齊全才啟用
 $clarifierScript = [regex]::Match($mainJs, '(?s)// ---------- 首頁釐清器.*?// ---------- D\+ 匿名彙總量測')
 if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 首頁 AI 兜底')) {

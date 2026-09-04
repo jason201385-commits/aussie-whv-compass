@@ -1216,6 +1216,47 @@ if (!harnessError) {
     expect(!h.byId("assist-answer").hidden && h.byId("assist-answer").querySelector('a[href="scam.html#help"]'), "敏感字眼回固定安全出口");
   });
 
+  // 客戶端攔截是「問題文字不離開瀏覽器」這個承諾的唯一保證（about.html #ai-assist 有寫）。
+  // 2026-09-04 red-team 之前，這裡只擋得住「剛匯款」那一類，其餘 12 類與全部英文都會送出去。
+  await runCase("behavior: 送出前攔截涵蓋各類人身安全題，且不誤攔含數字的預算題", async () => {
+    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true } });
+    h.location.hash = "#assist";
+    h.window.dispatchEvent(new h.Event("hashchange"));
+
+    const submit = (text) => {
+      h.byId("assist-input").value = text;
+      h.byId("assist-form").dispatchEvent(new h.Event("submit", { bubbles: true, cancelable: true }));
+      return h.byId("assist-answer").textContent;
+    };
+
+    for (const text of [
+      "老闆打我",
+      "我想不開",
+      "同事一直性騷擾我",
+      "護照被老闆收走",
+      "雇主說不還我證件",
+      "工作時手被機器夾到流很多血",
+      "農場主人不讓我離開",
+      "我被詐騙了",
+      "my boss took my passport",
+      "my employer won't let me leave the farm",
+      "I got scammed by a fake landlord",
+    ]) {
+      const answer = submit(text);
+      expect(h.fetchCalls.length === 0, `「${text}」必須在送出前攔下，不得呼叫 /api/assist`);
+      expect(answer.includes("這種情況不要等 AI。"), `「${text}」必須回固定安全文案`);
+      expect(h.byId("assist-answer").querySelector('a[href="scam.html#help"]'), `「${text}」必須帶救濟包連結`);
+    }
+
+    // 反向：含數字的一般問題不得被 000 的樣式掃到。
+    for (const text of ["第一個月大概要準備 30000 台幣", "買車預算 8000 澳幣夠嗎", "how much does grape picking pay"]) {
+      h.byId("assist-answer").textContent = "";
+      h.byId("assist-answer").hidden = true;
+      const answer = submit(text);
+      expect(!answer.includes("這種情況不要等 AI。"), `「${text}」是一般問題，不得顯示急難文案`);
+    }
+  });
+
   await runCase("behavior: 有結果的搜尋不渲染零結果區、不揭露 AI", async () => {
     const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA" } });
     h.window.openWhvSearch("退稅");

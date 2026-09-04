@@ -307,7 +307,7 @@
     if (searchLoadPromise) return searchLoadPromise;
     searchLoadPromise = new Promise(function (resolve, reject) {
       var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20260904-50";
+      script.src = "assets/search-index.js?v=20260904-51";
       script.async = true;
       script.onload = function () {
         if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -1372,7 +1372,55 @@
     var assistStatus = document.getElementById("assist-status");
     var assistAnswer = document.getElementById("assist-answer");
     var ASSIST_SAME_SITE = /^(?:[a-z0-9-]+\.html|lang\/[a-z]{2}(?:-[A-Za-z]{2,4})?\/(?:[a-z-]+\/)?)?(?:#[A-Za-z0-9_-]{1,80})?$/;
-    var ASSIST_SENSITIVE = /自殺|自傷|想死|不想活|輕生|傷害自己|被打|強暴|性侵|被威脅|扣護照|扣證件|剛匯款|匯款了|轉帳了|被騙了|急診|000/;
+    // 送出前的敏感題攔截：命中就直接在瀏覽器裡顯示固定安全出口，問題文字完全不離開這一頁。
+    // 這幾組樣式必須與 worker/src/assist.ts 的 ASSIST_SENSITIVE 逐字相同（check.ps1 會比對），
+    // 否則客戶端漏接的題目雖然伺服端仍會攔下，文字卻已經送出去了。
+    var SENSITIVE_SELF_HARM =
+      "自殺|自傷|自殘|想死|不想活|活不下去|撐不下去|輕生|想不開|傷害自己|了結自己";
+    var SENSITIVE_VIOLENCE =
+      "被打|毆打|被毆|揍我|打我|動手打|對我動手|家暴|暴力|強暴|性侵|性騷擾|騷擾我|猥褻|下藥|迷昏";
+    var SENSITIVE_COERCION =
+      "威脅|恐嚇|勒索|不讓我走|不讓我離開|不准我離開|不肯放我走|把我關|軟禁|限制我的自由";
+    var SENSITIVE_DOCUMENTS =
+      "扣護照|扣證件|" +
+      "(?:護照|證件|居留證)[^。？?!！]{0,10}(?:被扣|扣住|收走|拿走|沒收|不還|不肯還|還我)|" +
+      "(?:被扣|扣住|收走|拿走|沒收|不還|不肯還|不給我)[^。？?!！]{0,10}(?:護照|證件|居留證)";
+    var SENSITIVE_MONEY =
+      "剛匯款|匯款了|轉帳了|匯錢|把錢匯|匯給對方|轉給對方|付了訂金|被騙|被詐|詐騙|遭詐";
+    var SENSITIVE_INJURY =
+      "受傷|流血|出血|骨折|燙傷|灼傷|割傷|夾到|昏倒|救護車|送醫|急診";
+    var SENSITIVE_EN_SELF_HARM =
+      "suicid|kill myself|self[- ]?harm|want to die|end my life|hurt myself";
+    var SENSITIVE_EN_VIOLENCE =
+      "assault|violen|\\brape|harass|molest|beat me|hit me|punch|drugged";
+    var SENSITIVE_EN_COERCION =
+      "threat|blackmail|extort|won'?t let me (?:leave|go)|not allowed to leave|held against my will|locked me in";
+    var SENSITIVE_EN_DOCUMENTS =
+      "passport[^.?!]{0,24}(?:taken|confiscated|withheld|kept|back|returned)|(?:took|taken|confiscat|withh|keeping|holding|has|refus)[a-z]*[^.?!]{0,16}passport";
+    var SENSITIVE_EN_MONEY =
+      "(?:just |already )?(?:wired|transferred|sent|paid)[^.?!]{0,16}money|scammed|defrauded|\\bfraud";
+    var SENSITIVE_EN_INJURY =
+      "bleeding|broken (?:arm|leg|bone|rib|finger)|ambulance|emergency room";
+
+    var ASSIST_SENSITIVE = new RegExp(
+      [
+        SENSITIVE_SELF_HARM,
+        SENSITIVE_VIOLENCE,
+        SENSITIVE_COERCION,
+        SENSITIVE_DOCUMENTS,
+        SENSITIVE_MONEY,
+        SENSITIVE_INJURY,
+        // Australia's emergency number, guarded so it cannot fire inside other digits.
+        "(?:^|[^0-9])000(?:[^0-9]|$)",
+        SENSITIVE_EN_SELF_HARM,
+        SENSITIVE_EN_VIOLENCE,
+        SENSITIVE_EN_COERCION,
+        SENSITIVE_EN_DOCUMENTS,
+        SENSITIVE_EN_MONEY,
+        SENSITIVE_EN_INJURY,
+      ].join("|"),
+      "i",
+    );
     var ASSIST_FALLBACK_LINKS = [["用站內搜尋", "#search"], ["到各地社團問人", "#communities"]];
     var assistToken = "";
     var assistWidgetId = null;

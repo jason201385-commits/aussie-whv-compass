@@ -100,7 +100,7 @@
 | 項目 | 位置 | 來源 | 狀態（2026-09-02） |
 |---|---|---|---|
 | AI 兜底完整端到端（真實 Turnstile token → 模型 → 站內連結）尚未驗證 | 正式站首頁 `#assist` | D-2026-09-04-02 | 待站長本人以真實瀏覽器問一次；自動化瀏覽器拿不到 token，不得繞過人機驗證 |
-| AI 兜底命中率與 red-team 驗收未做 | `worker/src/assist.ts` 目錄與 prompt | P1-23 | 上線後觀察；命中率不佳再考慮重啟 intent 欄位 |
+| AI 兜底命中率觀察未做 | `worker/src/assist.ts` 目錄與 prompt | P1-23 | red-team 已於 2026-09-04 完成（D-2026-09-04-03，59/59）；命中率要等真實提問累積，不佳再考慮重啟 intent 欄位 |
 | 全站 nav 不一致（`market.html`、`simulator.html` 曾自加第 13 個連結） | `scripts/check.ps1` nav 規則 | 2026-09-02 漂移稽核 | 已處理：站長決定工具頁不進 nav，15 頁統一 12 連結，`check.ps1` 改為強制（D-2026-09-02-03） |
 | GA4 填入 ID 前必須排除詐騙、健康頁的 page view | `assets/analytics.js` | Codex 反方審查 2026-09-02 | 已處理：`SENSITIVE_PATHS`＋`scripts/test_analytics.cjs`；範圍為整頁清單，見 SPEC §1.5 |
 | `check.ps1` 未斷言 `defer` | `scripts/check.ps1` | Codex 反方審查 2026-09-02 | 已處理：根層＋`lang/` 全部頁面的本機 script 必須含 `defer` |
@@ -114,9 +114,9 @@
 | `worker/` 其他 POST 路由缺逐路由 Origin 測試 | `worker/test/` | 2026-09-02 完整性批評 | 未處理：目前靠 `index.ts` 單一入口保證；新增路由時補測試 |
 | 首頁重建後 `check.ps1` 首頁區塊需同步 | `scripts/check.ps1` 首頁區塊 | P0-7 | 已處理：首頁區塊重寫為釐清器契約（D-2026-09-02-04） |
 | 首頁 34px 點擊目標（熱門搜尋 chips、六大職類連結） | `assets/style.css` 640px 區塊 | 2026-09-02 瀏覽器回放 | 已處理：行動版 `min-height: 44px` |
-| `cost.html` WA rego 免費查詢 URL 帶 `?527=` 參數，伺服器 302 改寫為 `?0`（瀏覽器可用、非瀏覽器工具進入重導） | `cost.html` 買車表 WA 列 | 2026-09-03 查核（states.md） | 待站長決定：改連不帶參數的 `https://online.transport.wa.gov.au/webExternal/registration/`（實作時瀏覽器開一次確認） |
-| `cost.html` QLD 列連總覽頁，14 天過戶與 safety certificate 規則在 `/transport/registration/transfer` 與 `/roadworthy` 子頁 | `cost.html` 買車表 QLD 列 | 2026-09-03 查核（states.md） | 待站長決定：改連 `/transfer`（八州表其他列皆為過戶頁） |
-| 首頁社團區 Facebook 搜尋轉接未登入回 Not Found | `index.html#communities` 兩個平台搜尋鈕 | 2026-09-02 查核（fairwork-community.md） | 未處理：按鈕旁加「需先登入 Facebook」並顯示查詢字串；併入 P1-21 |
+| `cost.html` WA rego 免費查詢 URL 帶 `?527=` 參數 | `cost.html` 買車表 WA 列 | 2026-09-03 查核（states.md） | 已處理（2026-09-04）：改連不帶參數的網址，實測就是 `?527=` 被 302 改寫後的落點 |
+| `cost.html` QLD 列連總覽頁而非過戶頁 | `cost.html` 買車表 QLD 列 | 2026-09-03 查核（states.md） | 已處理（2026-09-04）：改連 `/transport/registration/transfer`（標題 Registration transfer、內文有 14 days），與其餘七列一致 |
+| 首頁社團區 Facebook 搜尋轉接未登入回 Not Found | `index.html#communities` 兩個平台搜尋鈕 | 2026-09-02 查核（fairwork-community.md） | 已處理（2026-09-04）：按鈕下方註明 Facebook 需先登入、未登入會顯示找不到頁面，Reddit 不用；顯示查詢字串仍併入 P1-21 |
 | `about.html` 隱私段落尚無 MiniMax 與 Turnstile 揭露 | `about.html#analytics` | D-2026-09-03-01 | 未處理：依 OPTIMIZATION_PLAN P1-23 揭露段落撰寫；填入 `MINIMAX_API_KEY` 前完成 |
 | 千問 UX 建議增補（`docs/UX-SUGGESTIONS.md`，UX-1～UX-10 與文案 D-1～D-3） | `docs/UX-SUGGESTIONS.md` | 2026-09-03 外部建議 | 待站長裁決：主 session 評估見該檔 §F（建議採納：麵包屑、其餘 7 頁的「30 秒版」一句、updated-tag 徽章化與柔化 CSS；不採納：新手一鍵開始（重複釐清器）、安全出口 FAB（P0-8 安全列已常駐）、漢堡選單（SDD §6 教訓 3）、section 預設折疊、閱讀進度條、信任數字列） |
 | P0-8 驗收 5：正式站 LCP／CLS 未取得有效量測 | 正式站首頁 | D-2026-09-03-03 | 未處理：本環境 PerformanceObserver 收不到 paint、trace 全距達中位數 242%（3,712–14,753 ms）整批作廢；需在噪音較低的環境重跑各 5 次 |

@@ -104,9 +104,60 @@ function hasControlCharacters(text: string): boolean {
  * Server-side twin of the client pre-filter (contract §2.7) plus the owner's
  * keyword list and English equivalents. A hit returns the fixed safety copy
  * without touching Turnstile, the limiter, the counter or the model.
+ *
+ * Built from named groups so a category can be extended without re-reading one
+ * 900-character literal. Recall is deliberately favoured over precision: routing
+ * an ordinary question to the safety exits costs the visitor one extra click,
+ * while missing a real one hands somebody in danger a chatbot. A 2026-09-04
+ * red-team run of 45 realistic questions had 12 of 16 safety questions fall
+ * through to the model; these groups are what closed that gap.
  */
-export const ASSIST_SENSITIVE =
-  /自殺|自傷|想死|不想活|輕生|傷害自己|被打|暴力|強暴|性侵|威脅|扣護照|扣證件|剛匯款|匯款了|轉帳了|被騙|急診|(?:^|[^0-9])000(?:[^0-9]|$)|suicid|kill myself|self[- ]?harm|want to die|end my life|assault|violen|\brape|threat|passport (?:was |is |got |has been )?(?:taken|confiscated|withheld|kept)|(?:just |already )?(?:wired|transferred|sent) (?:the |my )?money|scammed/i;
+const SENSITIVE_SELF_HARM =
+  "自殺|自傷|自殘|想死|不想活|活不下去|撐不下去|輕生|想不開|傷害自己|了結自己";
+const SENSITIVE_VIOLENCE =
+  "被打|毆打|被毆|揍我|打我|動手打|對我動手|家暴|暴力|強暴|性侵|性騷擾|騷擾我|猥褻|下藥|迷昏";
+const SENSITIVE_COERCION =
+  "威脅|恐嚇|勒索|不讓我走|不讓我離開|不准我離開|不肯放我走|把我關|軟禁|限制我的自由";
+const SENSITIVE_DOCUMENTS =
+  "扣護照|扣證件|" +
+  "(?:護照|證件|居留證)[^。？?!！]{0,10}(?:被扣|扣住|收走|拿走|沒收|不還|不肯還|還我)|" +
+  "(?:被扣|扣住|收走|拿走|沒收|不還|不肯還|不給我)[^。？?!！]{0,10}(?:護照|證件|居留證)";
+const SENSITIVE_MONEY =
+  "剛匯款|匯款了|轉帳了|匯錢|把錢匯|匯給對方|轉給對方|付了訂金|被騙|被詐|詐騙|遭詐";
+const SENSITIVE_INJURY =
+  "受傷|流血|出血|骨折|燙傷|灼傷|割傷|夾到|昏倒|救護車|送醫|急診";
+const SENSITIVE_EN_SELF_HARM =
+  "suicid|kill myself|self[- ]?harm|want to die|end my life|hurt myself";
+const SENSITIVE_EN_VIOLENCE =
+  "assault|violen|\\brape|harass|molest|beat me|hit me|punch|drugged";
+const SENSITIVE_EN_COERCION =
+  "threat|blackmail|extort|won'?t let me (?:leave|go)|not allowed to leave|held against my will|locked me in";
+const SENSITIVE_EN_DOCUMENTS =
+  "passport[^.?!]{0,24}(?:taken|confiscated|withheld|kept|back|returned)|(?:took|taken|confiscat|withh|keeping|holding|has|refus)[a-z]*[^.?!]{0,16}passport";
+const SENSITIVE_EN_MONEY =
+  "(?:just |already )?(?:wired|transferred|sent|paid)[^.?!]{0,16}money|scammed|defrauded|\\bfraud";
+const SENSITIVE_EN_INJURY =
+  "bleeding|broken (?:arm|leg|bone|rib|finger)|ambulance|emergency room";
+
+export const ASSIST_SENSITIVE = new RegExp(
+  [
+    SENSITIVE_SELF_HARM,
+    SENSITIVE_VIOLENCE,
+    SENSITIVE_COERCION,
+    SENSITIVE_DOCUMENTS,
+    SENSITIVE_MONEY,
+    SENSITIVE_INJURY,
+    // Australia's emergency number, guarded so it cannot fire inside other digits.
+    "(?:^|[^0-9])000(?:[^0-9]|$)",
+    SENSITIVE_EN_SELF_HARM,
+    SENSITIVE_EN_VIOLENCE,
+    SENSITIVE_EN_COERCION,
+    SENSITIVE_EN_DOCUMENTS,
+    SENSITIVE_EN_MONEY,
+    SENSITIVE_EN_INJURY,
+  ].join("|"),
+  "i",
+);
 
 /**
  * Questions that ask for a personal determination (visa eligibility, legality,
@@ -115,7 +166,7 @@ export const ASSIST_SENSITIVE =
  * and the model never sees the question.
  */
 export const ASSIST_DETERMINATION =
-  /能不能申請|可不可以申請|(?:可以|可不可|能|能夠)申請[^，。？?!！]{0,8}(?:嗎|吗)|申請得(?:到|過|过)[^，。？?!！]{0,8}(?:嗎|吗)|有沒有資格|有[^，。？?!！]{0,8}資格(?:嗎|吗)|符不符合|符合[^，。？?!！]{0,8}(?:嗎|吗)|合法嗎|違法嗎|合不合法|該不該看醫生|要不要看醫生|需不需要看醫生|是不是[^，。？?!！]{0,12}病|退稅多少|退多少稅|能退多少|要繳多少稅|繳多少稅|會不會被拒|會被拒嗎|能不能過|會不會過|過得了嗎|am i eligible|are we eligible|eligible for|can i apply|could i apply|may i apply|can i (?:still )?get (?:the |a )?(?:visa|417|462)|is (?:it|this|that) legal|is (?:it|this|that) illegal|(?:is|are) (?:my|our) (?:boss|employer|contract|pay|wage|job) (?:legal|illegal|allowed)|how much tax|tax refund|how much (?:will|do|would) i get back|should i see a doctor|do i need (?:a|to see a) doctor|do i have (?:a |an )?[a-z ]{0,20}(?:disease|illness|infection|cancer|covid)|will i be (?:rejected|refused|denied)|will (?:my|the) (?:visa|application) be (?:rejected|refused|denied|granted|approved)/i;
+  /能不能申請|可不可以申請|(?:可以|可不可|能|能夠)申請[^，。？?!！]{0,8}(?:嗎|吗)|申請得(?:到|過|过)[^，。？?!！]{0,8}(?:嗎|吗)|有沒有資格|有[^，。？?!！]{0,8}資格(?:嗎|吗)|符不符合|符合[^，。？?!！]{0,8}(?:嗎|吗)|合法嗎|違法嗎|合不合法|該不該看醫生|要不要看醫生|需不需要看醫生|是不是[^，。？?!！]{0,12}病|退稅多少|退多少稅|能退多少|要繳多少稅|繳多少稅|會不會被拒|會被拒嗎|能不能過|會不會過|會過嗎|過不過得了|過得了嗎|領回多少|拿回多少|能領回多少|am i eligible|are we eligible|eligible for|can i apply|could i apply|may i apply|can i (?:still )?get (?:the |a )?(?:visa|417|462)|is (?:it|this|that) legal|is (?:it|this|that) illegal|(?:is|are) (?:my|our) (?:boss|employer|contract|pay|wage|job) (?:legal|illegal|allowed)|how much tax|tax refund|how much (?:will|do|would) i get back|should i see a doctor|do i need (?:a|to see a) doctor|do i have (?:a |an )?[a-z ]{0,20}(?:disease|illness|infection|cancer|covid)|will i be (?:rejected|refused|denied)|will (?:my|the) (?:visa|application) be (?:rejected|refused|denied|granted|approved)/i;
 
 /** Topic hints used only to pick which fixed official exits accompany a determination question. */
 export const ASSIST_TOPIC_VISA = /簽證|集簽|二簽|三簽|417|462|申請|移民|永居|\bPR\b|visa|eligib|apply|immigra/i;
