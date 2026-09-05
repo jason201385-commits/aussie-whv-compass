@@ -35,6 +35,7 @@ function createTestEnvironment(keys: string[]): AppEnv {
     TURNSTILE_EXPECTED_ACTION: "turnstile-spin-v2",
     TURNSTILE_SECRET_KEY: "local-turnstile-test-secret",
     RATE_LIMIT_HMAC_KEY: "0123456789abcdef0123456789abcdef",
+    MAIL_FROM: "noreply@aussiewhvcompass.com",
   };
 }
 

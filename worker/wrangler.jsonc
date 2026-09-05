@@ -19,7 +19,8 @@
     "TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2",
     "ASSIST_DAILY_CAP": "200",
     "ASSIST_MODEL": "MiniMax-M2.7",
-    "ASSIST_BASE_URL": "https://api.minimaxi.com/v1"
+    "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
+    "MAIL_FROM": "noreply@aussiewhvcompass.com"
   },
   "d1_databases": [
     {
@@ -80,7 +81,8 @@
         "TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2",
         "ASSIST_DAILY_CAP": "200",
         "ASSIST_MODEL": "MiniMax-M2.7",
-        "ASSIST_BASE_URL": "https://api.minimaxi.com/v1"
+        "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
+    "MAIL_FROM": "noreply@aussiewhvcompass.com"
       },
       "d1_databases": [
         {

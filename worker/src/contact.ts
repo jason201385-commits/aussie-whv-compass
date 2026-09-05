@@ -1,7 +1,7 @@
 import { readBoundedJson } from "./body";
 import { validateContactInput, validateManageContactInput } from "./contact-validation";
 import { HttpError, jsonResponse } from "./http";
-import { DisabledMailTransport, type MailTransport } from "./mail";
+import { createMailTransportFromEnv, type MailTransport } from "./mail";
 import { createRateLimitKey, enforceRateLimit, type RateLimitBinding } from "./rate-limit";
 import {
   deleteManagedContactCase,
@@ -27,6 +27,12 @@ export interface ContactEnvironment {
   RATE_LIMIT_HMAC_KEY: string;
   TURNSTILE_EXPECTED_HOSTNAME: string;
   TURNSTILE_EXPECTED_ACTION: string;
+  /** Resend secret — set via `wrangler secret put`; never commit. */
+  RESEND_API_KEY?: string;
+  /** From address for transactional mail (default noreply@aussiewhvcompass.com). */
+  MAIL_FROM?: string;
+  /** Optional owner notify inbox; management token is never included. */
+  CONTACT_NOTIFY_TO?: string;
 }
 
 export interface ContactDependencies {
@@ -98,7 +104,7 @@ export async function createContactCase(
     outboxId,
   });
 
-  const mailTransport = dependencies.mailTransport ?? new DisabledMailTransport();
+  const mailTransport = dependencies.mailTransport ?? createMailTransportFromEnv(env);
   let emailStatus: "sent" | "queued" = "queued";
   try {
     await mailTransport.sendContactReceipt({

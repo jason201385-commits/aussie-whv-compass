@@ -6,7 +6,7 @@
 `/api/contact/delete`、`/api/metrics`、`/api/accommodation/search`、`/api/assist` 與每日 retention purge。住宿端點只接受嚴格白名單欄位，
 只輸出經平台網域與長度驗證的授權 provider 結果；目前 production provider 清單故意為空，所以只回傳五個平台的
 `external-link-only` 狀態，不會抓平台頁面或假造房源。預設 mail transport 故意停用；測試只使用記憶體 mock，
-所以 `emailStatus=sent` 是本機介面證據，不是外部送達證據。
+所以 `emailStatus=sent` 是本機介面證據，不是外部送達證據。正式環境在設定 `RESEND_API_KEY` secret 後會改用 `ResendMailTransport`（見下方「啟用交易信」）；未設定時仍 fail closed。
 
 `POST /api/assist` 是首頁釐清器最後一層的 AI 兜底（`docs/CLARIFIER_SPEC.md` §4）。模型只當**路由器**：
 它只能回 `{"links":["<SITE_CATALOGUE href>", ...]}`（1 到 3 個；可多帶一個會被忽略的 `intent`），使用者看到的
@@ -32,7 +32,7 @@
 
 - 僅承接需求單、確認信／刪除流程、無個人識別的 D+ 聚合計數、日後已取得書面授權的平台住宿單次搜尋，以及首頁 AI 兜底的單次轉發。
 - 所有 `POST` 路由（含 `/api/metrics`）都要求請求帶 `Origin` 且在 `ALLOWED_ORIGINS` 白名單內；缺少或不在名單一律 `403 origin_not_allowed`，用 curl 做煙霧測試時要加 `-H "Origin: http://localhost:4175"`。`GET /api/health` 不受此限。
-- 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`MINIMAX_API_KEY` 或寄信憑證。
+- 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`MINIMAX_API_KEY`、`RESEND_API_KEY` 或寄信憑證。
 - AI 兜底的公開設定是 `wrangler.jsonc` 的 `ASSIST_DAILY_CAP`（每 Perth 日 200 次）、`ASSIST_MODEL`、
   `ASSIST_BASE_URL`（只接受 https，且主機必須在 `ASSIST_ALLOWED_HOSTS` 內）；secret 只有 `MINIMAX_API_KEY`。
   三者任一為空或主機不在名單就 fail closed，不會有任何對外呼叫，也不會把 key 或問題送到別的主機。
@@ -110,5 +110,23 @@ npm run check
    在 P0-4 完成、站長審核過 MiniMax 資料處理條款揭露前，不得填入真實金鑰）。
 3. 受控驗證 CORS、Turnstile hostname/action、限流、migration、收件與退信。
 4. 只有取得正式 API 回執與前端 E2E 證據後，才能稱為已上線。
+
+## 啟用交易信（Resend）
+
+Contact API 的確認信走 Resend HTTP API（`POST https://api.resend.com/emails`）。Worker 程式已含 `ResendMailTransport`；**在 domain 驗證與 secret 就緒前，前端 `contactSubmitEnabled` 必須維持 `false`。**
+
+1. 在 [Resend](https://resend.com) 建立帳號，把 `aussiewhvcompass.com` 加為 sending domain，並依儀表板指示完成 DNS（SPF / DKIM；有要求再加 DMARC）。
+2. Domain 狀態變為 Verified 後，建立 API key（權限只要寄信即可）。
+3. 在本機 `worker/` 互動式寫入 secret（不要 echo、不要貼進聊天或檔案）：
+   `npx wrangler secret put RESEND_API_KEY --env production`
+4. 確認 `wrangler.jsonc` 的 `MAIL_FROM` 為已驗證網域上的位址（預設 `noreply@aussiewhvcompass.com`）。若要另外通知站長，可在 `env.production.vars` 加 `CONTACT_NOTIFY_TO`（例如 About 頁的站長信箱）；owner 信不含 management token，但會設 `reply_to` 為送件人。
+5. 重新部署：`npx wrangler deploy --env production`
+6. 煙霧：用受控 Turnstile token 打一次 `POST /api/contact`（或本機 mock），確認收件匣有 zh-Hant／en 確認信，且回傳 `emailStatus:"sent"`。Resend dashboard 應看到對應 delivery。
+7. **驗證成功後**才把前端打開：
+   - `assets/api-config.js` → `contactSubmitEnabled: true`
+   - 更新 `about.html`／`lang/en/about` 相關文案（若仍寫「尚未開放送出」）
+   - 升資產版本、commit、push
+
+回滾：先把 `contactSubmitEnabled` 改回 `false` 並 push；需要停寄信時可 `npx wrangler secret delete RESEND_API_KEY --env production` 後再 deploy（會回到 DisabledMailTransport，案件仍會寫入且 `emailStatus:"queued"`）。
 
 住宿平台另須逐一通過 [`docs/ACCOMMODATION_PROVIDER_ONBOARDING.md`](../docs/ACCOMMODATION_PROVIDER_ONBOARDING.md)；沒有平台合約／書面許可時，不能把 provider mock 或外部入口稱為站內即時房源。
