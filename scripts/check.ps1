@@ -143,7 +143,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
-  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|simulator\.js|postcodes\.js|seasons\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|simulator\.js|postcodes\.js|seasons\.js|map-transparency\.js|job-router\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -156,9 +156,9 @@ foreach ($p in $pages) {
     $links = ($nav -split '<a ').Count - 1
     $expectedNavLinks = 12
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
-    if ($nav -match 'href="(?:simulator|market|communities)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html 或 communities.html（站長 2026-09-02 決定；社團目錄同規則）"; $errors++ }
+    if ($nav -match 'href="(?:simulator|market|communities|map)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html、communities.html 或 map.html（站長 2026-09-02 決定；工具頁不進 nav）"; $errors++ }
   }
-  $offNavPages = @('simulator.html', 'market.html', 'communities.html')
+  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html')
   if ($p -in $offNavPages) {
     if ([regex]::Matches($t, 'aria-current="page"').Count -ne 0) {
       Write-Output "FAIL [$p] 不在全站 nav 的工具頁不得標 aria-current=page"; $errors++
@@ -1777,6 +1777,11 @@ if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 集簽快查器與存錢試算器固定案例測試失敗（scripts/test_tools.mjs）'
   $errors++
 }
+& node (Join-Path $dir 'scripts\test_job_router.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 公開求職篩選導流測試失敗（scripts/test_job_router.mjs）'
+  $errors++
+}
 & node (Join-Path $dir 'scripts\test_search.mjs')
 if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 站內搜尋驗收失敗（scripts/test_search.mjs；OPTIMIZATION_PLAN P0-9 驗收 1–2）'
@@ -1951,7 +1956,7 @@ if (-not (Test-Path $contentStatusPath)) {
     if ($contentStatus.schemaVersion -ne 2 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
     if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
     if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
-    if (@($contentStatus.primaryPages).Count -ne 16) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 16）"; $errors++ }
+    if (@($contentStatus.primaryPages).Count -ne 17) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 17）"; $errors++ }
     if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
     if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
     $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceCardStatus -eq 'checked' })

@@ -29,10 +29,11 @@
 - **首頁釐清器**（index.html）：點階段、護照與需求三層 chips 直達 21 個出口，另有 6 題找職類；選項只在頁面內、不儲存、不送出；無 JavaScript 時整個漏斗仍可見。AI 兜底表單只在後端正式啟用後出現。
 - **離澳出清 × 初登澳補給草稿產生器**（market.html）：選賣出／徵求、分類、城市、狀況、價格與面交方式，產生可複製的刊登草稿與 Facebook Marketplace／eBay 搜尋入口；不儲存任何輸入，也不代刊登。
 - **各地社團目錄**（首頁 `#communities`）：地點搜尋、LINE／Reddit 篩選、州別地圖鈕與 Facebook／Reddit 平台搜尋；只列公開入口，本站無管理權，不做站內配對。
-- **集簽郵遞區號初篩**（visa.html）：郵遞區號＋工作類型 → 比對留存的 subclass 417 清單；不取代實際職務、日期、支薪與個人資格查核。
+- **集簽郵遞區號初篩**（visa.html）：郵遞區號＋工作類型 → 比對留存的 subclass 417 清單；不取代實際職務、日期、支薪與個人資格查核。
 - **集簽透明地圖**（map.html）：州別圖層視覺化官方 specified-work 郵遞區號，並疊加可回查的採收月份；不含雇主名單。
   資料檔 `assets/postcodes.js` 抓取自內政部 specified-work 官方頁（2026-08-29），
   官方更新宣告區時請同步更新此檔。
+- **公開求職篩選導流**（map.html `#open-job-portals`）：州別、可選城市／郵遞區號、產業預設與「想優先指定工作地區」說明勾選，在瀏覽器內產生 Workforce Australia JobSearch、Fair Work 與本站 `work.html`／`scam.html` 的公開搜尋連結；Seek 僅在可組透明搜尋網址時附「第三方、非本站職缺庫」標示。政府 Harvest Trail 職缺服務已結束，不列入產生的入口。不上傳輸入、不鏡像職缺、不列雇主。
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。

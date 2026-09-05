@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-09-04｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-09-05｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -73,6 +73,7 @@
 | `cost.html` | 物價薪水稅務、換匯與匯款、採買、買車＋存錢試算器 |
 | `housing.html` | 住宿與租屋＋合法混合搜尋 |
 | `work.html` | 找工作、查核、證照、採收季節月曆、職災 |
+| `map.html` | 集簽透明地圖（官方郵遞區號圖層）＋公開求職篩選導流（工具頁，不進全站 nav） |
 | `scam.html` | 防詐騙（手法、紅旗、救濟）＋防詐測驗 |
 | `english.html` | 英文資源與策略 |
 | `health.html` | 保險就醫心理安全 |
@@ -92,6 +93,8 @@
 | `assets/analytics-config.js`、`analytics.js` | GA4 Measurement ID（空＝停用）與 Basic Consent loader；`SENSITIVE_PATHS` 敏感頁排除（`SPEC.md` §1.5） |
 | `assets/postcodes.js` | 官方集簽郵遞區號資料（§5） |
 | `assets/seasons.js` | 各州官方採收季節資料（§5 同規則） |
+| `assets/map-transparency.js` | 集簽透明地圖：州別圖層與郵遞區號初篩（不含雇主名單） |
+| `assets/job-router.js` | 公開求職篩選導流：只組公開搜尋／權益 URL，不上傳、不列雇主 |
 | `lang/` | 語言 hub、37 個非繁中 Quick Start、`lang/en/<topic>/` 7 頁完整英文 beta；產物由 `build_i18n.py` 產生 |
 | `.github/ISSUE_TEMPLATE/` | report／idea／thanks／collaborate 結構化表單 |
 | `CNAME`、`sitemap.xml`、`robots.txt`、`llms.txt` | 正式網域、搜尋探索、crawler 開放與 AI 導覽 |
@@ -101,6 +104,7 @@
 | `scripts/check.ps1` | 驗收腳本（`SPEC.md` §4） |
 | `scripts/test_housing_search.mjs` | 住宿搜尋 DOM 行為回放 |
 | `scripts/test_tools.mjs` | 集簽快查器與存錢試算器固定案例回放（`SPEC.md` §4） |
+| `scripts/test_job_router.mjs` | 公開求職篩選導流：公開入口 URL 與 map.html 腳本引用 |
 | `scripts/test_analytics.cjs` | GA4 敏感頁排除行為測試（vm 沙盒） |
 | `worker/` | 獨立無框架 Cloudflare Worker：`src/`（http、cors、body、turnstile、rate-limit、tokens、repository、mail、contact、contact-validation、metrics、accommodation、assist、index）、`migrations/`（0001–0003）、`test/`、`wrangler.jsonc`（D1 ID 為全零佔位、無 `env`）、`README.md` |
 | `docs/` | 交接文件；分工見 `docs/README.md` |

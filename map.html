@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-01" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-02" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -50,20 +50,32 @@
       "name": "集簽透明地圖：指定工作地區與採收月份｜澳打指南針",
       "description": "用官方指定工作郵遞區號與州政府採收月份，視覺化查看澳洲打工度假二簽／三簽可能地區。永久免費、可回查來源，不蒐集雇主名單。",
       "inLanguage": "zh-Hant",
-      "isPartOf": { "@id": "https://www.aussiewhvcompass.com/#website" },
+      "isPartOf": {
+        "@id": "https://www.aussiewhvcompass.com/#website"
+      },
       "isAccessibleForFree": true,
       "license": "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant",
       "publishingPrinciples": "https://www.aussiewhvcompass.com/crawler-policy.txt",
       "subjectOf": "https://www.aussiewhvcompass.com/content-status.json",
       "image": "https://www.aussiewhvcompass.com/assets/og-cover.png",
-      "dateModified": "2026-09-05"
+      "dateModified": "2026-09-02"
     },
     {
       "@type": "BreadcrumbList",
       "@id": "https://www.aussiewhvcompass.com/map.html#breadcrumb",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "澳打指南針", "item": "https://www.aussiewhvcompass.com/" },
-        { "@type": "ListItem", "position": 2, "name": "集簽透明地圖", "item": "https://www.aussiewhvcompass.com/map.html" }
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "澳打指南針",
+          "item": "https://www.aussiewhvcompass.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "集簽透明地圖：指定工作地區與採收月份",
+          "item": "https://www.aussiewhvcompass.com/map.html"
+        }
       ]
     }
   ]
@@ -73,7 +85,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20260905-01">
+<link rel="stylesheet" href="assets/style.css?v=20260905-02">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -89,7 +101,6 @@
       <a href="cost.html">物價薪水</a>
       <a href="housing.html">住宿租屋</a>
       <a href="work.html">找工作</a>
-      <a class="active" aria-current="page" href="map.html">集簽地圖</a>
       <a href="scam.html">防詐騙</a>
       <a href="english.html">英文</a>
       <a href="health.html">健康安全</a>
@@ -112,10 +123,11 @@
     <ul class="answer-card-points">
       <li><a href="#transparency-map">州別地圖與圖層</a></li>
       <li><a href="#tm-postcode-panel">郵遞區號初篩</a></li>
-      <li><a href="#open-job-portals">公開求職入口（非本站職缺庫）</a></li>
+      <li><a href="#open-job-portals">公開求職篩選導流（非本站職缺庫）</a></li>
     </ul>
     <div class="answer-card-actions">
       <a class="btn answer-card-primary" href="#transparency-map">開始用地圖查</a>
+      <a class="btn secondary" href="#open-job-portals">產生公開求職連結</a>
       <a class="answer-card-official" href="visa.html#postcode-tool">簽證頁完整初篩工具<svg class="answer-card-ext" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 4h6v6M20 4l-9 9M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg><span class="sr-only">（站內連結）</span></a>
     </div>
   </section>
@@ -172,14 +184,57 @@
     <div id="tm-postcode-result" class="tm-postcode-result" aria-live="polite"></div>
   </section>
 
-  <section id="open-job-portals" aria-labelledby="portals-heading">
-    <h2 id="portals-heading">公開求職入口（透明、可回查）</h2>
-    <p>以下是政府或可公開造訪的入口。本站<strong>不鏡像、不爬取</strong>第三方職缺庫；點進去後請自己核對雇主、合約與薪資。</p>
+  <section id="open-job-portals" class="jr-root" aria-labelledby="portals-heading">
+    <h2 id="portals-heading">公開求職篩選導流</h2>
+    <p>選州別、可選城市或郵遞區號、產業，產生<strong>公開搜尋網址</strong>。本站<strong>不提供雇主名單、職缺配對或付費點數</strong>；輸入只留在這個分頁，不上傳。</p>
+    <div class="note">政府 Harvest Trail 職缺服務已於 2024-06-30 結束，現行官方職缺板是 <a href="https://www.workforceaustralia.gov.au/individuals/jobs/search" rel="noopener">Workforce Australia JobSearch</a>。網路上沿用「harvest trail」名稱的私人網站不是官方。<span class="fact-meta">來源：<a href="https://www.dewr.gov.au/harvest-trail" rel="noopener">就業部 Harvest Trail 說明</a>・<a href="work.html#channels">本站找工作頁 2026-08 查核</a></span></div>
+
+    <form id="job-router-form" class="jr-form" method="get" action="#job-router-results">
+      <label for="jr-state">州或領地</label>
+      <select id="jr-state" name="state" required>
+        <option value="">請選擇</option>
+        <option value="NSW">NSW 新南威爾斯</option>
+        <option value="VIC">VIC 維多利亞</option>
+        <option value="QLD">QLD 昆士蘭</option>
+        <option value="WA">WA 西澳</option>
+        <option value="SA">SA 南澳</option>
+        <option value="TAS">TAS 塔斯馬尼亞</option>
+        <option value="NT">NT 北領地</option>
+        <option value="ACT">ACT 首都領地</option>
+      </select>
+
+      <label for="jr-place">城市或郵遞區號（選填）</label>
+      <input id="jr-place" name="place" type="text" maxlength="80" autocomplete="off" placeholder="例：Cairns 或 4870">
+
+      <label for="jr-industry">產業預設</label>
+      <select id="jr-industry" name="industry">
+        <option value="agriculture">農業／採收</option>
+        <option value="hospitality">餐旅／服務</option>
+        <option value="construction">營建／施工</option>
+        <option value="other">其他／未指定</option>
+      </select>
+
+      <label class="jr-check" for="jr-specified">
+        <input id="jr-specified" name="specified" type="checkbox" value="1">
+        <span>想優先指定工作地區（只顯示說明與官方連結，不會替你篩職缺或判定簽證）</span>
+      </label>
+
+      <button class="btn" type="submit">產生公開求職連結</button>
+    </form>
+    <p id="job-router-status" class="jr-status" role="status" aria-live="polite">選完條件後按產生。沒有 JavaScript 時，請用下方公開入口。</p>
+
+    <h3 id="jr-results-heading" class="jr-results-heading" tabindex="-1">產生的公開入口</h3>
+    <div id="job-router-results" class="jr-results" aria-live="polite">
+      <p class="fact-meta">送出後會在這裡列出搜尋網址。本站不會出現雇主名單。</p>
+    </div>
+
+    <h3 id="jr-fallback-heading">固定公開入口（不依篩選改寫）</h3>
+    <p>以下連結隨時可開。有 JavaScript 時，上方表單會另外組出帶地點／關鍵字的搜尋網址。</p>
     <ul class="tm-portal-list">
-      <li><a href="https://www.harvesttrail.gov.au/" rel="noopener">Harvest Trail（澳洲政府採收工作入口）</a></li>
+      <li><a href="https://www.workforceaustralia.gov.au/individuals/jobs/search" rel="noopener">Workforce Australia JobSearch（政府職缺板）</a></li>
+      <li><a href="https://www.dewr.gov.au/harvest-trail" rel="noopener">Harvest Trail 服務說明（已結束，改走 JobSearch）</a></li>
       <li><a href="https://www.fairwork.gov.au/" rel="noopener">Fair Work Ombudsman（最低薪資與職場權益）</a></li>
-      <li><a href="https://jobsearch.gov.au/" rel="noopener">Workforce Australia JobSearch</a></li>
-      <li><a href="https://www.agriculture.gov.au/" rel="noopener">澳洲農業部（產業與季節背景）</a></li>
+      <li><a href="https://horticulture.fairwork.gov.au/working-the-harvest-trail" rel="noopener">Fair Work：Working the Harvest Trail</a></li>
       <li><a href="work.html">本站「找工作」攻略：管道、紅旗與證照</a></li>
       <li><a href="scam.html">防詐騙：先認手法再出門</a></li>
     </ul>
@@ -200,9 +255,14 @@
   <p class="fact-meta">本站不是澳洲政府、移民代理、法律或醫療服務。</p>
 </footer>
 
-<script src="assets/main.js?v=20260905-01" defer></script>
-<script src="assets/postcodes.js?v=20260905-01" defer></script>
-<script src="assets/seasons.js?v=20260905-01" defer></script>
-<script src="assets/map-transparency.js?v=20260905-01" defer></script>
+<script src="assets/analytics-config.js?v=20260905-02" defer></script>
+<script src="assets/analytics.js?v=20260905-02" defer></script>
+<script src="assets/i18n.js?v=20260905-02" defer></script>
+<script src="assets/api-config.js?v=20260905-02" defer></script>
+<script src="assets/main.js?v=20260905-02" defer></script>
+<script src="assets/postcodes.js?v=20260905-02" defer></script>
+<script src="assets/seasons.js?v=20260905-02" defer></script>
+<script src="assets/map-transparency.js?v=20260905-02" defer></script>
+<script src="assets/job-router.js?v=20260905-02" defer></script>
 </body>
 </html>
