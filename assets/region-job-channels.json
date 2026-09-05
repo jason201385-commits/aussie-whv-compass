@@ -1,0 +1,364 @@
+{
+  "version": 1,
+  "retrieved": "2026-09-05",
+  "note_zh": "本資料只收錄公開／官方／開放求職管道與搜尋深連結，不是雇主名單、不是職缺庫、也不爬取第三方職缺。點連結後請自行核對 ABN、合約與薪資。",
+  "note_en": "Curated public/official/open job channels and search deep-links only — not an employer database, not scraped listings. Verify ABN, contracts and pay yourself.",
+  "national": [
+    {
+      "id": "workforce-au",
+      "kind": "government",
+      "label_zh": "Workforce Australia JobSearch（政府職缺板）",
+      "label_en": "Workforce Australia JobSearch (government jobs board)",
+      "url": "https://www.workforceaustralia.gov.au/individuals/jobs/search",
+      "note_zh": "現行官方職缺板。Harvest Trail 政府職缺服務已於 2024-06-30 結束；進站後用 harvest／farm／hospitality 等關鍵字自行搜尋。"
+    },
+    {
+      "id": "dewr-harvest-trail",
+      "kind": "official_info",
+      "label_zh": "DEWR：Harvest Trail 服務說明（已結束）",
+      "label_en": "DEWR Harvest Trail service note (ended)",
+      "url": "https://www.dewr.gov.au/harvest-trail",
+      "note_zh": "說明舊 Harvest Trail 服務現況；不是職缺板。請改走 Workforce Australia。"
+    },
+    {
+      "id": "fairwork-harvest",
+      "kind": "rights",
+      "label_zh": "Fair Work：Working the Harvest Trail（權益）",
+      "label_en": "Fair Work: Working the Harvest Trail (rights)",
+      "url": "https://horticulture.fairwork.gov.au/working-the-harvest-trail",
+      "note_zh": "採收／園藝最低條件與自保提醒。不是職缺名單。"
+    },
+    {
+      "id": "fairwork-visa",
+      "kind": "rights",
+      "label_zh": "Fair Work：簽證持有人與移工權益",
+      "label_en": "Fair Work: visa holders and migrants",
+      "url": "https://www.fairwork.gov.au/find-help-for/visa-holders-migrants",
+      "note_zh": "打工度假簽證適用同一套最低薪資與職場條件。"
+    },
+    {
+      "id": "specified-work",
+      "kind": "rights",
+      "label_zh": "內政部 specified-work 官方頁",
+      "label_en": "Home Affairs specified work (official)",
+      "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work",
+      "note_zh": "二簽／三簽指定工作定義與郵遞區號以這頁為準。地區符合 ≠ 工作符合 ≠ 簽證核准。"
+    },
+    {
+      "id": "abn-lookup",
+      "kind": "rights",
+      "label_zh": "ABN Lookup（查雇主登記）",
+      "label_en": "ABN Lookup (employer register check)",
+      "url": "https://abr.business.gov.au/",
+      "note_zh": "接工作前核對 ABN 狀態與登記名稱。官方免費工具。"
+    }
+  ],
+  "states": {
+    "NSW": {
+      "name_zh": "新南威爾斯",
+      "name_en": "New South Wales",
+      "hub_hint_zh": "常見區域農業樞紐含 Griffith、Orange、Riverina 等；以下為全州公開管道。",
+      "channels": [
+        {
+          "id": "nsw-help-harvest",
+          "kind": "government",
+          "label_zh": "NSW 政府：Help harvest NSW",
+          "label_en": "NSW Government: Help harvest NSW",
+          "url": "https://www.nsw.gov.au/employment/help-harvest-nsw",
+          "note_zh": "州政府季節性農業工作入口（彙整公開求職資源）。頁面可能仍提到舊 Harvest Trail，實際職缺請改走 Workforce Australia／Seek 等。"
+        },
+        {
+          "id": "nsw-safework",
+          "kind": "rights",
+          "label_zh": "SafeWork NSW：職場權利基礎",
+          "label_en": "SafeWork NSW: the basics — your rights at work",
+          "url": "https://www.safework.nsw.gov.au/resource-library/WHS/the-basics-your-rights-at-work",
+          "note_zh": "州職安與權利入口，不是職缺板。"
+        }
+      ]
+    },
+    "VIC": {
+      "name_zh": "維多利亞",
+      "name_en": "Victoria",
+      "hub_hint_zh": "Sunraysia／Mildura、Goulburn Valley 等為常見採收區。",
+      "channels": [
+        {
+          "id": "vic-ag-harvest",
+          "kind": "government",
+          "label_zh": "Agriculture Victoria：如何找採收工作",
+          "label_en": "Agriculture Victoria: how to get a harvest job",
+          "url": "https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest/how-to-get-a-harvest-job",
+          "note_zh": "州政府採收工作說明與產季概覽；會導向公開職缺板與技能中心，不是雇主名單。"
+        },
+        {
+          "id": "vic-workforce-harvest",
+          "kind": "official_info",
+          "label_zh": "Agriculture Victoria：Workforce and harvest",
+          "label_en": "Agriculture Victoria: Workforce and harvest",
+          "url": "https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest",
+          "note_zh": "州農業人力／採收主題入口。"
+        }
+      ]
+    },
+    "QLD": {
+      "name_zh": "昆士蘭",
+      "name_en": "Queensland",
+      "hub_hint_zh": "Bundaberg、Bowen、Cairns／FNQ、Stanthorpe 等為常見季節工樞紐。",
+      "channels": [
+        {
+          "id": "qld-find-ag-workers",
+          "kind": "government",
+          "label_zh": "Business Queensland：農業找人／求職資源",
+          "label_en": "Business Queensland: finding agriculture workers",
+          "url": "https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/business/workforce/find",
+          "note_zh": "州政府農業人力頁；含公開招募管道說明（對求職者也有用）。"
+        },
+        {
+          "id": "qld-qawn",
+          "kind": "government",
+          "label_zh": "Queensland Agriculture Workforce Network (QAWN)",
+          "label_en": "Queensland Agriculture Workforce Network (QAWN)",
+          "url": "https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/business/workforce/qawn",
+          "note_zh": "州資助農業人力網絡說明頁（主要服務業者，可查區域聯絡資訊）。"
+        },
+        {
+          "id": "qld-pick-burdekin",
+          "kind": "government",
+          "label_zh": "Burdekin Shire：Pick the Burdekin（季節工）",
+          "label_en": "Burdekin Shire: Pick the Burdekin",
+          "url": "https://www.burdekin.qld.gov.au/Business-and-investment/Pick-Burdekin",
+          "note_zh": "地方政府季節性農業工作公開頁；非本站職缺庫。"
+        }
+      ]
+    },
+    "WA": {
+      "name_zh": "西澳",
+      "name_en": "Western Australia",
+      "hub_hint_zh": "西南果園／葡萄區與北部熱帶作物區距離遠，交通規劃很重要。",
+      "channels": [
+        {
+          "id": "wa-jobs-board",
+          "kind": "government",
+          "label_zh": "WA Government jobs（州政府職缺）",
+          "label_en": "WA Government jobs board",
+          "url": "https://search.jobs.wa.gov.au/",
+          "note_zh": "州政府公開職缺搜尋（含部分區域／季節相關職缺，視當季刊登）。"
+        },
+        {
+          "id": "wa-agriculture",
+          "kind": "official_info",
+          "label_zh": "DPIRD WA：Agriculture and Food",
+          "label_en": "DPIRD WA: Agriculture and Food",
+          "url": "https://www.agric.wa.gov.au/",
+          "note_zh": "西澳農業與食品官方入口；產季與產業資訊，不是職缺庫。"
+        }
+      ]
+    },
+    "SA": {
+      "name_zh": "南澳",
+      "name_en": "South Australia",
+      "hub_hint_zh": "Riverland、東南等為常見園藝／穀物季區域。",
+      "channels": [
+        {
+          "id": "sa-pirsa",
+          "kind": "government",
+          "label_zh": "PIRSA：Primary Industries and Regions SA",
+          "label_en": "PIRSA: Primary Industries and Regions SA",
+          "url": "https://www.pir.sa.gov.au/",
+          "note_zh": "南澳農林漁業官方入口；產業與區域資訊。"
+        },
+        {
+          "id": "sa-bunge-harvest",
+          "kind": "commercial",
+          "label_zh": "Bunge Australia：Harvest jobs（公開招募頁）",
+          "label_en": "Bunge Australia: Harvest jobs (public recruitment)",
+          "url": "https://www.bunge.com/Australia/Harvest-jobs",
+          "note_zh": "大型穀物業者季節招募公開頁（SA／西維多利亞等站點視當季開放）。第三方、非本站職缺庫。"
+        }
+      ]
+    },
+    "TAS": {
+      "name_zh": "塔斯馬尼亞",
+      "name_en": "Tasmania",
+      "hub_hint_zh": "全島多數區域可計入指定工作；產季幾乎全年有不同作物。",
+      "channels": [
+        {
+          "id": "tas-nre-harvest",
+          "kind": "government",
+          "label_zh": "NRE Tasmania：Harvest jobs",
+          "label_en": "NRE Tasmania: Harvest jobs",
+          "url": "https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs",
+          "note_zh": "州政府採收工作說明與公開求職建議。"
+        },
+        {
+          "id": "tas-nre-dates",
+          "kind": "official_info",
+          "label_zh": "NRE Tasmania：季節產季日期",
+          "label_en": "NRE Tasmania: seasonal produce harvest dates",
+          "url": "https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs/seasonal-produce-harvest-dates",
+          "note_zh": "官方產季月份參考；不保證職缺。"
+        }
+      ]
+    },
+    "NT": {
+      "name_zh": "北領地",
+      "name_en": "Northern Territory",
+      "hub_hint_zh": "全領地常被視為指定工作／北澳相關範圍；熱季與雨季規劃很重要。",
+      "channels": [
+        {
+          "id": "nt-fruit",
+          "kind": "government",
+          "label_zh": "NT Government：Fruit crops availability",
+          "label_en": "NT Government: fruit crops availability",
+          "url": "https://nt.gov.au/industry/agriculture/food-crops-plants-and-quarantine/fruit-crops/fruit-availability-and-storage",
+          "note_zh": "北領地水果產季／供應公開資訊。"
+        },
+        {
+          "id": "nt-jobs",
+          "kind": "government",
+          "label_zh": "NT Government：Jobs in the NT",
+          "label_en": "NT Government: Jobs in the NT",
+          "url": "https://nt.gov.au/employ",
+          "note_zh": "領地政府就業相關入口。"
+        }
+      ]
+    },
+    "ACT": {
+      "name_zh": "首都領地",
+      "name_en": "Australian Capital Territory",
+      "hub_hint_zh": "ACT 通常不在區域澳洲指定工作郵遞區號清單內；仍可用全國公開職缺板找一般工作。",
+      "channels": [
+        {
+          "id": "act-jobs",
+          "kind": "government",
+          "label_zh": "ACT Government jobs",
+          "label_en": "ACT Government jobs",
+          "url": "https://www.jobs.act.gov.au/",
+          "note_zh": "首都領地政府職缺板。"
+        }
+      ]
+    }
+  },
+  "hubs": [
+    {
+      "id": "mildura",
+      "name": "Mildura",
+      "name_zh": "Mildura（Sunraysia）",
+      "state": "VIC",
+      "lat": -34.185,
+      "lng": 142.162,
+      "note_zh": "策展樞紐（非完整清單）：柑橘／葡萄等園藝季常見；請用下方公開搜尋連結自查。",
+      "default_keywords": "fruit picker",
+      "channels": [
+        {
+          "id": "hub-mildura-agvic",
+          "kind": "government",
+          "label_zh": "Agriculture Victoria：採收工作說明",
+          "label_en": "Agriculture Victoria harvest jobs guide",
+          "url": "https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest/how-to-get-a-harvest-job",
+          "note_zh": "州政府說明含 Sunraysia 等區域產季概覽。"
+        }
+      ]
+    },
+    {
+      "id": "bundaberg",
+      "name": "Bundaberg",
+      "name_zh": "Bundaberg",
+      "state": "QLD",
+      "lat": -24.866,
+      "lng": 152.348,
+      "note_zh": "策展樞紐：昆士蘭常見季節工／農作區域之一。",
+      "default_keywords": "fruit picker harvest",
+      "channels": [
+        {
+          "id": "hub-bundaberg-qld",
+          "kind": "government",
+          "label_zh": "Business Queensland：農業人力資源",
+          "label_en": "Business Queensland agriculture workforce",
+          "url": "https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/business/workforce/find",
+          "note_zh": "州政府公開管道說明。"
+        }
+      ]
+    },
+    {
+      "id": "cairns",
+      "name": "Cairns",
+      "name_zh": "Cairns（遠北昆）",
+      "state": "QLD",
+      "lat": -16.918,
+      "lng": 145.778,
+      "note_zh": "策展樞紐：觀光餐旅＋北部農業／季節工常見進出點。",
+      "default_keywords": "hospitality",
+      "channels": [
+        {
+          "id": "hub-cairns-qld",
+          "kind": "government",
+          "label_zh": "Business Queensland：農業人力資源",
+          "label_en": "Business Queensland agriculture workforce",
+          "url": "https://www.business.qld.gov.au/industries/farms-fishing-forestry/agriculture/business/workforce/find",
+          "note_zh": "遠北農業與公開招募管道入口。"
+        }
+      ]
+    },
+    {
+      "id": "hobart",
+      "name": "Hobart",
+      "name_zh": "Hobart",
+      "state": "TAS",
+      "lat": -42.882,
+      "lng": 147.327,
+      "note_zh": "策展樞紐：塔州進出點；全島多數區域可作指定工作規劃參考。",
+      "default_keywords": "fruit picker",
+      "channels": [
+        {
+          "id": "hub-hobart-nre",
+          "kind": "government",
+          "label_zh": "NRE Tasmania：Harvest jobs",
+          "label_en": "NRE Tasmania harvest jobs",
+          "url": "https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs",
+          "note_zh": "州政府採收工作公開說明。"
+        }
+      ]
+    },
+    {
+      "id": "darwin",
+      "name": "Darwin",
+      "name_zh": "Darwin",
+      "state": "NT",
+      "lat": -12.463,
+      "lng": 130.845,
+      "note_zh": "策展樞紐：北領地進出點；熱季與雨季影響職缺節奏。",
+      "default_keywords": "hospitality farm",
+      "channels": [
+        {
+          "id": "hub-darwin-nt",
+          "kind": "government",
+          "label_zh": "NT Government：就業入口",
+          "label_en": "NT Government employment",
+          "url": "https://nt.gov.au/employ",
+          "note_zh": "領地政府公開就業相關入口。"
+        }
+      ]
+    }
+  ],
+  "deep_link_boards": [
+    {
+      "id": "seek",
+      "label_zh": "Seek 公開搜尋",
+      "label_en": "Seek public search",
+      "kind": "commercial"
+    },
+    {
+      "id": "indeed",
+      "label_zh": "Indeed 公開搜尋",
+      "label_en": "Indeed public search",
+      "kind": "commercial"
+    },
+    {
+      "id": "jora",
+      "label_zh": "Jora 公開搜尋",
+      "label_en": "Jora public search",
+      "kind": "commercial"
+    }
+  ]
+}

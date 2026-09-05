@@ -31,6 +31,10 @@
   var geoLayer = null;
   var map = null;
   var geojsonData = null;
+  var channelData = null;
+  var hubLayer = null;
+  var selectedHubId = null;
+  var CACHE_V = "20260905-04";
 
   var LAYERS = {
     regional: {
@@ -121,14 +125,178 @@
     });
   }
 
+
+  function kindLabelZh(kind) {
+    if (kind === "government") return "政府入口";
+    if (kind === "rights") return "權益／官方";
+    if (kind === "official_info") return "官方說明";
+    if (kind === "commercial") return "第三方";
+    if (kind === "site") return "本站";
+    return "公開管道";
+  }
+
+  function linkItemHtml(link) {
+    var external = /^(https?:)?\/\//.test(link.url || link.href || "");
+    var href = link.url || link.href || "#";
+    var title = link.label_zh || link.title || href;
+    var note = link.note_zh || link.note || "";
+    var kind = link.kind || "";
+    var rel = ' rel="noopener noreferrer' + (kind === "commercial" ? " nofollow" : "") + '"';
+    var target = external ? ' target="_blank"' : "";
+    var html = "<li class=\"tm-channel-item\">";
+    html += '<p class="jr-meta"><span class="jr-badge">' + escapeHtml(kindLabelZh(kind)) + "</span>";
+    if (kind === "commercial") html += ' <span class="jr-disclaimer">第三方、非本站職缺庫</span>';
+    html += "</p>";
+    html += "<p><a class=\"btn" + (kind === "commercial" ? " secondary" : "") + "\" href=\"" +
+      escapeHtml(href) + "\"" + target + rel + ">" + escapeHtml(title);
+    if (external) html += '<span class="sr-only">（另開新頁）</span>';
+    html += "</a></p>";
+    if (note) html += '<p class="jr-note">' + escapeHtml(note) + "</p>";
+    html += "</li>";
+    return html;
+  }
+
+  function deepLinksForPlace(stateCode, place, keywords) {
+    var links = [];
+    var kw = keywords || "fruit picker";
+    var whereSeek = place ? (place + " " + stateCode) : null;
+    var jr = window.WHV_JOB_ROUTER;
+    var stMeta = jr && jr.STATES && jr.STATES[stateCode];
+    var seekWhere = place
+      ? (place + " " + stateCode)
+      : (stMeta ? stMeta.name : stateCode);
+    var indeedWhere = seekWhere;
+    if (jr && typeof jr.seekUrl === "function") {
+      links.push({
+        kind: "commercial",
+        label_zh: "Seek 公開搜尋（" + kw + " · " + seekWhere + "）",
+        url: jr.seekUrl(kw, seekWhere),
+        note_zh: "這是 Seek 自己的公開搜尋網址深連結。本站不爬職缺、沒有雇主庫。"
+      });
+    } else {
+      links.push({
+        kind: "commercial",
+        label_zh: "Seek 公開搜尋",
+        url: "https://www.seek.com.au/jobs?keywords=" + encodeURIComponent(kw) +
+          "&where=" + encodeURIComponent(seekWhere),
+        note_zh: "Seek 公開搜尋深連結。本站不爬職缺。"
+      });
+    }
+    var indeedFn = jr && jr.indeedUrl;
+    var indeedHref = typeof indeedFn === "function"
+      ? indeedFn(kw, indeedWhere)
+      : ("https://au.indeed.com/jobs?q=" + encodeURIComponent(kw) + "&l=" + encodeURIComponent(indeedWhere));
+    links.push({
+      kind: "commercial",
+      label_zh: "Indeed 公開搜尋（" + kw + " · " + indeedWhere + "）",
+      url: indeedHref,
+      note_zh: "Indeed 公開搜尋深連結。本站不鏡像職缺。"
+    });
+    var joraFn = jr && jr.joraUrl;
+    var joraHref = typeof joraFn === "function"
+      ? joraFn(kw, indeedWhere)
+      : ("https://au.jora.com/j?q=" + encodeURIComponent(kw) + "&l=" + encodeURIComponent(indeedWhere));
+    links.push({
+      kind: "commercial",
+      label_zh: "Jora 公開搜尋（" + kw + " · " + indeedWhere + "）",
+      url: joraHref,
+      note_zh: "Jora 公開搜尋深連結。本站不鏡像職缺。"
+    });
+    return links;
+  }
+
+  function renderChannelsBlock(opts) {
+    opts = opts || {};
+    if (!channelData) {
+      return '<p class="fact-meta">公開求職管道資料載入中或失敗；下方「公開求職篩選導流」仍可產生搜尋連結。</p>';
+    }
+    var stateCode = opts.stateCode;
+    var hub = opts.hub;
+    var html = "";
+    html += '<div class="tm-channels">';
+    html += '<p class="section-eyebrow">公開求職管道</p>';
+    if (hub) {
+      html += "<h3>" + escapeHtml(hub.name_zh || hub.name) + " · 策展樞紐</h3>";
+      html += "<p>" + escapeHtml(hub.note_zh || "") + "</p>";
+    } else if (stateCode && stateCode !== "ALL") {
+      var st = channelData.states && channelData.states[stateCode];
+      var title = st ? ((st.name_zh || "") + " " + stateCode) : stateCode;
+      html += "<h3>" + escapeHtml(title) + " 可查管道</h3>";
+      if (st && st.hub_hint_zh) html += "<p>" + escapeHtml(st.hub_hint_zh) + "</p>";
+    } else {
+      html += "<h3>點州／領地或橘色樞紐，看該地公開管道</h3>";
+      html += "<p>" + escapeHtml(channelData.note_zh || "") + "</p>";
+    }
+    html += '<p class="note">只列<strong>公開／官方／開放搜尋入口</strong>，不是雇主名單；也不爬 SEEK／Indeed 職缺進資料庫。</p>';
+
+    var items = [];
+    if (hub && hub.channels) items = items.concat(hub.channels);
+    if (stateCode && stateCode !== "ALL" && channelData.states && channelData.states[stateCode]) {
+      items = items.concat(channelData.states[stateCode].channels || []);
+    }
+    if (channelData.national) items = items.concat(channelData.national);
+
+    // de-dupe by id/url
+    var seen = Object.create(null);
+    var uniq = [];
+    items.forEach(function (it) {
+      var key = it.id || it.url;
+      if (!key || seen[key]) return;
+      seen[key] = true;
+      uniq.push(it);
+    });
+
+    html += '<ul class="jr-links tm-channel-list">';
+    uniq.forEach(function (it) { html += linkItemHtml(it); });
+
+    var place = hub ? hub.name : "";
+    var kw = (hub && hub.default_keywords) || "fruit picker";
+    if (stateCode && stateCode !== "ALL") {
+      deepLinksForPlace(stateCode, place, kw).forEach(function (dl) {
+        html += linkItemHtml(dl);
+      });
+    }
+    html += "</ul>";
+
+    html += '<p class="fact-meta">管道資料抓取：' + escapeHtml(channelData.retrieved || "") +
+      ' · 橘色圓點＝策展 WHV 樞紐（非完整清單）</p>';
+    html += '<p><a class="btn secondary" href="#open-job-portals">用表單自訂關鍵字產生更多搜尋連結</a></p>';
+    html += "</div>";
+    return html;
+  }
+
+  function syncJobRouterState(code) {
+    var sel = document.getElementById("jr-state");
+    if (!sel || !code || code === "ALL") return;
+    sel.value = code;
+  }
+
+  function selectHub(hubId) {
+    selectedHubId = hubId || null;
+    if (hubLayer) {
+      hubLayer.eachLayer(function (m) {
+        var id = m.options && m.options.hubId;
+        var on = id && id === selectedHubId;
+        m.setStyle({
+          radius: on ? 9 : 7,
+          weight: on ? 2.5 : 2,
+          fillColor: on ? "#c05621" : "#f6ad55",
+          color: on ? "#27342e" : "#9c4221"
+        });
+      });
+    }
+  }
+
   function currentGroup() {
     var layerKey = layerSelect ? layerSelect.value : "regional";
     var layer = LAYERS[layerKey] || LAYERS.regional;
     return { layer: layer, group: layer.getGroup() || {}, key: layerKey };
   }
 
-  function setActiveState(code) {
+  function setActiveState(code, opts) {
+    opts = opts || {};
     selectedState = code || "ALL";
+    if (!opts.keepHub) selectHub(null);
     stateButtons.forEach(function (btn) {
       var on = btn.getAttribute("data-tm-state") === selectedState;
       btn.classList.toggle("active", on);
@@ -136,6 +304,7 @@
     });
     if (stateSelect) stateSelect.value = selectedState;
     if (geoLayer) geoLayer.setStyle(styleFeature);
+    syncJobRouterState(selectedState);
     render();
   }
 
@@ -207,7 +376,43 @@
         offset: [8, 0]
       }).addTo(map);
     });
+    addHubMarkers();
     setTimeout(function () { if (map) map.invalidateSize(); }, 80);
+  }
+
+  function addHubMarkers() {
+    if (!map || typeof L === "undefined") return;
+    if (hubLayer) {
+      map.removeLayer(hubLayer);
+      hubLayer = null;
+    }
+    if (!channelData || !channelData.hubs || !channelData.hubs.length) return;
+    hubLayer = L.layerGroup().addTo(map);
+    channelData.hubs.forEach(function (hub) {
+      var marker = L.circleMarker([hub.lat, hub.lng], {
+        radius: 7,
+        color: "#9c4221",
+        fillColor: "#f6ad55",
+        fillOpacity: 0.95,
+        weight: 2,
+        hubId: hub.id,
+        className: "tm-hub-marker"
+      });
+      marker.bindTooltip((hub.name_zh || hub.name) + " · 策展樞紐", {
+        sticky: true,
+        className: "tm-state-tooltip"
+      });
+      marker.on("click", function (e) {
+        if (e && e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
+        setActiveState(hub.state, { keepHub: true });
+        selectHub(hub.id);
+        var placeEl = document.getElementById("jr-place");
+        if (placeEl) placeEl.value = hub.name;
+        render();
+        if (detail) detail.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+      hubLayer.addLayer(marker);
+    });
   }
 
   function renderSeasons(code) {
@@ -247,7 +452,7 @@
     html += '<p class="fact-meta">地圖底圖：OpenStreetMap ・ 州界 GeoJSON 開源資料（見 assets 說明）</p>';
 
     if (selectedState === "ALL") {
-      html += "<p><strong>全澳總覽：</strong>點地圖上的州／領地；金色＝此圖層有列出範圍。</p><ul>";
+      html += "<p><strong>全澳總覽：</strong>點地圖上的州／領地看指定工作範圍與<strong>公開求職管道</strong>；金色＝此圖層有列出範圍；橘色點＝策展樞紐。</p><ul>";
       ["NSW","VIC","QLD","WA","SA","TAS","NT","ACT"].forEach(function (code) {
         var mark = stateHasCoverage(group, code) ? "有" : "無";
         html += "<li><strong>" + code + "</strong> " + mark + " " + escapeHtml(summarizeList(group[code])) + "</li>";
@@ -264,6 +469,18 @@
       renderSeasons(selectedState);
     }
     html += '<p class="note">郵遞區號符合 ≠ 簽證核准。實際職務、支薪、天數計算與個人資格，請以內政部規則與你的證據為準。</p>';
+
+    var hub = null;
+    if (selectedHubId && channelData && channelData.hubs) {
+      for (var hi = 0; hi < channelData.hubs.length; hi++) {
+        if (channelData.hubs[hi].id === selectedHubId) { hub = channelData.hubs[hi]; break; }
+      }
+    }
+    html += renderChannelsBlock({
+      stateCode: selectedState,
+      hub: hub
+    });
+
     if (detail) detail.innerHTML = html;
   }
 
@@ -346,9 +563,28 @@
   });
 
   render();
-  fetch("assets/au-states.geojson?v=20260905-03")
+
+  var channelsPromise = fetch("assets/region-job-channels.json?v=" + CACHE_V)
+    .then(function (r) { if (!r.ok) throw new Error("channels " + r.status); return r.json(); })
+    .then(function (data) {
+      channelData = data;
+      if (map) addHubMarkers();
+      render();
+    })
+    .catch(function (err) {
+      if (typeof console !== "undefined" && console.warn) console.warn("tm channels", err);
+      channelData = null;
+      render();
+    });
+
+  fetch("assets/au-states.geojson?v=" + CACHE_V)
     .then(function (r) { if (!r.ok) throw new Error("geojson " + r.status); return r.json(); })
-    .then(function (data) { geojsonData = data; initMap(data); render(); })
+    .then(function (data) {
+      geojsonData = data;
+      initMap(data);
+      return channelsPromise;
+    })
+    .then(function () { render(); })
     .catch(function (err) {
       if (typeof console !== "undefined" && console.warn) console.warn("tm map", err);
       if (mapEl && !mapEl.querySelector(".leaflet-container")) {

@@ -94,6 +94,16 @@
       "&where=" + encodeURIComponent(where);
   }
 
+  function indeedUrl(keywords, where) {
+    return "https://au.indeed.com/jobs?q=" + encodeURIComponent(keywords) +
+      "&l=" + encodeURIComponent(where);
+  }
+
+  function joraUrl(keywords, where) {
+    return "https://au.jora.com/j?q=" + encodeURIComponent(keywords) +
+      "&l=" + encodeURIComponent(where);
+  }
+
   function fairWorkForIndustry(industry) {
     if (industry === "agriculture") {
       return {
@@ -303,6 +313,8 @@
   root.WHV_JOB_ROUTER = {
     buildLinks: buildLinks,
     seekUrl: seekUrl,
+    indeedUrl: indeedUrl,
+    joraUrl: joraUrl,
     STATES: STATES,
     INDUSTRIES: INDUSTRIES,
     PORTALS: PORTALS

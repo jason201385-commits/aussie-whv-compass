@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-03" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-04" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -86,7 +86,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="assets/style.css?v=20260905-03">
+<link rel="stylesheet" href="assets/style.css?v=20260905-04">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -114,7 +114,7 @@
 
 <main id="main-content" tabindex="-1">
   <h1 class="page-title">集簽透明地圖</h1>
-  <p class="page-sub">把內政部公開的指定工作郵遞區號，畫在可縮放的澳洲地圖上；再疊上州政府可回查的採收月份。永久免費、不上傳你的查詢。<span class="updated-tag">2026-09-05 上線</span></p>
+  <p class="page-sub">把內政部公開的指定工作郵遞區號，畫在可縮放的澳洲地圖上；點州／領地或橘色樞紐，會列出該地<strong>公開求職管道</strong>（政府職缺板、州官方說明、Seek／Indeed／Jora 搜尋深連結），再疊上採收月份。永久免費、不上傳你的查詢、不爬雇主名單。<span class="updated-tag">2026-09-05 上線</span></p>
 
   <div class="note">本頁<strong>不提供雇主名單、職缺配對或付費點數</strong>。地區符合 ≠ 工作符合 ≠ 簽證核准。申請前請打開<a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">內政部 specified-work 官方頁</a>核對現行清單。</div>
 
@@ -122,7 +122,7 @@
     <p class="answer-card-tags"><span class="answer-card-tag">集簽透明</span><span class="answer-card-tag">官方郵遞區號</span><span class="answer-card-tag answer-card-tag-date">2026-08 抓取</span></p>
     <h2 id="map-first-action">先選圖層，再點州別，最後用郵遞區號初篩</h2>
     <ul class="answer-card-points">
-      <li><a href="#transparency-map">州別地圖與圖層</a></li>
+      <li><a href="#transparency-map">州別地圖、樞紐與公開求職管道</a></li>
       <li><a href="#tm-postcode-panel">郵遞區號初篩</a></li>
       <li><a href="#open-job-portals">公開求職篩選導流（非本站職缺庫）</a></li>
     </ul>
@@ -135,7 +135,7 @@
 
   <section id="transparency-map" class="tm-root" aria-labelledby="tm-heading">
     <h2 id="tm-heading">指定工作地區圖層</h2>
-    <p>可縮放的澳洲地理地圖。金色＝目前圖層在該州有列出範圍；淺色＝此圖層未列。鍵盤請用州別選單。ACT 通常不在區域澳洲清單內。</p>
+    <p>可縮放的澳洲地理地圖。點州界看指定工作範圍＋公開求職管道；橘色圓點＝策展 WHV 樞紐（Mildura、Bundaberg、Cairns、Hobart、Darwin，非完整清單）。金色＝目前圖層在該州有列出範圍；淺色＝此圖層未列。鍵盤請用州別選單。ACT 通常不在區域澳洲清單內。</p>
 
     <label class="tm-layer-label" for="tm-layer">圖層（工作類型／地區規則）</label>
     <select id="tm-layer" class="tm-layer">
@@ -147,7 +147,7 @@
 
     <div class="community-map-layout">
       <div class="community-map">
-        <p><strong>澳洲地圖</strong><small>可縮放・OpenStreetMap 底圖・州界著色</small></p>
+        <p><strong>澳洲地圖</strong><small>可縮放・點州／橘色樞紐看管道・OSM 底圖</small></p>
         <!-- Leaflet 1.9.4 + OSM tiles. State polygons: assets/au-states.geojson, simplified from rowanhogan/australian-states (ABS/Geoscape Administrative Boundaries, CC BY 4.0). Display only; not a legal boundary. -->
         <div id="tm-leaflet-map" class="tm-leaflet-map" role="region" aria-label="澳洲地理地圖：點選州或領地" tabindex="0"></div>
         <label class="tm-layer-label" for="tm-state-select">或用選單選州／領地</label>
@@ -260,15 +260,15 @@
   <p class="fact-meta">本站不是澳洲政府、移民代理、法律或醫療服務。</p>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260905-03" defer></script>
-<script src="assets/analytics.js?v=20260905-03" defer></script>
-<script src="assets/i18n.js?v=20260905-03" defer></script>
-<script src="assets/api-config.js?v=20260905-03" defer></script>
+<script src="assets/analytics-config.js?v=20260905-04" defer></script>
+<script src="assets/analytics.js?v=20260905-04" defer></script>
+<script src="assets/i18n.js?v=20260905-04" defer></script>
+<script src="assets/api-config.js?v=20260905-04" defer></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-<script src="assets/main.js?v=20260905-03" defer></script>
-<script src="assets/postcodes.js?v=20260905-03" defer></script>
-<script src="assets/seasons.js?v=20260905-03" defer></script>
-<script src="assets/map-transparency.js?v=20260905-03" defer></script>
-<script src="assets/job-router.js?v=20260905-03" defer></script>
+<script src="assets/main.js?v=20260905-04" defer></script>
+<script src="assets/postcodes.js?v=20260905-04" defer></script>
+<script src="assets/seasons.js?v=20260905-04" defer></script>
+<script src="assets/map-transparency.js?v=20260905-04" defer></script>
+<script src="assets/job-router.js?v=20260905-04" defer></script>
 </body>
 </html>
