@@ -29,7 +29,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-03" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-04" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -88,7 +88,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20260905-03">
+<link rel="stylesheet" href="assets/style.css?v=20260905-04">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body data-i18n-topic="cost">
@@ -437,24 +437,13 @@
   <div class="tool" id="save-calc" data-answer-target="tool">
     <span class="tool-tag">互動工具</span>
     <h3><svg class="icon" aria-hidden="true"><use href="#i-dollar"/></svg> 存錢試算器</h3>
-    <p>調整時薪、工時、每週住宿與其他生活支出。模型用 46 個有收入週、52 個支出週，並依 2026–27 WHM 累進稅率估算；不是薪資、稅額或存款保證。</p>
+    <p>調整時薪、工時、每週住宿、其他生活支出，以及有收入週數與支出週數。預設 46／52，可依你的計畫改；稅額依 2026–27 WHM 累進稅率估算，不是薪資、稅額或存款保證。</p>
     <div class="tool-row"><label for="calc-rate">時薪（稅前）</label><input type="range" id="calc-rate" min="20" max="60" step="0.05" value="33.05"><output id="calc-rate-out">$33.05</output></div>
     <div class="tool-row"><label for="calc-hours">每週工時</label><input type="range" id="calc-hours" min="0" max="50" step="1" value="38"><output id="calc-hours-out">38 小時</output></div>
-    <div class="tool-row"><label for="calc-city">每週住宿預算假設</label>
-      <select id="calc-city">
-        <option value="180">$180／週</option>
-        <option value="250" selected>$250／週</option>
-        <option value="350">$350／週</option>
-        <option value="500">$500／週</option>
-      </select>
-    </div>
-    <div class="tool-row"><label for="calc-life">生活型態</label>
-      <select id="calc-life">
-        <option value="160">省到極致（伙食雜支 $160/週）</option>
-        <option value="240" selected>一般規劃（$240／週）</option>
-        <option value="340">社交與移動較多（$340／週）</option>
-      </select>
-    </div>
+    <div class="tool-row"><label for="calc-city">每週住宿預算</label><input type="number" id="calc-city" min="0" max="2000" step="10" value="250" inputmode="decimal"><output id="calc-city-out">$250／週</output></div>
+    <div class="tool-row"><label for="calc-life">其他生活支出</label><input type="number" id="calc-life" min="0" max="2000" step="10" value="240" inputmode="decimal"><output id="calc-life-out">$240／週</output></div>
+    <div class="tool-row"><label for="calc-income-weeks">有收入週數</label><input type="range" id="calc-income-weeks" min="1" max="52" step="1" value="46"><output id="calc-income-weeks-out">46 週</output></div>
+    <div class="tool-row"><label for="calc-expense-weeks">支出週數</label><input type="range" id="calc-expense-weeks" min="1" max="52" step="1" value="52"><output id="calc-expense-weeks-out">52 週</output></div>
     <div class="result-card">
       <div class="result-grid">
         <div class="stat"><b id="calc-gross">—</b><span>週薪（稅前）</span></div>
@@ -465,7 +454,7 @@
         <div class="stat"><b id="calc-twd">—</b><span>換算台幣</span></div>
       </div>
       <p class="result-verdict" id="calc-verdict"></p>
-      <p class="fact-meta">估算全年 WHM 稅 <span id="calc-tax">—</span>；符合條件時雇主 super 粗估 <span id="calc-super">—</span>／有收入週。公式採 2026–27 標準 WHM 累進級距與 46 個收入週、52 個支出週；未納入扣除額、其他收入、稅務居民或條約例外、award／penalty rate、實際發薪預扣差異與 DASP。官方來源：<a href="https://www.legislation.gov.au/F2026L00716/latest/text" rel="noopener">2026 WHM withholding schedule</a>、<a href="https://www.ato.gov.au/tax-rates-and-codes/tax-rates-working-holiday-makers" rel="noopener">ATO WHM tax rates</a>。匯率僅以 22.8 示意。</p>
+      <p class="fact-meta">估算全年 WHM 稅 <span id="calc-tax">—</span>；符合條件時雇主 super 粗估 <span id="calc-super">—</span>／有收入週。公式採 2026–27 標準 WHM 累進級距，收入週與支出週依上方設定；未納入扣除額、其他收入、稅務居民或條約例外、award／penalty rate、實際發薪預扣差異與 DASP。官方來源：<a href="https://www.legislation.gov.au/F2026L00716/latest/text" rel="noopener">2026 WHM withholding schedule</a>、<a href="https://www.ato.gov.au/tax-rates-and-codes/tax-rates-working-holiday-makers" rel="noopener">ATO WHM tax rates</a>。匯率僅以 22.8 示意。</p>
     </div>
   </div>
 
@@ -490,11 +479,11 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260905-03" defer></script>
-<script src="assets/analytics.js?v=20260905-03" defer></script>
-<script src="assets/i18n.js?v=20260905-03" defer></script>
-<script src="assets/api-config.js?v=20260905-03" defer></script>
-<script src="assets/main.js?v=20260905-03" defer></script>
-<script src="assets/tools.js?v=20260905-03" defer></script>
+<script src="assets/analytics-config.js?v=20260905-04" defer></script>
+<script src="assets/analytics.js?v=20260905-04" defer></script>
+<script src="assets/i18n.js?v=20260905-04" defer></script>
+<script src="assets/api-config.js?v=20260905-04" defer></script>
+<script src="assets/main.js?v=20260905-04" defer></script>
+<script src="assets/tools.js?v=20260905-04" defer></script>
 </body>
 </html>

@@ -282,17 +282,28 @@
     var hours = document.getElementById("calc-hours");
     var city = document.getElementById("calc-city");
     var life = document.getElementById("calc-life");
+    var incomeWeeksEl = document.getElementById("calc-income-weeks");
+    var expenseWeeksEl = document.getElementById("calc-expense-weeks");
     var calcEnglish = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
-    var incomeWeeks = 46;
-    var expenseWeeks = 52;
-    var CALC_KEY = "whv-save-calc-v1";
+    var CALC_KEY = "whv-save-calc-v2";
+    var clampNum = function (el, fallback) {
+      var n = parseFloat(el && el.value);
+      if (!isFinite(n)) n = fallback;
+      var lo = el && el.min !== "" ? Number(el.min) : null;
+      var hi = el && el.max !== "" ? Number(el.max) : null;
+      if (lo !== null && isFinite(lo) && n < lo) n = lo;
+      if (hi !== null && isFinite(hi) && n > hi) n = hi;
+      return n;
+    };
     try {
-      var savedCalc = JSON.parse(localStorage.getItem(CALC_KEY) || "null");
+      var savedCalc = JSON.parse(localStorage.getItem(CALC_KEY) || localStorage.getItem("whv-save-calc-v1") || "null");
       if (savedCalc) {
         if (Number(savedCalc.rate) >= Number(rate.min) && Number(savedCalc.rate) <= Number(rate.max)) rate.value = savedCalc.rate;
         if (Number(savedCalc.hours) >= Number(hours.min) && Number(savedCalc.hours) <= Number(hours.max)) hours.value = savedCalc.hours;
-        if (Array.prototype.some.call(city.options, function (o) { return o.value === String(savedCalc.city); })) city.value = savedCalc.city;
-        if (Array.prototype.some.call(life.options, function (o) { return o.value === String(savedCalc.life); })) life.value = savedCalc.life;
+        if (savedCalc.city != null && isFinite(Number(savedCalc.city))) city.value = Number(savedCalc.city);
+        if (savedCalc.life != null && isFinite(Number(savedCalc.life))) life.value = Number(savedCalc.life);
+        if (incomeWeeksEl && savedCalc.incomeWeeks != null && isFinite(Number(savedCalc.incomeWeeks))) incomeWeeksEl.value = Number(savedCalc.incomeWeeks);
+        if (expenseWeeksEl && savedCalc.expenseWeeks != null && isFinite(Number(savedCalc.expenseWeeks))) expenseWeeksEl.value = Number(savedCalc.expenseWeeks);
       }
     } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
     var whmAnnualTax = function (income) {
@@ -302,17 +313,33 @@
       return 54100 + (income - 190000) * 0.45;
     };
     var update = function () {
-      var r = parseFloat(rate.value), h = parseFloat(hours.value);
+      var r = clampNum(rate, 33.05), h = clampNum(hours, 38);
+      var incomeWeeks = incomeWeeksEl ? clampNum(incomeWeeksEl, 46) : 46;
+      var expenseWeeks = expenseWeeksEl ? clampNum(expenseWeeksEl, 52) : 52;
+      if (incomeWeeks < 1) incomeWeeks = 1;
+      if (expenseWeeks < 1) expenseWeeks = 1;
       document.getElementById("calc-rate-out").textContent = "$" + r.toFixed(2);
       document.getElementById("calc-hours-out").textContent = h + (calcEnglish ? " hours" : " 小時");
+      var cityOut = document.getElementById("calc-city-out");
+      var lifeOut = document.getElementById("calc-life-out");
+      var incomeOut = document.getElementById("calc-income-weeks-out");
+      var expenseOut = document.getElementById("calc-expense-weeks-out");
+      var rent = clampNum(city, 250);
+      var living = clampNum(life, 240);
+      city.value = rent;
+      life.value = living;
+      if (incomeWeeksEl) incomeWeeksEl.value = incomeWeeks;
+      if (expenseWeeksEl) expenseWeeksEl.value = expenseWeeks;
+      if (cityOut) cityOut.textContent = calcEnglish ? ("$" + rent + " / week") : ("$" + rent + "／週");
+      if (lifeOut) lifeOut.textContent = calcEnglish ? ("$" + living + " / week") : ("$" + living + "／週");
+      if (incomeOut) incomeOut.textContent = incomeWeeks + (calcEnglish ? " weeks" : " 週");
+      if (expenseOut) expenseOut.textContent = expenseWeeks + (calcEnglish ? " weeks" : " 週");
       var gross = r * h;
       var annualGross = gross * incomeWeeks;
       var annualTax = whmAnnualTax(annualGross);
       var annualAfterTax = annualGross - annualTax;
       var net = annualAfterTax / incomeWeeks;
       var sup = gross * 0.12;
-      var rent = parseFloat(city.value);
-      var living = parseFloat(life.value);
       var save = net - rent - living;
       var yearly = annualAfterTax - (rent + living) * expenseWeeks;
       document.getElementById("calc-gross").textContent = fmt(gross);
@@ -328,7 +355,7 @@
       var v = document.getElementById("calc-verdict");
       if (yearly <= 0) {
         v.textContent = calcEnglish
-          ? "This plan runs short over a full 52 weeks. Lower the weekly assumptions, increase verified paid hours, or arrive with a larger buffer."
+          ? ("This plan runs short over " + expenseWeeks + " expense weeks. Lower the weekly assumptions, increase verified paid hours, or arrive with a larger buffer.")
           : "全年估算會入不敷出——降低每週支出假設、增加已確認的有薪工時，或準備更大的落地緩衝金。";
         v.className = "result-verdict result-no";
       } else if (yearly < 10000) {
@@ -351,10 +378,10 @@
         localStorage.setItem(CALC_KEY, JSON.stringify({
           rate: r,
           hours: h,
-          city: city.value,
-          cityLabel: city.selectedOptions[0].textContent,
-          life: life.value,
-          lifeLabel: life.selectedOptions[0].textContent,
+          city: rent,
+          cityLabel: (calcEnglish ? "$" + rent + " / week" : "$" + rent + "／週"),
+          life: living,
+          lifeLabel: (calcEnglish ? "$" + living + " / week" : "$" + living + "／週"),
           gross: gross,
           annualGross: annualGross,
           annualTax: annualTax,
@@ -368,7 +395,9 @@
         }));
       } catch (e) { /* 私密視窗或封鎖儲存時略過 */ }
     };
-    [rate, hours, city, life].forEach(function (el) { el.addEventListener("input", update); });
+    [rate, hours, city, life, incomeWeeksEl, expenseWeeksEl].forEach(function (el) {
+      if (el) el.addEventListener("input", update);
+    });
     update();
   }
 
