@@ -139,8 +139,13 @@
     render();
   }
 
+  function featureCode(feature) {
+    var p = (feature && feature.properties) || {};
+    return p.STATE_CODE || p.STATE_ABBR || "";
+  }
+
   function styleFeature(feature) {
-    var code = feature.properties && feature.properties.STATE_ABBR;
+    var code = featureCode(feature);
     var covered = stateHasCoverage(currentGroup().group, code);
     var selected = code === selectedState;
     return {
@@ -153,8 +158,8 @@
   }
 
   function onEachFeature(feature, layer) {
-    var code = feature.properties.STATE_ABBR;
-    var name = feature.properties.STATE_NAME || code;
+    var code = featureCode(feature);
+    var name = (feature.properties && feature.properties.STATE_NAME) || code;
     layer.bindTooltip(name + (code ? " (" + code + ")" : ""), { sticky: true });
     layer.on({
       click: function () { setActiveState(code); },
@@ -165,14 +170,44 @@
 
   function initMap(data) {
     if (!mapEl || typeof L === "undefined") return;
-    map = L.map(mapEl, { scrollWheelZoom: false }).setView([-25.5, 134.5], 4);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    map = L.map(mapEl, {
+      scrollWheelZoom: true,
+      minZoom: 3,
       maxZoom: 12,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      maxBounds: [[-48, 108], [-8, 158]],
+      maxBoundsViscosity: 0.5
+    }).setView([-25.5, 134.5], 4);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 12,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     geoLayer = L.geoJSON(data, { style: styleFeature, onEachFeature: onEachFeature }).addTo(map);
-    try { map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] }); } catch (e) {}
-    mapEl.addEventListener("focusin", function () { map.scrollWheelZoom.enable(); });
+    try { map.fitBounds(geoLayer.getBounds(), { padding: [12, 12], maxZoom: 5 }); } catch (e) {}
+    [
+      { name: "Perth", lat: -31.95, lng: 115.86 },
+      { name: "Darwin", lat: -12.46, lng: 130.84 },
+      { name: "Brisbane", lat: -27.47, lng: 153.03 },
+      { name: "Adelaide", lat: -34.93, lng: 138.6 },
+      { name: "Sydney", lat: -33.87, lng: 151.21 },
+      { name: "Canberra", lat: -35.28, lng: 149.13 },
+      { name: "Melbourne", lat: -37.81, lng: 144.96 },
+      { name: "Hobart", lat: -42.88, lng: 147.33 }
+    ].forEach(function (c) {
+      L.circleMarker([c.lat, c.lng], {
+        radius: c.name === "Canberra" ? 7 : 4,
+        color: "#27342e",
+        fillColor: "#fffdf5",
+        fillOpacity: 1,
+        weight: 1.5,
+        interactive: false
+      }).bindTooltip(c.name, {
+        permanent: true,
+        direction: "right",
+        className: "tm-capital-label",
+        offset: [8, 0]
+      }).addTo(map);
+    });
+    setTimeout(function () { if (map) map.invalidateSize(); }, 80);
   }
 
   function renderSeasons(code) {
@@ -214,7 +249,7 @@
     if (selectedState === "ALL") {
       html += "<p><strong>全澳總覽：</strong>點地圖上的州／領地；金色＝此圖層有列出範圍。</p><ul>";
       ["NSW","VIC","QLD","WA","SA","TAS","NT","ACT"].forEach(function (code) {
-        var mark = stateHasCoverage(group, code) ? "✓" : "—";
+        var mark = stateHasCoverage(group, code) ? "有" : "無";
         html += "<li><strong>" + code + "</strong> " + mark + " " + escapeHtml(summarizeList(group[code])) + "</li>";
       });
       html += "</ul>";
@@ -310,11 +345,15 @@
     if (e.key === "Enter") { e.preventDefault(); checkPostcode(); }
   });
 
-  fetch("assets/au-states.geojson")
+  render();
+  fetch("assets/au-states.geojson?v=20260905-03")
     .then(function (r) { if (!r.ok) throw new Error("geojson " + r.status); return r.json(); })
     .then(function (data) { geojsonData = data; initMap(data); render(); })
-    .catch(function () {
-      if (mapEl) mapEl.innerHTML = '<p class="note" style="padding:16px">州界地圖資料載入失敗。仍可用下方州別選單與郵遞區號工具。</p>';
+    .catch(function (err) {
+      if (typeof console !== "undefined" && console.warn) console.warn("tm map", err);
+      if (mapEl && !mapEl.querySelector(".leaflet-container")) {
+        mapEl.innerHTML = '<p class="note" style="padding:16px">州界地圖資料載入失敗。仍可用下方州別選單與郵遞區號工具。</p>';
+      }
       render();
     });
 })();

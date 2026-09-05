@@ -11,6 +11,17 @@ const mapHtml = fs.readFileSync(path.join(root, "map.html"), "utf8");
 
 assert.match(mapHtml, /assets\/map-transparency\.js\?v=/);
 assert.match(mapHtml, /assets\/job-router\.js\?v=/);
+assert.match(mapHtml, /id="tm-leaflet-map"/);
+assert.match(mapHtml, /id="tm-state-select"/);
+assert.match(mapHtml, /unpkg\.com\/leaflet@1\.9\.4\/dist\/leaflet\.js/);
+assert.match(mapHtml, /unpkg\.com\/leaflet@1\.9\.4\/dist\/leaflet\.css/);
+assert.doesNotMatch(mapHtml, /maps\.googleapis\.com|maps\.google\.com|Google Maps API/i);
+assert.doesNotMatch(mapHtml, /(?:https?:\/\/)(?:www\.)?whvcompass\.com/i);
+const geoPath = path.join(root, "assets", "au-states.geojson");
+assert.ok(fs.existsSync(geoPath), "missing assets/au-states.geojson");
+const geo = JSON.parse(fs.readFileSync(geoPath, "utf8"));
+const geoCodes = geo.features.map((f) => f.properties && f.properties.STATE_CODE).sort();
+assert.deepEqual(geoCodes, ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"]);
 assert.match(mapHtml, /id="job-router-form"/);
 assert.match(mapHtml, /id="job-router-results"/);
 assert.match(mapHtml, /aria-live="polite"/);

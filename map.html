@@ -135,7 +135,7 @@
 
   <section id="transparency-map" class="tm-root" aria-labelledby="tm-heading">
     <h2 id="tm-heading">指定工作地區圖層</h2>
-    <p>可縮放的澳洲地圖<strong>不按比例</strong>。金色＝目前圖層在該州有列出範圍；灰色＝此圖層未列。ACT 通常不在區域澳洲清單內。</p>
+    <p>可縮放的澳洲地理地圖。金色＝目前圖層在該州有列出範圍；淺色＝此圖層未列。鍵盤請用州別選單。ACT 通常不在區域澳洲清單內。</p>
 
     <label class="tm-layer-label" for="tm-layer">圖層（工作類型／地區規則）</label>
     <select id="tm-layer" class="tm-layer">
@@ -147,8 +147,9 @@
 
     <div class="community-map-layout">
       <div class="community-map">
-        <p><strong>澳洲地圖</strong><small>可縮放・OpenStreetMap</small></p>
-        <div id="tm-leaflet-map" class="tm-leaflet-map" role="region" aria-label="澳洲集簽地區地圖" tabindex="0"></div>
+        <p><strong>澳洲地圖</strong><small>可縮放・OpenStreetMap 底圖・州界著色</small></p>
+        <!-- Leaflet 1.9.4 + OSM tiles. State polygons: assets/au-states.geojson, simplified from rowanhogan/australian-states (ABS/Geoscape Administrative Boundaries, CC BY 4.0). Display only; not a legal boundary. -->
+        <div id="tm-leaflet-map" class="tm-leaflet-map" role="region" aria-label="澳洲地理地圖：點選州或領地" tabindex="0"></div>
         <label class="tm-layer-label" for="tm-state-select">或用選單選州／領地</label>
         <select id="tm-state-select" class="tm-layer">
           <option value="ALL">全澳</option>
@@ -254,6 +255,7 @@
 </main>
 
 <footer class="site-footer">
+  <p><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg> 澳打指南針 — 公開攻略免費・開源維護・<a href="about.html#maintain">回報錯誤與聯絡</a></p>
   <p>澳打指南針 · 開源攻略 · <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant" rel="noopener">CC BY-SA 4.0</a> · <a href="https://github.com/jason201385-commits/aussie-whv-compass" rel="noopener">GitHub</a></p>
   <p class="fact-meta">本站不是澳洲政府、移民代理、法律或醫療服務。</p>
 </footer>
@@ -262,7 +264,7 @@
 <script src="assets/analytics.js?v=20260905-03" defer></script>
 <script src="assets/i18n.js?v=20260905-03" defer></script>
 <script src="assets/api-config.js?v=20260905-03" defer></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
 <script src="assets/main.js?v=20260905-03" defer></script>
 <script src="assets/postcodes.js?v=20260905-03" defer></script>
 <script src="assets/seasons.js?v=20260905-03" defer></script>

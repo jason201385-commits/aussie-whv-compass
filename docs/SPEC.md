@@ -35,7 +35,7 @@
 | `simulator.html` | 遊戲區 | 抵澳 30 天模擬器 | — | — |
 | `housing.html` | 已在澳洲 | 住宿與租屋＋合法混合搜尋 | 有 | 有 |
 | `work.html` | 已在澳洲 | 找工作、查核、證照、採收月曆、四季職類、職災 | 有 | 有 |
-| `map.html` | 已在澳洲（工具頁，不進全站 nav） | 集簽透明地圖＋公開求職篩選導流；不含雇主名單 | — | — |
+| `map.html` | 已在澳洲（工具頁，不進全站 nav） | 集簽透明地圖（Leaflet + OSM 地理州界）＋公開求職篩選導流；不含雇主名單 | — | — |
 | `scam.html` | 已在澳洲 | 防詐騙 16 手法（含私下換匯）、三道防線、救濟包＋測驗 | 有 | 有 |
 | `english.html` | 決定要去 | 英文資源與策略 | 有 | — |
 | `health.html` | 決定要去 | 保險就醫心理安全 | 有 | 有 |
@@ -72,6 +72,7 @@
 | 私人合作需求單 | `about.html` `#private-contact`＋`#contact-brief`＋`#contact-management` | 必填 Email、需求類型、目前卡點、希望結果與邊界確認；姓名／組織、時程、預算選填 | `api-config.js` 空值時不寫 localStorage、不上傳，只產生 Gmail／mailto／複製備援（所有參數 `encodeURIComponent`；clipboard 不可用時只選取預覽）；啟用後需 Turnstile、後端 `{ok:true}` 回執，管理 token 只經 fragment | 現況：Email／複製備援；程式已支援案件編號、sent／queued、查閱、更正、永久刪除 | `worker/test/contact.test.ts`、`security.test.ts`；check.ps1 about.html 需求類型禁招攬檢查；正式啟用屬 P0-4 |
 | 自願找路測試（D+） | `about.html` | 固定題目，零打字 | 答案與 `performance.now()` 只留當頁記憶體；origin 留空時 `sendDplusMetric()` 回 `false` 不建 request；啟用後只送 7 個白名單 metricKey；開始鍵 HTML 預設 `hidden`，由 `main.js` 揭露 | 本機結果＋後端是否接受計數的區分 | check.ps1「D+」區塊；`worker/test/metrics.test.ts` |
 | 離澳出清 × 初登澳補給草稿 | `market.html` `#market-tool` | 模式（賣出／徵求）、分類、物品、城市、狀況、價格、面交方式、備註、安全確認 | 只在當頁記憶體，不寫 storage、不呼叫 API；產生可複製刊登草稿；Facebook Marketplace／eBay 搜尋連結由分類關鍵字與城市組成；不代刊登、不支援受限物品（頁面 `#restricted-title` 列出） | 草稿文字＋複製＋兩個平台入口＋安全五件事 | check.ps1 對 `market.html` 的 nav／問題入口／證據卡斷言 |
+| 集簽透明地圖 | `map.html` `#transparency-map`／`assets/map-transparency.js` | 圖層 select、州別 select 或地圖點選、郵遞區號 | Leaflet + OSM 地理州界著色（`assets/au-states.geojson`）；不寫 storage、不列雇主、不用 Google Maps | 州著色＋`#tm-detail`＋採收月份；鍵盤用 `#tm-state`；舊磚塊地圖為備用 | `scripts/test_job_router.mjs`（`#tm-leaflet-map`、八州 GeoJSON、禁 Google Maps／whvcompass） |
 | 公開求職篩選導流 | `map.html` `#open-job-portals`／`assets/job-router.js` | 州別（NSW–ACT）、可選城市或 4 碼郵遞區號、產業預設（agriculture／hospitality／construction／other）、「想優先指定工作地區」核取方塊 | 純前端、不寫 storage、不 fetch、不列雇主；只組公開搜尋／權益 URL。政府 Harvest Trail 職缺服務已於 2024-06-30 結束，**不列入產生的求職入口**（靜態說明連就業部頁；私人 harvest-trail 網站不是官方）。職缺改走 Workforce Australia JobSearch 入口並提示建議關鍵字（不虛構其 query 參數）。Seek 僅在 `jobs?keywords=&where=` 透明搜尋網址可組時出現，並標「第三方、非本站職缺庫」。指定工作勾選只加內政部官方頁與簽證頁初篩，不宣稱職缺符合集簽 | 公開入口清單（政府／權益／第三方／本站 `work.html`＋`scam.html`）＋ aria-live 狀態；無 JS 時固定入口仍可見 | `scripts/test_job_router.mjs`；map.html 必須同時載入 `map-transparency.js` 與 `job-router.js` |
 | 回饋列 | 全站（`main.js` 注入） | — | 分享→clipboard 複製網址；回報→`report.yml`；感謝→`thanks.yml`；自動帶入頁名 | — | check.ps1「感謝閉環」區塊 |
 | 繼續上次閱讀 | 首頁 `#journey-resume` | 自動記錄最近開啟的白名單內容頁 | `whv-last-page-v1` 只存 `{path}`；固定頁名／階段 map；拒絕未知 path | 續讀連結＋清除；無資料時隱藏 | check.ps1 首頁入口文案 |
@@ -157,7 +158,7 @@ label「需要查證」）＋`idea.yml`（許願池）＋`thanks.yml`（公開�
 
 ## 3. 相依與整合點
 
-- 現況：GitHub Pages（公開前端部署）、Google Fonts（唯一前端外部資產）、GitHub Issues（公開回饋）。
+- 現況：GitHub Pages（公開前端部署）、Google Fonts（全站字體）、Leaflet 1.9.4 + OpenStreetMap tiles（僅 `map.html`）、GitHub Issues（公開回饋）。
 - 已批准但未啟用：Cloudflare Web Analytics（啟用時登錄此處與 SDD §2）；Cloudflare Worker、D1、Turnstile
   與可替換交易信服務（P0-4）；GA4（P0-3 與 §1.5 前置）。
 - repo 內不得出現 API key／secret；前端不得包含 D1、Turnstile secret 或寄信憑證。

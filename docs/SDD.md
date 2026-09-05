@@ -53,7 +53,7 @@
 - **快取**：GitHub Pages 資產 `max-age=600`（10 分鐘）。全站本機 CSS／JS／資料檔
   共用同一個 `?v=` 版本查詢碼（`ASSET_VERSION`）；任何這些資產異動時，push 前必須全站同步升版。
   驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
-- **外部依賴**：現行前端只有 Google Fonts。GA4 程式保留但 ID 為空；Cloudflare Web Analytics
+- **外部依賴**：現行前端為 Google Fonts，以及 `map.html` 的 Leaflet 1.9.4 CDN 與 OpenStreetMap 圖磚（無 Google Maps、無 API key）。GA4 程式保留但 ID 為空；Cloudflare Web Analytics
   尚未加入，啟用時必須同步登錄於本節與 `SPEC.md` §3。
 - **後端邊界**：GitHub Pages 提供全部內容；Cloudflare Worker 只提供六種能力：私人需求單、
   查閱／更正／刪除申請、交易信、D+ 聚合計數、已授權住宿搜尋轉發、AI 兜底轉發（§3.1）。正式資源尚未完成
@@ -93,7 +93,8 @@
 | `assets/analytics-config.js`、`analytics.js` | GA4 Measurement ID（空＝停用）與 Basic Consent loader；`SENSITIVE_PATHS` 敏感頁排除（`SPEC.md` §1.5） |
 | `assets/postcodes.js` | 官方集簽郵遞區號資料（§5） |
 | `assets/seasons.js` | 各州官方採收季節資料（§5 同規則） |
-| `assets/map-transparency.js` | 集簽透明地圖：州別圖層與郵遞區號初篩（不含雇主名單） |
+| `assets/map-transparency.js` | 集簽透明地圖：Leaflet 州界著色、圖層與郵遞區號初篩（不含雇主名單） |
+| `assets/au-states.geojson` | 簡化澳洲八州／領地多邊形（顯示用，非正式地籍） |
 | `assets/job-router.js` | 公開求職篩選導流：只組公開搜尋／權益 URL，不上傳、不列雇主 |
 | `lang/` | 語言 hub、37 個非繁中 Quick Start、`lang/en/<topic>/` 7 頁完整英文 beta；產物由 `build_i18n.py` 產生 |
 | `.github/ISSUE_TEMPLATE/` | report／idea／thanks／collaborate 結構化表單 |
