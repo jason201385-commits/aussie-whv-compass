@@ -1,5 +1,6 @@
-/* 澳打指南針 — 集簽透明地圖（官方郵遞區號＋州／領地採收月份）
- * 不蒐集雇主名單、不複製第三方商業資料庫。資料來源見頁面與 WHV_POSTCODES / WHV_SEASONS。
+/* 澳打指南針 — 集簽透明地圖（Leaflet 真地圖 + 官方郵遞區號圖層）
+ * GeoJSON: assets/au-states.geojson（australian-states / rowanhogan，另加 STATE_ABBR）
+ * 不蒐集雇主名單、不複製第三方商業資料庫。
  */
 (function () {
   "use strict";
@@ -9,11 +10,15 @@
   var root = document.getElementById("transparency-map");
   if (!root) return;
   if (!D) {
-    root.innerHTML = '<p class="note">集簽郵遞區號資料載入失敗，請重新整理，或直接查閱內政部指定工作官方頁。</p>';
+    root.insertAdjacentHTML("afterbegin", '<p class="note">集簽郵遞區號資料載入失敗，請重新整理，或直接查閱內政部指定工作官方頁。</p>');
     return;
+  }
+  if (typeof L === "undefined") {
+    root.insertAdjacentHTML("afterbegin", '<p class="note">地圖函式庫載入失敗。請檢查網路後重新整理；下方仍可用郵遞區號初篩。</p>');
   }
 
   var layerSelect = document.getElementById("tm-layer");
+  var stateSelect = document.getElementById("tm-state-select");
   var stateButtons = root.querySelectorAll("[data-tm-state]");
   var detail = document.getElementById("tm-detail");
   var pcInput = document.getElementById("tm-postcode");
@@ -21,7 +26,11 @@
   var pcBtn = document.getElementById("tm-check");
   var pcOut = document.getElementById("tm-postcode-result");
   var seasonBox = document.getElementById("tm-seasons");
+  var mapEl = document.getElementById("tm-leaflet-map");
   var selectedState = "ALL";
+  var geoLayer = null;
+  var map = null;
+  var geojsonData = null;
 
   var LAYERS = {
     regional: {
@@ -35,21 +44,12 @@
       getGroup: function () {
         var t = D.northern_remote_tourism || {};
         return {
-          _applies_to: t._applies_to,
           NSW: unionLists(t.remote_very_remote && t.remote_very_remote.NSW, t.northern_australia && t.northern_australia.NSW),
           VIC: unionLists(t.remote_very_remote && t.remote_very_remote.VIC, t.northern_australia && t.northern_australia.VIC),
-          QLD: unionLists(
-            t.remote_very_remote && t.remote_very_remote.QLD,
-            t.northern_australia && t.northern_australia.QLD,
-            t.extra_postcodes && t.extra_postcodes.QLD
-          ),
+          QLD: unionLists(t.remote_very_remote && t.remote_very_remote.QLD, t.northern_australia && t.northern_australia.QLD, t.extra_postcodes && t.extra_postcodes.QLD),
           WA: unionLists(t.remote_very_remote && t.remote_very_remote.WA, t.northern_australia && t.northern_australia.WA),
           SA: unionLists(t.remote_very_remote && t.remote_very_remote.SA, t.northern_australia && t.northern_australia.SA),
-          TAS: unionLists(
-            t.remote_very_remote && t.remote_very_remote.TAS,
-            t.northern_australia && t.northern_australia.TAS,
-            t.extra_postcodes && t.extra_postcodes.TAS
-          ),
+          TAS: unionLists(t.remote_very_remote && t.remote_very_remote.TAS, t.northern_australia && t.northern_australia.TAS, t.extra_postcodes && t.extra_postcodes.TAS),
           NT: "ALL",
           ACT: [],
           NORFOLK: []
@@ -63,14 +63,13 @@
     },
     disaster: {
       label: "災害復原區",
-      hint: "官方災害／復原相關指定工作郵遞區號（若資料檔有 disaster 區塊）。",
+      hint: "官方災害／復原相關指定工作郵遞區號（Table 6）。",
       getGroup: function () { return (D.disaster && D.disaster.postcodes) || {}; }
     }
   };
 
   function unionLists() {
-    var out = [];
-    var seen = Object.create(null);
+    var out = [], seen = Object.create(null);
     for (var i = 0; i < arguments.length; i++) {
       var list = arguments[i];
       if (!list) continue;
@@ -116,24 +115,64 @@
     return sample + more;
   }
 
+  function escapeHtml(s) {
+    return String(s || "").replace(/[&<>"']/g, function (c) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+    });
+  }
+
+  function currentGroup() {
+    var layerKey = layerSelect ? layerSelect.value : "regional";
+    var layer = LAYERS[layerKey] || LAYERS.regional;
+    return { layer: layer, group: layer.getGroup() || {}, key: layerKey };
+  }
+
   function setActiveState(code) {
-    selectedState = code;
+    selectedState = code || "ALL";
     stateButtons.forEach(function (btn) {
-      var on = btn.getAttribute("data-tm-state") === code;
+      var on = btn.getAttribute("data-tm-state") === selectedState;
       btn.classList.toggle("active", on);
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     });
+    if (stateSelect) stateSelect.value = selectedState;
+    if (geoLayer) geoLayer.setStyle(styleFeature);
     render();
   }
 
-  function paintStates(group) {
-    stateButtons.forEach(function (btn) {
-      var code = btn.getAttribute("data-tm-state");
-      if (code === "ALL") return;
-      var covered = stateHasCoverage(group, code);
-      btn.classList.toggle("tm-covered", covered);
-      btn.classList.toggle("tm-empty", !covered);
+  function styleFeature(feature) {
+    var code = feature.properties && feature.properties.STATE_ABBR;
+    var covered = stateHasCoverage(currentGroup().group, code);
+    var selected = code === selectedState;
+    return {
+      fillColor: selected ? "#c05621" : (covered ? "#e6b84d" : "#d7e2dc"),
+      weight: selected ? 2.5 : 1,
+      opacity: 1,
+      color: selected ? "#27342e" : "#53645b",
+      fillOpacity: selected ? 0.72 : (covered ? 0.55 : 0.25)
+    };
+  }
+
+  function onEachFeature(feature, layer) {
+    var code = feature.properties.STATE_ABBR;
+    var name = feature.properties.STATE_NAME || code;
+    layer.bindTooltip(name + (code ? " (" + code + ")" : ""), { sticky: true });
+    layer.on({
+      click: function () { setActiveState(code); },
+      mouseover: function (e) { e.target.setStyle({ weight: 2.5, fillOpacity: 0.75 }); },
+      mouseout: function (e) { geoLayer.resetStyle(e.target); }
     });
+  }
+
+  function initMap(data) {
+    if (!mapEl || typeof L === "undefined") return;
+    map = L.map(mapEl, { scrollWheelZoom: false }).setView([-25.5, 134.5], 4);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 12,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    geoLayer = L.geoJSON(data, { style: styleFeature, onEachFeature: onEachFeature }).addTo(map);
+    try { map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] }); } catch (e) {}
+    mapEl.addEventListener("focusin", function () { map.scrollWheelZoom.enable(); });
   }
 
   function renderSeasons(code) {
@@ -144,7 +183,7 @@
     }
     var st = S.states.find(function (x) { return x.code === code; });
     if (!st || !st.entries || !st.entries.length) {
-      seasonBox.innerHTML = "<p class=\"fact-meta\">「" + code + "」目前沒有已追溯到州政府來源的採收月份條目（本站只收錄可回查來源）。</p>";
+      seasonBox.innerHTML = "<p class=\"fact-meta\">「" + escapeHtml(code) + "」目前沒有已追溯到州政府來源的採收月份條目。</p>";
       return;
     }
     var monthNames = ["", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
@@ -155,24 +194,14 @@
         "<br><span class=\"fact-meta\">約 " + escapeHtml(months) + "（採收／供應參考，不保證職缺）</span></li>";
     });
     html += "</ul>";
-    if (S.sources && st.entries[0] && S.sources[st.entries[0].source]) {
-      var src = S.sources[st.entries[0].source];
-      html += '<p class="fact-meta">來源例：<a href="' + src.url + '" rel="noopener">' + escapeHtml(src.name) + "</a>（抓取 " + escapeHtml(S.retrieved || "") + "）</p>";
-    }
     seasonBox.innerHTML = html;
   }
 
-  function escapeHtml(s) {
-    return String(s || "").replace(/[&<>"']/g, function (c) {
-      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
-    });
-  }
-
   function render() {
-    var layerKey = layerSelect ? layerSelect.value : "regional";
-    var layer = LAYERS[layerKey] || LAYERS.regional;
-    var group = layer.getGroup() || {};
-    paintStates(group);
+    var cur = currentGroup();
+    var group = cur.group;
+    var layer = cur.layer;
+    if (geoLayer) geoLayer.setStyle(styleFeature);
 
     var html = "";
     html += "<p class=\"section-eyebrow\">目前圖層</p>";
@@ -180,13 +209,13 @@
     html += "<p>" + escapeHtml(layer.hint) + "</p>";
     html += '<p class="fact-meta">郵遞區號資料抓取：' + escapeHtml(D.retrieved || "") +
       ' ・ <a href="' + escapeHtml(D.source || "#") + '" rel="noopener">內政部 specified-work 官方頁</a></p>';
+    html += '<p class="fact-meta">地圖底圖：OpenStreetMap ・ 州界 GeoJSON 開源資料（見 assets 說明）</p>';
 
     if (selectedState === "ALL") {
-      html += "<p><strong>全澳總覽：</strong>點州別看該州列出的郵遞區號區段；金色表示此圖層有列出範圍。</p><ul>";
+      html += "<p><strong>全澳總覽：</strong>點地圖上的州／領地；金色＝此圖層有列出範圍。</p><ul>";
       ["NSW","VIC","QLD","WA","SA","TAS","NT","ACT"].forEach(function (code) {
-        var v = group[code];
         var mark = stateHasCoverage(group, code) ? "✓" : "—";
-        html += "<li><strong>" + code + "</strong> " + mark + " " + escapeHtml(summarizeList(v)) + "</li>";
+        html += "<li><strong>" + code + "</strong> " + mark + " " + escapeHtml(summarizeList(group[code])) + "</li>";
       });
       html += "</ul>";
       if (seasonBox) seasonBox.innerHTML = "<p class=\"fact-meta\">點選州別後，顯示該州已收錄的採收月份參考。</p>";
@@ -199,9 +228,8 @@
       }
       renderSeasons(selectedState);
     }
-
     html += '<p class="note">郵遞區號符合 ≠ 簽證核准。實際職務、支薪、天數計算與個人資格，請以內政部規則與你的證據為準。</p>';
-    detail.innerHTML = html;
+    if (detail) detail.innerHTML = html;
   }
 
   function inExpanded(pc, list) {
@@ -212,7 +240,6 @@
   }
 
   function stateFromPostcode(pc) {
-    // 粗略澳郵遞區號 → 州（與 tools.js 精神一致；邊界碼請再核對）
     if (pc >= 1000 && pc <= 1999) return "NSW";
     if (pc >= 2000 && pc <= 2599) return "NSW";
     if (pc >= 2619 && pc <= 2899) return "NSW";
@@ -264,12 +291,10 @@
     if (ok) {
       pcOut.innerHTML = '<p class="result-verdict result-ok">郵遞區號 <strong>' + raw + "</strong>（" + st +
         "）在「" + label + "」清單中<strong>有對應</strong>。</p>" +
-        '<p style="font-size:.9rem">這只是地區初篩。工作內容必須符合指定工作定義，並自行保存支薪與出勤證據。</p>' +
-        '<p><a class="btn" href="visa.html#postcode-tool">回簽證頁完整初篩工具</a></p>';
+        '<p style="font-size:.9rem">這只是地區初篩。工作內容必須符合指定工作定義，並自行保存支薪與出勤證據。</p>';
     } else {
       pcOut.innerHTML = '<p class="result-verdict result-no">郵遞區號 <strong>' + raw + "</strong>（" + st +
-        "）在「" + label + "」清單中<strong>未找到對應</strong>。</p>" +
-        '<p style="font-size:.9rem">請再核對官方頁面，或改試其他工作類別圖層。</p>';
+        "）在「" + label + "」清單中<strong>未找到對應</strong>。</p>";
     }
   }
 
@@ -278,11 +303,18 @@
       setActiveState(btn.getAttribute("data-tm-state"));
     });
   });
-  if (layerSelect) layerSelect.addEventListener("change", render);
+  if (stateSelect) stateSelect.addEventListener("change", function () { setActiveState(stateSelect.value); });
+  if (layerSelect) layerSelect.addEventListener("change", function () { if (geoLayer) geoLayer.setStyle(styleFeature); render(); });
   if (pcBtn) pcBtn.addEventListener("click", checkPostcode);
   if (pcInput) pcInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") { e.preventDefault(); checkPostcode(); }
   });
 
-  render();
+  fetch("assets/au-states.geojson")
+    .then(function (r) { if (!r.ok) throw new Error("geojson " + r.status); return r.json(); })
+    .then(function (data) { geojsonData = data; initMap(data); render(); })
+    .catch(function () {
+      if (mapEl) mapEl.innerHTML = '<p class="note" style="padding:16px">州界地圖資料載入失敗。仍可用下方州別選單與郵遞區號工具。</p>';
+      render();
+    });
 })();

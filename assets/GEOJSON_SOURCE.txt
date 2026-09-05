@@ -1,0 +1,2 @@
+Source: https://github.com/rowanhogan/australian-states (states.geojson)
+Augmented with STATE_ABBR for Aussie WHV Compass map shading.

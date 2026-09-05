@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-02" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260905-03" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20260905-02">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="assets/style.css?v=20260905-03">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body>
@@ -113,7 +114,7 @@
 
 <main id="main-content" tabindex="-1">
   <h1 class="page-title">集簽透明地圖</h1>
-  <p class="page-sub">把內政部公開的指定工作郵遞區號，做成可點選的州別圖層；再疊上州政府可回查的採收月份。永久免費、不上傳你的查詢。<span class="updated-tag">2026-09-05 上線</span></p>
+  <p class="page-sub">把內政部公開的指定工作郵遞區號，畫在可縮放的澳洲地圖上；再疊上州政府可回查的採收月份。永久免費、不上傳你的查詢。<span class="updated-tag">2026-09-05 上線</span></p>
 
   <div class="note">本頁<strong>不提供雇主名單、職缺配對或付費點數</strong>。地區符合 ≠ 工作符合 ≠ 簽證核准。申請前請打開<a href="https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work" rel="noopener">內政部 specified-work 官方頁</a>核對現行清單。</div>
 
@@ -134,7 +135,7 @@
 
   <section id="transparency-map" class="tm-root" aria-labelledby="tm-heading">
     <h2 id="tm-heading">指定工作地區圖層</h2>
-    <p>簡化州別圖<strong>不按比例</strong>。金色＝目前圖層在該州有列出範圍；灰色＝此圖層未列。ACT 通常不在區域澳洲清單內。</p>
+    <p>可縮放的澳洲地圖<strong>不按比例</strong>。金色＝目前圖層在該州有列出範圍；灰色＝此圖層未列。ACT 通常不在區域澳洲清單內。</p>
 
     <label class="tm-layer-label" for="tm-layer">圖層（工作類型／地區規則）</label>
     <select id="tm-layer" class="tm-layer">
@@ -146,18 +147,20 @@
 
     <div class="community-map-layout">
       <div class="community-map">
-        <p><strong>點州別查看</strong><small>簡化區域圖・不按比例</small></p>
-        <div class="australia-tile-map" role="group" aria-label="澳洲州與領地">
-          <button class="map-region map-all active" type="button" data-tm-state="ALL" aria-pressed="true">全澳</button>
-          <button class="map-region map-wa" type="button" data-tm-state="WA" aria-pressed="false">WA<small>西澳</small></button>
-          <button class="map-region map-nt" type="button" data-tm-state="NT" aria-pressed="false">NT<small>北領地</small></button>
-          <button class="map-region map-qld" type="button" data-tm-state="QLD" aria-pressed="false">QLD<small>昆州</small></button>
-          <button class="map-region map-sa" type="button" data-tm-state="SA" aria-pressed="false">SA<small>南澳</small></button>
-          <button class="map-region map-nsw" type="button" data-tm-state="NSW" aria-pressed="false">NSW<small>新州</small></button>
-          <button class="map-region map-act" type="button" data-tm-state="ACT" aria-pressed="false">ACT</button>
-          <button class="map-region map-vic" type="button" data-tm-state="VIC" aria-pressed="false">VIC<small>維州</small></button>
-          <button class="map-region map-tas" type="button" data-tm-state="TAS" aria-pressed="false">TAS<small>塔州</small></button>
-        </div>
+        <p><strong>澳洲地圖</strong><small>可縮放・OpenStreetMap</small></p>
+        <div id="tm-leaflet-map" class="tm-leaflet-map" role="region" aria-label="澳洲集簽地區地圖" tabindex="0"></div>
+        <label class="tm-layer-label" for="tm-state-select">或用選單選州／領地</label>
+        <select id="tm-state-select" class="tm-layer">
+          <option value="ALL">全澳</option>
+          <option value="NSW">NSW 新南威爾斯</option>
+          <option value="VIC">VIC 維多利亞</option>
+          <option value="QLD">QLD 昆士蘭</option>
+          <option value="WA">WA 西澳</option>
+          <option value="SA">SA 南澳</option>
+          <option value="TAS">TAS 塔斯馬尼亞</option>
+          <option value="NT">NT 北領地</option>
+          <option value="ACT">ACT 首都領地</option>
+        </select>
       </div>
       <div class="community-platform-search" id="tm-detail" aria-live="polite"></div>
     </div>
@@ -255,14 +258,15 @@
   <p class="fact-meta">本站不是澳洲政府、移民代理、法律或醫療服務。</p>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260905-02" defer></script>
-<script src="assets/analytics.js?v=20260905-02" defer></script>
-<script src="assets/i18n.js?v=20260905-02" defer></script>
-<script src="assets/api-config.js?v=20260905-02" defer></script>
-<script src="assets/main.js?v=20260905-02" defer></script>
-<script src="assets/postcodes.js?v=20260905-02" defer></script>
-<script src="assets/seasons.js?v=20260905-02" defer></script>
-<script src="assets/map-transparency.js?v=20260905-02" defer></script>
-<script src="assets/job-router.js?v=20260905-02" defer></script>
+<script src="assets/analytics-config.js?v=20260905-03" defer></script>
+<script src="assets/analytics.js?v=20260905-03" defer></script>
+<script src="assets/i18n.js?v=20260905-03" defer></script>
+<script src="assets/api-config.js?v=20260905-03" defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="assets/main.js?v=20260905-03" defer></script>
+<script src="assets/postcodes.js?v=20260905-03" defer></script>
+<script src="assets/seasons.js?v=20260905-03" defer></script>
+<script src="assets/map-transparency.js?v=20260905-03" defer></script>
+<script src="assets/job-router.js?v=20260905-03" defer></script>
 </body>
 </html>
