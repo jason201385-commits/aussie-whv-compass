@@ -1,4 +1,4 @@
-/* 澳打指南針 — 共用腳本 */
+﻿/* 澳打指南針 — 共用腳本 */
 (function () {
   "use strict";
 
@@ -2129,8 +2129,8 @@
       var briefText = makeBrief();
       var subject = "[合作詢問] " + briefType.value.trim();
       briefPreview.value = briefText;
-      briefGmailLink.href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent("chunaenqiu6@gmail.com") + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
-      briefEmailLink.href = "mailto:chunaenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
+      briefGmailLink.href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent("chuanenqiu6@gmail.com") + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
+      briefEmailLink.href = "mailto:chuanenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
       briefOutput.hidden = false;
       setBriefStatus("需求單已整理好；請再次確認未放入簽證、移民或其他敏感個案資料，再由你選擇方式寄出");
       briefGmailLink.focus();

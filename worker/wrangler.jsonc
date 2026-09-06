@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "aussie-whv-compass-api",
   "main": "src/index.ts",
@@ -21,7 +21,7 @@
     "ASSIST_MODEL": "MiniMax-M2.7",
     "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
     "MAIL_FROM": "noreply@aussiewhvcompass.com",
-    "CONTACT_NOTIFY_TO": "chunaenqiu6@gmail.com"
+    "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"
   },
   "d1_databases": [
     {
@@ -84,7 +84,7 @@
         "ASSIST_MODEL": "MiniMax-M2.7",
         "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
     "MAIL_FROM": "noreply@aussiewhvcompass.com",
-    "CONTACT_NOTIFY_TO": "chunaenqiu6@gmail.com"
+    "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"
       },
       "d1_databases": [
         {
