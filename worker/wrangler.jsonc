@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "aussie-whv-compass-api",
   "main": "src/index.ts",
