@@ -1999,6 +1999,9 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     'id="simulator-finish"',
     'id="simulator-progress"',
     'id="simulator-profile-note"',
+    'id="simulator-arrival-month"',
+    'id="simulator-landing"',
+    'id="simulator-transport"',
     '不傳送答案',
     '不判定簽證資格',
     '遊戲分數只表示你在這段模擬中保留了多少資源',
@@ -2006,8 +2009,8 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     '請停止模擬並撥 <strong>000</strong>',
     'Consumer Protection WA 租屋指南',
     'Scamwatch 求職詐騙',
-    'Fair Work payslips',
-    'healthdirect 000',
+    'Fair Work 移工權益',
+    'healthdirect 就醫分流',
     'MoneySmart budget planner'
   )) {
     if (-not $simulatorText.Contains($simulatorNeedle)) { Write-Output "FAIL [simulator.html] 缺情境、隱私或來源邊界：$simulatorNeedle"; $errors++ }
@@ -2021,8 +2024,8 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     Write-Output 'FAIL [simulator.html] 角色設定不得收自由文字、Email 或非白名單輸入'
     $errors++
   }
-  if ([regex]::Matches($simulatorScript, 'day:\s*"DAY').Count -ne 6) {
-    Write-Output 'FAIL [simulator.js] 必須維持 6 個固定事件'
+  if ([regex]::Matches($simulatorScript, 'day:\s*"DAY').Count -ne 10) {
+    Write-Output 'FAIL [simulator.js] 必須維持 10 個固定事件'
     $errors++
   }
   if ([regex]::Matches($simulatorText, '<noscript>').Count -ne 1) {
@@ -2033,7 +2036,7 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     Write-Output 'FAIL [simulator.js] 作答後必須同步更新角色快照'
     $errors++
   }
-  foreach ($simulatorScriptNeedle in @('var EVENTS = [', 'critical: true', 'href="tel:000"', 'criticalAction.hidden = !event.critical', 'prefers-reduced-motion: reduce', '確定要放棄本輪嗎', 'simulator-profile-form { display: none; }', '模擬器需要 JavaScript', 'state.riskChoices', 'goalKeys[state.goal]', 'slice(0, 3)', 'new FormData(form)', 'whv-simulator-progress-v1', 'sessionStorage.setItem(progressKey', 'sessionStorage.removeItem(progressKey)', 'isValidState(saved.state)', 'state.selectedChoice !== null', 'showFeedback(event, event.choices[state.selectedChoice], false)', '遊戲進度只在目前分頁暫存', '從攻略回來或重新整理可繼續')) {
+  foreach ($simulatorScriptNeedle in @('var EVENTS = [', 'critical: true', 'href="tel:000"', 'criticalAction.hidden = !event.critical', 'prefers-reduced-motion: reduce', '確定要放棄本輪嗎', 'simulator-profile-form { display: none; }', '模擬器需要 JavaScript', 'state.riskChoices', 'goalKeys[state.goal]', 'slice(0, 3)', 'new FormData(form)', 'whv-simulator-progress-v1', 'version: 2', 'migrateLegacyState', 'resolveCopy(event.story)', 'sessionStorage.setItem(progressKey', 'sessionStorage.removeItem(progressKey)', 'isValidState(saved.state)', 'state.selectedChoice !== null', 'showFeedback(event, event.choices[state.selectedChoice], false)', '遊戲進度只在目前分頁暫存', '從攻略回來或重新整理可繼續')) {
     if (-not ($simulatorScript + "`n" + $simulatorText).Contains($simulatorScriptNeedle)) { Write-Output "FAIL [simulator.js] 缺固定事件或結果邊界：$simulatorScriptNeedle"; $errors++ }
   }
   foreach ($simulatorForbidden in @('localStorage', 'fetch(', 'XMLHttpRequest', 'navigator.sendBeacon', '成功率：', '簽證資格：')) {
@@ -2043,6 +2046,8 @@ if (-not (Test-Path $simulatorPath) -or -not (Test-Path $simulatorScriptPath)) {
     Write-Output 'FAIL [i18n.js] 模擬器繁中語言路由未保留原主題'
     $errors++
   }
+  & node (Join-Path $dir 'scripts\test_simulator.mjs')
+  if ($LASTEXITCODE -ne 0) { Write-Output 'FAIL 模擬器行為契約回放失敗'; $errors++ }
 }
 
 $crawlerPolicyPath = Join-Path $dir 'crawler-policy.txt'

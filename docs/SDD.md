@@ -144,7 +144,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
     `whv-prep-check-v1`、`whv-prep-check-en-v1`、`whv-leave-check-v1`、`whv-save-calc-v2`（讀取相容 v1）、
     `whv-last-page-v1`（`{path}` 白名單）、`whv-saved-pages-v1`（白名單 path 陣列）、
     `whv-analytics-consent-v1`（`granted`／`denied`）。
-  - sessionStorage：`whv-simulator-progress-v1`（版本化、嚴格驗證；只在目前分頁）。
+  - sessionStorage：`whv-simulator-progress-v1`（envelope v2；版本化、嚴格驗證、v1 事件對照遷移；只在目前分頁）。
   - 名稱或語意變更需同步隱私說明。
 - SVG sprite 由 `main.js` 注入 `<body>` 開頭；頁面以 `<svg class="icon"><use href="#i-名稱"/></svg>` 引用。
   JS 未載入時圖示不顯示，屬已接受的取捨。

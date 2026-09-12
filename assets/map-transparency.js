@@ -34,7 +34,7 @@
   var channelData = null;
   var hubLayer = null;
   var selectedHubId = null;
-  var CACHE_V = "20260912-01";
+  var CACHE_V = "20260912-03";
 
   var LAYERS = {
     regional: {

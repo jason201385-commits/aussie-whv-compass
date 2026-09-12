@@ -55,7 +55,7 @@
 | P1-21 | 社團目錄 JSON 與 communities.html 子頁（C-5 地區×需求推薦） | 已上線（2026-09-04） | 首頁 `#communities` 尚未縮成入口卡 | OPTIMIZATION_PLAN.md | D-2026-09-04-08 | D-2026-09-02-06 |
 | P1-22 | 釐清器與 AI 兜底指標（D+ 白名單擴充、GA4 事件表、判讀規則） | 未開始 | P0-3（CWA token、GA4 ID）與 P0-4（D+ 部署） | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
 | P1-23 | AI 兜底正式啟用（第一階段 links-only；intent 待命中率達標再重啟） | 已上線（2026-09-04） | red-team 驗收與命中率觀察仍待做 | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06、D-2026-09-04-01 |
-| P1-24 | 常見問題研究與情境模擬器 v2 | 部分完成（研究矩陣與情境模型） | 互動實作與 E2E 待完成 | WHV_COMMON_PROBLEMS_RESEARCH.md、SPEC §1.2 | D-2026-09-12-01 |
+| P1-24 | 常見問題研究與情境模擬器 v2 | 本機完成（研究、互動實作、程式回放、桌機／390px 瀏覽器 E2E） | 正式站回放須等本輪部署後執行 | WHV_COMMON_PROBLEMS_RESEARCH.md、SPEC §1.2 | D-2026-09-12-01～03 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |

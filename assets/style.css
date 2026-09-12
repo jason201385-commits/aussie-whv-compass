@@ -2836,6 +2836,30 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 .simulator-boundary { border-width: 2px; }
 
 .simulator-profile { margin-top: 44px; }
+.simulator-context-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 28px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--blue-soft);
+}
+.simulator-context-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; }
+.simulator-context-field > span { font-weight: 900; }
+.simulator-context-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 9px 12px;
+  border: 2px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.simulator-context-field select:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.simulator-context-field small { color: var(--ink-soft); font-size: .76rem; line-height: 1.5; }
 .simulator-question {
   margin: 18px 0;
   padding: 0;
@@ -2981,6 +3005,7 @@ h2 .icon, h3 .icon { color: var(--accent); margin-right: 2px; }
 
 @media (max-width: 760px) {
   .simulator-home-cta, .simulator-hero { grid-template-columns: 1fr; }
+  .simulator-context-grid { grid-template-columns: 1fr; }
   .simulator-home-cta::after { width: 112px; font-size: 2.6rem; }
   .simulator-lemon { width: 130px; justify-self: center; }
   .simulator-dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }

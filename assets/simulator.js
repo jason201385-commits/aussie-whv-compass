@@ -30,6 +30,16 @@
   var finishActions = document.getElementById("finish-actions");
   var progressKey = "whv-simulator-progress-v1";
   var state = null;
+  var monthLabels = ["", "1 月", "2 月", "3 月", "4 月", "5 月", "6 月", "7 月", "8 月", "9 月", "10 月", "11 月", "12 月"];
+  var landingLabels = { perth: "Perth 都會區", major: "澳洲其他主要城市", regional: "區域城鎮／農業區" };
+  var transportLabels = { public: "大眾運輸／步行", shared: "共乘／雇主接送", car: "自己開車" };
+  var seasonLabel = function (month) {
+    if ([12, 1, 2].indexOf(month) >= 0) return "夏季";
+    if ([3, 4, 5].indexOf(month) >= 0) return "秋季";
+    if ([6, 7, 8].indexOf(month) >= 0) return "冬季";
+    return "春季";
+  };
+  var resolveCopy = function (value) { return typeof value === "function" ? value(state) : value; };
   var scrollBehavior = function () {
     return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
   };
@@ -38,8 +48,15 @@
     {
       day: "DAY 01",
       tag: "晚班抵達",
-      title: "你在晚上抵達 Perth，手機只剩 18%",
-      story: "機場有人主動說可以免費載你去『朋友的便宜房間』；另一邊是你自己查到的短住地址。你很累，只想趕快洗澡睡覺。",
+      title: function (current) { return "你在晚上抵達 " + landingLabels[current.landing] + "，手機只剩 18%"; },
+      story: function (current) {
+        var transportDetail = current.transport === "car"
+          ? "你原本安排的取車櫃檯快關了"
+          : current.transport === "shared"
+            ? "原本說好接你的共乘臨時失聯"
+            : "你查到的末班公共運輸時間很接近";
+        return transportDetail + "。機場有人主動說可以免費載你去『朋友的便宜房間』；另一邊是你自己查到的短住地址。你很累，只想趕快洗澡睡覺。";
+      },
       question: "你要怎麼保留第一晚的安全退路？",
       guide: "housing.html#book",
       official: "https://www.consumerprotection.wa.gov.au/publications/looking-rental-home-tenants-guide-1",
@@ -71,7 +88,42 @@
       ]
     },
     {
-      day: "DAY 04",
+      day: "DAY 03",
+      tag: "落地手續",
+      title: "工作邀請來了，但對方先要你的 TFN 與銀行資料",
+      story: "你還在整理 TFN、銀行帳戶與 super。有人從社群私訊，說可以替你把全部手續一次辦好，只要先把護照照片、TFN 與網銀截圖傳過去。",
+      question: "落地手續很多，你要怎麼避免方便變成資料外洩？",
+      guide: "prep.html#arrive",
+      official: "https://www.ato.gov.au/api/public/content/0-e74c5f17-c293-45b0-b033-f5d5a3aee760",
+      choices: [
+        {
+          label: "自己從 ATO 與銀行官方入口辦理，分開保存資料",
+          hint: "只把必要資料交給真正需要的對象",
+          tone: "safer",
+          delta: { work: 8, wellbeing: -2, evidence: 12 },
+          title: "你把一大包敏感資料拆成了幾個可核對步驟",
+          copy: "在澳洲工作會用到 TFN、銀行與 super，但不代表任何招募者都需要看你的全部資料。從自己找到的官方入口開始，記下申請進度；不要傳網銀密碼、驗證碼或完整帳戶畫面。"
+        },
+        {
+          label: "把全部截圖傳給對方，換取一次辦完",
+          hint: "速度快，但無法控制資料之後去哪裡",
+          tone: "danger",
+          delta: { work: -8, wellbeing: -8, evidence: -16 },
+          title: "便利沒有證明對方有權收這些資料",
+          copy: "先停止傳送。TFN、護照與銀行資料要分開處理，且只交給必要、可獨立核對的機構或雇主流程；密碼與一次性驗證碼永遠不要交給別人。"
+        },
+        {
+          label: "先做一張順序表，缺哪項就回官方頁補哪項",
+          hint: "今天不一定全部完成，但每一步都有來源",
+          tone: "safer",
+          delta: { work: 6, wellbeing: 3, evidence: 10 },
+          title: "你把『全部還沒好』變成了可完成的小步驟",
+          copy: "手續不必交給陌生人包辦。先確認工作權利，再從官方入口處理 TFN、自己的銀行帳戶與 super 選擇；保存申請紀錄，但不要把敏感資料寫進公開清單。"
+        }
+      ]
+    },
+    {
+      day: "DAY 05",
       tag: "租屋催款",
       title: "有人說每週 A$180，但今晚要先付 bond",
       story: "對方只傳了房間照片，說很多人排隊；不方便看房，也不想提供書面 agreement，但承諾你明天就能入住。",
@@ -107,6 +159,50 @@
     },
     {
       day: "DAY 08",
+      tag: "投遞沒回音",
+      title: "你投了 18 份履歷，只收到一個很難通勤的回覆",
+      story: function (current) {
+        var place = landingLabels[current.landing];
+        var season = monthLabels[current.arrivalMonth] + "（澳洲" + seasonLabel(current.arrivalMonth) + "）";
+        var commute = current.transport === "car"
+          ? "你能自己開車，但還要把油、rego、保險與維修算進去"
+          : current.transport === "shared"
+            ? "工作要求清晨到場，但接送只有口頭承諾"
+            : "工作要求清晨到場，現有公共運輸無法準時抵達";
+        return "你在" + place + "找工作，抵達時間是 " + season + "。這只能提供季節背景，不代表現在有缺額。" + commute + "。";
+      },
+      question: "沒有立即拿到理想工作時，你要改哪一個可控條件？",
+      guide: "work.html#find",
+      official: "https://www.workforceaustralia.gov.au/individuals/coaching/visas-and-working-in-australia",
+      choices: [
+        {
+          label: "盤點 14 天現金跑道，並行改履歷、職類、地區與來源",
+          hint: "設定重新評估日，不把等待當成失敗或保證",
+          tone: "safer",
+          delta: { work: 12, wellbeing: 4, evidence: 5 },
+          title: "你把沒回音拆成可測試的求職策略",
+          copy: "月份、採收訊號與平台職缺都不能保證錄取。保留申請紀錄、逐批調整一個變因，並在現金止損日前重新評估地點、職類與住宿；不要只重複投同一種履歷。"
+        },
+        {
+          label: "相信月份到了就一定有工作，繼續只等同一批回覆",
+          hint: "把季節可能性當成現有 vacancy",
+          tone: "danger",
+          delta: { cash: -220, work: -10, wellbeing: -10 },
+          title: "月曆不是職缺保證，等待也會消耗住宿與生活費",
+          copy: "採收月份只能幫你找方向，不能證明某個雇主此刻招人。回到即時職缺與雇主查核，同時算清楚你願意等到哪一天。"
+        },
+        {
+          label: "先驗證班次與地址能否抵達，再決定要不要追這份工作",
+          hint: "把交通從『到時再想』變成上工條件",
+          tone: "safer",
+          delta: { cash: -35, work: 9, wellbeing: 3, evidence: 7 },
+          title: "你在接受工作前，先驗證每天真的到得了",
+          copy: "沒有車不等於不能工作，有車也不等於成本可忽略。用實際地址、開始時間、回程班次與備援方式核對；接送若只是口頭承諾，也要準備取消時的退路。"
+        }
+      ]
+    },
+    {
+      day: "DAY 11",
       tag: "高薪職缺",
       title: "招募者說：免面試、明天上工，但先付 A$300",
       story: "對方從通訊軟體主動聯絡，聲稱是農場職缺，薪水很好、住宿全包；費用名稱是『保留名額與交通押金』，要求用 PayID 立刻付款。",
@@ -141,7 +237,7 @@
       ]
     },
     {
-      day: "DAY 12",
+      day: "DAY 15",
       tag: "第一週薪資",
       title: "你做完第一週，雇主說 payslip 之後再補",
       story: "排班、工時與薪資都只在口頭講過。雇主說會付現金，叫你不用把每天幾點上下班記得那麼細。",
@@ -177,6 +273,46 @@
     },
     {
       day: "DAY 18",
+      tag: "非緊急就醫",
+      title: "你喉嚨痛、發燒，但目前沒有呼吸困難或立即危險",
+      story: function (current) {
+        var access = current.landing === "regional"
+          ? "你所在的區域城鎮選擇較少，最近的服務也有一段距離。"
+          : "附近有藥師、GP、urgent care 與醫院，但你不知道該選哪一個。";
+        return access + "你也還沒確認自己的 Medicare／RHCA 或保單保障，擔心一問就很貴。";
+      },
+      question: "不是立即危險，不等於只能硬撐；你先怎麼分流？",
+      guide: "health.html#doctor",
+      official: "https://www.healthdirect.gov.au/amp/article/what-care-do-i-need",
+      choices: [
+        {
+          label: "打 healthdirect 或用官方 Service Finder 找合適服務",
+          hint: "先取得分流方向，再確認費用與保障",
+          tone: "safer",
+          delta: { cash: -25, wellbeing: 12, evidence: 5 },
+          title: "你沒有把非緊急誤解成不用處理",
+          copy: "非緊急狀況可先詢問 GP、藥師、urgent care 或 healthdirect；若症狀變嚴重或出現立即危險，改走 000／急診。保障與費用仍要按國籍、服務與保單逐項查。"
+        },
+        {
+          label: "因為不是危及生命，就完全不處理",
+          hint: "讓不確定與費用焦慮取代健康判斷",
+          tone: "danger",
+          delta: { wellbeing: -15, work: -5 },
+          title: "『不用急診』不等於『不用求助』",
+          copy: "healthdirect 提供非緊急分流入口。可以先打 1800 022 222、找 GP、藥師或 urgent care；若狀況轉為嚴重且緊急，立即撥 000。"
+        },
+        {
+          label: "先查 RHCA／保單，再預約能說明費用的服務",
+          hint: "把保障資格與就醫必要性分開看",
+          tone: "safer",
+          delta: { cash: -45, wellbeing: 10, evidence: 9 },
+          title: "你先確認資訊，但沒有讓查保單延誤必要照護",
+          copy: "RHCA 只適用特定國家與條件，私人保單也有保障範圍、除外與自付額。先查自己的狀況；需要立即醫療協助時，安全仍優先。"
+        }
+      ]
+    },
+    {
+      day: "DAY 21",
       tag: "安全中斷",
       title: "室友突然胸痛、呼吸困難，而且快失去意識",
       story: "有人說可能只是太累，想先上社群問；另一個人擔心叫救護車很貴。現在狀況正在惡化。",
@@ -212,7 +348,7 @@
       ]
     },
     {
-      day: "DAY 24",
+      day: "DAY 25",
       tag: "工時減少",
       title: "這週只排到兩個班，短住也快到期",
       story: "雇主沒有保證下週工時。你在社群看到另一個『保證開工』的仲介，也開始擔心每天的住宿與餐費。",
@@ -245,6 +381,46 @@
           copy: "這不一定是最省錢的選項，但能避免因住宿倒數而接受無法查證的房源或工作。接著仍要計算現金跑道，設定下一個止損點。"
         }
       ]
+    },
+    {
+      day: "DAY 28",
+      tag: "生活壓力",
+      title: "你連續幾天只在工作、住宿與求職 App 之間切換",
+      story: function (current) {
+        var support = current.wellbeing <= 48
+          ? "你原本就沒有固定報平安或求助的人，現在更不想麻煩別人。"
+          : "你有聯絡人，但最近總回答『我沒事』，沒有說出真正卡住的地方。";
+        return support + "今天雇主打來時你沒聽懂班表，又因為怕英文不好而沒有回撥。";
+      },
+      question: "你要怎麼讓支持與英文變成可用的工具，而不是另一個壓力分數？",
+      guide: "english.html#work",
+      official: "https://www.healthdirect.gov.au/the-role-of-a-gp",
+      choices: [
+        {
+          label: "準備一句回撥腳本，並向可信任的人說明一個具體困難",
+          hint: "一次只處理一通電話與一個求助",
+          tone: "safer",
+          delta: { work: 7, wellbeing: 14, evidence: 4 },
+          title: "你沒有等英文完美，先建立可重複的小動作",
+          copy: "請對方慢一點、重複時間並用訊息確認班表，都是可用的工作溝通。向可信任的人說出一個具體需求，也比只說『沒事』更容易得到實際支持。"
+        },
+        {
+          label: "繼續不回電話，也不告訴任何人",
+          hint: "短期避開尷尬，工作與壓力一起累積",
+          tone: "danger",
+          delta: { work: -12, wellbeing: -18, evidence: -5 },
+          title: "沉默減少了眼前壓力，也讓可用選項變少",
+          copy: "你不必一次解決英文與孤單。先回覆可確認的事，例如時間、地址與是否能上班；生活壓力則找可信任的人或正式服務，不要只靠公開社群承接個人危機。"
+        },
+        {
+          label: "加入公開活動或社群，但不公開住址、證件與付款資料",
+          hint: "建立連結，同時保留隱私與交易邊界",
+          tone: "safer",
+          delta: { cash: -20, wellbeing: 11, work: 4 },
+          title: "你開始建立連結，但沒有把信任一次交出去",
+          copy: "公開社群可以交換生活經驗，不代表成員身分、房源或工作已被查核。先從公開活動與低風險互動開始；交易、住宿與工作仍回到各自的查證流程。"
+        }
+      ]
     }
   ];
 
@@ -263,6 +439,9 @@
     if (!isIntegerInRange(candidate.work, 0, 100)) return false;
     if (!isIntegerInRange(candidate.wellbeing, 0, 100)) return false;
     if (!isIntegerInRange(candidate.evidence, 0, 100)) return false;
+    if (!isIntegerInRange(candidate.arrivalMonth, 1, 12)) return false;
+    if (["perth", "major", "regional"].indexOf(candidate.landing) < 0) return false;
+    if (["public", "shared", "car"].indexOf(candidate.transport) < 0) return false;
     if (["safety", "income", "experience", "evidence"].indexOf(candidate.goal) < 0) return false;
     if (!isIntegerInRange(candidate.index, 0, EVENTS.length - 1)) return false;
     if (!isIntegerInRange(candidate.riskChoices, 0, EVENTS.length)) return false;
@@ -271,19 +450,48 @@
     return !candidate.finished || candidate.index === EVENTS.length - 1;
   };
 
+  var migrateLegacyState = function (candidate) {
+    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return null;
+    var legacyIndexMap = [0, 2, 4, 5, 7, 8];
+    if (!isIntegerInRange(candidate.index, 0, legacyIndexMap.length - 1)) return null;
+    var migrated = {
+      cash: candidate.cash,
+      housing: candidate.housing,
+      work: candidate.work,
+      wellbeing: candidate.wellbeing,
+      evidence: candidate.evidence,
+      arrivalMonth: 1,
+      landing: "perth",
+      transport: "public",
+      goal: candidate.goal,
+      index: candidate.finished ? EVENTS.length - 1 : legacyIndexMap[candidate.index],
+      riskChoices: candidate.riskChoices,
+      selectedChoice: candidate.selectedChoice,
+      finished: candidate.finished
+    };
+    return isValidState(migrated) ? migrated : null;
+  };
+
   var clearProgress = function () {
     try { sessionStorage.removeItem(progressKey); } catch (_error) { /* storage may be unavailable */ }
   };
 
   var saveProgress = function () {
     if (!state) return;
-    try { sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, state: state })); } catch (_error) { /* keep the game usable */ }
+    try { sessionStorage.setItem(progressKey, JSON.stringify({ version: 2, state: state })); } catch (_error) { /* keep the game usable */ }
   };
 
   var readProgress = function () {
     try {
       var saved = JSON.parse(sessionStorage.getItem(progressKey));
-      if (!saved || saved.version !== 1 || !isValidState(saved.state)) {
+      if (saved && saved.version === 1) {
+        var migrated = migrateLegacyState(saved.state);
+        if (migrated) {
+          sessionStorage.setItem(progressKey, JSON.stringify({ version: 2, state: migrated }));
+          return migrated;
+        }
+      }
+      if (!saved || saved.version !== 2 || !isValidState(saved.state)) {
         clearProgress();
         return null;
       }
@@ -357,9 +565,9 @@
     progress.setAttribute("aria-valuenow", String(state.index));
     progressBar.style.width = ((state.index / EVENTS.length) * 100) + "%";
     eventTag.textContent = event.tag;
-    eventTitle.textContent = event.title;
-    eventStory.textContent = event.story;
-    eventQuestion.textContent = event.question;
+    eventTitle.textContent = resolveCopy(event.title);
+    eventStory.textContent = resolveCopy(event.story);
+    eventQuestion.textContent = resolveCopy(event.question);
     criticalAction.hidden = !event.critical;
     choicesWrap.textContent = "";
     feedback.hidden = true;
@@ -417,7 +625,7 @@
     if (state.wellbeing <= 48) notes.push("先設定報平安與緊急聯絡人");
     if (state.evidence <= 40) notes.push("先建立工時、付款與文件的保存方式");
     if (notes.length < 2) notes.push(goalNotes[state.goal]);
-    profileNote.textContent = "角色快照：你目前最值得先守住的是「" + notes.slice(0, 2).join("」與「") + "」。接下來的分數只代表模擬資源，不是適合度。";
+    profileNote.textContent = "角色快照：" + monthLabels[state.arrivalMonth] + "（" + seasonLabel(state.arrivalMonth) + "）到 " + landingLabels[state.landing] + "，主要靠" + transportLabels[state.transport] + "。目前最值得先守住的是「" + notes.slice(0, 2).join("」與「") + "」。分數只代表模擬資源，不是適合度。";
   };
 
   var renderFinishStat = function (icon, label, value) {
@@ -444,7 +652,7 @@
     var riskText = state.riskChoices === 0
       ? "你在這輪保留了很多查證與退場空間。"
       : "你在這輪有 " + state.riskChoices + " 次被急迫感推向高風險選項；這正是重玩的價值。";
-    finishSummary.textContent = riskText + " 遊戲不判定你適不適合澳洲；請把下面最脆弱的三項，改成現實中的查核與備援。";
+    finishSummary.textContent = monthLabels[state.arrivalMonth] + "到 " + landingLabels[state.landing] + "、主要靠" + transportLabels[state.transport] + "的這一輪，" + riskText + " 遊戲不判定你適不適合澳洲；請把下面最脆弱的三項，改成現實中的查核與備援。";
     finishDashboard.textContent = "";
     renderFinishStat("dollar", "可用資金", formatCash(state.cash));
     renderFinishStat("home", "住宿退路", state.housing + " / 100");
@@ -502,6 +710,9 @@
       work: { start: 25, basic: 45, ready: 70 }[readiness],
       wellbeing: { solo: 48, contact: 63, network: 78 }[support],
       evidence: { start: 20, basic: 40, ready: 68 }[readiness],
+      arrivalMonth: Number(data.get("arrivalMonth")),
+      landing: String(data.get("landing")),
+      transport: String(data.get("transport")),
       goal: String(data.get("goal")),
       index: 0,
       riskChoices: 0,
@@ -536,6 +747,7 @@
     if (window.confirm("這會清除本輪進度並回到角色設定。確定要放棄本輪嗎？")) resetSimulation();
   });
 
+  progress.setAttribute("aria-valuemax", String(EVENTS.length));
   state = readProgress();
   if (state) {
     profileSection.hidden = true;
