@@ -682,7 +682,7 @@
         ctx.fillText("A$" + Math.round(calcData.yearlySave).toLocaleString("en-AU"), 120, 1535);
         ctx.font = '600 23px "Noto Sans TC", sans-serif';
         ctx.fillStyle = "#6b3b2c";
-        ctx.fillText("年存款粗估（46 週）", 120, 1580);
+        ctx.fillText("年存款粗估（收入 " + (calcData.incomeWeeks || 46) + " 週）", 120, 1580);
         ctx.fillStyle = "#221d15";
         ctx.font = '700 25px "Noto Sans TC", sans-serif';
         ctx.fillText("時薪 A$" + Number(calcData.rate).toFixed(2) + " ・ 每週 " + calcData.hours + " 小時", 650, 1502);
@@ -702,7 +702,7 @@
     posterButton.addEventListener("click", function () {
       var worksheet = readStored("whv-worksheet-v1") || {};
       var prepData = readStored("whv-prep-check-v1") || {};
-      var calcData = readStored("whv-save-calc-v1");
+      var calcData = readStored("whv-save-calc-v2") || readStored("whv-save-calc-v1");
       var hasWorksheet = Object.keys(worksheet).some(function (key) { return String(worksheet[key] || "").trim(); });
       var hasChecklist = Object.keys(prepData).some(function (key) { return prepData[key] === true; });
       var hasCalc = calcData && Number.isFinite(Number(calcData.yearlySave));

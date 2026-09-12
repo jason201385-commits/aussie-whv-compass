@@ -1,6 +1,6 @@
 # 澳打指南針 — 現況行為契約（SPEC）
 
-> 版本 2.0｜最後更新 2026-09-05｜本文件只寫「現在的行為是什麼、怎麼驗證」。
+> 版本 2.0｜最後更新 2026-09-12｜本文件只寫「現在的行為是什麼、怎麼驗證」。
 > 待辦與狀態在 `ROADMAP.md`，為什麼與證據在 `DECISIONS.md`，原則與架構在 `SDD.md`，
 > 閱讀路線在 `README.md`。改動任何功能行為時，必須在同一個 commit 更新本文件對應列並更新標頭日期。
 
@@ -60,7 +60,7 @@
 | 工具 | 位置 | 輸入 | 邏輯與隱私邊界 | 輸出 | 驗證指標 |
 |---|---|---|---|---|---|
 | 集簽郵遞區號初篩 | `visa.html` `#postcode-tool`；`lang/en/visa/`（417-only） | 4 碼郵遞區號（字串，保留前導零）＋類型（plant/tourism/bushfire/disaster）＋6 個熱門點 chips | 州判定（NT 0800-0999、ACT 2600-2618∪2900-2920、Norfolk 2899…）→ 對應表查 `ALL` 或範圍；tourism＝三表聯集；跨州碼全清單兜底掃描；不寫 storage | 是否符合 2026-08-29 留存清單＋類型日期條件＋適用限制＋官方頁；不得表述為個人簽證資格判定 | `scripts/test_tools.mjs`（check.ps1 執行；7 案例）；check.ps1「完整英文簽證頁」鎖 417 邊界 |
-| 存錢試算器 | `cost.html`／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿 select、其他支出 select | weeklyGross=r×h；annualGross=×46；annualTax 依 2026–27 WHM 15／30／37／45% 級距；afterTaxWeek=(annualGross−annualTax)÷46；year=(annualGross−annualTax)−weeklyExpenses×52；super=weeklyGross×0.12（OTE 粗估）；輸入與最近結果存 `whv-save-calc-v1` | 六格數據＋稅／super 邊界；繁中台幣示意（係數 22.8 在 tools.js）、英文顯示可覆蓋幾個支出週；四級壓力警語 | `scripts/test_tools.mjs`（check.ps1 執行；基準四值與 0 工時）；check.ps1「完整英文生活成本頁」 |
+| 存錢試算器 | `cost.html`／`lang/en/cost/` `#save-calc` | 時薪滑桿 20–60（預設 33.05）、工時 0–50（38）、每週住宿與其他支出 number input 0–2000、有收入週與支出週滑桿 1–52（預設 46／52） | weeklyGross=r×h；annualGross=weeklyGross×incomeWeeks；annualTax 依 2026–27 WHM 15／30／37／45% 級距；afterTaxWeek=(annualGross−annualTax)÷incomeWeeks；year=(annualGross−annualTax)−weeklyExpenses×expenseWeeks；super=weeklyGross×0.12（OTE 粗估）；最近結果存 `whv-save-calc-v2`，讀取時相容 v1 | 六格數據＋稅／super 邊界；繁中台幣示意（係數 22.8 在 tools.js）、英文顯示可覆蓋幾個支出週；四級壓力警語 | `scripts/test_tools.mjs`（check.ps1 執行；預設基準、可調週數與 0 工時）；check.ps1「完整英文生活成本頁」 |
 | 行前互動清單 | `prep.html` `#prep-checklist`；`lang/en/prep/`（獨立 key） | 21 項勾選（3 組，JS 產生） | `whv-prep-check-v1`／`whv-prep-check-en-v1`、進度條、100% 文案、清空需 confirm | 進度 x/21 | check.ps1 頁面基線；「完整英文行前頁」 |
 | 我的行前海報 | `prep.html` | 工作表答案＋清單進度＋試算結果（皆 localStorage） | Canvas A4 直式 PNG 本機生成；下載／長按儲存備援；空資料引導 | PNG | 桌機／390px E2E 通過；iPhone Safari／Android Chrome 實機為人工 gate（P1-2） |
 | 抵澳 30 天模擬器 | `simulator.html` `#simulator-profile-form`＋`#simulator-stage` | 5 組固定單選；6 個固定事件各 3 個白名單選項 | 資源與關卡只寫 `sessionStorage` `whv-simulator-progress-v1`（版本、型別、範圍嚴格驗證）；不用 localStorage、fetch、自由文字；delta 可重播且恢復不重複套用；緊急就醫事件選項前顯示 `tel:000`；重開需確認；分數不得描述為成功率、適合度、診斷或簽證判定 | 角色快照＋逐關取捨／官方出口＋第 30 天行動地圖；no-JS 只顯示靜態入口 | check.ps1「模擬器」區塊 |

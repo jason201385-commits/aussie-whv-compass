@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ANSWER_LEAD,
   ASSIST_ALLOWED_HOSTS,
@@ -106,6 +106,12 @@ async function storedCount(day: string): Promise<number | null> {
     .first<{ count: number }>();
   return row?.count ?? null;
 }
+
+beforeEach(async () => {
+  await env.DB.prepare("DELETE FROM assist_daily_usage WHERE day BETWEEN ? AND ?")
+    .bind("2026-09-09", "2026-09-15")
+    .run();
+});
 
 afterEach(() => {
   vi.restoreAllMocks();

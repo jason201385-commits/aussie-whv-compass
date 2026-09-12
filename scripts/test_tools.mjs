@@ -3,7 +3,7 @@
    1. 集簽郵遞區號初篩測試組（7 案例）＋輸入邊界；
    2. 存錢試算器基準（33.05 x 38h、住宿 250、其他 240）＋ 0 工時負餘額。
    顯示值與數值對應：畫面文字經 fmt() = "$" + Math.round(n).toLocaleString("en-AU")；
-   本檔同時斷言畫面文字（SPEC 基準字面）與 tools.js 寫入 whv-save-calc-v1 的原始數值。 */
+   本檔同時斷言畫面文字（SPEC 基準字面）與 tools.js 寫入 whv-save-calc-v2 的原始數值。 */
 import fs from "node:fs";
 import vm from "node:vm";
 
@@ -139,9 +139,12 @@ function createHarness(lang = "zh-Hant", options = {}) {
     value: "240",
     options: Object.keys(text.life).map((value) => ({ value, textContent: text.life[value] }))
   });
+  add("calc-income-weeks", { value: "46", min: "1", max: "52" });
+  add("calc-expense-weeks", { value: "52", min: "1", max: "52" });
   for (const id of [
     "calc-rate-out", "calc-hours-out", "calc-gross", "calc-net", "calc-exp", "calc-save",
-    "calc-super", "calc-year", "calc-tax", "calc-twd", "calc-verdict"
+    "calc-super", "calc-year", "calc-tax", "calc-twd", "calc-verdict", "calc-city-out",
+    "calc-life-out", "calc-income-weeks-out", "calc-expense-weeks-out"
   ]) add(id);
 
   const stored = {};
@@ -294,7 +297,7 @@ runCase("postcode English page 4880/plant=YES", () => {
 });
 
 /* ---------- 存錢試算器：SPEC §4 基準 ---------- */
-const CALC_KEY = "whv-save-calc-v1";
+const CALC_KEY = "whv-save-calc-v2";
 const near = (actual, expected, tolerance = 0.005) => Math.abs(actual - expected) < tolerance;
 const readStoredCalc = (h) => JSON.parse(h.stored[CALC_KEY] || "null");
 
@@ -324,7 +327,7 @@ runCase("calculator baseline derived weekly figures", () => {
   expect(verdict.className === "result-verdict result-ok", `verdict class ${verdict.className}`);
   expect(verdict.textContent.includes("規劃上可行"), verdict.textContent);
 });
-runCase("calculator baseline raw numbers stored in whv-save-calc-v1", () => {
+runCase("calculator baseline raw numbers stored in whv-save-calc-v2", () => {
   const saved = readStoredCalc(calcHarness);
   expect(saved !== null, "tools.js must persist the latest result locally");
   expect(saved.rate === 33.05 && saved.hours === 38, `inputs ${saved.rate} x ${saved.hours}`);
@@ -335,7 +338,19 @@ runCase("calculator baseline raw numbers stored in whv-save-calc-v1", () => {
   expect(saved.expenses === 490, `expenses ${saved.expenses}`);
   expect(near(saved.yearlySave, 21709.98), `yearlySave ${saved.yearlySave}`);
   expect(saved.incomeWeeks === 46 && saved.expenseWeeks === 52, "46 income weeks and 52 expense weeks");
-  expect(saved.cityLabel === "$250／週" && saved.lifeLabel === "一般規劃（$240／週）", "selected option labels");
+  expect(saved.cityLabel === "$250／週" && saved.lifeLabel === "$240／週", "numeric budget labels");
+});
+runCase("calculator uses adjustable income and expense weeks", () => {
+  const custom = createHarness();
+  custom.elements["calc-income-weeks"].value = "40";
+  custom.elements["calc-expense-weeks"].value = "48";
+  custom.elements["calc-income-weeks"].dispatch("input");
+  const saved = readStoredCalc(custom);
+  expect(saved.incomeWeeks === 40 && saved.expenseWeeks === 48, `weeks ${saved.incomeWeeks}/${saved.expenseWeeks}`);
+  expect(calcText(custom, "calc-income-weeks-out") === "40 週", calcText(custom, "calc-income-weeks-out"));
+  expect(calcText(custom, "calc-expense-weeks-out") === "48 週", calcText(custom, "calc-expense-weeks-out"));
+  expect(near(saved.annualGross, 50236), `annualGross ${saved.annualGross}`);
+  expect(near(saved.yearlySave, 18395.2), `yearlySave ${saved.yearlySave}`);
 });
 runCase("calculator 0 hours gives a negative annual remainder and the shortfall warning", () => {
   calcHarness.elements["calc-hours"].value = "0";

@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-09-05｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-09-12｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -141,7 +141,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 - **旅程順序單一來源**：`main.js` 的 `JOURNEY_ORDER` 與首頁四階段一致，負責內容頁的上一站／下一站。
 - **Storage keys**（改動＝使用者資料遺失，不得更名）：
   - localStorage：`whv-worksheet-v1`（慢想 q1..q8）、`whv-why-quick-v1`（快思 qq1..qq8，1..5）、
-    `whv-prep-check-v1`、`whv-prep-check-en-v1`、`whv-leave-check-v1`、`whv-save-calc-v1`、
+    `whv-prep-check-v1`、`whv-prep-check-en-v1`、`whv-leave-check-v1`、`whv-save-calc-v2`（讀取相容 v1）、
     `whv-last-page-v1`（`{path}` 白名單）、`whv-saved-pages-v1`（白名單 path 陣列）、
     `whv-analytics-consent-v1`（`granted`／`denied`）。
   - sessionStorage：`whv-simulator-progress-v1`（版本化、嚴格驗證；只在目前分頁）。

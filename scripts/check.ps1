@@ -1065,7 +1065,7 @@ if (-not (Test-Path $englishCostPath)) {
     '<link rel="alternate" hreflang="en" href="https://www.aussiewhvcompass.com/lang/en/cost/">',
     '<body data-i18n-topic="cost">',
     'id="calc-tax"',
-    '46 個收入週、52 個支出週'
+    '預設 46／52'
   )) {
     if (-not $traditionalCostText.Contains($needle)) { Write-Output "FAIL [cost.html] 缺英文 reciprocal hreflang、主題標記或新公式邊界：$needle"; $errors++ }
   }
@@ -1080,8 +1080,8 @@ if (-not (Test-Path $englishCostPath)) {
   $costToolsText = [System.IO.File]::ReadAllText((Join-Path $dir 'assets\tools.js'), [System.Text.Encoding]::UTF8)
   foreach ($needle in @(
     'var calcEnglish =',
-    'var incomeWeeks = 46;',
-    'var expenseWeeks = 52;',
+    'var incomeWeeks = incomeWeeksEl ? clampNum(incomeWeeksEl, 46) : 46;',
+    'var expenseWeeks = expenseWeeksEl ? clampNum(expenseWeeksEl, 52) : 52;',
     'if (income <= 45000)',
     'if (income <= 135000)',
     'if (income <= 190000)',
