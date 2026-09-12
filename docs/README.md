@@ -1,6 +1,6 @@
 # docs/ 索引與閱讀路線
 
-> 版本 2.0｜最後更新 2026-09-04｜接手 agent 從這一頁開始，不要從「讀全文」開始。
+> 版本 2.0｜最後更新 2026-09-12｜接手 agent 從這一頁開始，不要從「讀全文」開始。
 > 五份核心文件各管一件事；同一個事實只寫在一個地方，其他地方用 ID 或章節號引用。
 
 ## 1. 文件分工
@@ -18,6 +18,7 @@
 | [`MEASUREMENT_SETUP.md`](MEASUREMENT_SETUP.md) | GA4 與 Search Console 的人工前置步驟 | 量測方式變動 |
 | [`ACCOMMODATION_PROVIDER_ONBOARDING.md`](ACCOMMODATION_PROVIDER_ONBOARDING.md) | 住宿 provider 授權、secret、商業關係、E2E 與公開開關 gate | provider 狀態變動 |
 | [`ACCOMMODATION_PROVIDER_APPLICATION_PACK.md`](ACCOMMODATION_PROVIDER_APPLICATION_PACK.md) | 五個住宿平台的申請文字與站長人工欄位 | 申請進度變動 |
+| [`WHV_COMMON_PROBLEMS_RESEARCH.md`](WHV_COMMON_PROBLEMS_RESEARCH.md) | P1-24 常見問題的需求訊號、官方核對矩陣與模擬器情境模型 | 問題優先序、情境來源或採納邊界變動 |
 
 ## 2. 每個任務都要先讀（不可省略）
 

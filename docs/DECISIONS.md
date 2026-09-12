@@ -1,6 +1,6 @@
 # 澳打指南針 — 決策與證據日誌（DECISIONS）
 
-> 版本 2.0｜最後更新 2026-09-04｜按日期遞增的決策紀錄（ADR 風格）。
+> 版本 2.0｜最後更新 2026-09-12｜按日期遞增的決策紀錄（ADR 風格）。
 > 規格檔只寫「現在是什麼」；為什麼變成這樣、誰在哪一天拍板、當時的本機證據與反方裁決，
 > 全部寫在這裡。新增條目只能往後加，不改舊條目；要推翻舊決策就寫新條目並標「取代 D-…」。
 > 條目格式：決策／理由／證據／影響／狀態。commit 以短 hash 指向 `main` 歷史。
@@ -503,3 +503,11 @@
   `third-party-register.json` 新增 `community-search-navigation-group` 與 `public-forums-navigation-group`；
   頁面進 `build_seo.py`／`build_search.py`／sitemap／llms.txt／SPEC §1.1，但**不進全站 nav**（同工具頁規則）。
 - 狀態：已上線，`ALL CHECKS PASSED (16 pages)`。
+
+## D-2026-09-12-01 P1-24 常見問題研究採雙層證據，模擬器先補現實條件
+
+- 決策：把「大家常問什麼」與「正確答案是什麼」拆成兩層。站長轉述的使用者回饋與公開討論只用來發現問題；簽證、租屋、勞權、防詐、醫療、稅務與 super 的答案回澳洲官方原頁核對。
+- 證據：`WHV_COMMON_PROBLEMS_RESEARCH.md` 建立 13 類問題矩陣；四篇公開討論反覆出現找工等待、住宿、現金、交通與孤單，但樣本不具代表性，因此不宣稱發生率或熱門排行。官方出口涵蓋 Home Affairs、Fair Work、ATO、Workforce Australia、Scamwatch、healthdirect、Services Australia 與 WA Consumer Protection。
+- 產品判斷：首頁四階段與既有問題出口已涵蓋本輪主題，不另外疊一套大分類。第一批先把模擬器從六個固定事件擴成能感受到月份、落腳地與交通差異的可重播情境，並補求職沒回音、落地手續、非緊急就醫與支持壓力。
+- 邊界：月份與地點不是 vacancy、成功率或推薦城市；玩家資料維持白名單、零自由文字、sessionStorage only、零傳送；高風險安全出口不能被遊戲化遮住。
+- 狀態：研究矩陣與情境模型完成；互動實作與 E2E 待完成。
