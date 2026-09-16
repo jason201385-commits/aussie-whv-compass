@@ -1,0 +1,108 @@
+name: Read-only production AI discovery verification
+on:
+  push:
+    branches: [qa/ai-discovery-production-20260917]
+    paths: [.github/workflows/verify-ai-discovery-production.yml]
+permissions:
+  contents: read
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ce0b8338b08f586b81d2e42d1e6778a717d27e47
+          persist-credentials: false
+      - name: Verify exact production bytes and compatible crawler responses
+        run: |
+          mkdir -p /tmp/ai-discovery-production
+          python - <<'PY'
+          import pathlib,json,hashlib,urllib.request,urllib.error,datetime,time
+          from urllib.parse import urlsplit
+          from urllib.robotparser import RobotFileParser
+          root=pathlib.Path('.')
+          out=pathlib.Path('/tmp/ai-discovery-production')
+          origin='https://www.aussiewhvcompass.com'
+          manifest=json.loads(root.joinpath('ai-index.json').read_text())
+          rows=[]
+          def check(path,agent,exact=True,html=False):
+            url=origin+'/'+path
+            req=urllib.request.Request(url,headers={'User-Agent':agent,'Accept':'text/markdown,text/plain,text/html,application/json,application/xml;q=0.9,*/*;q=0.5'})
+            try:
+              r=urllib.request.urlopen(req,timeout=20)
+            except urllib.error.HTTPError as e:r=e
+            with r:
+              data=r.read(2000000);content_type=r.headers.get('Content-Type','')
+              row={'url':url,'userAgent':agent,'status':r.status,'contentType':content_type,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'cfMitigated':r.headers.get('cf-mitigated')}
+              rows.append(row)
+              out.joinpath('requests.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2))
+              assert r.status==200,(url,r.status)
+              assert r.headers.get('cf-mitigated')!='challenge',url
+              if exact:assert data==root.joinpath(path).read_bytes(), 'Production bytes differ: '+url
+              if path.endswith('.md'):assert content_type.startswith(('text/plain','text/markdown')), (url,content_type)
+              if path.endswith('.json'):assert 'application/json' in content_type,(url,content_type)
+              if html:
+                text=data.decode('utf-8')
+                assert '<!-- AI_READING_BEGIN -->' in text and '<!-- AI_READING_FOOTER_BEGIN -->' in text,url
+              if path=='robots.txt':
+                parser=RobotFileParser();parser.parse(data.decode().splitlines())
+                for bot in ['Claude-SearchBot','Claude-User','ClaudeBot']:
+                  assert parser.can_fetch(bot,origin+'/ai/visa.md')
+                  assert not parser.can_fetch(bot,origin+'/api/private')
+            time.sleep(.15)
+          for doc in manifest['documents']:check(urlsplit(doc['markdownUrl']).path.lstrip('/'),'AussieWHVCompassAudit/1.0')
+          for path in ['ai-index.json','llms.txt','llms-full.txt','robots.txt','sitemap.xml']:check(path,'AussieWHVCompassAudit/1.0')
+          for path in ['index.html','free.html','lang/en/visa/index.html']:check(path,'AussieWHVCompassAudit/1.0',html=True)
+          for agent in ['ClaudeBot','Claude-SearchBot','Claude-User']:
+            for path in ['robots.txt','llms.txt','ai-index.json','ai/visa.md','ai/free.md']:check(path,agent)
+          report={'productionCommit':'ce0b8338b08f586b81d2e42d1e6778a717d27e47','checkedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'passedRequests':len(rows),'markdownDocuments':len(manifest['documents']),'limitations':'GET-only probes from GitHub runner. User-Agent strings are simulations, not verified Anthropic requests or indexing evidence. No Cloudflare settings, authenticated sessions or live listings touched.'}
+          out.joinpath('result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Install isolated browser dependency
+        run: |
+          npm install --prefix /tmp/ai-prod-browser playwright@1.55.0
+          /tmp/ai-prod-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Verify native reading links without JavaScript on the live site
+        env:
+          NODE_PATH: /tmp/ai-prod-browser/node_modules
+        run: |
+          node <<'JS'
+          const { chromium }=require('playwright');
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs');
+          (async()=>{
+            const browser=await chromium.launch();const checks=[];
+            try {
+              for(const width of [390,1280]) {
+                const context=await browser.newContext({viewport:{width,height:844},javaScriptEnabled:false});
+                await context.route('**/*',route=>{
+                  const req=route.request();const u=new URL(req.url());
+                  return req.method()==='GET'&&u.origin==='https://www.aussiewhvcompass.com'?route.continue():route.abort();
+                });
+                const page=await context.newPage();
+                for(const [path,md] of [['/','/ai/index.md'],['/free.html','/ai/free.md'],['/lang/en/visa/','/ai/en/visa.md']]) {
+                  const response=await page.goto('https://www.aussiewhvcompass.com'+path,{waitUntil:'domcontentloaded'});
+                  assert.equal(response.status(),200);
+                  const link=page.locator('footer a[href="https://www.aussiewhvcompass.com'+md+'"]');
+                  assert.equal(await link.count(),1);
+                  await link.scrollIntoViewIfNeeded();assert(await link.isVisible());
+                  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'horizontal overflow');
+                  assert.equal(await page.locator('head link[rel="alternate"][type="text/markdown"][href="https://www.aussiewhvcompass.com'+md+'"]').count(),1);
+                  checks.push({path,width,noJavaScript:true,readingLink:md});
+                  if(path==='/free.html')await page.screenshot({path:'/tmp/ai-discovery-production/free-footer-'+width+'.png'});
+                }
+                await context.close();
+              }
+            }finally{await browser.close();}
+            fs.writeFileSync('/tmp/ai-discovery-production/browser-result.json',JSON.stringify({passed:checks.length,checks,limitations:'Read-only live-page tests with JS disabled and third-party requests blocked; not physical-device or actual crawler verification.'},null,2));
+            console.log('Production no-JavaScript reading-link groups passed:',checks.length);
+          })().catch(err=>{console.error(err);process.exit(1);});
+          JS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ai-discovery-production-qa
+          path: /tmp/ai-discovery-production
+          retention-days: 7
