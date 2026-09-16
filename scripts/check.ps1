@@ -6,6 +6,9 @@ $ErrorActionPreference = 'Stop'
 $dir = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Join-Path $dir 'index.html'))) { $dir = (Get-Location).Path }
 $errors = 0
+& node (Join-Path $dir 'scripts/test_free_board_access.cjs')
+if ($LASTEXITCODE -ne 0) { $errors++ }
+
 $assetVersions = @()
 $canonicalOrigin = 'https://www.aussiewhvcompass.com'
 
@@ -65,8 +68,8 @@ if (-not (Test-Path $notFoundPath)) {
     if (-not $notFoundText.Contains($required)) { Write-Output "FAIL [404.html] 缺復原要素：$required"; $errors++ }
   }
   $notFoundNav = [regex]::Matches($notFoundText, 'class="nav-links"[\s\S]*?</div>')
-  if ($notFoundNav.Count -ne 1 -or (($notFoundNav[0].Value -split '<a ').Count - 1) -ne 12) {
-    Write-Output 'FAIL [404.html] 主導覽必須維持 12 個連結'
+  if ($notFoundNav.Count -ne 1 -or (($notFoundNav[0].Value -split '<a ').Count - 1) -ne 13) {
+    Write-Output 'FAIL [404.html] 主導覽必須維持 13 個連結（含免費二手）'
     $errors++
   }
   if ($notFoundText.Contains('rel="canonical"') -or $notFoundText.Contains('property="og:url"')) {
@@ -154,11 +157,11 @@ foreach ($p in $pages) {
   else {
     $nav = [regex]::Matches($t, 'class="nav-links"[\s\S]*?</div>')[0].Value
     $links = ($nav -split '<a ').Count - 1
-    $expectedNavLinks = 12
+    $expectedNavLinks = 13
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
     if ($nav -match 'href="(?:simulator|market|communities|map)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html、communities.html 或 map.html（站長 2026-09-02 決定；工具頁不進 nav）"; $errors++ }
   }
-  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html', 'free.html')
+  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html')
   if ($p -in $offNavPages) {
     if ([regex]::Matches($t, 'aria-current="page"').Count -ne 0) {
       Write-Output "FAIL [$p] 不在全站 nav 的工具頁不得標 aria-current=page"; $errors++
@@ -2321,8 +2324,8 @@ if (-not $entryCards.Success) {
   $errors++
 } else {
   $entryHrefs = @([regex]::Matches($entryCards.Value, '<a class="home-entry-card"[^>]*href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
-  if ($entryHrefs.Count -ne 4 -or ($entryHrefs -join ',') -ne 'communities.html,free.html,#games,#journey-resume') {
-    Write-Output "FAIL [index.html] 入口卡必須恰好四張且依序連 communities.html、free.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
+  if ($entryHrefs.Count -ne 3 -or ($entryHrefs -join ',') -ne 'communities.html,#games,#journey-resume') {
+    Write-Output "FAIL [index.html] 下方入口卡必須三張：communities.html、#games、#journey-resume；免費二手移至階段旁；目前：$($entryHrefs -join ', ')"
     $errors++
   }
   foreach ($entryCardNeedle in @('找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {

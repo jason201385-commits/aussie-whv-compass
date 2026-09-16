@@ -16,7 +16,7 @@ LANG_ROOT = ROOT / "lang"
 SWITCHER_PATH = ROOT / "assets" / "i18n.js"
 INDEX_PATH = ROOT / "index.html"
 ORIGIN = "https://www.aussiewhvcompass.com"
-ASSET_VERSION = "20260916-01"
+ASSET_VERSION = "20260917-01"
 GITHUB = "https://github.com/jason201385-commits/aussie-whv-compass"
 INDEX_BEGIN = "<!-- I18N_DISCOVERY_BEGIN -->"
 INDEX_END = "<!-- I18N_DISCOVERY_END -->"
@@ -144,6 +144,7 @@ def header(home_label: str = "Aussie WHV Compass") -> str:
   <nav class="nav-inner" aria-label="Primary">
     <a class="brand" href="/"><span class="logo" aria-hidden="true">A</span>{esc(home_label)}</a>
     <a class="language-hub-link" href="/lang/">All languages</a>
+    <a class="language-hub-link" href="/free.html" hreflang="zh-Hant">Free items (Chinese)</a>
   </nav>
 </header>'''
 
