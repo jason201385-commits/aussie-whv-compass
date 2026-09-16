@@ -1,0 +1,80 @@
+name: Read-only task-first production verification
+on:
+  push:
+    branches: [qa/task-first-production-20260917]
+    paths: [.github/workflows/verify-task-production.yml]
+permissions:
+  contents: read
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 1ee6e8e72677e40f120f82032e0b8b6c45f4eebe
+          persist-credentials: false
+      - name: Verify served task source and derived reading bytes
+        run: |
+          mkdir -p /tmp/task-production-qa
+          python - <<'PY'
+          import pathlib,json,hashlib,urllib.request,re,time
+          root=pathlib.Path('.');out=pathlib.Path('/tmp/task-production-qa');origin='https://www.aussiewhvcompass.com'
+          registry=json.loads(root.joinpath('answers.json').read_text());results=[]
+          def get(path):
+              with urllib.request.urlopen(urllib.request.Request(origin+'/'+path,headers={'User-Agent':'AussieWHVTaskVerification/1.0'}),timeout=25) as r:
+                  assert r.status==200 and r.headers.get('cf-mitigated')!='challenge'
+                  return r.read(2000000),r.headers.get('Content-Type','')
+          paths=['answers.json','assets/main.js','assets/style.css','assets/cash-runway.js','assets/search-index.js','content-status.json','ai-index.json','llms-full.txt']+[str(p) for p in root.joinpath('ai').rglob('*.md')]
+          for path in paths:
+              data,ct=get(path);assert data==root.joinpath(path).read_bytes(),path+' bytes differ'
+              results.append({'path':path,'http200':True,'exact':True,'contentType':ct,'sha256':hashlib.sha256(data).hexdigest()})
+          for path in sorted({'index.html'}|{x['href'].split('#')[0] for x in registry['answers']}):
+              data,ct=get(path);text=data.decode();source=root.joinpath(path).read_text()
+              main=lambda t:re.search(r'<main\b[\s\S]*?</main>',t).group()
+              assert main(text)==main(source),path+' main differs'
+              assert '20260917-02' in text and 'text/html' in ct
+              results.append({'path':path,'http200':True,'mainExact':True})
+          out.joinpath('http-results.json').write_text(json.dumps({'commit':'1ee6e8e72677e40f120f82032e0b8b6c45f4eebe','requests':len(results),'results':results,'limitations':'Read-only compatibility checks, not user outcomes or official crawler indexing.'},ensure_ascii=False,indent=2))
+          print('Production source and main sections match:',len(results))
+          PY
+      - name: Install isolated browser dependency
+        run: |
+          npm install --prefix /tmp/task-prod-browser playwright@1.55.0
+          /tmp/task-prod-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Exercise task discovery and example arithmetic without sending data
+        env:
+          NODE_PATH: /tmp/task-prod-browser/node_modules
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright');const assert=require('node:assert/strict');const fs=require('node:fs');
+          (async()=>{
+            const origin='https://www.aussiewhvcompass.com',browser=await chromium.launch();const checks=[];
+            const pass=name=>{checks.push(name);fs.writeFileSync('/tmp/task-production-qa/browser-results.json',JSON.stringify({passed:checks.length,checks,limitations:'Desktop/mobile viewports, third-party requests blocked; no user research, posting or physical device test.'},null,2));};
+            try {
+              for(const width of [390,1280]){
+                const c=await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'});const writes=[],errors=[];
+                await c.route('**/*',r=>{const q=r.request();if(q.method()!=='GET')writes.push(q.url());return q.method()==='GET'&&new URL(q.url()).origin===origin?r.continue():r.abort();});
+                const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));
+                assert.equal((await p.goto(origin+'/')).status(),200);await p.waitForSelector('.site-search-open');assert.equal(await p.locator('.home-task-links a').count(),10);
+                assert.equal(await p.locator('#exit-considering-why a[href="prep.html#first-city"]').count(),1);pass(width+': live task entry and corrected city route');
+                await p.click('.site-search-open');await p.fill('#site-search-input','落地第一週');await p.locator('#site-search-input').press('Enter');await p.waitForSelector('.task-search-answer');
+                assert((await p.locator('.task-search-answer').textContent()).includes('TFN 申請'));assert.equal(await p.locator('.task-search-answer a[href="prep.html#first-week"]').count(),1);pass(width+': live scoped answer search');
+                if(width===390)await p.screenshot({path:'/tmp/task-production-qa/search-390.png'});
+                await p.goto(origin+'/cost.html#runway-tool');await p.waitForSelector('#runway-form:not([hidden])');assert.equal(await p.locator('#runway-cash').inputValue(),'');await p.click('#runway-example');await p.click('#runway-form button[type="submit"]');await p.waitForSelector('#runway-result:not([hidden])');
+                assert((await p.locator('#runway-result').textContent()).includes('8.0 週'));assert((await p.locator('#runway-result').textContent()).includes('4,000.00'));await p.fill('#runway-weekly','0');assert.equal(await p.locator('#runway-result').isVisible(),false);
+                assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert.deepEqual(writes,[]);assert.deepEqual(errors,[]);pass(width+': live eight-week arithmetic and stale-result clearing without writes');await c.close();
+              }
+              const c=await browser.newContext({viewport:{width:390,height:844},javaScriptEnabled:false});await c.route('**/*',r=>r.request().method()==='GET'&&new URL(r.request().url()).origin===origin?r.continue():r.abort());const p=await c.newPage();
+              await p.goto(origin+'/');await p.click('.home-task-links a[href="cost.html#runway"]');assert(await p.locator('[data-task-answer="cash-runway"]').isVisible());assert.equal(await p.locator('#runway-form').isVisible(),false);assert((await p.locator('#runway-tool').textContent()).includes('公式：'));pass('no-JS: live native answer route and formula');
+              await p.goto(origin+'/prep.html#first-week');await p.locator('[data-task-answer="first-week"] summary').click();assert(await p.locator('[data-task-answer="first-week"] details a[href*="getting-a-tax-file-number"]').isVisible());pass('no-JS: live source and review scope');await c.close();
+            }finally{await browser.close();}
+            console.log('Production browser groups:',checks.length);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: task-production-qa
+          path: /tmp/task-production-qa
+          retention-days: 7
