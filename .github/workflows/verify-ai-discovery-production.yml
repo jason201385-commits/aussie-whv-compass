@@ -8,63 +8,110 @@ permissions:
 jobs:
   production:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ce0b8338b08f586b81d2e42d1e6778a717d27e47
           persist-credentials: false
-      - name: Verify exact production bytes and compatible crawler responses
+      - name: Read all public formats and retain strict HTML difference evidence
         run: |
           mkdir -p /tmp/ai-discovery-production
           python - <<'PY'
-          import pathlib,json,hashlib,urllib.request,urllib.error,datetime,time
+          import pathlib,json,hashlib,urllib.request,urllib.error,datetime,time,re,difflib
           from urllib.parse import urlsplit
           from urllib.robotparser import RobotFileParser
+          from html.parser import HTMLParser
           root=pathlib.Path('.')
           out=pathlib.Path('/tmp/ai-discovery-production')
           origin='https://www.aussiewhvcompass.com'
           manifest=json.loads(root.joinpath('ai-index.json').read_text())
-          rows=[]
-          def check(path,agent,exact=True,html=False):
-            url=origin+'/'+path
-            req=urllib.request.Request(url,headers={'User-Agent':agent,'Accept':'text/markdown,text/plain,text/html,application/json,application/xml;q=0.9,*/*;q=0.5'})
+          rows=[]; errors=[]
+          class Head(HTMLParser):
+            def __init__(self):
+              super().__init__();self.canonical=[];self.robots=[];self.alternates=[]
+            def handle_starttag(self,tag,attrs):
+              d=dict(attrs)
+              if tag=='link' and d.get('rel')=='canonical':self.canonical.append(d.get('href'))
+              if tag=='link' and d.get('type')=='text/markdown':self.alternates.append(d.get('href'))
+              if tag=='meta' and d.get('name','').lower()=='robots':self.robots.append(d.get('content',''))
+          def check(path,agent,doc=None):
+            url=origin+path
+            row={'url':url,'userAgent':agent,'checkedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
             try:
-              r=urllib.request.urlopen(req,timeout=20)
-            except urllib.error.HTTPError as e:r=e
-            with r:
-              data=r.read(2000000);content_type=r.headers.get('Content-Type','')
-              row={'url':url,'userAgent':agent,'status':r.status,'contentType':content_type,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'cfMitigated':r.headers.get('cf-mitigated')}
-              rows.append(row)
-              out.joinpath('requests.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2))
-              assert r.status==200,(url,r.status)
-              assert r.headers.get('cf-mitigated')!='challenge',url
-              if exact:assert data==root.joinpath(path).read_bytes(), 'Production bytes differ: '+url
-              if path.endswith('.md'):assert content_type.startswith(('text/plain','text/markdown')), (url,content_type)
-              if path.endswith('.json'):assert 'application/json' in content_type,(url,content_type)
-              if html:
-                text=data.decode('utf-8')
-                assert '<!-- AI_READING_BEGIN -->' in text and '<!-- AI_READING_FOOTER_BEGIN -->' in text,url
-              if path=='robots.txt':
-                parser=RobotFileParser();parser.parse(data.decode().splitlines())
-                for bot in ['Claude-SearchBot','Claude-User','ClaudeBot']:
-                  assert parser.can_fetch(bot,origin+'/ai/visa.md')
-                  assert not parser.can_fetch(bot,origin+'/api/private')
-            time.sleep(.15)
-          for doc in manifest['documents']:check(urlsplit(doc['markdownUrl']).path.lstrip('/'),'AussieWHVCompassAudit/1.0')
-          for path in ['ai-index.json','llms.txt','llms-full.txt','robots.txt','sitemap.xml']:check(path,'AussieWHVCompassAudit/1.0')
-          for path in ['index.html','free.html','lang/en/visa/index.html']:check(path,'AussieWHVCompassAudit/1.0',html=True)
+              req=urllib.request.Request(url,headers={'User-Agent':agent,'Accept':'text/html,text/markdown,text/plain,application/json,application/xml;q=0.9,*/*;q=0.5'})
+              try:r=urllib.request.urlopen(req,timeout=20)
+              except urllib.error.HTTPError as e:r=e
+              with r:
+                data=r.read(2000001);ct=r.headers.get('Content-Type','')
+                row.update(status=r.status,finalUrl=r.geturl(),contentType=ct,bytes=len(data),sha256=hashlib.sha256(data).hexdigest(),cfMitigated=r.headers.get('cf-mitigated'),xRobotsTag=r.headers.get('X-Robots-Tag'),server=r.headers.get('Server'),cfRay=r.headers.get('cf-ray'),cache=r.headers.get('CF-Cache-Status'))
+              assert len(data)<=2000000,'response exceeded bound'
+              assert row['status']==200,('HTTP',row['status'])
+              assert row['cfMitigated']!='challenge','challenge response'
+              assert 'noindex' not in (row['xRobotsTag'] or '').lower(),'X-Robots-Tag noindex'
+              source_path=path.lstrip('/')
+              if not source_path or source_path.endswith('/'):source_path+='index.html'
+              source=root.joinpath(source_path).read_bytes()
+              row['rawExact']=data==source
+              if doc:
+                assert ct.startswith('text/html'),ct
+                text=data.decode('utf-8');original=source.decode('utf-8')
+                before=re.search(r'<main\b[\s\S]*?</main>',original)
+                after=re.search(r'<main\b[\s\S]*?</main>',text)
+                row['mainExact']=bool(before and after and before.group()==after.group())
+                a=Head();a.feed(text)
+                row['canonicalCorrect']=a.canonical==[doc['canonicalUrl']]
+                row['alternateCorrect']=doc['markdownUrl'] in a.alternates
+                row['noIndex']=any('noindex' in x.lower() for x in a.robots)
+                row['readingFooterPresent']='<!-- AI_READING_FOOTER_BEGIN -->' in text
+                assert row['canonicalCorrect'],'wrong canonical'
+                assert row['alternateCorrect'],'missing reading alternate'
+                assert row['readingFooterPresent'],'missing reading footer'
+                assert not row['noIndex'],'meta robots noindex'
+                if not row['rawExact']:
+                  key=source_path.replace('/','__')
+                  out.joinpath(key+'.original').write_bytes(source)
+                  out.joinpath(key+'.served').write_bytes(data)
+                  diff=''.join(difflib.unified_diff(original.splitlines(True),text.splitlines(True),fromfile='source/'+source_path,tofile='served/'+source_path,n=2))
+                  out.joinpath(key+'.diff').write_text(diff)
+                  row['diffFile']=key+'.diff'
+                  row['lineEndingOnly']=original.replace('\r\n','\n')==text.replace('\r\n','\n')
+                  row['injectedScriptSources']=re.findall(r'<script[^>]+src=[\"\']([^\"\']+)',text)
+              else:
+                assert row['rawExact'],'published reading bytes differ'
+                if path.endswith('.md'):assert ct.startswith(('text/plain','text/markdown')),ct
+                if path.endswith('.json'):assert 'application/json' in ct,ct
+                if path=='/robots.txt':
+                  parser=RobotFileParser();parser.parse(data.decode().splitlines())
+                  checks={}
+                  for bot in ['Claude-SearchBot','Claude-User','ClaudeBot']:
+                    checks[bot]={'public':all(parser.can_fetch(bot,origin+p) for p in ['/','/free.html','/ai/visa.md','/llms.txt']), 'privateExcluded':all(not parser.can_fetch(bot,origin+p) for p in ['/api/private','/admin/','/crm/','/contact/receipt/test'])}
+                  row['robotsChecks']=checks
+                  assert all(x['public'] and x['privateExcluded'] for x in checks.values()),checks
+            except Exception as e:
+              row['error']=str(e);errors.append({'url':url,'userAgent':agent,'error':str(e)})
+            rows.append(row)
+            out.joinpath('requests.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2))
+            time.sleep(.2)
+          for doc in manifest['documents']:check(urlsplit(doc['markdownUrl']).path,'AussieWHVCompassVerification/1.0')
+          for path in ['/ai-index.json','/llms.txt','/llms-full.txt','/robots.txt','/sitemap.xml']:check(path,'AussieWHVCompassVerification/1.0')
+          for doc in manifest['documents']:check(urlsplit(doc['canonicalUrl']).path,'AussieWHVCompassVerification/1.0',doc)
           for agent in ['ClaudeBot','Claude-SearchBot','Claude-User']:
-            for path in ['robots.txt','llms.txt','ai-index.json','ai/visa.md','ai/free.md']:check(path,agent)
-          report={'productionCommit':'ce0b8338b08f586b81d2e42d1e6778a717d27e47','checkedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'passedRequests':len(rows),'markdownDocuments':len(manifest['documents']),'limitations':'GET-only probes from GitHub runner. User-Agent strings are simulations, not verified Anthropic requests or indexing evidence. No Cloudflare settings, authenticated sessions or live listings touched.'}
+            for path in ['/robots.txt','/llms.txt','/ai-index.json','/ai/visa.md','/ai/free.md']:check(path,agent)
+            check('/index.html',agent,manifest['documents'][0])
+          html_rows=[x for x in rows if 'mainExact' in x]
+          report={'productionCommit':'ce0b8338b08f586b81d2e42d1e6778a717d27e47','checkedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'requests':len(rows),'http200':sum(x.get('status')==200 for x in rows),'readingDocuments':len(manifest['documents']),'htmlChecked':len(html_rows),'htmlRawExact':sum(x['rawExact'] for x in html_rows),'htmlMainExact':sum(x['mainExact'] for x in html_rows),'errors':errors,'htmlDiffs':[{'url':x['url'],'agent':x['userAgent'],'mainExact':x['mainExact'],'diffFile':x.get('diffFile')} for x in html_rows if not x['rawExact']],'limitations':'GET-only compatibility probes from a GitHub runner, not verified Anthropic traffic or indexing evidence. Raw HTML differences are retained for diagnosis, NOT silently considered equivalent. No production, Cloudflare, Supabase, posting or authentication writes.'}
           out.joinpath('result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
           print(json.dumps(report,ensure_ascii=False,indent=2))
+          assert not errors,'HTTP/reading/discovery errors; inspect artifact'
           PY
       - name: Install isolated browser dependency
+        if: always()
         run: |
           npm install --prefix /tmp/ai-prod-browser playwright@1.55.0
           /tmp/ai-prod-browser/node_modules/.bin/playwright install --with-deps chromium
       - name: Verify native reading links without JavaScript on the live site
+        if: always()
         env:
           NODE_PATH: /tmp/ai-prod-browser/node_modules
         run: |
@@ -91,12 +138,12 @@ jobs:
                   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'horizontal overflow');
                   assert.equal(await page.locator('head link[rel="alternate"][type="text/markdown"][href="https://www.aussiewhvcompass.com'+md+'"]').count(),1);
                   checks.push({path,width,noJavaScript:true,readingLink:md});
+                  fs.writeFileSync('/tmp/ai-discovery-production/browser-result.json',JSON.stringify({passed:checks.length,checks,limitations:'Read-only live pages with JavaScript disabled and third-party requests blocked; not physical-device, real crawler or indexing verification.'},null,2));
                   if(path==='/free.html')await page.screenshot({path:'/tmp/ai-discovery-production/free-footer-'+width+'.png'});
                 }
                 await context.close();
               }
             }finally{await browser.close();}
-            fs.writeFileSync('/tmp/ai-discovery-production/browser-result.json',JSON.stringify({passed:checks.length,checks,limitations:'Read-only live-page tests with JS disabled and third-party requests blocked; not physical-device or actual crawler verification.'},null,2));
             console.log('Production no-JavaScript reading-link groups passed:',checks.length);
           })().catch(err=>{console.error(err);process.exit(1);});
           JS
