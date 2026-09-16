@@ -1,0 +1,102 @@
+diff --git a/scripts/check.ps1 b/scripts/check.ps1
+--- a/scripts/check.ps1
++++ b/scripts/check.ps1
+@@ -211,5 +211,5 @@
+ $answerCardContract = @{
+   'visa.html'    = @{ Id = 'visa-first-action';    Points = @('#first', '#apply', '#evidence');    Tool = '#postcode-tool';       TocQuestion = '#where';             Official = 'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417' }
+-  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#math', '#food', '#car-checklist'); Tool = '#save-calc';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
++  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#runway', '#food', '#car-checklist'); Tool = 'https://calculate.fairwork.gov.au/';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
+   'housing.html' = @{ Id = 'housing-first-action'; Points = @('#find', '#bond', '#contract');      Tool = '#housing-search-tool'; TocQuestion = '#book';              Official = 'https://www.consumerprotection.wa.gov.au/publications/looking-rental-home-tenants-guide-1' }
+   'work.html'    = @{ Id = 'work-first-action';    Points = @('#channels', '#seasons', '#injury'); Tool = '#verify-steps';        TocQuestion = '#verify';            Official = 'https://abr.business.gov.au/' }
+@@ -298,8 +298,14 @@
+   }
+   # 主按鈕直達工具輸入區：目標必須是 input|select|button|form，或標有 data-answer-target="tool" 的容器，不能是標題。
+-  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="(#[^"]+)">')
++  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="([^"]+)"[^>]*>')
+   if (-not $answerPrimary.Success -or $answerPrimary.Groups[1].Value -ne $contract.Tool) {
+     Write-Output "FAIL [$answerCardPage] 主按鈕必須直達 $($contract.Tool)"
+     $errors++
++  } elseif ($answerCardPage -eq 'cost.html' -and $contract.Tool -eq 'https://calculate.fairwork.gov.au/') {
++    # P1-27: the wage question must lead to the exact official pay calculator, not a savings tool.
++    if (-not $answerPrimary.Value.Contains('rel="noopener noreferrer"')) {
++      Write-Output "FAIL [cost.html] 官方薪資計算器主連結必須保留安全 rel"
++      $errors++
++    }
+   } else {
+     $toolId = $contract.Tool.Substring(1)
+diff --git a/scripts/build_seo.py b/scripts/build_seo.py
+--- a/scripts/build_seo.py
++++ b/scripts/build_seo.py
+@@ -12,7 +12,10 @@
+ from pathlib import Path
+ from ai_reading import build_assets, build_robots, decorate_page, reading_path
++from build_task_answers import load as load_task_answers
+ 
+ 
+ ROOT = Path(__file__).resolve().parent.parent
++TASK_DATA = load_task_answers()
++TASK_PAGES = {"index.html"} | {a["href"].split("#", 1)[0] for a in TASK_DATA["answers"]}
+ ORIGIN = "https://www.aussiewhvcompass.com"
+ LAST_MODIFIED = "2026-09-02"
+@@ -65,4 +68,6 @@
+ 
+ def page_modified(page: str) -> str:
++    if page in TASK_PAGES:
++        return TASK_DATA["updatedAt"]
+     return "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED
+ 
+@@ -360,5 +365,5 @@
+     manifest = {
+         "schemaVersion": 2,
+-        "generatedAt": "2026-09-16",
++        "generatedAt": max("2026-09-16", TASK_DATA["updatedAt"]),
+         "canonicalOrigin": ORIGIN,
+         "siteEditorialStatus": "independent-open-source-community-guide",
+@@ -386,4 +391,9 @@
+         },
+         "legacyFieldPolicy": "editorialStatus, evidenceStatus and evidenceCheckedAt are retained for compatibility; use pageReviewStatus and evidenceCard* fields for scope-aware status.",
++        "sectionAnswerRegistry": {
++            "url": f"{ORIGIN}/answers.json",
++            "scope": "Source/operation checks apply only to the named task card, not the entire page or an individual case.",
++            "reviewDuePolicy": "Editorial maintenance deadline, not a guarantee of unchanged rules; sourceCheckedAt is not automatically refreshed by a build.",
++        },
+         "primaryPages": primary_pages,
+         "fullEnglishGuides": full_english_guides,
+diff --git a/visa.html b/visa.html
+--- a/visa.html
++++ b/visa.html
+@@ -235,4 +235,9 @@
+ 
+   <h2 id="where">哪些工作、哪些地區可以集簽</h2>
++<!-- TASK_ANSWER:specified-work:BEGIN -->
++<!-- TASK_ANSWER:specified-work:END -->
++
++<nav id="specified-work-options" class="task-options" aria-label="選擇指定工作官方規則"><a class="btn" href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions/specified-work-417" rel="noopener noreferrer">查 417 指定工作</a><a class="btn secondary" href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions/specified-work-462" rel="noopener noreferrer">查 462 指定工作</a><a href="https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions" rel="noopener noreferrer">不確定／先核對適用例外</a></nav>
++
+ 
+   <p class="answer-card-return"><a href="#visa-first-action">回到答案卡</a></p>
+diff --git a/work.html b/work.html
+--- a/work.html
++++ b/work.html
+@@ -165,3 +165,6 @@
+ 
+   <h2 id="channels">一、求職管道</h2>
++<!-- TASK_ANSWER:find-work:BEGIN -->
++<!-- TASK_ANSWER:find-work:END -->
++
+ 
+@@ -200,4 +203,7 @@
+ 
+   <h2 id="verify">二、接工作前的合法性查核（5 分鐘）</h2>
++<!-- TASK_ANSWER:job-check:BEGIN -->
++<!-- TASK_ANSWER:job-check:END -->
++
+   <p class="answer-card-return"><a href="#work-first-action">回到答案卡</a></p>
+   <ol id="verify-steps" data-answer-target="tool">
+@@ -212,5 +218,5 @@
+       </ul>
+     </li>
+-    <li><strong>查薪資</strong>：用官方 <a href="https://calculate.fairwork.gov.au/" rel="noopener">P.A.C.T. 薪資計算器</a>輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（2026 年 casual 絕對地板 $33.05/hr，見<a href="cost.html#wage">物價與薪水</a>）。</li>
++    <li><strong>查薪資</strong>：用官方 <a href="https://calculate.fairwork.gov.au/" rel="noopener">P.A.C.T. 薪資計算器</a>輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（適用條件見<a href="cost.html#wage">薪資查核</a>，不能用單一 casual 時薪當所有工作的絕對地板）。</li>
+     <li><strong>確認雇主是 registered WHM employer</strong>：不是的話，稅金預扣就不是 15%（見<a href="cost.html#tax">稅務</a>）。</li>
+   </ol>
