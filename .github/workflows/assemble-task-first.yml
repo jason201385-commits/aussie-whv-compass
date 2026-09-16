@@ -2,7 +2,7 @@ name: Build and verify task-first answers
 on:
   push:
     branches: [feat/task-first-answers-20260917]
-    paths: [.github/workflows/assemble-task-first.yml]
+    paths: [.github/workflows/assemble-task-first.yml, 'scripts/task-first-*.patch', 'scripts/test_task_answers*']
 permissions:
   contents: write
 jobs:
