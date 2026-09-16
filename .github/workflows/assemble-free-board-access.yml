@@ -1,0 +1,86 @@
+name: Verify free-board access improvements
+on:
+  push:
+    branches: [feat/free-board-access-20260917]
+permissions:
+  contents: write
+concurrency:
+  group: free-board-access-assembly
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.repository == 'jason201385-commits/aussie-whv-compass'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TZ: Australia/Perth
+      QA_DIR: /tmp/free-board-access-qa
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Record current full-check baseline
+        run: |
+          mkdir -p "$QA_DIR"
+          set +e
+          pwsh -NoProfile -File scripts/check.ps1 > "$QA_DIR/check-before.txt" 2>&1
+          echo "$?" > "$QA_DIR/check-before.exit"
+          exit 0
+      - name: Integrate reviewed navigation changes on feature branch
+        run: |
+          test "$GITHUB_REF_NAME" = 'feat/free-board-access-20260917'
+          git merge-base --is-ancestor 7a4f34d6d69e43f1db8ebe90df49d1af775fad2d HEAD
+          python scripts/integrate_free_board_access.py
+      - name: Verify syntax, core tests and generated files
+        run: |
+          set -o pipefail
+          node --check assets/free-board-navigation.js
+          node --test scripts/test_free_board_access.cjs scripts/test_free_board.cjs scripts/test_map_postcode_regression.cjs | tee "$QA_DIR/unit-tests.txt"
+          python scripts/build_i18n.py --check
+          python scripts/build_seo.py --check
+          python scripts/build_search.py --check
+          node scripts/test_analytics.cjs > "$QA_DIR/analytics.txt"
+          node scripts/test_housing_search.mjs
+          node scripts/test_job_router.mjs
+          node scripts/test_search.mjs
+          node scripts/clarifier-contract.mjs
+      - name: Record full-check results for baseline comparison
+        run: |
+          set +e
+          pwsh -NoProfile -File scripts/check.ps1 > "$QA_DIR/check-after.txt" 2>&1
+          echo "$?" > "$QA_DIR/check-after.exit"
+          grep '^FAIL' "$QA_DIR/check-before.txt" > "$QA_DIR/baseline-failures.txt" || true
+          grep '^FAIL' "$QA_DIR/check-after.txt" > "$QA_DIR/after-failures.txt" || true
+          diff -u "$QA_DIR/baseline-failures.txt" "$QA_DIR/after-failures.txt" > "$QA_DIR/failure-diff.txt" || true
+          cat "$QA_DIR/failure-diff.txt"
+          exit 0
+      - name: Install isolated browser dependency
+        run: |
+          npm install --prefix /tmp/access-browser playwright@1.55.0
+          /tmp/access-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Desktop, mobile, no-JS and sharing checks
+        env:
+          NODE_PATH: /tmp/access-browser/node_modules
+        run: |
+          node scripts/test_free_board_access_browser.cjs
+          node scripts/test_free_board_browser.cjs
+      - name: Commit tested integration to this feature branch only
+        run: |
+          test "$GITHUB_REF_NAME" = 'feat/free-board-access-20260917'
+          test "$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | cut -f1)" = "$GITHUB_SHA"
+          rm scripts/integrate_free_board_access.py .github/workflows/assemble-free-board-access.yml
+          git diff --stat > "$QA_DIR/diff-stat.txt"
+          git diff > "$QA_DIR/integration.diff"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat(P1-25): integrate tested free-board navigation, mobile actions and city sharing'
+          git rev-parse HEAD > "$QA_DIR/commit.txt"
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+      - name: Retain verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: free-board-access-qa
+          path: /tmp/free-board-access-qa
+          retention-days: 7
