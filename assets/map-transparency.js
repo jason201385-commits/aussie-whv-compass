@@ -36,6 +36,8 @@
   var selectedHubId = null;
   var CACHE_V = "20260905-04";
 
+  var STATE_CODES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT", "NORFOLK"];
+
   var LAYERS = {
     regional: {
       label: "區域澳洲（農漁林礦建等）",
@@ -47,17 +49,15 @@
       hint: "觀光與餐旅指定工作：官方以 Remote／Very Remote、Northern Australia 與追加郵遞區號三表聯集判定。",
       getGroup: function () {
         var t = D.northern_remote_tourism || {};
-        return {
-          NSW: unionLists(t.remote_very_remote && t.remote_very_remote.NSW, t.northern_australia && t.northern_australia.NSW),
-          VIC: unionLists(t.remote_very_remote && t.remote_very_remote.VIC, t.northern_australia && t.northern_australia.VIC),
-          QLD: unionLists(t.remote_very_remote && t.remote_very_remote.QLD, t.northern_australia && t.northern_australia.QLD, t.extra_postcodes && t.extra_postcodes.QLD),
-          WA: unionLists(t.remote_very_remote && t.remote_very_remote.WA, t.northern_australia && t.northern_australia.WA),
-          SA: unionLists(t.remote_very_remote && t.remote_very_remote.SA, t.northern_australia && t.northern_australia.SA),
-          TAS: unionLists(t.remote_very_remote && t.remote_very_remote.TAS, t.northern_australia && t.northern_australia.TAS, t.extra_postcodes && t.extra_postcodes.TAS),
-          NT: "ALL",
-          ACT: [],
-          NORFOLK: []
-        };
+        var group = {};
+        STATE_CODES.forEach(function (code) {
+          group[code] = unionLists(
+            t.remote_very_remote && t.remote_very_remote[code],
+            t.northern_australia && t.northern_australia[code],
+            t.extra_postcodes && t.extra_postcodes[code]
+          );
+        });
+        return group;
       }
     },
     bushfire: {
@@ -86,21 +86,29 @@
     return out;
   }
 
-  function expandRanges(list) {
-    if (list === "ALL") return "ALL";
-    if (!list || !list.length) return [];
-    var nums = [];
-    list.forEach(function (token) {
-      var m = String(token).match(/^(\d{4})-(\d{4})$/);
-      if (m) {
-        var a = parseInt(m[1], 10), b = parseInt(m[2], 10);
-        for (var n = a; n <= b; n++) nums.push(n);
-      } else {
-        var one = parseInt(token, 10);
-        if (!isNaN(one)) nums.push(one);
-      }
+  // Match explicit table entries directly; never expand entire ranges or
+  // interpret metadata / an ALL sentinel as an unrestricted postcode match.
+  function postcodeInList(pc, list) {
+    if (!Array.isArray(list)) return false;
+    return list.some(function (token) {
+      var m = String(token).match(/^(\d{4})(?:-(\d{4}))?$/);
+      if (!m) return false;
+      var first = parseInt(m[1], 10);
+      var last = m[2] ? parseInt(m[2], 10) : first;
+      return pc >= first && pc <= last;
     });
-    return nums;
+  }
+
+  function matchingStates(pc, group) {
+    group = group || {};
+    var approximateState = stateFromPostcode(pc);
+    return STATE_CODES.filter(function (code) {
+      var list = group[code];
+      // ALL remains scoped to its own state; it must not match every query.
+      if (list === "ALL") return code === approximateState;
+      // Explicit entries may cross postal/state boundaries (e.g. NSW 2618).
+      return postcodeInList(pc, list);
+    });
   }
 
   function stateHasCoverage(group, code) {
@@ -112,11 +120,11 @@
   }
 
   function summarizeList(list) {
-    if (list === "ALL") return "全州／領地皆可能符合（仍須核對工作內容與日期）";
+    if (list === "ALL") return "全州／領地列入（僅指地區範圍，仍須核對工作內容與日期）";
     if (!list || !list.length) return "此層在該州目前沒有列出郵遞區號";
     var sample = list.slice(0, 8).join("、");
     var more = list.length > 8 ? " 等共 " + list.length + " 段／碼" : "（共 " + list.length + " 段／碼）";
-    return sample + more;
+    return "部分區段列入：" + sample + more;
   }
 
   function escapeHtml(s) {
@@ -447,6 +455,7 @@
     html += "<p class=\"section-eyebrow\">目前圖層</p>";
     html += "<h3>" + escapeHtml(layer.label) + "</h3>";
     html += "<p>" + escapeHtml(layer.hint) + "</p>";
+    html += '<p class="note"><strong>417 清單初篩：</strong>目前僅比對本站收錄的 417 指定工作資料，不提供 462 資格判定。此圖為<strong>州別概覽，不是合資格邊界圖</strong>；部分區段列入不代表全州都符合。</p>';
     html += '<p class="fact-meta">郵遞區號資料抓取：' + escapeHtml(D.retrieved || "") +
       ' ・ <a href="' + escapeHtml(D.source || "#") + '" rel="noopener">內政部 specified-work 官方頁</a></p>';
     html += '<p class="fact-meta">地圖底圖：OpenStreetMap ・ 州界 GeoJSON 開源資料（見 assets 說明）</p>';
@@ -484,13 +493,7 @@
     if (detail) detail.innerHTML = html;
   }
 
-  function inExpanded(pc, list) {
-    if (list === "ALL") return true;
-    var nums = expandRanges(list);
-    if (nums === "ALL") return true;
-    return nums.indexOf(pc) !== -1;
-  }
-
+  // Approximate display / ALL fallback only; not an address validator.
   function stateFromPostcode(pc) {
     if (pc >= 1000 && pc <= 1999) return "NSW";
     if (pc >= 2000 && pc <= 2599) return "NSW";
@@ -513,41 +516,36 @@
       pcOut.innerHTML = '<p class="result-verdict result-no">請輸入四位數字郵遞區號（北領地請保留前導 0，例如 0870）。</p>';
       return;
     }
-    var pc = parseInt(raw, 10);
-    var st = stateFromPostcode(pc);
-    if (!st) {
-      pcOut.innerHTML = '<p class="result-verdict result-no">無法判斷州別，請確認郵遞區號。</p>';
+    var cat = (pcCat && pcCat.value) || "regional";
+    if (!Object.prototype.hasOwnProperty.call(LAYERS, cat)) {
+      pcOut.innerHTML = '<p class="result-verdict result-no">請選擇有效的指定工作類別。</p>';
       return;
     }
-    setActiveState(st);
-    var cat = (pcCat && pcCat.value) || "regional";
-    var ok = false;
-    var label = "";
-    if (cat === "regional") {
-      ok = inExpanded(pc, D.regional[st]);
-      label = "區域澳洲指定工作";
-    } else if (cat === "tourism") {
-      var t = D.northern_remote_tourism || {};
-      ok = inExpanded(pc, (t.remote_very_remote && t.remote_very_remote[st]) || []) ||
-           inExpanded(pc, (t.northern_australia && t.northern_australia[st]) || []) ||
-           inExpanded(pc, (t.extra_postcodes && t.extra_postcodes[st]) || []);
-      if (st === "NT") ok = true;
-      label = "觀光旅宿餐飲（偏遠／北澳聯集）";
-    } else if (cat === "bushfire") {
-      ok = inExpanded(pc, (D.bushfire && D.bushfire.postcodes && D.bushfire.postcodes[st]) || []);
-      label = "森林火災重建區";
-    } else if (cat === "disaster") {
-      ok = inExpanded(pc, (D.disaster && D.disaster.postcodes && D.disaster.postcodes[st]) || []);
-      label = "災害復原區";
-    }
-    if (ok) {
-      pcOut.innerHTML = '<p class="result-verdict result-ok">郵遞區號 <strong>' + raw + "</strong>（" + st +
-        "）在「" + label + "」清單中<strong>有對應</strong>。</p>" +
-        '<p style="font-size:.9rem">這只是地區初篩。工作內容必須符合指定工作定義，並自行保存支薪與出勤證據。</p>';
+    var pc = parseInt(raw, 10);
+    var layer = LAYERS[cat];
+    var matches = matchingStates(pc, layer.getGroup());
+    // Keep the displayed layer and lookup category aligned. Multiple table
+    // matches stay in the overview instead of claiming a unique state.
+    if (layerSelect) layerSelect.value = cat;
+    setActiveState(matches.length === 1 ? matches[0] : "ALL");
+    var label = escapeHtml(layer.label);
+    if (matches.length) {
+      pcOut.innerHTML = '<p class="result-verdict result-ok">郵遞區號 <strong>' + raw +
+        '</strong> 在「' + label + '」清單中<strong>有對應</strong>（對應清單：' +
+        escapeHtml(matches.join("、")) + '）。</p>';
+      if (matches.length > 1) {
+        pcOut.innerHTML += '<p class="fact-meta">此郵遞區號對應多個州／領地清單，請核對實際工作地址，不要只依郵遞區號推定州別。</p>';
+      }
     } else {
-      pcOut.innerHTML = '<p class="result-verdict result-no">郵遞區號 <strong>' + raw + "</strong>（" + st +
-        "）在「" + label + "」清單中<strong>未找到對應</strong>。</p>";
+      pcOut.innerHTML = '<p class="result-verdict result-no">郵遞區號 <strong>' + raw +
+        '</strong> 在「' + label + '」本站收錄清單中<strong>未找到對應</strong>。</p>';
     }
+    pcOut.innerHTML += '<p class="fact-meta">這只是本站 417 資料的地區初篩，不驗證地址是否存在，也不是 462 或簽證資格判定。請核對實際工作地址、職務、日期、支薪與出勤證據，並以 <a href="' +
+      escapeHtml(D.source || "#") + '" rel="noopener">內政部官方清單</a>為準。</p>';
+  }
+
+  function clearPostcodeResult() {
+    if (pcOut) pcOut.innerHTML = "";
   }
 
   stateButtons.forEach(function (btn) {
@@ -558,6 +556,8 @@
   if (stateSelect) stateSelect.addEventListener("change", function () { setActiveState(stateSelect.value); });
   if (layerSelect) layerSelect.addEventListener("change", function () { if (geoLayer) geoLayer.setStyle(styleFeature); render(); });
   if (pcBtn) pcBtn.addEventListener("click", checkPostcode);
+  if (pcCat) pcCat.addEventListener("change", clearPostcodeResult);
+  if (pcInput) pcInput.addEventListener("input", clearPostcodeResult);
   if (pcInput) pcInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") { e.preventDefault(); checkPostcode(); }
   });
