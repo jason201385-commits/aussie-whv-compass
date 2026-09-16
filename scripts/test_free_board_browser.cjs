@@ -32,9 +32,9 @@ const server=http.createServer((req,res)=>{
         if(u.origin===origin)return route.continue();
         if(u.hostname==='api.github.com'){
           calls++;
-          if(mode==='error')return route.fulfill({status:403,contentType:'application/json',body:'{"message":"rate limited"}'});
+          if(mode==='error')return route.fulfill({status:403,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:'{"message":"rate limited"}'});
           const next=u.searchParams.get('page')==='2';
-          return route.fulfill({status:200,contentType:'application/json',headers:next?{}:{Link:'<https://api.github.com/next>; rel="next"'},body:JSON.stringify(next?[listing(3)]:[listing(2),Object.assign(listing(4),{state:'closed'})])});
+          return route.fulfill({status:200,contentType:'application/json',headers:Object.assign({'Access-Control-Allow-Origin':'*','Access-Control-Expose-Headers':'Link'},next?{}:{Link:'<https://api.github.com/next>; rel="next"'}),body:JSON.stringify(next?[listing(3)]:[listing(2),Object.assign(listing(4),{state:'closed'})])});
         }
         return route.abort();
       });
