@@ -27,3 +27,18 @@
 .fb-error{color:var(--danger);font-weight:700}
 .fb-panel [hidden],.fb-hero [hidden]{display:none!important}
 @media(max-width:600px){.fb-form-grid,.fb-list{grid-template-columns:1fr}.fb-panel,.fb-hero{padding:18px}.fb-actions .btn{flex:1 1 180px}.fb-card{padding:16px}}
+
+/* P1-25: mobile actions reserve space and hide while editing. */
+.fb-mobile-actions { display:none; }
+#free-board, #publish { scroll-margin-top:160px; }
+#fb-share-controls { border-top:1px solid var(--line-soft); margin-top:18px; padding-top:16px; }
+#fb-share-fallback input { display:block; width:100%; min-width:0; min-height:44px; padding:10px; font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:8px; }
+@media(max-width:768px) {
+  body[data-i18n-topic="free"] { padding-bottom:calc(88px + env(safe-area-inset-bottom, 0px)); }
+  html:has(body[data-i18n-topic="free"]) { scroll-padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px)); }
+  #free-board, #publish { scroll-margin-top:16px; }
+  .fb-mobile-actions { position:fixed; z-index:40; bottom:0; left:0; right:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background:var(--surface); border-top:1px solid var(--line); box-shadow:0 -4px 16px #00000012; }
+  .fb-mobile-actions .btn { min-height:46px; padding:10px; text-align:center; white-space:normal; }
+  .fb-editing .fb-mobile-actions, body:has(:is(input,textarea,select,[contenteditable="true"]):focus) .fb-mobile-actions { display:none; }
+}
+@media print { .fb-mobile-actions, #fb-share-controls { display:none!important; } body[data-i18n-topic="free"] { padding-bottom:0; } }

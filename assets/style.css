@@ -3505,3 +3505,14 @@ main [id] { scroll-margin-top: 170px; }
   border: 2px solid #9c4221;
   display: inline-block;
 }
+
+/* P1-25: direct free-board entry, beside the stage choices. */
+.home-free-entry { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 16px; align-items:center; margin:14px 0; padding:14px 16px; border:1px solid var(--line-soft); border-radius:14px; background:var(--surface); }
+.home-free-entry h2 { font-size:1.06rem; line-height:1.5; margin:0; }
+.home-free-entry h2::before { display:none; }
+.home-free-entry p { margin:3px 0 0; font-size:.88rem; color:var(--ink-soft); }
+.home-free-entry small { grid-column:1/-1; color:var(--ink-soft); font-size:.78rem; }
+.home-free-actions { display:flex; gap:8px; }
+.home-free-actions .btn { min-height:44px; white-space:normal; text-align:center; }
+@media(max-width:768px) { .home-free-entry { grid-template-columns:1fr; padding:12px; } .home-free-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); } .home-free-actions .btn { padding:9px 10px; font-size:.9rem; } }
+@media print { .home-free-entry { display:none; } }

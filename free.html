@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260916-01" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20260917-01" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -87,9 +87,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@700;900&amp;display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20260916-01">
+<link rel="stylesheet" href="assets/style.css?v=20260917-01">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
-<link rel="stylesheet" href="assets/free-board.css?v=20260916-01">
+<link rel="stylesheet" href="assets/free-board.css?v=20260917-01">
 </head>
 <body data-i18n-topic="free">
 <a class="skip-link" href="#main-content">跳到主要內容</a>
@@ -99,6 +99,7 @@
     <a class="brand" href="index.html"><span class="logo"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>澳打指南針</a>
     <div class="nav-links">
       <a href="why.html">自我釐清</a>
+      <a class="active" aria-current="page" href="free.html">免費二手</a>
       <a href="visa.html">簽證集簽</a>
       <a href="prep.html">行前落地</a>
       <a href="cost.html">物價薪水</a>
@@ -119,11 +120,11 @@
     <p class="fb-kicker">免費交接，讓好物繼續旅行</p>
     <h1 id="free-title">離澳免費二手版</h1>
     <p>你帶回故事，把用得上的生活用品留給下一位。離澳出清、搬家整理、剛到澳洲找補給，都從這裡開始。</p>
-    <div class="fb-actions"><a class="btn" href="#publish">我要免費送物</a><a class="btn secondary" href="#free-board">找同城免費物品</a></div>
+    <div class="fb-actions"><a class="btn" href="#free-board">找同城免費物品</a><a class="btn secondary" href="#publish">我要免費送物</a></div>
     <p class="fb-meta">只收免費贈送・不收訂金或運費・自行約定面交。刊登與留言使用 GitHub 帳號；瀏覽不用登入。</p>
   </section>
 
-  <section class="fb-panel" id="free-board" aria-labelledby="browse-title">
+  <section class="fb-panel" id="free-board" tabindex="-1" aria-labelledby="browse-title">
     <p class="section-eyebrow">找物品</p><h2 id="browse-title">看看同城有哪些好物</h2>
     <p>點「載入免費物品」後，瀏覽器才會向 GitHub 讀取公開刊登；GitHub 會接收到一般連線資訊。篩選字詞不送出，本站不保存你的搜尋。</p>
     <div class="fb-actions"><button class="btn" type="button" id="fb-load" hidden>載入免費物品</button><a class="btn secondary" href="https://github.com/jason201385-commits/aussie-whv-compass/issues?q=is%3Aissue%20is%3Aopen%20label%3Afree-board-approved" target="_blank" rel="noopener noreferrer">到 GitHub 看公開刊登</a></div>
@@ -135,6 +136,12 @@
       <div class="fb-wide"><label for="fb-query">找什麼物品？</label><input id="fb-query" type="search" maxlength="60" autocomplete="off" placeholder="例如：電鍋、衣架、腳踏車"></div>
       <div class="fb-wide"><button class="btn secondary" type="button" id="fb-reset">清除篩選</button></div>
     </form>
+    <div id="fb-share-controls" hidden>
+      <div class="fb-actions"><button class="btn secondary" type="button" id="fb-share-copy">複製看板連結</button><button class="btn secondary" type="button" id="fb-share-open">分享看板</button></div>
+      <p class="fb-meta" id="fb-share-scope">只分享城市，不包含搜尋字詞或刊登草稿。</p>
+      <p class="fb-meta" id="fb-share-message" role="status"></p>
+      <div id="fb-share-fallback" hidden><label for="fb-share-url">手動複製分享連結</label><input id="fb-share-url" type="text" readonly autocomplete="off"></div>
+    </div>
     <p id="fb-message" role="status">尚未連線讀取；也可以直接開啟 GitHub 公開刊登。</p>
     <p id="fb-count" role="status"></p>
     <div class="fb-list" id="fb-list" aria-busy="false"></div>
@@ -142,7 +149,7 @@
     <p class="fb-meta">本站只顯示通過版規審核、未關閉且尚未過期的刊登。不是即時庫存，請先到原貼確認；所有截止日統一以澳洲伯斯時間（UTC+8）計算。</p>
   </section>
 
-  <section class="fb-panel" id="publish" aria-labelledby="publish-title">
+  <section class="fb-panel" id="publish" tabindex="-1" aria-labelledby="publish-title">
     <p class="section-eyebrow">送出一件好物</p><h2 id="publish-title">先預覽，再到 GitHub 確認刊登</h2>
     <p><strong>這裡不是直接發布按鈕。</strong>填完會產生前往 GitHub 的草稿連結；登入後仍需按「Submit new issue」。原貼送出即公開，經站長加上審核標籤後才顯示在本站。</p>
     <p>只寫城市、公共區域與可面交時段，不寫電話、Email、LINE ID、住家門牌、帳戶或證件。照片可在 GitHub 原貼補上，請先遮掉人臉與個資；本站不直接載入使用者圖片。</p>
@@ -174,6 +181,12 @@
   </section>
 </main>
 
+<nav class="fb-mobile-actions" aria-label="免費二手快捷操作">
+  <a class="btn secondary" href="#free-board">找免費物品</a>
+  <a class="btn" href="#publish">我要免費送</a>
+</nav>
+
+
 
 <footer class="site-footer">
   <div class="foot-inner">
@@ -182,11 +195,12 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20260916-01" defer></script>
-<script src="assets/analytics.js?v=20260916-01" defer></script>
-<script src="assets/i18n.js?v=20260916-01" defer></script>
-<script src="assets/api-config.js?v=20260916-01" defer></script>
-<script src="assets/main.js?v=20260916-01" defer></script>
-<script src="assets/free-board.js?v=20260916-01" defer></script>
+<script src="assets/analytics-config.js?v=20260917-01" defer></script>
+<script src="assets/analytics.js?v=20260917-01" defer></script>
+<script src="assets/i18n.js?v=20260917-01" defer></script>
+<script src="assets/api-config.js?v=20260917-01" defer></script>
+<script src="assets/main.js?v=20260917-01" defer></script>
+<script src="assets/free-board.js?v=20260917-01" defer></script>
+<script src="assets/free-board-navigation.js?v=20260917-01" defer></script>
 </body>
 </html>

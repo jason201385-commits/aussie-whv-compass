@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-09-16｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-09-17｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -117,7 +117,7 @@
 quick-answer hub → 高風險證據卡 → 完整內容與參考資料目錄 → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ 五支 `<script src defer>`。
 
-**導覽**：全部 15 頁的 `.nav-links` 統一 12 連結（why→about）；`simulator.html` 與 `market.html` 是工具頁，
+**導覽**：根層 `.nav-links` 統一 13 連結（自我釐清之後為「免費二手」，其餘順序不變；P1-25），英文完整頁與 Quick Start 另提供標示中文的免費二手入口；`simulator.html` 與 `market.html` 是工具頁，
 不進全站 nav、不標 `aria-current`（站長 2026-09-02 決定，`check.ps1` 強制；理由見 §6 教訓 3）。
 **新增頁面時**：複製既有頁骨架；16 個根層 HTML（含 404）與 7 個 `lang/en/**` 頁的 nav 都要改
 （用腳本批次替換，別手改）；`build_seo.py`、`build_search.py` 的頁面清單加項並重跑；
