@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/housing.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -118,6 +118,28 @@ WA tenant guide 提供簽約、condition report 與 bond 的起點；不在 WA �
 ## 四、押金（bond）自保
 
 [Section permalink](https://www.aussiewhvcompass.com/housing.html#bond)
+
+### 押金可以先付嗎？
+
+[Section permalink](https://www.aussiewhvcompass.com/housing.html#task-rental-bond-title)
+
+先核對房源、收款者與書面條件；不要因為催促就匯款。押金流程要看房屋所在地與租住關係。
+
+**適用：**一般租屋防詐；住宅租約、分租、寄宿及短住可能適用不同規則。
+
+**先核對：**先確認州／領地與租住安排，再看當地 bond 規定；本文不把單一州規則套用全澳。
+
+[選房屋所在地的官方入口](https://www.aussiewhvcompass.com/housing.html#bond-authorities)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[QLD RTA：辨識租屋詐騙](https://www.rta.qld.gov.au/before-renting/choosing-a-rental-property/rental-scams)・[NSW Government：租屋規則入口](https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=housing.html%23bond&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%8A%BC%E9%87%91%E5%8F%AF%E4%BB%A5%E5%85%88%E4%BB%98%E5%97%8E%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
 
 - **規則看房屋所在地的州或領地，不看工作地或簽證。**先確認你是 tenant、co-tenant、sub-tenant、boarder／lodger 或其他 arrangement，再使用當地官方 bond 流程；保留收據、lodgement 紀錄與編號。
 

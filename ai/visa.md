@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/visa.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -137,6 +137,28 @@
 ## 哪些工作、哪些地區可以集簽
 
 [Section permalink](https://www.aussiewhvcompass.com/visa.html#where)
+
+### 這份工作能集簽嗎？
+
+[Section permalink](https://www.aussiewhvcompass.com/visa.html#task-specified-work-title)
+
+先分清 417／462，再核對工作內容、地區、日期與證據；只看郵遞區號不足以判定。
+
+**適用：**需要核對二簽／三簽指定工作者；部分護照另有例外。
+
+**先核對：**需確認自己的適用規則。本站郵遞區號工具只使用留存的 417 資料，不做 462 資格判定。
+
+[先選 417／462 官方工作規則](https://www.aussiewhvcompass.com/visa.html#specified-work-options)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[內政部：指定工作條件與適用例外](https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=visa.html%23where&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E9%80%99%E4%BB%BD%E5%B7%A5%E4%BD%9C%E8%83%BD%E9%9B%86%E7%B0%BD%E5%97%8E%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
 
 [回到答案卡](https://www.aussiewhvcompass.com/visa.html#visa-first-action)
 

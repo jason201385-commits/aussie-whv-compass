@@ -356,6 +356,6 @@ Reddit平台搜尋轉接一般
 
 [回報或推薦公開入口（公開於 GitHub）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=community.yml)
 
-機器可讀版本：[community-directory.json](https://www.aussiewhvcompass.com/community-directory.json?v=20260917-01)。每筆都有查核日與到期日；直連入口 90 天、平台搜尋 180 天、說明 365 天到期，逾期會降級為搜尋轉接。
+機器可讀版本：[community-directory.json](https://www.aussiewhvcompass.com/community-directory.json?v=20260917-02)。每筆都有查核日與到期日；直連入口 90 天、平台搜尋 180 天、說明 365 天到期，逾期會降級為搜尋轉接。
 
 **不管在哪個群，這幾件事一樣成立。**沒有任何合法工作需要你先付錢才能上工；沒看過房、沒見過人之前不要付訂金；簽證與集簽規定以[官方頁](https://www.aussiewhvcompass.com/visa.html)為準，不看群裡轉述；被威脅、被扣證件或已經匯款，先走[中招救濟包](https://www.aussiewhvcompass.com/scam.html#help)。

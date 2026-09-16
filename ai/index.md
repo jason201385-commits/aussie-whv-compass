@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-16
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: no-evidence-card
 - 證據卡查核日期: 未記錄
@@ -64,9 +64,9 @@
 
 最想先解決哪件事？
 
-[自我釐清 ### 我到底要啥 [Section permalink](https://www.aussiewhvcompass.com/#exit-considering-why) 用快思看見準備輪廓，再慢慢整理價值、取捨與底線；不是心理診斷。 第一步：做 2 分鐘快思](https://www.aussiewhvcompass.com/why.html)
+[落地城市比較 ### 第一站去哪 [Section permalink](https://www.aussiewhvcompass.com/#exit-considering-why) 比較住得起、到得了、做得來；附官方交通入口，不替城市或職缺排名。 第一步：比較兩個候選城市](https://www.aussiewhvcompass.com/prep.html#first-city)
 
-[2 分鐘快思](https://www.aussiewhvcompass.com/why.html#quick-quiz)[先玩一次](https://www.aussiewhvcompass.com/simulator.html)[看公開討論](https://www.aussiewhvcompass.com/communities.html?need=region-choice)
+[查通勤路線](https://www.aussiewhvcompass.com/prep.html#transport-planners)[另看自我釐清](https://www.aussiewhvcompass.com/why.html#quick-quiz)[看公開討論](https://www.aussiewhvcompass.com/communities.html?need=region-choice)
 
 不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。
 
@@ -358,7 +358,7 @@ LINE・PERTH・版主同意分享
 
 [Reddit・WA**r/perth**Perth／WA 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/perth/) [Reddit・NSW**r/sydney**Sydney 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/sydney/) [Reddit・VIC**r/melbourne**Melbourne 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/melbourne/) [Reddit・QLD**r/brisbane**Brisbane 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/brisbane/) [Reddit・SA**r/Adelaide**Adelaide 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/Adelaide/) [Reddit・ACT**r/canberra**Canberra 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/canberra/) [Reddit・NT**r/darwin**Darwin 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/darwin/) [Reddit・TAS**r/tasmania**Tasmania 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/tasmania/)
 
-名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01)
+名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02)
 
 PLAY BEFORE REAL LIFE
 

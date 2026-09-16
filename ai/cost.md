@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/cost.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -22,13 +22,13 @@
 
 [Section permalink](https://www.aussiewhvcompass.com/cost.html#cost-first-action)
 
-- [我帶的錢夠不夠，工作後存得到錢嗎？](https://www.aussiewhvcompass.com/cost.html#math)
+- [還沒找到工作，我帶的錢能撐多久？](https://www.aussiewhvcompass.com/cost.html#runway)
 
 - [吃飯要怎麼省，又不想每天只吃泡麵？](https://www.aussiewhvcompass.com/cost.html#food)
 
 - [我想買二手車，付款前要查什麼？](https://www.aussiewhvcompass.com/cost.html#car-checklist)
 
-[打開存錢試算器](https://www.aussiewhvcompass.com/cost.html#save-calc) [Fair Work 最低工資官方頁（外部連結）](https://www.fairwork.gov.au/pay-and-wages/minimum-wages)
+[開官方薪資計算器](https://calculate.fairwork.gov.au/) [Fair Work 最低工資官方頁（外部連結）](https://www.fairwork.gov.au/pay-and-wages/minimum-wages)
 
 官方依據：Fair Work Ombudsman（2026-08 查核）
 
@@ -48,16 +48,38 @@ Fair Work 的最低工資頁提供全國基準；要確認個別工作，請把�
 
 本頁數字查核於 2026-08-30。薪資與稅務數字可能調整；使用前請從各段落的官方來源核對當期數字與你的適用條件。
 
-**完整內容與參考資料** [雇主開的薪水是否合法？](https://www.aussiewhvcompass.com/cost.html#cost-first-action) [薪水](https://www.aussiewhvcompass.com/cost.html#wage) [稅與退休金](https://www.aussiewhvcompass.com/cost.html#tax) [房租](https://www.aussiewhvcompass.com/cost.html#rent) [省錢吃飯](https://www.aussiewhvcompass.com/cost.html#food) [交通・手機](https://www.aussiewhvcompass.com/cost.html#living) [便宜買衣服](https://www.aussiewhvcompass.com/cost.html#clothes) [買車與賣車](https://www.aussiewhvcompass.com/cost.html#car) [該帶多少錢](https://www.aussiewhvcompass.com/cost.html#budget) [換匯與匯款](https://www.aussiewhvcompass.com/cost.html#exchange) [存錢試算](https://www.aussiewhvcompass.com/cost.html#math)
+**完整內容與參考資料** [雇主開的薪水是否合法？](https://www.aussiewhvcompass.com/cost.html#cost-first-action) [薪水](https://www.aussiewhvcompass.com/cost.html#wage) [稅與退休金](https://www.aussiewhvcompass.com/cost.html#tax) [房租](https://www.aussiewhvcompass.com/cost.html#rent) [省錢吃飯](https://www.aussiewhvcompass.com/cost.html#food) [交通・手機](https://www.aussiewhvcompass.com/cost.html#living) [便宜買衣服](https://www.aussiewhvcompass.com/cost.html#clothes) [買車與賣車](https://www.aussiewhvcompass.com/cost.html#car) [該帶多少錢](https://www.aussiewhvcompass.com/cost.html#budget) [換匯與匯款](https://www.aussiewhvcompass.com/cost.html#exchange) [無收入能撐多久](https://www.aussiewhvcompass.com/cost.html#runway) [存錢試算](https://www.aussiewhvcompass.com/cost.html#math)
 
 ## 薪水：法定最低時薪
 
 [Section permalink](https://www.aussiewhvcompass.com/cost.html#wage)
 
+### 薪水有沒有算對？
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#task-pay-check-title)
+
+先查適用的 award 或 agreement、職級、年齡與工作時段；不能用一個全國時薪判斷所有工作。
+
+**適用：**澳洲僱員薪資核對；承攬、州制或特殊身分需另確認。
+
+**先核對：**準備稅前工資、工時、casual／part-time／full-time 與加成資料，不只看入帳淨額。
+
+[開 Fair Work 薪資計算器](https://calculate.fairwork.gov.au/)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[Fair Work Commission：award 與薪資條件](https://www.fwc.gov.au/work-conditions/minimum-wages-and-conditions/where-find-your-pay-and-conditions)・[Fair Work：簽證持有人職場權益](https://www.fairwork.gov.au/find-help-for/visa-holders-migrants)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=cost.html%23wage&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E8%96%AA%E6%B0%B4%E6%9C%89%E6%B2%92%E6%9C%89%E7%AE%97%E5%B0%8D%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 | 項目 | 2026-07-01 起 | 說明 |
 | --- | --- | --- |
-| 國家最低時薪（全職/兼職） | **A$26.44** | 約合週薪 $1,004.90（38 小時） |
-| Casual 最低時薪 | **A$33.05** | 含 25% casual loading（無特休病假的補償）；背包客多數是 casual |
+| 國家最低時薪（全職/兼職） | **A$26.44** | 未受 award／agreement 涵蓋者的全國基準；約合週薪 $1,004.90（38 小時） |
+| 未受 award／agreement 涵蓋的成人 casual 參考 | **A$33.05** | 含 25% casual loading（無特休病假的補償）；背包客多數是 casual |
 | 農場（Horticulture Award）casual | 約 A$32.18–33.05 | 官方園藝專頁 2026-07 入門級為 $32.18，與 NMW 地板的適用關係依你的僱用型態而定——**你的精確時薪用下方 P.A.C.T. 查**；週末假日另有加成 |
 | 餐飲（Hospitality Award）casual | 約 A$33 起 | 週日與國定假日加成顯著（假日可達兩倍以上） |
 
@@ -315,6 +337,46 @@ Fair Work 的最低工資頁提供全國基準；要確認個別工作，請把�
 **社團「匯率比銀行好」的私下換匯，不要碰。**這不只是[詐騙高發區](https://www.aussiewhvcompass.com/scam.html)：在澳洲經營匯款服務必須向 AUSTRAC 註冊，無註冊經營是刑事重罪（最重可處 7 年徒刑）；AUSTRAC 也發布過犯罪集團吸收留學生與臨時簽證持有人當「錢騾」（money mule）的官方警告——幫陌生人「過個帳」可能讓你的帳戶被凍結、簽證與紀錄都受影響。合法業者一定會做身分驗證；**不跟你要證件的，多半就沒註冊**。
 
 來源：[ACCC Foreign currency and money exchange](https://www.accc.gov.au/consumers/specific-products-and-activities/foreign-currency-and-money-exchange)・[Moneysmart Sending money overseas](https://moneysmart.gov.au/banking/sending-money-overseas)・[AUSTRAC 無註冊匯款業者警告](https://www.austrac.gov.au/industry-and-business/your-industry/remittance-service-providers/unregistered-remittance-service-providers)・[外匯收支或交易申報辦法](https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0450009)｜2026-09-01 查核。各銀行費率隨時變動，匯款前以業者現行公告與實拿金額試算為準；本站無任何換匯業者合作或分潤。
+
+## 還沒找到工作，手上的錢能撐多久？
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#runway)
+
+### 還沒找到工作，錢能撐多久？
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#task-cash-runway-title)
+
+用可動用現金扣除尚未支付的一次性支出、押金與保留金，再除以每週必要開支。
+
+**適用：**假設期間沒有收入、支出固定；不是找工時間或簽證財力預測。
+
+**先核對：**不要把借款額度、未收到的薪水、super 或押金退款當現金；避免重複扣款。
+
+[算自己的無收入緩衝期](https://www.aussiewhvcompass.com/cost.html#runway-tool)
+
+本卡來源核對：2026-09-17・下次複核：2026-12-16
+
+依據、適用範圍與更正
+
+來源：[ASIC Moneysmart：預算規劃](https://moneysmart.gov.au/budgeting/how-to-do-a-budget)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=cost.html%23runway&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E9%82%84%E6%B2%92%E6%89%BE%E5%88%B0%E5%B7%A5%E4%BD%9C%EF%BC%8C%E9%8C%A2%E8%83%BD%E6%92%90%E5%A4%9A%E4%B9%85%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
+### 無收入緩衝試算
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#runway-tool)
+
+這是你自行設定的情境，不是生活費行情或找工時間預測。所有金額以澳幣填寫，不換匯、不計稅、不把 super、借款額度或未入帳收入算成現金。
+
+**公式：**（可動用現金 − 尚未支付的一次性支出 − 尚未支付押金 − 保留金）÷ 每週必要開支。
+
+一次性費用與每週支出不要重複計入；已付費用只要已反映在現金餘額，就不要再扣一次。期間支出變動時重新試算。
+
+若想看有收入後的年度收支，改用[原存錢試算器](https://www.aussiewhvcompass.com/cost.html#save-calc)；兩者的假設不同，不要混用結果。
+
+預算項目參考 [ASIC Moneysmart](https://moneysmart.gov.au/budgeting/how-to-do-a-budget)；公式及情境是本站算術工具，不是官方資格門檻｜2026-09-17 查核。
 
 ## 存得到錢嗎？自己拉拉看
 

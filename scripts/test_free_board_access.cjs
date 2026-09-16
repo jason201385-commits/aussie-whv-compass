@@ -48,7 +48,7 @@ test('context entry and both mobile targets exist without JS', () => {
   assert.match(html, /<nav class="fb-mobile-actions"/);
   assert.match(html, /id="free-board" tabindex="-1"/);
   assert.match(html, /id="publish" tabindex="-1"/);
-  assert.match(html, /src="assets\/free-board-navigation.js\?v=20260917-01" defer/);
+  assert.match(html, /src="assets\/free-board-navigation.js\?v=20260917-02" defer/);
 });
 test('every allowed city round-trips without a query string', () => {
   for(const city of CITIES){const u=new URL(buildShareUrl(city,CITIES));assert.equal(u.origin,'https://www.aussiewhvcompass.com');assert.equal(u.pathname,'/free.html');assert.equal(u.search,'');assert.equal(readSharedCity(u.hash,CITIES),city);}

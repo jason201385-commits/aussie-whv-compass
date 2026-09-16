@@ -22,11 +22,14 @@ import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
+from build_task_answers import load as load_task_answers, search_answer
 
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
-VERSION = "2026-09-03"
+VERSION = "2026-09-17"
+TASK_DATA = load_task_answers()
+TASK_BY_HREF = {a["href"]: a for a in TASK_DATA["answers"]}
 # P0-9 驗收 8：索引檔大小增加不得超過改版前（178,908 bytes）的 30%。
 MAX_INDEX_BYTES = 232580
 INACTIVE_UI_SENTINELS = {
@@ -84,6 +87,8 @@ ALIASES = {
 # 詞源為 questions.md §D 60 組（含台灣口語、中國用語、英文原詞與城市繁簡英對照）。
 # key 是索引裡的 href；--check 會確認每個 key 都對得到一筆 entry。
 INTENT_SYNONYMS = {
+    "prep.html#first-city": "第一站 落地城市 去哪個城市 城市比較 先去哪",
+    "cost.html#runway": "無收入緩衝 錢能撐多久 找工空窗 沒工作幾週",
     # why.html
     "why.html#quick-title": "適不適合 我適合嗎 該不該去 值不值得 還缺什麼 準備好了嗎 8題快思",
     "why.html#slow-title": "想逃 逃離現狀 只是想逃 跟家人談 伴侶反對 父母反對 底線 退場方案 慢想",
@@ -157,7 +162,7 @@ INTENT_SYNONYMS = {
     "pr.html#points": "技術移民 分數 EOI 189 190 491 州提名 skills assessment 偏遠地區 regional",
     "pr.html#reality": "找誰問 移民代理 OMARA RMA 律師 代辦",
     # index.html
-    "index.html#communities-title": "社團 群組 群 LINE群 微信群 討論 同鄉會 伯斯 珀斯 Perth 墨爾本 墨尔本 Melbourne 布里斯本 布里斯班 Brisbane 雪梨 悉尼 Sydney 阿德雷德 阿德莱德 Adelaide 達爾文 达尔文 Darwin 荷巴特 霍巴特 Hobart 坎培拉 堪培拉 Canberra 黃金海岸 Gold Coast 凱恩斯 Cairns 塔斯 Tasmania 第一站 落地城市 去哪個城市",
+    "index.html#communities-title": "社團 群組 群 LINE群 微信群 討論 同鄉會 伯斯 珀斯 Perth 墨爾本 墨尔本 Melbourne 布里斯本 布里斯班 Brisbane 雪梨 悉尼 Sydney 阿德雷德 阿德莱德 Adelaide 達爾文 达尔文 Darwin 荷巴特 霍巴特 Hobart 坎培拉 堪培拉 Canberra 黃金海岸 Gold Coast 凱恩斯 Cairns 塔斯 Tasmania",
     # lang/en/visa/
     "lang/en/visa/#choose": "462 抽籤 抽签 EOI ballot 名額 5000 中國護照 大陸 Work and Holiday 462抽籤 学历 學歷 Functional English 462签",
 }
@@ -290,6 +295,8 @@ def make_entry(page: str, page_title: str, title: str, href: str, text: str, key
         "text": text[:4000],
         "keywords": keywords,
     }
+    if href in TASK_BY_HREF:
+        entry["answer"] = search_answer(TASK_BY_HREF[href], TASK_DATA["sources"])
     synonyms = INTENT_SYNONYMS.get(href, "")
     if synonyms:
         entry["synonyms"] = synonyms
@@ -391,7 +398,7 @@ def main() -> int:
     if args.check:
         return check(current, expected)
     OUTPUT.write_text(expected, encoding="utf-8", newline="\n")
-    count = expected.count('"href":')
+    count = expected.count('"pageTitle":')
     print(f"SEARCH INDEX BUILT ({count} entries, {len(expected.encode('utf-8'))} bytes)")
     return 0
 

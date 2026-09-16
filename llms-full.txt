@@ -6,7 +6,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-16
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: no-evidence-card
 - 證據卡查核日期: 未記錄
@@ -68,9 +68,9 @@
 
 最想先解決哪件事？
 
-[自我釐清 ### 我到底要啥 [Section permalink](https://www.aussiewhvcompass.com/#exit-considering-why) 用快思看見準備輪廓，再慢慢整理價值、取捨與底線；不是心理診斷。 第一步：做 2 分鐘快思](https://www.aussiewhvcompass.com/why.html)
+[落地城市比較 ### 第一站去哪 [Section permalink](https://www.aussiewhvcompass.com/#exit-considering-why) 比較住得起、到得了、做得來；附官方交通入口，不替城市或職缺排名。 第一步：比較兩個候選城市](https://www.aussiewhvcompass.com/prep.html#first-city)
 
-[2 分鐘快思](https://www.aussiewhvcompass.com/why.html#quick-quiz)[先玩一次](https://www.aussiewhvcompass.com/simulator.html)[看公開討論](https://www.aussiewhvcompass.com/communities.html?need=region-choice)
+[查通勤路線](https://www.aussiewhvcompass.com/prep.html#transport-planners)[另看自我釐清](https://www.aussiewhvcompass.com/why.html#quick-quiz)[看公開討論](https://www.aussiewhvcompass.com/communities.html?need=region-choice)
 
 不配對、不代聊。這裡只放公開入口；找房找工請走平台搜尋，不要先傳護照或匯款。
 
@@ -362,7 +362,7 @@ LINE・PERTH・版主同意分享
 
 [Reddit・WA**r/perth**Perth／WA 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/perth/) [Reddit・NSW**r/sydney**Sydney 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/sydney/) [Reddit・VIC**r/melbourne**Melbourne 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/melbourne/) [Reddit・QLD**r/brisbane**Brisbane 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/brisbane/) [Reddit・SA**r/Adelaide**Adelaide 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/Adelaide/) [Reddit・ACT**r/canberra**Canberra 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/canberra/) [Reddit・NT**r/darwin**Darwin 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/darwin/) [Reddit・TAS**r/tasmania**Tasmania 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/tasmania/)
 
-名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01)
+名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02)
 
 PLAY BEFORE REAL LIFE
 
@@ -496,7 +496,7 @@ Schwartz 的基本價值理論強調價值之間既有相容也有衝突。本�
 
 - 原始網頁: https://www.aussiewhvcompass.com/visa.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -632,6 +632,28 @@ Schwartz 的基本價值理論強調價值之間既有相容也有衝突。本�
 
 [Section permalink](https://www.aussiewhvcompass.com/visa.html#where)
 
+### 這份工作能集簽嗎？
+
+[Section permalink](https://www.aussiewhvcompass.com/visa.html#task-specified-work-title)
+
+先分清 417／462，再核對工作內容、地區、日期與證據；只看郵遞區號不足以判定。
+
+**適用：**需要核對二簽／三簽指定工作者；部分護照另有例外。
+
+**先核對：**需確認自己的適用規則。本站郵遞區號工具只使用留存的 417 資料，不做 462 資格判定。
+
+[先選 417／462 官方工作規則](https://www.aussiewhvcompass.com/visa.html#specified-work-options)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[內政部：指定工作條件與適用例外](https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=visa.html%23where&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E9%80%99%E4%BB%BD%E5%B7%A5%E4%BD%9C%E8%83%BD%E9%9B%86%E7%B0%BD%E5%97%8E%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 [回到答案卡](https://www.aussiewhvcompass.com/visa.html#visa-first-action)
 
 互動工具
@@ -730,7 +752,7 @@ Schwartz 的基本價值理論強調價值之間既有相容也有衝突。本�
 
 - 原始網頁: https://www.aussiewhvcompass.com/prep.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: no-evidence-card
 - 證據卡查核日期: 未記錄
@@ -756,9 +778,67 @@ Schwartz 的基本價值理論強調價值之間既有相容也有衝突。本�
 
  [四題都不是？直接看完整內容與參考資料](https://www.aussiewhvcompass.com/prep.html#full-contents)
 
-[簽證還沒核准，我現在能準備什麼？**先做：**先準備護照、英文、預算與資料，不做不可退的大額承諾。看下簽前後時間軸](https://www.aussiewhvcompass.com/prep.html#timeline) [剛落地的 72 小時，事情要怎麼排？**先做：**先確保住宿、連線、交通與付款方式，再處理後續行政手續。查看落地 72 小時](https://www.aussiewhvcompass.com/prep.html#72h) [TFN、銀行、myGov 和 super 要先辦哪個？**先做：**照第一週順序逐項處理，不把帳密或證件交給陌生人代辦。查看第一週順序](https://www.aussiewhvcompass.com/prep.html#first-week) [我怕漏東漏西，只想要一張清單**先做：**直接使用本機互動清單；只勾你已完成的項目。打開行前檢查清單](https://www.aussiewhvcompass.com/prep.html#checklist)
+[簽證還沒核准，我現在能準備什麼？**先做：**先準備護照、英文、預算與資料，不做不可退的大額承諾。看下簽前後時間軸](https://www.aussiewhvcompass.com/prep.html#timeline) [剛落地的 72 小時，事情要怎麼排？**先做：**先確保住宿、連線、交通與付款方式，再處理後續行政手續。查看落地 72 小時](https://www.aussiewhvcompass.com/prep.html#72h) [TFN、銀行、myGov 和 super 要先辦哪個？**先做：**先看各項用途與到職資料，不把帳密或證件交給陌生人代辦。查看第一週手續](https://www.aussiewhvcompass.com/prep.html#first-week) [我怕漏東漏西，只想要一張清單**先做：**直接使用本機互動清單；只勾你已完成的項目。打開行前檢查清單](https://www.aussiewhvcompass.com/prep.html#checklist)
 
-**完整內容與參考資料** [出發前時間軸](https://www.aussiewhvcompass.com/prep.html#timeline) [錢怎麼帶](https://www.aussiewhvcompass.com/prep.html#money) [行李](https://www.aussiewhvcompass.com/prep.html#luggage) [落地 72 小時](https://www.aussiewhvcompass.com/prep.html#72h) [第一週三大號](https://www.aussiewhvcompass.com/prep.html#first-week) [常見錯誤快查](https://www.aussiewhvcompass.com/prep.html#mistakes) [互動清單](https://www.aussiewhvcompass.com/prep.html#checklist)
+**完整內容與參考資料** [第一站城市比較](https://www.aussiewhvcompass.com/prep.html#first-city) [出發前時間軸](https://www.aussiewhvcompass.com/prep.html#timeline) [錢怎麼帶](https://www.aussiewhvcompass.com/prep.html#money) [行李](https://www.aussiewhvcompass.com/prep.html#luggage) [落地 72 小時](https://www.aussiewhvcompass.com/prep.html#72h) [第一週三大號](https://www.aussiewhvcompass.com/prep.html#first-week) [常見錯誤快查](https://www.aussiewhvcompass.com/prep.html#mistakes) [互動清單](https://www.aussiewhvcompass.com/prep.html#checklist)
+
+## 第一站去哪？先比住得起、到得了、做得來
+
+[Section permalink](https://www.aussiewhvcompass.com/prep.html#first-city)
+
+### 第一站去哪？
+
+[Section permalink](https://www.aussiewhvcompass.com/prep.html#task-first-city-title)
+
+先挑兩個候選城市，比同日期住宿總價、實際通勤與可做的工作；不要只按城市名決定。
+
+**適用：**準備選落地城市；這是比較方法，不是城市排名。
+
+**先核對：**需自行查入住日期、住處區域與上下班時間；沒有即時租金或職缺數據。
+
+[開官方交通入口比通勤](https://www.aussiewhvcompass.com/prep.html#transport-planners)
+
+本卡來源核對：2026-09-17・下次複核：2026-12-16
+
+依據、適用範圍與更正
+
+來源：[NSW Transport：行程規劃](https://transportnsw.info/plan)・[ASIC Moneysmart：預算規劃](https://moneysmart.gov.au/budgeting/how-to-do-a-budget)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=prep.html%23first-city&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E7%AC%AC%E4%B8%80%E7%AB%99%E5%8E%BB%E5%93%AA%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
+這裡不替城市排名，也不宣稱哪裡一定有工作。先選兩個你願意生活的地方，用同一組條件比完再決定。
+
+| 比較項目 | 自己要查的資料 | 如何排除不合適選項 |
+| --- | --- | --- |
+| 住得起 | 同一入住日期的短住總價、取消條件、押金與交通費。 | 把自己的報價放進[無收入緩衝試算](https://www.aussiewhvcompass.com/cost.html#runway)，不要拿平均租金當可訂到的價格。 |
+| 到得了 | 住處到面試或工作區，按預計上班及下班時間查來回班次。 | 只有白天交通方便，不代表早班或深夜也能通勤；查不到就先準備替代方案。 |
+| 做得來 | 公開職缺的技能、溝通、證照、交通與工作權要求。 | 拿[同一類關鍵字](https://www.aussiewhvcompass.com/map.html#open-job-portals)查兩個城市，不把網站搜尋結果當錄取或集簽保證。 |
+
+### 八個城市的官方交通查詢入口
+
+[Section permalink](https://www.aussiewhvcompass.com/prep.html#transport-planners)
+
+下列連結只幫你查路線、班次與當時票價；不是城市推薦或即時價格比較。地址由你在官方網站輸入，本站不定位也不接收地址。
+
+- 雪梨 Sydney（NSW）：[Transport for NSW](https://transportnsw.info/plan)
+
+- 墨爾本 Melbourne（VIC）：[Transport Victoria](https://transport.vic.gov.au/plan-a-journey)
+
+- 布里斯本 Brisbane（QLD）：[Translink](https://translink.com.au/plan-your-journey)
+
+- 伯斯 Perth（WA）：[WA Government／Transperth](https://www.wa.gov.au/service/transport/passenger-services/plan-journey-public-transport)
+
+- 阿德雷德 Adelaide（SA）：[Adelaide Metro](https://www.adelaidemetro.com.au/plan-a-trip/plan-my-journey)
+
+- 荷巴特 Hobart（TAS）：[Metro Tasmania](https://www.metrotas.com.au/planner/)
+
+- 達爾文 Darwin（NT）：[NT Government](https://nt.gov.au/driving/public-transport-cycling/public-buses/online-journey-planner)
+
+- 坎培拉 Canberra（ACT）：[Transport Canberra](https://www.transport.act.gov.au/home)
+
+比較方法為本站編輯建議；來源為上列政府／公共交通營運單位｜2026-09-17 查核（僅交通入口與比較方法，未查核城市行情）。
 
 ## 一、出發前時間軸
 
@@ -849,31 +929,77 @@ Schwartz 的基本價值理論強調價值之間既有相容也有衝突。本�
 
 [Section permalink](https://www.aussiewhvcompass.com/prep.html#72h)
 
-- **SIM 卡**：機場或超市買預付卡即可。打算跑偏遠地區的人，選用 Telstra 網路的電信（如 Boost）訊號覆蓋最廣（見[物價頁](https://www.aussiewhvcompass.com/cost.html#living)）。
+### 剛落地 72 小時先做什麼？
 
-- **交通卡**：各州各自的卡（Opal／myki／go card／SmartRider），機場或超商可辦。
+[Section permalink](https://www.aussiewhvcompass.com/prep.html#task-arrival-title)
 
-- **緩衝住宿**：行前先訂好 **1–2 週**的過渡住宿（hostel 或短租）——這不是浪費錢，是讓你「不會被『今天不付就沒地方住』逼著踩租屋詐騙」的保險（見[住宿租屋](https://www.aussiewhvcompass.com/housing.html)）。
+先確認今晚住宿、網路、交通與付款備援，再安排行政手續；別在趕時間時決定長租。
 
-- **銀行開戶**：帶護照臨櫃開戶（有行前預開的人則是去驗證啟用），拿到卡片與 BSB/帳號。
+**適用：**所有剛抵澳者；這是本站建議順序，不是法定辦理期限。
 
-## 五、第一週「三大號」：順序錯就被扣 45%
+**先核對：**入境申報依航班與 ABF 指示；交通班次與付款方式依城市確認。
+
+[照落地行動清單逐項做](https://www.aussiewhvcompass.com/prep.html#arrival-actions)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[ABF：入境旅客申報](https://www.abf.gov.au/crossing/Pages/incoming-passenger-card.aspx)・[NSW Transport：行程規劃](https://transportnsw.info/plan)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=prep.html%2372h&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E5%89%9B%E8%90%BD%E5%9C%B0+72+%E5%B0%8F%E6%99%82%E5%85%88%E5%81%9A%E4%BB%80%E9%BA%BC%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
+- **先確認今晚能入住：**地址、可入住時段、訂房紀錄、付款與取消條件先存好；先處理短住，不急著匯長租押金。[開住宿入口](https://www.aussiewhvcompass.com/housing.html#housing-search-tool)。
+
+- **確認能聯絡與付款：**讓手機能連線，保留緊急聯絡與支付備援；電信涵蓋區與方案依旅程直接向業者核對，不把單一品牌當通用答案。
+
+- **查當下的交通：**依實際抵達時間查機場到住宿的路線、末班與付款方式，不假設每個城市都有相同交通卡。[選官方交通入口](https://www.aussiewhvcompass.com/prep.html#transport-planners)。
+
+- **休息後安排行政：**確認可收件的方式及到職資料，再看[第一週手續](https://www.aussiewhvcompass.com/prep.html#first-week)。此處「72 小時」是準備框架，不是法定期限。
+
+順序為本站建議；入境時仍依 [ABF 旅客申報](https://www.abf.gov.au/crossing/Pages/incoming-passenger-card.aspx)及航班指示辦理，不把數位申報試辦當成人人適用｜2026-09-17 查核（僅本節與官方入口）。
+
+## 五、落地第一週：分清 TFN、銀行、myGov 與 super
 
 [Section permalink](https://www.aussiewhvcompass.com/prep.html#first-week)
 
-**優先順序：TFN（一有地址就辦）→ 銀行帳戶 → myGov 綁 ATO → super 帳戶。**
+### TFN、銀行、myGov、super 先辦哪個？
 
-- **TFN（稅號）第一優先**：申請**只需要護照與澳洲收件地址**（hostel 地址可用，不需要先有銀行帳戶）——一落腳就上 ATO 官網[免費線上申請](https://www.ato.gov.au/individuals-and-families/tax-file-number/apply-for-a-tfn)，最長 **28 天**寄達，這就是為什麼要第一週辦。任何收費「代辦 TFN」都是在賣你免費表格（見[防詐騙](https://www.aussiewhvcompass.com/scam.html)）。
+[Section permalink](https://www.aussiewhvcompass.com/prep.html#task-first-week-title)
 
-- **還沒拿到 TFN 就找到工作？**在雇主的 TFN declaration 勾選「已申請 TFN」，依 ATO 的 28 天規則可先按正常稅率預扣；**完全沒申請也沒申報的人才會被 45% 預扣**。
+先分清四者用途：TFN 申請與銀行準備可分別進行；myGov 是服務入口，super 是退休金帳戶。
 
-- **銀行帳戶**：抵澳後儘快開好（薪資要入帳）；TFN 到手後回頭補登到銀行（否則利息被高額預扣）、交給雇主（勾選 working holiday maker）。
+**適用：**準備在澳洲工作者；TFN 申請方式依個人身分。
 
-- **myGov**：註冊並連結 ATO——之後查 super 入帳、報稅全靠它。
+**先核對：**到職需處理 TFN declaration、銀行與 super 資料；不是順序不同就固定扣某一稅率。
 
-- **super 帳戶**：**自己先選好一個**基金（比較管理費），入職時把帳戶資料給雇主——否則每換一個雇主就被開一個新帳戶，管理費多頭蠶食，離澳領回時還要先整併（見[報稅離澳](https://www.aussiewhvcompass.com/leave.html#super)）。
+[開官方 TFN 申請說明](https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number)
 
-來源：[ATO TFN 申請](https://www.ato.gov.au/individuals-and-families/tax-file-number/apply-for-a-tfn)・[ATO WHM 專頁](https://www.ato.gov.au/individuals-and-families/coming-to-australia-or-going-overseas/coming-to-australia/working-holiday-makers)｜2026-08-28 查核
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[myGov：取得或找回 TFN](https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number)・[myGov：到職時提供的資料](https://my.gov.au/en/services/work/starting-a-job/what-your-employer-needs-from-you/providing-financial-details-to-your-employer)・[myGov：super 與選擇基金](https://my.gov.au/en/services/work/currently-employed/superannuation/how-super-works-and-choosing-a-fund)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=prep.html%23first-week&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+TFN%E3%80%81%E9%8A%80%E8%A1%8C%E3%80%81myGov%E3%80%81super+%E5%85%88%E8%BE%A6%E5%93%AA%E5%80%8B%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
+**先準備 TFN 與銀行所需資料，再完成到職設定；這是待辦安排，不是四項必須依序完成的法定流程。**
+
+- **TFN：**先從 [myGov 官方說明](https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number)選符合自己身分的 ATO 申請方式。首次申請免費；以前已有 TFN，應找回原號，不重新申請。不要在本站輸入 TFN 或護照資料。
+
+- **銀行：**向選定銀行核對現行開戶文件及身分驗證要求。到職時一般提供戶名、BSB 和帳號，不提供網銀密碼或驗證碼。
+
+- **到職稅務：**依 [TFN declaration 指示](https://my.gov.au/en/services/work/starting-a-job/what-your-employer-needs-from-you/providing-financial-details-to-your-employer)提供資料；未完成申報可能被多預扣稅。尚在申請 TFN 時，依官方申報選項及期限處理，不能把預扣結果簡化成「辦理順序錯就固定扣 45%」。
+
+- **myGov：**是政府服務入口，連結 ATO 後可以管理相關稅務與 super 服務；myGov 帳號不是 TFN，也不是銀行帳戶。
+
+- **super：**確認自己能否選擇基金，依官方方式提供基金資料。沒有指定時，雇主可能使用既有的 stapled super fund 或其預設基金，**不是每換工作必然另開一個帳戶**。比較費用、保險與適用條件，不只看品牌。
+
+來源：[myGov TFN](https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number)・[到職財務資料](https://my.gov.au/en/services/work/starting-a-job/what-your-employer-needs-from-you/providing-financial-details-to-your-employer)・[super 與選擇基金](https://my.gov.au/en/services/work/currently-employed/superannuation/how-super-works-and-choosing-a-fund)｜2026-09-17 查核（僅本節，不代表整頁）。
 
 ## 六、常見錯誤快查表
 
@@ -974,7 +1100,7 @@ HOW IT WORKS
 
 - 原始網頁: https://www.aussiewhvcompass.com/cost.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -994,13 +1120,13 @@ HOW IT WORKS
 
 [Section permalink](https://www.aussiewhvcompass.com/cost.html#cost-first-action)
 
-- [我帶的錢夠不夠，工作後存得到錢嗎？](https://www.aussiewhvcompass.com/cost.html#math)
+- [還沒找到工作，我帶的錢能撐多久？](https://www.aussiewhvcompass.com/cost.html#runway)
 
 - [吃飯要怎麼省，又不想每天只吃泡麵？](https://www.aussiewhvcompass.com/cost.html#food)
 
 - [我想買二手車，付款前要查什麼？](https://www.aussiewhvcompass.com/cost.html#car-checklist)
 
-[打開存錢試算器](https://www.aussiewhvcompass.com/cost.html#save-calc) [Fair Work 最低工資官方頁（外部連結）](https://www.fairwork.gov.au/pay-and-wages/minimum-wages)
+[開官方薪資計算器](https://calculate.fairwork.gov.au/) [Fair Work 最低工資官方頁（外部連結）](https://www.fairwork.gov.au/pay-and-wages/minimum-wages)
 
 官方依據：Fair Work Ombudsman（2026-08 查核）
 
@@ -1020,16 +1146,38 @@ Fair Work 的最低工資頁提供全國基準；要確認個別工作，請把�
 
 本頁數字查核於 2026-08-30。薪資與稅務數字可能調整；使用前請從各段落的官方來源核對當期數字與你的適用條件。
 
-**完整內容與參考資料** [雇主開的薪水是否合法？](https://www.aussiewhvcompass.com/cost.html#cost-first-action) [薪水](https://www.aussiewhvcompass.com/cost.html#wage) [稅與退休金](https://www.aussiewhvcompass.com/cost.html#tax) [房租](https://www.aussiewhvcompass.com/cost.html#rent) [省錢吃飯](https://www.aussiewhvcompass.com/cost.html#food) [交通・手機](https://www.aussiewhvcompass.com/cost.html#living) [便宜買衣服](https://www.aussiewhvcompass.com/cost.html#clothes) [買車與賣車](https://www.aussiewhvcompass.com/cost.html#car) [該帶多少錢](https://www.aussiewhvcompass.com/cost.html#budget) [換匯與匯款](https://www.aussiewhvcompass.com/cost.html#exchange) [存錢試算](https://www.aussiewhvcompass.com/cost.html#math)
+**完整內容與參考資料** [雇主開的薪水是否合法？](https://www.aussiewhvcompass.com/cost.html#cost-first-action) [薪水](https://www.aussiewhvcompass.com/cost.html#wage) [稅與退休金](https://www.aussiewhvcompass.com/cost.html#tax) [房租](https://www.aussiewhvcompass.com/cost.html#rent) [省錢吃飯](https://www.aussiewhvcompass.com/cost.html#food) [交通・手機](https://www.aussiewhvcompass.com/cost.html#living) [便宜買衣服](https://www.aussiewhvcompass.com/cost.html#clothes) [買車與賣車](https://www.aussiewhvcompass.com/cost.html#car) [該帶多少錢](https://www.aussiewhvcompass.com/cost.html#budget) [換匯與匯款](https://www.aussiewhvcompass.com/cost.html#exchange) [無收入能撐多久](https://www.aussiewhvcompass.com/cost.html#runway) [存錢試算](https://www.aussiewhvcompass.com/cost.html#math)
 
 ## 薪水：法定最低時薪
 
 [Section permalink](https://www.aussiewhvcompass.com/cost.html#wage)
 
+### 薪水有沒有算對？
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#task-pay-check-title)
+
+先查適用的 award 或 agreement、職級、年齡與工作時段；不能用一個全國時薪判斷所有工作。
+
+**適用：**澳洲僱員薪資核對；承攬、州制或特殊身分需另確認。
+
+**先核對：**準備稅前工資、工時、casual／part-time／full-time 與加成資料，不只看入帳淨額。
+
+[開 Fair Work 薪資計算器](https://calculate.fairwork.gov.au/)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[Fair Work Commission：award 與薪資條件](https://www.fwc.gov.au/work-conditions/minimum-wages-and-conditions/where-find-your-pay-and-conditions)・[Fair Work：簽證持有人職場權益](https://www.fairwork.gov.au/find-help-for/visa-holders-migrants)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=cost.html%23wage&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E8%96%AA%E6%B0%B4%E6%9C%89%E6%B2%92%E6%9C%89%E7%AE%97%E5%B0%8D%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 | 項目 | 2026-07-01 起 | 說明 |
 | --- | --- | --- |
-| 國家最低時薪（全職/兼職） | **A$26.44** | 約合週薪 $1,004.90（38 小時） |
-| Casual 最低時薪 | **A$33.05** | 含 25% casual loading（無特休病假的補償）；背包客多數是 casual |
+| 國家最低時薪（全職/兼職） | **A$26.44** | 未受 award／agreement 涵蓋者的全國基準；約合週薪 $1,004.90（38 小時） |
+| 未受 award／agreement 涵蓋的成人 casual 參考 | **A$33.05** | 含 25% casual loading（無特休病假的補償）；背包客多數是 casual |
 | 農場（Horticulture Award）casual | 約 A$32.18–33.05 | 官方園藝專頁 2026-07 入門級為 $32.18，與 NMW 地板的適用關係依你的僱用型態而定——**你的精確時薪用下方 P.A.C.T. 查**；週末假日另有加成 |
 | 餐飲（Hospitality Award）casual | 約 A$33 起 | 週日與國定假日加成顯著（假日可達兩倍以上） |
 
@@ -1288,6 +1436,46 @@ Fair Work 的最低工資頁提供全國基準；要確認個別工作，請把�
 
 來源：[ACCC Foreign currency and money exchange](https://www.accc.gov.au/consumers/specific-products-and-activities/foreign-currency-and-money-exchange)・[Moneysmart Sending money overseas](https://moneysmart.gov.au/banking/sending-money-overseas)・[AUSTRAC 無註冊匯款業者警告](https://www.austrac.gov.au/industry-and-business/your-industry/remittance-service-providers/unregistered-remittance-service-providers)・[外匯收支或交易申報辦法](https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0450009)｜2026-09-01 查核。各銀行費率隨時變動，匯款前以業者現行公告與實拿金額試算為準；本站無任何換匯業者合作或分潤。
 
+## 還沒找到工作，手上的錢能撐多久？
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#runway)
+
+### 還沒找到工作，錢能撐多久？
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#task-cash-runway-title)
+
+用可動用現金扣除尚未支付的一次性支出、押金與保留金，再除以每週必要開支。
+
+**適用：**假設期間沒有收入、支出固定；不是找工時間或簽證財力預測。
+
+**先核對：**不要把借款額度、未收到的薪水、super 或押金退款當現金；避免重複扣款。
+
+[算自己的無收入緩衝期](https://www.aussiewhvcompass.com/cost.html#runway-tool)
+
+本卡來源核對：2026-09-17・下次複核：2026-12-16
+
+依據、適用範圍與更正
+
+來源：[ASIC Moneysmart：預算規劃](https://moneysmart.gov.au/budgeting/how-to-do-a-budget)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=cost.html%23runway&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E9%82%84%E6%B2%92%E6%89%BE%E5%88%B0%E5%B7%A5%E4%BD%9C%EF%BC%8C%E9%8C%A2%E8%83%BD%E6%92%90%E5%A4%9A%E4%B9%85%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
+### 無收入緩衝試算
+
+[Section permalink](https://www.aussiewhvcompass.com/cost.html#runway-tool)
+
+這是你自行設定的情境，不是生活費行情或找工時間預測。所有金額以澳幣填寫，不換匯、不計稅、不把 super、借款額度或未入帳收入算成現金。
+
+**公式：**（可動用現金 − 尚未支付的一次性支出 − 尚未支付押金 − 保留金）÷ 每週必要開支。
+
+一次性費用與每週支出不要重複計入；已付費用只要已反映在現金餘額，就不要再扣一次。期間支出變動時重新試算。
+
+若想看有收入後的年度收支，改用[原存錢試算器](https://www.aussiewhvcompass.com/cost.html#save-calc)；兩者的假設不同，不要混用結果。
+
+預算項目參考 [ASIC Moneysmart](https://moneysmart.gov.au/budgeting/how-to-do-a-budget)；公式及情境是本站算術工具，不是官方資格門檻｜2026-09-17 查核。
+
 ## 存得到錢嗎？自己拉拉看
 
 [Section permalink](https://www.aussiewhvcompass.com/cost.html#math)
@@ -1323,7 +1511,7 @@ Fair Work 的最低工資頁提供全國基準；要確認個別工作，請把�
 
 - 原始網頁: https://www.aussiewhvcompass.com/housing.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -1439,6 +1627,28 @@ WA tenant guide 提供簽約、condition report 與 bond 的起點；不在 WA �
 ## 四、押金（bond）自保
 
 [Section permalink](https://www.aussiewhvcompass.com/housing.html#bond)
+
+### 押金可以先付嗎？
+
+[Section permalink](https://www.aussiewhvcompass.com/housing.html#task-rental-bond-title)
+
+先核對房源、收款者與書面條件；不要因為催促就匯款。押金流程要看房屋所在地與租住關係。
+
+**適用：**一般租屋防詐；住宅租約、分租、寄宿及短住可能適用不同規則。
+
+**先核對：**先確認州／領地與租住安排，再看當地 bond 規定；本文不把單一州規則套用全澳。
+
+[選房屋所在地的官方入口](https://www.aussiewhvcompass.com/housing.html#bond-authorities)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[QLD RTA：辨識租屋詐騙](https://www.rta.qld.gov.au/before-renting/choosing-a-rental-property/rental-scams)・[NSW Government：租屋規則入口](https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=housing.html%23bond&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%8A%BC%E9%87%91%E5%8F%AF%E4%BB%A5%E5%85%88%E4%BB%98%E5%97%8E%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
 
 - **規則看房屋所在地的州或領地，不看工作地或簽證。**先確認你是 tenant、co-tenant、sub-tenant、boarder／lodger 或其他 arrangement，再使用當地官方 bond 流程；保留收據、lodgement 紀錄與編號。
 
@@ -1578,7 +1788,7 @@ Scamwatch 建議高價商品付款前看實物、使用平台建議的安全付�
 
 [**Facebook Marketplace**搜尋本地二手品；進站後重新確認地點與平台規則](https://www.facebook.com/marketplace/search/?query=working%20holiday) [**eBay Australia**搜尋可寄送或自取商品；付款與保障依平台條款](https://www.ebay.com.au/sch/i.html?_nkw=working+holiday) [**Gumtree Australia**開啟官方首頁後自行搜尋城市與品項](https://www.gumtree.com.au/) [**Facebook 購物安全中心**交易前先看平台安全、禁售品與檢舉說明](https://www.facebook.com/help/123884166448529/)
 
-關係狀態：全部為外部原始入口；無付費、無佣金、無資料交換｜2026-09-01 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01)
+關係狀態：全部為外部原始入口；無付費、無佣金、無資料交換｜2026-09-01 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02)
 
 ## 面交或付款前，五件事都要完成
 
@@ -1669,7 +1879,7 @@ ACCC 說明：若是兩名私人個人之間的一次性交易，且賣方不是
 
 - 原始網頁: https://www.aussiewhvcompass.com/free.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-16
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: no-evidence-card
 - 證據卡查核日期: 未記錄
@@ -1694,6 +1904,28 @@ ACCC 說明：若是兩名私人個人之間的一次性交易，且賣方不是
 ## 看看同城有哪些好物
 
 [Section permalink](https://www.aussiewhvcompass.com/free.html#browse-title)
+
+### 怎麼找同城免費物品？
+
+[Section permalink](https://www.aussiewhvcompass.com/free.html#task-free-items-title)
+
+選城市後按「載入免費物品」，再到原貼確認狀態；瀏覽免登入，刊登與留言需 GitHub 帳號。
+
+**適用：**本站免費二手看板；只顯示符合版規、經審核且未到期的刊登。
+
+**先核對：**不是即時庫存；免費面交，不付訂金或運費。空清單不代表載入失敗。
+
+[進入免費物品篩選](https://www.aussiewhvcompass.com/free.html#fb-browse-actions)
+
+本站功能核對：2026-09-17・下次複核：2026-12-16
+
+依據、適用範圍與更正
+
+來源：[本站：免費二手版規與操作說明](https://www.aussiewhvcompass.com/free.html#rules)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=free.html%23browse-title&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%80%8E%E9%BA%BC%E6%89%BE%E5%90%8C%E5%9F%8E%E5%85%8D%E8%B2%BB%E7%89%A9%E5%93%81%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
 
 點「載入免費物品」後，瀏覽器才會向 GitHub 讀取公開刊登；GitHub 會接收到一般連線資訊。篩選字詞不送出，本站不保存你的搜尋。
 
@@ -1736,7 +1968,7 @@ ACCC 說明：若是兩名私人個人之間的一次性交易，且賣方不是
 
 - 原始網頁: https://www.aussiewhvcompass.com/work.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -1788,6 +2020,28 @@ ACCC 說明：若是兩名私人個人之間的一次性交易，且賣方不是
 
 [Section permalink](https://www.aussiewhvcompass.com/work.html#channels)
 
+### 沒車、英文不好，怎麼開始找工作？
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#task-find-work-title)
+
+先確認能到達的工作區與班次，再按已有技能搜尋；面試前練習工時、薪資和安全指示的確認方式。
+
+**適用：**尚未取得工作的讀者；不是零英文就能上工的承諾。
+
+**先核對：**需確認工作權利、職務證照與溝通要求；求職入口不保證有合適職缺。
+
+[按地區與職類找公開入口](https://www.aussiewhvcompass.com/map.html#open-job-portals)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[Workforce Australia：公開求職入口](https://www.workforceaustralia.gov.au/individuals/jobs/)・[Fair Work：簽證持有人職場權益](https://www.fairwork.gov.au/find-help-for/visa-holders-migrants)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=work.html%23channels&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%B2%92%E8%BB%8A%E3%80%81%E8%8B%B1%E6%96%87%E4%B8%8D%E5%A5%BD%EF%BC%8C%E6%80%8E%E9%BA%BC%E9%96%8B%E5%A7%8B%E6%89%BE%E5%B7%A5%E4%BD%9C%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 **先講競爭現實：**2025 年起在澳背包客人數創歷史新高（破 21 萬，比疫情前多約 10 萬），大城市網路海投常常無回音。求職量級要對：**掃街是數十到上百份履歷，不是投五份就喊飽和**；線上＋線下管道要並行。來源：[ABC 2025-01-31](https://www.abc.net.au/news/2025-01-31/working-holidaymaker-visas-employment-travel/104798716)
 
 ### 線上平台
@@ -1833,6 +2087,28 @@ ACCC 說明：若是兩名私人個人之間的一次性交易，且賣方不是
 
 [Section permalink](https://www.aussiewhvcompass.com/work.html#verify)
 
+### 接工作前先查什麼？
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#task-job-check-title)
+
+核對雇主名稱與 ABN、工作內容、薪資條件及紀錄方式；ABN 有效不代表這份工作已被驗證。
+
+**適用：**準備接受工作；仲介、承攬或不同薪資制度需另查適用條件。
+
+**先核對：**先取得職務、僱用型態、工時與適用 award 或 agreement；本站不判定個案是否合法。
+
+[先核對企業登記資訊](https://abr.business.gov.au/)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[ABN Lookup：企業登記資訊](https://abr.business.gov.au/)・[Fair Work：簽證持有人職場權益](https://www.fairwork.gov.au/find-help-for/visa-holders-migrants)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=work.html%23verify&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%8E%A5%E5%B7%A5%E4%BD%9C%E5%89%8D%E5%85%88%E6%9F%A5%E4%BB%80%E9%BA%BC%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 [回到答案卡](https://www.aussiewhvcompass.com/work.html#work-first-action)
 
 - **查雇主**：把對方給的 ABN 丟進 [ABN Lookup](https://abr.business.gov.au/)（官方、免費）——ABN 是否有效、登記名稱與對方自稱是否一致。
@@ -1849,7 +2125,7 @@ ACCC 說明：若是兩名私人個人之間的一次性交易，且賣方不是
 
   - 其他州目前無同類州級牌照制度（以各州官網現況為準），更要依賴 ABN 查核與 payslip 檢查。
 
-- **查薪資**：用官方 [P.A.C.T. 薪資計算器](https://calculate.fairwork.gov.au/)輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（2026 年 casual 絕對地板 $33.05/hr，見[物價與薪水](https://www.aussiewhvcompass.com/cost.html#wage)）。
+- **查薪資**：用官方 [P.A.C.T. 薪資計算器](https://calculate.fairwork.gov.au/)輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（適用條件見[薪資查核](https://www.aussiewhvcompass.com/cost.html#wage)，不能用單一 casual 時薪當所有工作的絕對地板）。
 
 - **確認雇主是 registered WHM employer**：不是的話，稅金預扣就不是 15%（見[稅務](https://www.aussiewhvcompass.com/cost.html#tax)）。
 
@@ -3422,7 +3698,7 @@ Reddit平台搜尋轉接一般
 
 [回報或推薦公開入口（公開於 GitHub）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=community.yml)
 
-機器可讀版本：[community-directory.json](https://www.aussiewhvcompass.com/community-directory.json?v=20260917-01)。每筆都有查核日與到期日；直連入口 90 天、平台搜尋 180 天、說明 365 天到期，逾期會降級為搜尋轉接。
+機器可讀版本：[community-directory.json](https://www.aussiewhvcompass.com/community-directory.json?v=20260917-02)。每筆都有查核日與到期日；直連入口 90 天、平台搜尋 180 天、說明 365 天到期，逾期會降級為搜尋轉接。
 
 **不管在哪個群，這幾件事一樣成立。**沒有任何合法工作需要你先付錢才能上工；沒看過房、沒見過人之前不要付訂金；簽證與集簽規定以[官方頁](https://www.aussiewhvcompass.com/visa.html)為準，不看群裡轉述；被威脅、被扣證件或已經匯款，先走[中招救濟包](https://www.aussiewhvcompass.com/scam.html#help)。
 
@@ -3577,7 +3853,7 @@ LEVEL 3
 
 - 恢復、修正或永久移除都在公開登錄表留下日期、理由與狀態；付款方不能要求刪除必要的負面資訊。
 
-[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
+[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
 
 ## 留下感謝與肯定
 

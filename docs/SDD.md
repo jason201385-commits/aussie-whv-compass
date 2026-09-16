@@ -321,3 +321,9 @@ inline link 持續顯示底線，不只靠顏色辨識；官方來源連結必�
 ## AI 閱讀衍生格式（P1-26）
 
 靜態 HTML 仍為唯一內容來源，既有 SEO 產生器同時匯出明列白名單頁面的閱讀副本，不引入網站執行時建置、RAG、外部模型或資料庫。`scripts/ai_reading.py` 使用 Python 標準庫；`scripts/test_ai_reading.py` 驗證同源、來源與隱私排除。`ai-index.json` 提供來源網址、語言、段落與 SHA-256，不增加第三方追蹤。
+
+
+## 9. 同源任務答案與緩衝期模組（P1-27）
+
+`answers.json` → `scripts/build_task_answers.py` → 原生 HTML 卡片；同一筆資料經 `build_search.py` 產生小型 `answer` 欄位供 `main.js` 的精確整題查詢使用，再由現有 `build_seo.py` 產生閱讀版。產生格式不等於重新查核。所有新內容對人與爬蟲一致；不新增新頁面、不增加問答 API，也不切換量測開關。
+`assets/cash-runway.js` 為獨立純函式與 DOM adaptor，不修改原本存錢試算器的資料／storage 契約。新增入口以原生連結為基線；缺 JavaScript 時仍能讀條件與公式。金額不進 URL、事件、storage 或遠端。操作結果加 `data-ai-exclude` 並排除搜尋。

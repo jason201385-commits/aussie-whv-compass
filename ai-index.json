@@ -10,12 +10,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/index.md",
       "title": "澳打指南針｜澳洲打工度假免費開源攻略",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-16",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "b86bc1edc102ead202d532b01594a1803a11d20973addc783f9be60578465447",
+      "markdownSha256": "879d53e7670786ede8d30bdf9155e71f794c28e69f421337d9e69591cc0b091f",
       "sections": [
         {
           "title": "澳洲打工度假，你現在在哪一步？",
@@ -38,7 +38,7 @@
           "url": "https://www.aussiewhvcompass.com/#considering-passport-462-title"
         },
         {
-          "title": "我到底要啥",
+          "title": "第一站去哪",
           "url": "https://www.aussiewhvcompass.com/#exit-considering-why"
         },
         {
@@ -251,16 +251,18 @@
         "https://www.aussiewhvcompass.com/pr.html#overview",
         "https://www.aussiewhvcompass.com/prep.html",
         "https://www.aussiewhvcompass.com/prep.html#checklist",
+        "https://www.aussiewhvcompass.com/prep.html#first-city",
         "https://www.aussiewhvcompass.com/prep.html#first-week",
         "https://www.aussiewhvcompass.com/prep.html#money",
         "https://www.aussiewhvcompass.com/prep.html#prep-poster",
         "https://www.aussiewhvcompass.com/prep.html#timeline",
+        "https://www.aussiewhvcompass.com/prep.html#transport-planners",
         "https://www.aussiewhvcompass.com/scam.html",
         "https://www.aussiewhvcompass.com/scam.html#defense",
         "https://www.aussiewhvcompass.com/scam.html#help",
         "https://www.aussiewhvcompass.com/scam.html#quiz",
         "https://www.aussiewhvcompass.com/simulator.html",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02",
         "https://www.aussiewhvcompass.com/visa.html",
         "https://www.aussiewhvcompass.com/visa.html#apply",
         "https://www.aussiewhvcompass.com/visa.html#counting",
@@ -269,7 +271,6 @@
         "https://www.aussiewhvcompass.com/visa.html#postcode-tool",
         "https://www.aussiewhvcompass.com/visa.html#second",
         "https://www.aussiewhvcompass.com/visa.html#where",
-        "https://www.aussiewhvcompass.com/why.html",
         "https://www.aussiewhvcompass.com/why.html#quick-quiz",
         "https://www.aussiewhvcompass.com/work.html",
         "https://www.aussiewhvcompass.com/work.html#certs",
@@ -367,12 +368,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/visa.md",
       "title": "簽證與集簽：417 一簽、二簽、三簽官方查核入口",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-02",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-08-30",
-      "markdownSha256": "10de6a94b53f3de45fc9b58a813c6319239005af52255e2ceac3a4ff15dc3c70",
+      "markdownSha256": "15e192cd11d9e298f696e2216b8b18c7bf31c2f6622b363f6ba007353767ac9a",
       "sections": [
         {
           "title": "簽證與集簽",
@@ -411,6 +412,10 @@
           "url": "https://www.aussiewhvcompass.com/visa.html#where"
         },
         {
+          "title": "這份工作能集簽嗎？",
+          "url": "https://www.aussiewhvcompass.com/visa.html#task-specified-work-title"
+        },
+        {
           "title": "集簽郵遞區號初篩",
           "url": "https://www.aussiewhvcompass.com/visa.html#postcode-tool"
         },
@@ -432,6 +437,7 @@
         }
       ],
       "sourceLinks": [
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=visa.html%23where&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E9%80%99%E4%BB%BD%E5%B7%A5%E4%BD%9C%E8%83%BD%E9%9B%86%E7%B0%BD%E5%97%8E%EF%BC%9F",
         "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-activity-408/australian-government-endorsed-events-workplace-justice-pilot",
         "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417",
         "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/first-working-holiday-417",
@@ -439,6 +445,7 @@
         "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/specified-work",
         "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/third-working-holiday-417",
         "https://immi.homeaffairs.gov.au/what-we-do/whm-program/latest-news",
+        "https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions",
         "https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions/6-month-work-limitation",
         "https://online.immi.gov.au/",
         "https://www.abc.net.au/news/2026-08-18/australia-working-holiday-maker-visa-program-pause/107046986",
@@ -456,6 +463,7 @@
         "https://www.aussiewhvcompass.com/visa.html#rights",
         "https://www.aussiewhvcompass.com/visa.html#second",
         "https://www.aussiewhvcompass.com/visa.html#sixmonth",
+        "https://www.aussiewhvcompass.com/visa.html#specified-work-options",
         "https://www.aussiewhvcompass.com/visa.html#visa-first-action",
         "https://www.aussiewhvcompass.com/visa.html#where",
         "https://www.fairwork.gov.au/find-help-for/visa-holders-migrants",
@@ -467,12 +475,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/prep.md",
       "title": "行前準備與落地 SOP",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-02",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "medium",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "b2c07dc2096b1be0801d3ca8ef5ca395ca85262630d79f485a446c33cebb71d8",
+      "markdownSha256": "cf63884ed4c5f8352225bb06d51df5462e1ef47c1132328cb5e15937aa8df5da",
       "sections": [
         {
           "title": "行前準備與落地 SOP",
@@ -481,6 +489,18 @@
         {
           "title": "不用背完整流程，先看你現在位於哪一步",
           "url": "https://www.aussiewhvcompass.com/prep.html#quick-answers"
+        },
+        {
+          "title": "第一站去哪？先比住得起、到得了、做得來",
+          "url": "https://www.aussiewhvcompass.com/prep.html#first-city"
+        },
+        {
+          "title": "第一站去哪？",
+          "url": "https://www.aussiewhvcompass.com/prep.html#task-first-city-title"
+        },
+        {
+          "title": "八個城市的官方交通查詢入口",
+          "url": "https://www.aussiewhvcompass.com/prep.html#transport-planners"
         },
         {
           "title": "一、出發前時間軸",
@@ -523,8 +543,16 @@
           "url": "https://www.aussiewhvcompass.com/prep.html#72h"
         },
         {
-          "title": "五、第一週「三大號」：順序錯就被扣 45%",
+          "title": "剛落地 72 小時先做什麼？",
+          "url": "https://www.aussiewhvcompass.com/prep.html#task-arrival-title"
+        },
+        {
+          "title": "五、落地第一週：分清 TFN、銀行、myGov 與 super",
           "url": "https://www.aussiewhvcompass.com/prep.html#first-week"
+        },
+        {
+          "title": "TFN、銀行、myGov、super 先辦哪個？",
+          "url": "https://www.aussiewhvcompass.com/prep.html#task-first-week-title"
         },
         {
           "title": "六、常見錯誤快查表",
@@ -540,36 +568,53 @@
         }
       ],
       "sourceLinks": [
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=prep.html%2372h&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E5%89%9B%E8%90%BD%E5%9C%B0+72+%E5%B0%8F%E6%99%82%E5%85%88%E5%81%9A%E4%BB%80%E9%BA%BC%EF%BC%9F",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=prep.html%23first-city&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E7%AC%AC%E4%B8%80%E7%AB%99%E5%8E%BB%E5%93%AA%EF%BC%9F",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=prep.html%23first-week&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+TFN%E3%80%81%E9%8A%80%E8%A1%8C%E3%80%81myGov%E3%80%81super+%E5%85%88%E8%BE%A6%E5%93%AA%E5%80%8B%EF%BC%9F",
+        "https://moneysmart.gov.au/budgeting/how-to-do-a-budget",
+        "https://my.gov.au/en/services/work/currently-employed/superannuation/how-super-works-and-choosing-a-fund",
+        "https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number",
+        "https://my.gov.au/en/services/work/starting-a-job/what-your-employer-needs-from-you/providing-financial-details-to-your-employer",
+        "https://nt.gov.au/driving/public-transport-cycling/public-buses/online-journey-planner",
+        "https://translink.com.au/plan-your-journey",
+        "https://transport.vic.gov.au/plan-a-journey",
+        "https://transportnsw.info/plan",
         "https://web.customs.gov.tw/taipei/singlehtml/3394?cntId=cus2_3394_3394_1359",
+        "https://www.abf.gov.au/crossing/Pages/incoming-passenger-card.aspx",
         "https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in",
-        "https://www.ato.gov.au/individuals-and-families/coming-to-australia-or-going-overseas/coming-to-australia/working-holiday-makers",
-        "https://www.ato.gov.au/individuals-and-families/tax-file-number/apply-for-a-tfn",
+        "https://www.adelaidemetro.com.au/plan-a-trip/plan-my-journey",
         "https://www.aussiewhvcompass.com/cost.html#budget",
         "https://www.aussiewhvcompass.com/cost.html#exchange",
-        "https://www.aussiewhvcompass.com/cost.html#living",
         "https://www.aussiewhvcompass.com/cost.html#math",
+        "https://www.aussiewhvcompass.com/cost.html#runway",
         "https://www.aussiewhvcompass.com/english.html#before",
         "https://www.aussiewhvcompass.com/free.html#free-board",
         "https://www.aussiewhvcompass.com/free.html#publish",
         "https://www.aussiewhvcompass.com/health.html",
         "https://www.aussiewhvcompass.com/health.html#insurance",
         "https://www.aussiewhvcompass.com/housing.html",
-        "https://www.aussiewhvcompass.com/leave.html#super",
+        "https://www.aussiewhvcompass.com/housing.html#housing-search-tool",
+        "https://www.aussiewhvcompass.com/map.html#open-job-portals",
         "https://www.aussiewhvcompass.com/pr.html",
         "https://www.aussiewhvcompass.com/prep.html#72h",
+        "https://www.aussiewhvcompass.com/prep.html#arrival-actions",
         "https://www.aussiewhvcompass.com/prep.html#checklist",
+        "https://www.aussiewhvcompass.com/prep.html#first-city",
         "https://www.aussiewhvcompass.com/prep.html#first-week",
         "https://www.aussiewhvcompass.com/prep.html#full-contents",
         "https://www.aussiewhvcompass.com/prep.html#luggage",
         "https://www.aussiewhvcompass.com/prep.html#mistakes",
         "https://www.aussiewhvcompass.com/prep.html#money",
         "https://www.aussiewhvcompass.com/prep.html#timeline",
-        "https://www.aussiewhvcompass.com/scam.html",
+        "https://www.aussiewhvcompass.com/prep.html#transport-planners",
         "https://www.aussiewhvcompass.com/visa.html",
         "https://www.aussiewhvcompass.com/visa.html#changes",
         "https://www.aussiewhvcompass.com/why.html",
         "https://www.aussiewhvcompass.com/work.html#resume",
-        "https://www.austrac.gov.au/general-public/moving-money-overseas"
+        "https://www.austrac.gov.au/general-public/moving-money-overseas",
+        "https://www.metrotas.com.au/planner/",
+        "https://www.transport.act.gov.au/home",
+        "https://www.wa.gov.au/service/transport/passenger-services/plan-journey-public-transport"
       ]
     },
     {
@@ -622,12 +667,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/cost.md",
       "title": "物價與薪水：帶多少錢、賺多少錢？",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-02",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-08-30",
-      "markdownSha256": "a9c22816202e8ebe88d9dd830596cbbb3ad2060355fe871b4bd9a6b6d122b837",
+      "markdownSha256": "b8c3243b6eed2216d33bd964fc57ed16b8cc3415fb36be83034d6f5cabf2e515",
       "sections": [
         {
           "title": "物價與薪水",
@@ -640,6 +685,10 @@
         {
           "title": "薪水：法定最低時薪",
           "url": "https://www.aussiewhvcompass.com/cost.html#wage"
+        },
+        {
+          "title": "薪水有沒有算對？",
+          "url": "https://www.aussiewhvcompass.com/cost.html#task-pay-check-title"
         },
         {
           "title": "稅與退休金",
@@ -702,6 +751,18 @@
           "url": "https://www.aussiewhvcompass.com/cost.html#exchange"
         },
         {
+          "title": "還沒找到工作，手上的錢能撐多久？",
+          "url": "https://www.aussiewhvcompass.com/cost.html#runway"
+        },
+        {
+          "title": "還沒找到工作，錢能撐多久？",
+          "url": "https://www.aussiewhvcompass.com/cost.html#task-cash-runway-title"
+        },
+        {
+          "title": "無收入緩衝試算",
+          "url": "https://www.aussiewhvcompass.com/cost.html#runway-tool"
+        },
+        {
           "title": "存得到錢嗎？自己拉拉看",
           "url": "https://www.aussiewhvcompass.com/cost.html#math"
         },
@@ -713,12 +774,15 @@
       "sourceLinks": [
         "https://askizzy.org.au/",
         "https://calculate.fairwork.gov.au/",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=cost.html%23runway&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E9%82%84%E6%B2%92%E6%89%BE%E5%88%B0%E5%B7%A5%E4%BD%9C%EF%BC%8C%E9%8C%A2%E8%83%BD%E6%92%90%E5%A4%9A%E4%B9%85%EF%BC%9F",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=cost.html%23wage&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E8%96%AA%E6%B0%B4%E6%9C%89%E6%B2%92%E6%9C%89%E7%AE%97%E5%B0%8D%EF%BC%9F",
         "https://goodsammy.com.au/locations/",
         "https://horticulture.fairwork.gov.au/how-to-use-piece-rates",
         "https://horticulture.fairwork.gov.au/pay-and-piece-rates",
         "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417",
         "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0450009",
         "https://moneysmart.gov.au/banking/sending-money-overseas",
+        "https://moneysmart.gov.au/budgeting/how-to-do-a-budget",
         "https://nt.gov.au/driving/rego/existing-nt-registration/buying-selling-a-used-vehicle-registration",
         "https://online.apps.austrac.gov.au/rsr/",
         "https://online.transport.wa.gov.au/webExternal/registration/",
@@ -750,6 +814,8 @@
         "https://www.aussiewhvcompass.com/cost.html#living",
         "https://www.aussiewhvcompass.com/cost.html#math",
         "https://www.aussiewhvcompass.com/cost.html#rent",
+        "https://www.aussiewhvcompass.com/cost.html#runway",
+        "https://www.aussiewhvcompass.com/cost.html#runway-tool",
         "https://www.aussiewhvcompass.com/cost.html#save-calc",
         "https://www.aussiewhvcompass.com/cost.html#tax",
         "https://www.aussiewhvcompass.com/cost.html#wage",
@@ -767,8 +833,10 @@
         "https://www.coles.com.au/on-special",
         "https://www.facebook.com/marketplace/create/vehicle",
         "https://www.facebook.com/marketplace/perth/vehicles",
+        "https://www.fairwork.gov.au/find-help-for/visa-holders-migrants",
         "https://www.fairwork.gov.au/pay-and-wages/minimum-wages",
         "https://www.foodstandards.gov.au/consumer/prevention-of-foodborne-illness/food-safety-basics",
+        "https://www.fwc.gov.au/work-conditions/minimum-wages-and-conditions/where-find-your-pay-and-conditions",
         "https://www.gumtree.com.au/cars/sell-my-car",
         "https://www.gumtree.com.au/s-cars-vans-utes/perth/c18320l3008303",
         "https://www.kmart.com.au/category/women/womens-clothing/",
@@ -793,12 +861,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/housing.md",
       "title": "住宿與租屋：找房、押金、Share House 生存",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-02",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-08-30",
-      "markdownSha256": "6d749823adf0d3467945c4adaeea2a19d9fce706e63944e5c0658f442af27ad8",
+      "markdownSha256": "3d2d9b033f1bbab0445a6621699c43022846c774af9572c3287b0c1bea924f71",
       "sections": [
         {
           "title": "住宿與租屋",
@@ -833,6 +901,10 @@
           "url": "https://www.aussiewhvcompass.com/housing.html#bond"
         },
         {
+          "title": "押金可以先付嗎？",
+          "url": "https://www.aussiewhvcompass.com/housing.html#task-rental-bond-title"
+        },
+        {
           "title": "五、合約陷阱",
           "url": "https://www.aussiewhvcompass.com/housing.html#contract"
         },
@@ -849,12 +921,14 @@
         "https://cbos.tas.gov.au/topics/housing/renting",
         "https://consumeraffairs.nt.gov.au/for-consumers/residential-tenancies",
         "https://flatmates.com.au/rooms/perth",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=housing.html%23bond&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%8A%BC%E9%87%91%E5%8F%AF%E4%BB%A5%E5%85%88%E4%BB%98%E5%97%8E%EF%BC%9F",
         "https://www.act.gov.au/housing-planning-and-property/renting",
         "https://www.aussiewhvcompass.com/cost.html#rent",
         "https://www.aussiewhvcompass.com/english.html#exchange",
         "https://www.aussiewhvcompass.com/free.html#free-board",
         "https://www.aussiewhvcompass.com/free.html#publish",
         "https://www.aussiewhvcompass.com/housing.html#bond",
+        "https://www.aussiewhvcompass.com/housing.html#bond-authorities",
         "https://www.aussiewhvcompass.com/housing.html#book",
         "https://www.aussiewhvcompass.com/housing.html#contract",
         "https://www.aussiewhvcompass.com/housing.html#culture",
@@ -878,6 +952,7 @@
         "https://www.hostelworld.com/hostels/oceania/australia/perth/",
         "https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live",
         "https://www.realestate.com.au/rent/in-perth,+wa+6000/list-1",
+        "https://www.rta.qld.gov.au/before-renting/choosing-a-rental-property/rental-scams",
         "https://www.rta.qld.gov.au/starting-a-tenancy",
         "https://www.sa.gov.au/topics/housing/renting-and-letting/renting-privately"
       ]
@@ -892,7 +967,7 @@
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-09-01",
-      "markdownSha256": "426c0a4b492c48f8fd4a1b1467f9f10a433ad608ecf554d1e21a37f7dec341ff",
+      "markdownSha256": "49949533c26e449823147304d5cd8435fe4cf81aab01b0274ff2e17e527dcc35",
       "sections": [
         {
           "title": "離澳出清 × 初登澳補給站",
@@ -962,7 +1037,7 @@
         "https://www.aussiewhvcompass.com/market.html#rights",
         "https://www.aussiewhvcompass.com/market.html#safety",
         "https://www.aussiewhvcompass.com/scam.html#help",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02",
         "https://www.ebay.com.au/sch/i.html?_nkw=working+holiday",
         "https://www.facebook.com/help/123884166448529/",
         "https://www.facebook.com/marketplace/search/?query=working%20holiday",
@@ -977,12 +1052,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/free.md",
       "title": "離澳免費二手版",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-16",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "medium",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "7d93c32dd23f814344dcc1c6e67959953c4116e65556458cff82407be6a0be1e",
+      "markdownSha256": "e7085afe4051d3f41d0d2fcff301cb24635787b9ba7336023ae82a2cea4d9849",
       "sections": [
         {
           "title": "離澳免費二手版",
@@ -991,6 +1066,10 @@
         {
           "title": "看看同城有哪些好物",
           "url": "https://www.aussiewhvcompass.com/free.html#browse-title"
+        },
+        {
+          "title": "怎麼找同城免費物品？",
+          "url": "https://www.aussiewhvcompass.com/free.html#task-free-items-title"
         },
         {
           "title": "先預覽，再到 GitHub 確認刊登",
@@ -1003,10 +1082,13 @@
       ],
       "sourceLinks": [
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=free_item.md",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=free.html%23browse-title&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%80%8E%E9%BA%BC%E6%89%BE%E5%90%8C%E5%9F%8E%E5%85%8D%E8%B2%BB%E7%89%A9%E5%93%81%EF%BC%9F",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues?q=is%3Aissue%20is%3Aopen%20label%3Afree-board-approved",
         "https://www.aussiewhvcompass.com/about.html#maintain",
+        "https://www.aussiewhvcompass.com/free.html#fb-browse-actions",
         "https://www.aussiewhvcompass.com/free.html#free-board",
         "https://www.aussiewhvcompass.com/free.html#publish",
+        "https://www.aussiewhvcompass.com/free.html#rules",
         "https://www.aussiewhvcompass.com/market.html",
         "https://www.aussiewhvcompass.com/scam.html"
       ]
@@ -1016,12 +1098,12 @@
       "markdownUrl": "https://www.aussiewhvcompass.com/ai/work.md",
       "title": "工作機會在哪裡？求職管道、雇主查核與證照",
       "language": "zh-Hant",
-      "sourceContentLastModified": "2026-09-02",
+      "sourceContentLastModified": "2026-09-17",
       "reviewedByDomainProfessional": false,
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-08-30",
-      "markdownSha256": "b13579b610c8f09e0c93155e47f01966a6ff32ed8551bbc23aa203da03824fff",
+      "markdownSha256": "80421d3d8ec4e98c833262b84332f14ee91109191061f33b5c30d5fb37814d34",
       "sections": [
         {
           "title": "工作機會在哪裡？",
@@ -1034,6 +1116,10 @@
         {
           "title": "一、求職管道",
           "url": "https://www.aussiewhvcompass.com/work.html#channels"
+        },
+        {
+          "title": "沒車、英文不好，怎麼開始找工作？",
+          "url": "https://www.aussiewhvcompass.com/work.html#task-find-work-title"
         },
         {
           "title": "線上平台",
@@ -1050,6 +1136,10 @@
         {
           "title": "二、接工作前的合法性查核（5 分鐘）",
           "url": "https://www.aussiewhvcompass.com/work.html#verify"
+        },
+        {
+          "title": "接工作前先查什麼？",
+          "url": "https://www.aussiewhvcompass.com/work.html#task-job-check-title"
         },
         {
           "title": "三、常見證照：哪些工作需要先考什麼",
@@ -1102,6 +1192,8 @@
         "https://au.indeed.com/",
         "https://au.jora.com/",
         "https://calculate.fairwork.gov.au/",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=work.html%23channels&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%B2%92%E8%BB%8A%E3%80%81%E8%8B%B1%E6%96%87%E4%B8%8D%E5%A5%BD%EF%BC%8C%E6%80%8E%E9%BA%BC%E9%96%8B%E5%A7%8B%E6%89%BE%E5%B7%A5%E4%BD%9C%EF%BC%9F",
+        "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=work.html%23verify&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%8E%A5%E5%B7%A5%E4%BD%9C%E5%89%8D%E5%85%88%E6%9F%A5%E4%BB%80%E9%BA%BC%EF%BC%9F",
         "https://immunisationhandbook.health.gov.au/contents/vaccine-preventable-diseases/q-fever",
         "https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs",
         "https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs/harvest-jobs-faqs",
@@ -1115,6 +1207,7 @@
         "https://www.aussiewhvcompass.com/health.html",
         "https://www.aussiewhvcompass.com/health.html#women",
         "https://www.aussiewhvcompass.com/map.html",
+        "https://www.aussiewhvcompass.com/map.html#open-job-portals",
         "https://www.aussiewhvcompass.com/scam.html",
         "https://www.aussiewhvcompass.com/scam.html#chinese",
         "https://www.aussiewhvcompass.com/scam.html#job",
@@ -1137,6 +1230,7 @@
         "https://www.business.qld.gov.au/industries/hospitality-tourism-sport/liquor-gaming/liquor/training/rsa/certification",
         "https://www.cbs.sa.gov.au/find-a-licence-holder",
         "https://www.fairwork.gov.au/employment-conditions/workers-compensation",
+        "https://www.fairwork.gov.au/find-help-for/visa-holders-migrants",
         "https://www.fairwork.gov.au/pay-and-wages",
         "https://www.gumtree.com.au/jobs",
         "https://www.jobsandskills.gov.au/news/slight-uplift-recruitment-activity-november",
@@ -1147,6 +1241,7 @@
         "https://www.servicesaustralia.gov.au/reciprocal-health-care-agreements",
         "https://www.thredbo.com.au/about-thredbo/jobs/recruitment-process/",
         "https://www.vic.gov.au/rsa-training",
+        "https://www.workforceaustralia.gov.au/individuals/jobs/",
         "https://www.workforceaustralia.gov.au/individuals/jobs/search",
         "https://www.worksafe.act.gov.au/licensing-and-registration/labour-hire-licensing",
         "https://www.worksafe.qld.gov.au/licensing-and-registrations/work-health-and-safety-licences/what-licence-do-i-need/forklift-truck",
@@ -1700,7 +1795,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "9970cb5c1dcd9bc40a1855972fc920830582e4b6d4a5ee285119d835db235066",
+      "markdownSha256": "65861452a1ada31ec13544c6f3ecc51e9fa0e2b0e0e479465a280668501fab60",
       "sections": [
         {
           "title": "各地社團目錄",
@@ -1785,7 +1880,7 @@
       ],
       "sourceLinks": [
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=community.yml",
-        "https://www.aussiewhvcompass.com/community-directory.json?v=20260917-01",
+        "https://www.aussiewhvcompass.com/community-directory.json?v=20260917-02",
         "https://www.aussiewhvcompass.com/index.html#perth-community",
         "https://www.aussiewhvcompass.com/index.html#support-hub",
         "https://www.aussiewhvcompass.com/scam.html#help",
@@ -1815,7 +1910,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "11078408ab2362d3fbdafbad3dd883969feab61d0d414f4f009454d17ef7f5fc",
+      "markdownSha256": "2c71aef7402beabf7dbacb10d190bb786869edb245728b686c6129c3dce57c93",
       "sections": [
         {
           "title": "關於本站",
@@ -1947,7 +2042,7 @@
         "https://www.aussiewhvcompass.com/about.html#private-contact",
         "https://www.aussiewhvcompass.com/free.html",
         "https://www.aussiewhvcompass.com/free.html#rules",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02",
         "https://www.fairwork.gov.au/",
         "https://www.mara.gov.au/",
         "https://www.minimax.io/"

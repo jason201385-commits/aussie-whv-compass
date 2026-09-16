@@ -146,7 +146,7 @@ LEVEL 3
 
 - 恢復、修正或永久移除都在公開登錄表留下日期、理由與狀態；付款方不能要求刪除必要的負面資訊。
 
-[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-01) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
+[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20260917-02) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
 
 ## 留下感謝與肯定
 
