@@ -9,6 +9,7 @@
      同時涵蓋 /scam.html、/scam、/scam/、/lang/en/scam/、/lang/en/scam/index.html，
      以及站台掛在子路徑下（例如 /aussie/scam.html）的情況。 */
   var SENSITIVE_PATHS = [
+    "/free.html",
     "/scam.html",
     "/health.html",
     "/lang/en/scam/",

@@ -44,6 +44,7 @@ PAGES = [
     "cost.html",
     "housing.html",
     "market.html",
+    "free.html",
     "work.html",
     "scam.html",
     "english.html",
@@ -60,6 +61,7 @@ EXTRA_PAGES = {
 }
 ALL_PAGES = PAGES + list(EXTRA_PAGES)
 ALIASES = {
+    "free.html": "離澳免費二手版 免費二手板 免費贈送 送物 搬家 出清 同城 面交 二手 生活補給 giveaway free stuff",
     "index.html": "澳洲打工度假 WHV 攻略 導覽 工具 搜尋",
     "why.html": "適不適合 自我探索 價值觀 心理 快思 慢想 決定 出發",
     "visa.html": "417 首簽 一簽 二簽 三簽 集簽 88天 179天 指定工作 郵遞區號",

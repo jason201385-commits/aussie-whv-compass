@@ -158,7 +158,7 @@ foreach ($p in $pages) {
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
     if ($nav -match 'href="(?:simulator|market|communities|map)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html、communities.html 或 map.html（站長 2026-09-02 決定；工具頁不進 nav）"; $errors++ }
   }
-  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html')
+  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html', 'free.html')
   if ($p -in $offNavPages) {
     if ([regex]::Matches($t, 'aria-current="page"').Count -ne 0) {
       Write-Output "FAIL [$p] 不在全站 nav 的工具頁不得標 aria-current=page"; $errors++
@@ -2321,8 +2321,8 @@ if (-not $entryCards.Success) {
   $errors++
 } else {
   $entryHrefs = @([regex]::Matches($entryCards.Value, '<a class="home-entry-card"[^>]*href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
-  if ($entryHrefs.Count -ne 3 -or ($entryHrefs -join ',') -ne 'communities.html,#games,#journey-resume') {
-    Write-Output "FAIL [index.html] 入口卡必須恰好三張且依序連 communities.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
+  if ($entryHrefs.Count -ne 4 -or ($entryHrefs -join ',') -ne 'communities.html,free.html,#games,#journey-resume') {
+    Write-Output "FAIL [index.html] 入口卡必須恰好四張且依序連 communities.html、free.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
     $errors++
   }
   foreach ($entryCardNeedle in @('找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
@@ -2406,8 +2406,8 @@ foreach ($marketNeedle in @(
   'id="market-draft-output"',
   'id="market-facebook-link"',
   'id="market-ebay-link"',
-  '本站目前不收刊登、不保存聯絡資料，也不介入付款',
-  '不保存刊登內容、不驗證身分、不檢驗商品',
+  '本頁草稿工具不收刊登、不保存聯絡資料，也不介入付款',
+  '本頁不保存草稿內容、不驗證身分、不檢驗商品',
   '多數 consumer guarantees 不適用',
   '商品所有權、買方不受干擾持有，以及沒有未揭露債務／權利負擔'
 )) {
@@ -2861,7 +2861,8 @@ if (-not (Test-Path $assistTsPath)) {
   $errors++
 } else {
   $assistTs = [System.IO.File]::ReadAllText($assistTsPath, [System.Text.Encoding]::UTF8)
-  $sensitiveGroups = [regex]::Matches($assistTs, '(?s)const (SENSITIVE_[A-Z_]+) =(.*?);?
+  $sensitiveGroups = [regex]::Matches($assistTs, '(?s)const (SENSITIVE_[A-Z_]+) =(.*?);
+?
 ')
   if ($sensitiveGroups.Count -lt 10) {
     Write-Output "FAIL [worker/src/assist.ts] 敏感題分組樣式只有 $($sensitiveGroups.Count) 組，應為 12 組以上"
@@ -3656,5 +3657,7 @@ if (-not (Test-Path $workerNodeModules)) {
 }
 
 Write-Output ("-" * 40)
+& node --test (Join-Path $dir "scripts/test_free_board.cjs")
+if ($LASTEXITCODE -ne 0) { $errors++ }
 if ($errors -eq 0) { Write-Output "ALL CHECKS PASSED ($($pages.Count) pages)"; exit 0 }
 else { Write-Output "$errors ERROR(S)"; exit 1 }

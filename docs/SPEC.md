@@ -1,6 +1,6 @@
 # 澳打指南針 — 現況行為契約（SPEC）
 
-> 版本 2.0｜最後更新 2026-09-05｜本文件只寫「現在的行為是什麼、怎麼驗證」。
+> 版本 2.0｜最後更新 2026-09-16｜本文件只寫「現在的行為是什麼、怎麼驗證」。
 > 待辦與狀態在 `ROADMAP.md`，為什麼與證據在 `DECISIONS.md`，原則與架構在 `SDD.md`，
 > 閱讀路線在 `README.md`。改動任何功能行為時，必須在同一個 commit 更新本文件對應列並更新標頭日期。
 
@@ -40,6 +40,7 @@
 | `english.html` | 決定要去 | 英文資源與策略 | 有 | — |
 | `health.html` | 決定要去 | 保險就醫心理安全 | 有 | 有 |
 | `leave.html` | 回程與延續 | 報稅退休金離澳＋DASP 粗估＋離澳收尾清單 | 有 | 有 |
+| `free.html` | 回程與延續／初登澳（工具頁） | 離澳免費二手版；GitHub 公開 Issue＋審核標籤、同城篩選、刊登草稿 | 有 | — |
 | `market.html` | 回程與延續／初登澳 | 離澳出清 × 初登澳補給：交換草稿產生器與平台入口 | 有 | 有 |
 | `communities.html` | 落地後找人 | 各地社團目錄：地區 × 需求的公開入口；不進全站 nav（同工具頁規則） | 有 | 有 |
 | `pr.html` | 已在澳洲 | PR 路徑總覽 | 有 | 有 |
@@ -201,3 +202,17 @@ powershell -File scripts/check.ps1
 | 每季 | 交通票價政策優惠（myki 半價 2027-01 到期、QLD 50c、Perth $2.80）、手機方案、匯率係數（tools.js 的 22.8）、換匯段落來源（ACCC／Moneysmart／AUSTRAC） |
 | 官方公告時 | `postcodes.js` 重抽（SDD §5 程序）；`seasons.js` 各州官方表；WHM 制度變動（88 天檢討、Workplace Justice 試辦狀態） |
 | 隨時 | Issue triage：「需要查證」→查官方→修→關單附證據；`third-party-register.json` 查核日期 |
+
+## 6. P1-24 離澳免費二手版
+
+`free.html` 是獨立工具頁，保留既有 12 項全站導覽，首頁新增一張入口卡並於離澳與原市集頁交叉連結。
+只收一般生活用品免費贈送，不做付款、運送、保管或身分認證。原市集付費買賣草稿保持獨立。
+
+- 輸入：固定城市／分類／狀況、50 字品名、90 字面交區域、300 字說明、今天至 90 天內截止日。日期統一用 Australia/Perth（UTC+8）。無聯絡資料欄位，不寫 storage。
+- 送出：先產生本機預覽，明示尚未刊登。經使用者同意，僅以標題與 body URL 參數前往 GitHub Markdown Issue template；不用 labels query（一般訪客不需標籤權限）。仍需登入 GitHub 自行 Submit。URL 含草稿並可能進入瀏覽紀錄。
+- 資料：只在按載入後讀 GitHub 公開 issues API，credentials omit／no-referrer；只列帶 `free-board-approved` 的 open、非 locked、非 PR、格式有效且未過期的 AUD 0 刊登。每批 50 筆，依 Link 判斷是否可載入更多，去除重複；API 失敗與空結果明確區分。
+- 顯示：城市、分類、關鍵字、狀態皆在記憶體篩選；截止或最新排序。用 textContent，連結依 issue number 組固定 repo URL，不採使用者 HTML 或圖片 URL。
+- 狀態：`free-board-reserved` 顯示已預約；關閉或本文已送出不顯示。修改原文由 `free-board-moderation.yml` 撤下 approved，須重審。到期只隱藏，不自動刪除 GitHub 原貼。
+- 審核：站長確認免費、允收範圍、格式、照片與文字沒有敏感個資，再手動加 approved；不是商品安全認證。預約加 reserved；不當刊登移除 approved 或關閉，涉及個資需另外處理原貼刪除。
+- 無 JavaScript／API 限流：原生 GitHub 瀏覽與模板連結仍可用；不虛構刊登或成功狀態。GA4 排除 free.html；公開刊登不連接私人需求資料。
+- 驗證：`node --test scripts/test_free_board.cjs`；`NODE_PATH=<playwright install>/node_modules node scripts/test_free_board_browser.cjs`；全站 `scripts/check.ps1`。

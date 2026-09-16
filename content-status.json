@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-02",
+  "generatedAt": "2026-09-16",
   "canonicalOrigin": "https://www.aussiewhvcompass.com",
   "siteEditorialStatus": "independent-open-source-community-guide",
   "isOfficialGovernmentService": false,
@@ -41,7 +41,7 @@
       "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-16"
     },
     {
       "url": "https://www.aussiewhvcompass.com/why.html",
@@ -153,7 +153,23 @@
       "evidenceCardCheckedAt": "2026-09-01",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-09-01",
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-16"
+    },
+    {
+      "url": "https://www.aussiewhvcompass.com/free.html",
+      "language": "zh-Hant",
+      "title": "離澳免費二手版",
+      "riskLevel": "medium",
+      "pageReviewStatus": "human-edited-unreviewed-by-domain-professional",
+      "editorialStatus": "human-edited-unreviewed-by-domain-professional",
+      "reviewedByDomainProfessional": false,
+      "officialVerificationRequired": false,
+      "evidenceCardStatus": "not-applicable",
+      "evidenceCardScope": "no-evidence-card",
+      "evidenceCardCheckedAt": null,
+      "evidenceStatus": "not-applicable",
+      "evidenceCheckedAt": null,
+      "lastModified": "2026-09-16"
     },
     {
       "url": "https://www.aussiewhvcompass.com/work.html",
@@ -249,7 +265,7 @@
       "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-16"
     },
     {
       "url": "https://www.aussiewhvcompass.com/pr.html",
@@ -297,7 +313,7 @@
       "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-16"
     }
   ],
   "fullEnglishGuides": [
