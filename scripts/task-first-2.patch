@@ -1,0 +1,242 @@
+diff --git a/cost.html b/cost.html
+--- a/cost.html
++++ b/cost.html
+@@ -128,10 +128,10 @@
+     <h2 id="cost-first-action">開啟 Fair Work 官方計算器核對適用的 award 與最低薪資</h2>
+     <ul class="answer-card-points">
+-      <li><a href="#math">我帶的錢夠不夠，工作後存得到錢嗎？</a></li>
++      <li><a href="#runway">還沒找到工作，我帶的錢能撐多久？</a></li>
+       <li><a href="#food">吃飯要怎麼省，又不想每天只吃泡麵？</a></li>
+       <li><a href="#car-checklist">我想買二手車，付款前要查什麼？</a></li>
+     </ul>
+     <div class="answer-card-actions">
+-      <a class="btn answer-card-primary" href="#save-calc">打開存錢試算器</a>
++      <a class="btn answer-card-primary" href="https://calculate.fairwork.gov.au/" rel="noopener noreferrer">開官方薪資計算器</a>
+       <a class="answer-card-official" href="https://www.fairwork.gov.au/pay-and-wages/minimum-wages" rel="noopener">Fair Work 最低工資官方頁<svg class="answer-card-ext" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 4h6v6M20 4l-9 9M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg><span class="sr-only">（外部連結）</span></a>
+     </div>
+@@ -165,13 +165,17 @@
+     <a href="#budget">該帶多少錢</a>
+     <a href="#exchange">換匯與匯款</a>
++    <a href="#runway">無收入能撐多久</a>
+     <a href="#math">存錢試算</a>
+   </div>
+ 
+   <h2 id="wage">薪水：法定最低時薪</h2>
++<!-- TASK_ANSWER:pay-check:BEGIN -->
++<!-- TASK_ANSWER:pay-check:END -->
++
+   <div class="table-wrap"><table>
+     <thead><tr><th>項目</th><th>2026-07-01 起</th><th>說明</th></tr></thead>
+     <tbody>
+-      <tr><td>國家最低時薪（全職/兼職）</td><td><strong>A$26.44</strong></td><td>約合週薪 $1,004.90（38 小時）</td></tr>
+-      <tr><td>Casual 最低時薪</td><td><strong>A$33.05</strong></td><td>含 25% casual loading（無特休病假的補償）；背包客多數是 casual</td></tr>
++      <tr><td>國家最低時薪（全職/兼職）</td><td><strong>A$26.44</strong></td><td>未受 award／agreement 涵蓋者的全國基準；約合週薪 $1,004.90（38 小時）</td></tr>
++      <tr><td>未受 award／agreement 涵蓋的成人 casual 參考</td><td><strong>A$33.05</strong></td><td>含 25% casual loading（無特休病假的補償）；背包客多數是 casual</td></tr>
+       <tr><td>農場（Horticulture Award）casual</td><td>約 A$32.18–33.05</td><td>官方園藝專頁 2026-07 入門級為 $32.18，與 NMW 地板的適用關係依你的僱用型態而定——<strong>你的精確時薪用下方 P.A.C.T. 查</strong>；週末假日另有加成</td></tr>
+       <tr><td>餐飲（Hospitality Award）casual</td><td>約 A$33 起</td><td>週日與國定假日加成顯著（假日可達兩倍以上）</td></tr>
+@@ -437,4 +441,28 @@
+   <p class="fact-meta">來源：<a href="https://www.accc.gov.au/consumers/specific-products-and-activities/foreign-currency-and-money-exchange" rel="noopener">ACCC Foreign currency and money exchange</a>・<a href="https://moneysmart.gov.au/banking/sending-money-overseas" rel="noopener">Moneysmart Sending money overseas</a>・<a href="https://www.austrac.gov.au/industry-and-business/your-industry/remittance-service-providers/unregistered-remittance-service-providers" rel="noopener">AUSTRAC 無註冊匯款業者警告</a>・<a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0450009" rel="noopener">外匯收支或交易申報辦法</a>｜2026-09-01 查核。各銀行費率隨時變動，匯款前以業者現行公告與實拿金額試算為準；本站無任何換匯業者合作或分潤。</p>
+ 
++  <h2 id="runway">還沒找到工作，手上的錢能撐多久？</h2>
++<!-- TASK_ANSWER:cash-runway:BEGIN -->
++<!-- TASK_ANSWER:cash-runway:END -->
++
++  <div class="tool" id="runway-tool" data-answer-target="tool">
++    <h3>無收入緩衝試算</h3>
++    <p>這是你自行設定的情境，不是生活費行情或找工時間預測。所有金額以澳幣填寫，不換匯、不計稅、不把 super、借款額度或未入帳收入算成現金。</p>
++    <p><strong>公式：</strong>（可動用現金 − 尚未支付的一次性支出 − 尚未支付押金 − 保留金）÷ 每週必要開支。</p>
++    <p>一次性費用與每週支出不要重複計入；已付費用只要已反映在現金餘額，就不要再扣一次。期間支出變動時重新試算。</p>
++    <form id="runway-form" hidden>
++      <div class="runway-fields"><div><label for="runway-cash">現在可動用現金（A$）</label><input id="runway-cash" type="number" min="0" max="100000000" step="0.01" required inputmode="decimal" autocomplete="off" aria-describedby="runway-cash-help"><small id="runway-cash-help">以現在帳戶與手上可用金額為準。</small></div>
++<div><label for="runway-oneoff">尚未支付的一次性支出（A$）</label><input id="runway-oneoff" type="number" min="0" max="100000000" step="0.01" required inputmode="decimal" autocomplete="off" aria-describedby="runway-oneoff-help"><small id="runway-oneoff-help">例如接下來要付的交通、設備；已從現金扣除的費用不要再填。</small></div>
++<div><label for="runway-bond">尚未支付、暫不能動用的押金（A$）</label><input id="runway-bond" type="number" min="0" max="100000000" step="0.01" required inputmode="decimal" autocomplete="off" aria-describedby="runway-bond-help"><small id="runway-bond-help">只扣尚未支付的部分；不假設期間內可以退回。</small></div>
++<div><label for="runway-reserve">不打算動用的保留金（A$）</label><input id="runway-reserve" type="number" min="0" max="100000000" step="0.01" required inputmode="decimal" autocomplete="off" aria-describedby="runway-reserve-help"><small id="runway-reserve-help">自己設定緊急或回程預備金；不是本站建議門檻。</small></div>
++<div><label for="runway-weekly">每週必要開支（A$）</label><input id="runway-weekly" type="number" min="0.01" max="100000000" step="0.01" required inputmode="decimal" autocomplete="off" aria-describedby="runway-weekly-help"><small id="runway-weekly-help">租金、吃飯、交通、帳單與其他必要支出合計，須大於 0。</small></div>
++      <div><label for="runway-target">想預留幾週沒有收入的時間？</label><select id="runway-target"><option value="4">4 週（情境選項）</option><option value="8">8 週（情境選項）</option><option value="12">12 週（情境選項）</option></select></div></div>
++      <p class="task-actions"><button type="submit" class="btn">計算緩衝週數</button><button id="runway-example" type="button" class="btn secondary">填入示範，非建議金額</button><button id="runway-reset" type="button" class="btn secondary">清空</button></p>
++    </form>
++    <p id="runway-status" role="status">啟用 JavaScript 後可試算；不啟用時可用上方公式自行計算。金額不儲存、不上傳。</p>
++    <div id="runway-result" class="runway-result" tabindex="-1" hidden data-ai-exclude="true" data-search-ui></div>
++    <p>若想看有收入後的年度收支，改用<a href="#save-calc">原存錢試算器</a>；兩者的假設不同，不要混用結果。</p>
++  </div>
++  <p class="fact-meta">預算項目參考 <a href="https://moneysmart.gov.au/budgeting/how-to-do-a-budget" rel="noopener noreferrer">ASIC Moneysmart</a>；公式及情境是本站算術工具，不是官方資格門檻｜2026-09-17 查核。</p>
++
+   <h2 id="math">存得到錢嗎？自己拉拉看</h2>
+ 
+@@ -494,4 +522,5 @@
+ <script src="assets/main.js?v=20260917-01" defer></script>
+ <script src="assets/tools.js?v=20260917-01" defer></script>
++<script src="assets/cash-runway.js?v=20260917-01" defer></script>
+ </body>
+ </html>
+diff --git a/docs/README.md b/docs/README.md
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -8,4 +8,5 @@
+ | 檔案 | 管什麼 | 什麼時候改 |
+ |---|---|---|
++| [`TASK_FIRST_ROLLOUT.md`](TASK_FIRST_ROLLOUT.md) | 新手任務答案的來源維護、真人測試與待發推廣素材 | 任務答案或測試流程變動 |
+ | [`AI_DISCOVERY.md`](AI_DISCOVERY.md) | AI／Claude 探索格式、Cloudflare 只讀排查與驗收邊界 | 爬取或機器閱讀格式變動 |
+ | [`SDD.md`](SDD.md) | 憲法與架構：不可協商原則、系統邊界、後端資料契約、第三方治理、設計 token、無障礙基線、資料檔規則、教訓 | 原則、架構或設計系統變動 |
+diff --git a/docs/ROADMAP.md b/docs/ROADMAP.md
+--- a/docs/ROADMAP.md
++++ b/docs/ROADMAP.md
+@@ -59,4 +59,5 @@
+ | P1-26 | AI／Claude 公開內容探索、純文字閱讀與抓取驗收 | 程式完成／本機驗證 | Cloudflare 真實爬蟲事件需站長帳號驗收；不保證收錄 | SPEC §8 | scripts/test_ai_reading.py |
+ | P1-25 | 免費二手入口、手機操作與同城分享 | 程式完成／本機驗證 | 正式發布及實機分享仍需驗收 | SPEC §7 | scripts/test_free_board_access.cjs、test_free_board_access_browser.cjs |
++| P1-27 | 新手任務入口、適用條件答案卡與無收入緩衝期 | 程式完成／本機驗證 | 正式發布待驗收；真人任務測試與推廣未執行 | SPEC §9、TASK_FIRST_ROLLOUT.md | scripts/test_task_answers.py、test_task_answers.cjs、test_task_answers_browser.cjs |
+ | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
+ | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
+diff --git a/docs/SDD.md b/docs/SDD.md
+--- a/docs/SDD.md
++++ b/docs/SDD.md
+@@ -322,2 +322,8 @@
+ 
+ 靜態 HTML 仍為唯一內容來源，既有 SEO 產生器同時匯出明列白名單頁面的閱讀副本，不引入網站執行時建置、RAG、外部模型或資料庫。`scripts/ai_reading.py` 使用 Python 標準庫；`scripts/test_ai_reading.py` 驗證同源、來源與隱私排除。`ai-index.json` 提供來源網址、語言、段落與 SHA-256，不增加第三方追蹤。
++
++
++## 9. 同源任務答案與緩衝期模組（P1-27）
++
++`answers.json` → `scripts/build_task_answers.py` → 原生 HTML 卡片；同一筆資料經 `build_search.py` 產生小型 `answer` 欄位供 `main.js` 的精確整題查詢使用，再由現有 `build_seo.py` 產生閱讀版。產生格式不等於重新查核。所有新內容對人與爬蟲一致；不新增新頁面、不增加問答 API，也不切換量測開關。
++`assets/cash-runway.js` 為獨立純函式與 DOM adaptor，不修改原本存錢試算器的資料／storage 契約。新增入口以原生連結為基線；缺 JavaScript 時仍能讀條件與公式。金額不進 URL、事件、storage 或遠端。操作結果加 `data-ai-exclude` 並排除搜尋。
+diff --git a/docs/SPEC.md b/docs/SPEC.md
+--- a/docs/SPEC.md
++++ b/docs/SPEC.md
+@@ -240,2 +240,17 @@
+ 
+ 驗收：`python scripts/build_seo.py --check`、`python scripts/test_ai_reading.py`、`build_i18n.py --check`、`build_search.py --check`。正式 GET 需比對檔案 bytes 與 UA 相容性；模擬 UA 不等於真實 Anthropic 爬蟲，HTTP 200 也不是收錄或引用證據。操作手冊見 AI_DISCOVERY.md。
++
++
++## 9. 新手任務與適用條件答案（P1-27）
++
++`answers.json` 是任務摘要、適用範圍、待確認條件、下一步及來源的唯一輸入；`scripts/build_task_answers.py` 產生既有頁面上的原生答案卡與首頁直達入口。卡片數與題目以此登記檔為準，不另維護問答資料庫。`sourceCheckedAt` 是本卡來源／本站操作的人工核對日；`reviewDue` 是維護排程，不是新鮮度保證；`reviewedByDomainProfessional` 保持 false，既有全頁與證據卡查核範圍不變。
++
++首頁仍保留四階段與 21 個出口。第一站城市問題保留舊出口 ID 以相容分享，但實際目的地改為 `prep.html#first-city`。已知問題可直接走三個主要任務或其他問題連結，不必先交護照資訊。
++
++搜尋只在整句正規化後唯一命中已登記 queries 時顯示編輯答案；並非模型即時回答，也不把原演算法的模糊匹配當成確認答案。其他查詢沿用原搜尋。`needs-review`、日期缺漏／不合理或 UTC+8 已到 `reviewDue` 時，瀏覽器不顯示舊摘要，保留條件與查核出口。靜態頁明示核對與複核日期；無 JS 不承諾自動按今日隱藏，到期維護仍須人工或建置處理。純文字同源，沒有新增「最新／已專業審校」宣稱。
++
++`cost.html#runway-tool` 為本機無收入情境試算：可動用現金減尚未支付的一次性支出、未付押金、不動用保留金，再除以每週必要開支。以整數 cents 計算，金額限非負且最多兩位小數，週開支須正數；輸出可用生活金、完整週數、向下取到一位小數的週數、達到使用者目標的資金差額。負可用金另顯示前置費用缺口，不輸出負週數。沒有收入、固定支出、押金期間內不退的假設必須可見；已從現金扣過或已預付的費用不可重複扣。範例需明示非建議金額，不預填讀者的金額。修改輸入清空舊結果；結果與表單不進搜尋、AI 閱讀版。無 JS 保留公式，表單隱藏。新工具不讀寫 storage、不連網、不計算稅率、簽證財力或找工機率。
++
++來源回報只預填卡片名稱與固定網址到現有 GitHub issue form，原貼公開且需要登入，不能附個資。核對入口含單獨 417／462 規則與不確定出口；ABN 登記不作為雇主安全保證，國家最低工資參考不代替 award／agreement 個案核對。
++
++驗收：生成器 check、Python 來源／anchor／字串安全檢查、Node 搜尋與金額邊界、Chromium 桌機／手機／無 JS／逾期／隱私檢查。完整基線保留既存失敗，不宣稱真人完成率或導流成效。
+diff --git a/docs/TASK_FIRST_ROLLOUT.md b/docs/TASK_FIRST_ROLLOUT.md
+new file mode 100644
+--- /dev/null
++++ b/docs/TASK_FIRST_ROLLOUT.md
+@@ -0,0 +1,83 @@
++# 新手任務上線與真人驗證手冊
++
++> 最後更新 2026-09-17｜P1-27｜工程交付與測試模板；真人數據尚未取得，社群稿尚未發布。
++
++## 維護同一份答案
++
++編輯 `answers.json`，不要直接改產生出的答案卡。每筆來源只支持卡片所列的範圍，不代表整頁、所有租屋安排或所有簽證資格。法規、收費與權利義務以官方原文為準，遇差異先將 `status` 改成 `needs-review`，說明缺少哪個條件，不讓舊結論繼續冒充現行規則。
++
++1. 人工閱讀 sourceIds 對應原文，核對適用對象與例外；官方連結 HTTP 200 不是內容已確認。
++2. 改摘要、條件、下一步與查核日期。reviewDue 是下次維護期限，不能當內容一定沒變的保證；未重讀不得改 sourceCheckedAt。
++3. 依序執行：
++
++```sh
++python scripts/build_task_answers.py
++python scripts/build_i18n.py
++python scripts/build_search.py
++python scripts/build_seo.py
++python scripts/build_task_answers.py --check
++python scripts/build_search.py --check
++python scripts/build_seo.py --check
++python scripts/test_task_answers.py
++node --test scripts/test_task_answers.cjs
++```
++
++瀏覽器到期會隱藏短摘要，仍提供條件與來源；靜態與純文字版本保留核對日期。到期內容須人工更新為 needs-review 並重新發布，不能以瀏覽器日期代替編輯維護。沒有替站長開啟背景監控、寄信或排程。
++
++## 本輪來源與界線
++
++官方來源網址及卡片適用條件完整登記於 `../answers.json`。交通比較採八城官方／公共交通查詢入口，不宣稱某城市最好、房租多少或職缺充足。Workforce Australia 只核對求職入口，不保證職缺結果。資金試算是本站整數金額算術，參考 Moneysmart 的支出分類，不是政府核准的模型。TFN 與到職資料以 myGov 官方說明為入口；本輪不承諾簽證資格、稅率、辦理時限或補助資格。
++
++## 真人測試：先觀察，再幫忙
++
++建議邀請 6–8 位第一次赴澳者或抵澳未滿一個月者。這是找操作障礙的小樣本，不可當市場代表。先詢問是否願意參與；不自動寄邀請、不要求真實收入、地址、帳號、證件或薪資單。資料使用情境數字。錄音、錄影需另外同意，報告用代號，不存聯絡資訊。
++
++開場可說：「這是在測網站，不是在考你。請用自己的手機找答案，邊操作邊說你在想什麼。遇到卡關我先不教你，因為那是網站要改的地方。」
++
++從首頁開始，記錄開始時間與第一次正確行動；首次回答前不要教操作。每人可選五題，輪換順序。30–60 秒找到正確入口是待驗證目標，不是現有成效。
++
++| 任務 | 目標入口 | 理解驗收（比單純點擊更重要） |
++|---|---|---|
++| 還沒選城市，先怎麼比較？ | prep.html#first-city | 能說出至少兩項實際比較條件，不說本站有最佳城市排名 |
++| 手上 8000、一次支出 1000、押金 1000、保留 2000，每週 500，沒有收入能撐多久？ | cost.html#runway | 得到 8 週；能說明沒有收入、支出固定與押金不退的假設 |
++| TFN、銀行、myGov、super 各做什麼？ | prep.html#first-week | 能找到官方 TFN 說明，不誤認先後不同固定扣 45% |
++| 接到工作邀約先查什麼？ | work.html#verify | 知道 ABN 不等於工作安全或集簽認證，還需核對薪資職務 |
++| 租屋對方催先付押金？ | housing.html#bond | 先核對房源收款者；依所在地和租住關係查官方規則 |
++| 拿 462，郵遞區號符合就可集簽？ | visa.html#where | 能選 462 官方入口；知道本站工具只初篩留存417地區資料 |
++| 想找同城免費用品？ | free.html#browse-title | 知道需要主動載入、原貼確認，不把空清單當錯誤 |
++
++單次記錄格式（不含個資）：代號｜階段｜任務｜秒數｜首次入口｜是否找對｜理解假設｜卡點｜協助次數。
++
++測試前資料：尚未取得。測試後資料：尚未取得。每一條改版結論要附觀察，不把自動化瀏覽器測試當真人數據。兩版相同任務比較時說明受試者差異與學習效應。
++
++## 三份社群分享草稿（未發布）
++
++發布前再核對連結、內容日期及社團規則。可先與管理者確認是否適合置頂；不洗版、不暗示政府背書、不使用假見證。以下來源及限制以連結中的可見答案卡為準。
++
++### 1. 不只問帶多少錢，先算沒有收入能撐多久
++
++準備去澳洲，最難回答的可能不是「能賺多少」，而是「還沒領到第一份薪水之前，我能不能安心生活？」
++
++澳打指南針新增一個免費情境試算：把可動用現金、還沒支付的費用、押金、保留金與每週開支分開，就能看見自己的無收入緩衝期。金額只在頁面計算，不儲存、不上傳。不是建議準備金，也不保證幾週能找到工作。
++
++https://www.aussiewhvcompass.com/cost.html#runway
++
++### 2. 落地第一週，不必一次背完四個名詞
++
++TFN、銀行、myGov、super 看起來都重要，先搞懂用途，比死背先後順序更有幫助。
++
++我們把第一週的用途說明、到職需要準備的資料，以及官方辦理入口放在一起。不是代辦，不收你的證件或帳密；有個別身分條件時回到官方來源核對。
++
++https://www.aussiewhvcompass.com/prep.html#first-week
++
++### 3. 接工作前，先把條件問清楚
++
++看到雇主有 ABN，就代表薪資、工作內容和集簽都沒問題嗎？企業登記查得到，不等於每一份邀約都已被驗證。
++
++接工作前先核對雇主、職務、僱用型態、工時與薪資依據，並保留書面條件。澳打指南針整理了核對入口；涉及指定工作，417 和 462 請分開看適用規則。免費使用，不替個案下合法或合資格結論。
++
++https://www.aussiewhvcompass.com/work.html#verify
++
++## 下一輪決策
++
++先由真人卡點與實際查詢決定下一批題目，再考慮擴張內容或本站刊登。搜尋分析、外部合作及真人測試都尚未執行；未獲授權不得新增追蹤或代發文章。
+diff --git a/free.html b/free.html
+--- a/free.html
++++ b/free.html
+@@ -131,6 +131,9 @@
+   <section class="fb-panel" id="free-board" tabindex="-1" aria-labelledby="browse-title">
+     <p class="section-eyebrow">找物品</p><h2 id="browse-title">看看同城有哪些好物</h2>
++<!-- TASK_ANSWER:free-items:BEGIN -->
++<!-- TASK_ANSWER:free-items:END -->
++
+     <p>點「載入免費物品」後，瀏覽器才會向 GitHub 讀取公開刊登；GitHub 會接收到一般連線資訊。篩選字詞不送出，本站不保存你的搜尋。</p>
+-    <div class="fb-actions"><button class="btn" type="button" id="fb-load" hidden>載入免費物品</button><a class="btn secondary" href="https://github.com/jason201385-commits/aussie-whv-compass/issues?q=is%3Aissue%20is%3Aopen%20label%3Afree-board-approved" target="_blank" rel="noopener noreferrer">到 GitHub 看公開刊登</a></div>
++    <div class="fb-actions" id="fb-browse-actions"><button class="btn" type="button" id="fb-load" hidden>載入免費物品</button><a class="btn secondary" href="https://github.com/jason201385-commits/aussie-whv-compass/issues?q=is%3Aissue%20is%3Aopen%20label%3Afree-board-approved" target="_blank" rel="noopener noreferrer">到 GitHub 看公開刊登</a></div>
+     <form class="fb-form-grid" id="fb-filter" hidden aria-label="免費物品篩選">
+       <div><label for="fb-city">城市／地區</label><select id="fb-city"><option value="">全部地區</option></select></div>
+diff --git a/housing.html b/housing.html
+--- a/housing.html
++++ b/housing.html
+@@ -348,4 +348,7 @@
+ 
+   <h2 id="bond">四、押金（bond）自保</h2>
++<!-- TASK_ANSWER:rental-bond:BEGIN -->
++<!-- TASK_ANSWER:rental-bond:END -->
++
+   <ul>
+     <li><strong>規則看房屋所在地的州或領地，不看工作地或簽證。</strong>先確認你是 tenant、co-tenant、sub-tenant、boarder／lodger 或其他 arrangement，再使用當地官方 bond 流程；保留收據、lodgement 紀錄與編號。</li>
+@@ -355,5 +358,5 @@
+     <li><strong>退租糾紛</strong>：先走所在州的 bond release／dispute 流程；仍談不攏再依官方指引進入調解或 tribunal。期限、費用與能否由他人代理各州不同，直接看該州當下規則。</li>
+   </ul>
+-  <details>
++  <details id="bond-authorities">
+     <summary>開啟房屋所在地的官方租屋入口</summary>
+     <div class="table-wrap"><table>
