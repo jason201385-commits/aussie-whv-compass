@@ -1,0 +1,116 @@
+name: Final verification of free-board access
+on:
+  push:
+    branches: [feat/free-board-access-20260917]
+permissions:
+  contents: write
+concurrency:
+  group: free-board-access-assembly
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.repository == 'jason201385-commits/aussie-whv-compass'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TZ: Australia/Perth
+      QA_DIR: /tmp/free-board-access-final-qa
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Record original production baseline without changing it
+        run: |
+          mkdir -p "$QA_DIR"
+          git worktree add --detach /tmp/whv-original 7a4f34d6d69e43f1db8ebe90df49d1af775fad2d
+          set +e
+          (cd /tmp/whv-original && pwsh -NoProfile -File scripts/check.ps1) > "$QA_DIR/check-before.txt" 2>&1
+          echo "$?" > "$QA_DIR/check-before.exit"
+          exit 0
+      - name: Correct English labels without relaxing language checks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import sys
+          root=Path.cwd()
+          for p in (root/'lang').rglob('*.html'):
+              text=p.read_text(encoding='utf-8')
+              if 'Free items · 中文' in text:
+                  p.write_text(text.replace('Free items · 中文','Free items (Chinese)'),encoding='utf-8')
+          p=root/'scripts/build_i18n.py'
+          text=p.read_text(encoding='utf-8')
+          assert text.count('Free items · 中文') == 1
+          p.write_text(text.replace('Free items · 中文','Free items (Chinese)'),encoding='utf-8')
+          p=root/'scripts/test_free_board_access.cjs'
+          text=p.read_text(encoding='utf-8')
+          assert text.count('Free items · 中文') == 1
+          p.write_text(text.replace('Free items · 中文',r'Free items \(Chinese\)'),encoding='utf-8')
+          for script in ('build_i18n.py','build_seo.py','build_search.py'):
+              subprocess.run([sys.executable,str(root/'scripts'/script)],check=True)
+          PY
+      - name: Check syntax, regression coverage and generated content
+        run: |
+          set -o pipefail
+          node --check assets/free-board-navigation.js
+          node --test scripts/test_free_board_access.cjs scripts/test_free_board.cjs scripts/test_map_postcode_regression.cjs | tee "$QA_DIR/unit-tests.txt"
+          python scripts/build_i18n.py --check
+          python scripts/build_seo.py --check
+          python scripts/build_search.py --check
+          node scripts/test_analytics.cjs > "$QA_DIR/analytics.txt"
+          node scripts/test_housing_search.mjs
+          node scripts/test_job_router.mjs
+          node scripts/test_search.mjs
+          node scripts/clarifier-contract.mjs
+      - name: Require no additional full-suite failures against production baseline
+        run: |
+          set +e
+          pwsh -NoProfile -File scripts/check.ps1 > "$QA_DIR/check-after.txt" 2>&1
+          echo "$?" > "$QA_DIR/check-after.exit"
+          set -e
+          python - <<'PY'
+          from pathlib import Path
+          from collections import Counter
+          import re,json,os
+          d=Path(os.environ['QA_DIR'])
+          def failures(name):
+              text=re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]','',(d/name).read_text(encoding='utf-8-sig',errors='replace'))
+              return Counter(line.strip() for line in text.splitlines() if line.strip().startswith('FAIL '))
+          before=failures('check-before.txt'); after=failures('check-after.txt'); new=after-before
+          result={'original_commit':'7a4f34d6d69e43f1db8ebe90df49d1af775fad2d','baseline_failure_lines':dict(before),'current_failure_lines':dict(after),'new_failure_lines':dict(new),'removed_failure_lines':dict(before-after)}
+          (d/'baseline-comparison.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          if new: raise SystemExit('New full-suite failures: do not publish')
+          PY
+      - name: Install isolated browser test dependency
+        run: |
+          npm install --prefix /tmp/access-browser playwright@1.55.0
+          /tmp/access-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run browser behavior and compatibility tests
+        env:
+          NODE_PATH: /tmp/access-browser/node_modules
+        run: |
+          node scripts/test_free_board_access_browser.cjs
+          node scripts/test_free_board_browser.cjs
+      - name: Save verified files on the feature branch only
+        run: |
+          test "$GITHUB_REF_NAME" = 'feat/free-board-access-20260917'
+          test "$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | cut -f1)" = "$GITHUB_SHA"
+          rm .github/workflows/verify-free-board-access-final.yml
+          git diff --stat > "$QA_DIR/diff-stat.txt"
+          git diff > "$QA_DIR/final-adjustment.diff"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix(P1-25): keep free-board link labels English and verify baseline parity'
+          git rev-parse HEAD > "$QA_DIR/commit.txt"
+          git diff --stat 7a4f34d6d69e43f1db8ebe90df49d1af775fad2d HEAD > "$QA_DIR/full-diff-stat.txt"
+          git diff 7a4f34d6d69e43f1db8ebe90df49d1af775fad2d HEAD > "$QA_DIR/full-feature.diff"
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+      - name: Retain evidence and screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: free-board-access-final-qa
+          path: /tmp/free-board-access-final-qa
+          retention-days: 7
