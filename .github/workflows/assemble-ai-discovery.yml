@@ -1,0 +1,101 @@
+name: Build and verify AI discovery
+on:
+  push:
+    branches: [feat/ai-discovery-20260917]
+    paths: [.github/workflows/assemble-ai-discovery.yml]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Record unmodified production baseline
+        run: |
+          mkdir -p /tmp/ai-discovery-qa
+          git worktree add --detach /tmp/ai-baseline fc03c1262d96858cfccfb4f47ed9f40060d638b0
+          set +e
+          (cd /tmp/ai-baseline && pwsh -NoProfile -File scripts/check.ps1) > /tmp/ai-discovery-qa/full-before.txt 2>&1
+          echo $? > /tmp/ai-discovery-qa/full-before-exit.txt
+          exit 0
+      - name: Integrate feature and generate reading files
+        run: |
+          python scripts/integrate_ai_discovery.py
+          python scripts/build_seo.py
+          python scripts/build_seo.py --check
+          python scripts/build_i18n.py --check
+          python scripts/build_search.py --check
+      - name: Verify privacy, source parity and existing behavior
+        run: |
+          set -o pipefail
+          python scripts/test_ai_reading.py 2>&1 | tee /tmp/ai-discovery-qa/reading-tests.txt
+          node --test scripts/test_free_board_access.cjs scripts/test_free_board.cjs scripts/test_map_postcode_regression.cjs | tee /tmp/ai-discovery-qa/node-tests.txt
+          node scripts/test_analytics.cjs > /tmp/ai-discovery-qa/analytics.txt
+          node scripts/test_housing_search.mjs
+          node scripts/test_job_router.mjs
+          node scripts/test_search.mjs
+          python - <<'PY'
+          import pathlib,re,sys
+          sys.path.insert(0,'scripts')
+          import build_seo as s
+          paths=s.PAGES+[f'lang/en/{x}/index.html' for x in s.FULL_TRANSLATION_SLUGS]
+          for p in paths:
+            before=pathlib.Path('/tmp/ai-baseline',p).read_text(); after=pathlib.Path(p).read_text()
+            assert re.search(r'<main\b[\s\S]*?</main>',before).group()==re.search(r'<main\b[\s\S]*?</main>',after).group(),p
+          assert pathlib.Path('content-status.json').read_bytes()==pathlib.Path('/tmp/ai-baseline/content-status.json').read_bytes()
+          pathlib.Path('/tmp/ai-discovery-qa/source-parity.txt').write_text(f'{len(paths)} original main sections unchanged; content-status bytes unchanged.\n')
+          PY
+          git diff --exit-code fc03c1262d96858cfccfb4f47ed9f40060d638b0 -- assets worker .github/ISSUE_TEMPLATE
+      - name: Require no new full-suite failures
+        run: |
+          set +e
+          pwsh -NoProfile -File scripts/check.ps1 > /tmp/ai-discovery-qa/full-after.txt 2>&1
+          echo $? > /tmp/ai-discovery-qa/full-after-exit.txt
+          set -e
+          python - <<'PY'
+          import pathlib,re,collections,json
+          p=pathlib.Path('/tmp/ai-discovery-qa')
+          def fails(name):
+            text=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',p.joinpath(name).read_text())
+            return collections.Counter(x.strip() for x in text.splitlines() if x.strip().startswith('FAIL'))
+          old=fails('full-before.txt');new=fails('full-after.txt')
+          extra=new-old
+          report={'baselineFailures':dict(old),'afterFailures':dict(new),'newFailures':dict(extra),'baselineExit':p.joinpath('full-before-exit.txt').read_text().strip(),'afterExit':p.joinpath('full-after-exit.txt').read_text().strip()}
+          p.joinpath('baseline-comparison.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          assert not extra, json.dumps(dict(extra),ensure_ascii=False)
+          assert report['baselineExit']==report['afterExit'], 'Unexpected full-check exit change'
+          print('No additional full-check failure; pre-existing failures remain documented.')
+          PY
+      - name: Install isolated browser dependency
+        run: |
+          npm install --prefix /tmp/ai-browser playwright@1.55.0
+          /tmp/ai-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Replay existing desktop and mobile browser tests
+        env:
+          NODE_PATH: /tmp/ai-browser/node_modules
+          QA_DIR: /tmp/ai-discovery-qa
+        run: |
+          node scripts/test_free_board_access_browser.cjs
+          node scripts/test_free_board_browser.cjs
+      - name: Save tested integration to feature branch only
+        run: |
+          test "$GITHUB_REF" = refs/heads/feat/ai-discovery-20260917
+          git rm scripts/integrate_ai_discovery.py .github/workflows/ai-discovery-audit.yml .github/workflows/assemble-ai-discovery.yml
+          git add -u
+          git add ai ai-index.json llms-full.txt
+          git diff --cached --stat > /tmp/ai-discovery-qa/change-stat.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'feat(P1-26): generate verified public reading copies and Claude search discovery'
+          git push origin HEAD:feat/ai-discovery-20260917
+          git rev-parse HEAD > /tmp/ai-discovery-qa/commit.txt
+          git archive --format=tar HEAD > /tmp/ai-discovery-qa/tested-source.tar
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ai-discovery-qa
+          path: /tmp/ai-discovery-qa
+          retention-days: 7
