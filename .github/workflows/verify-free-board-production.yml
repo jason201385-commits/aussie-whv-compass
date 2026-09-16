@@ -1,0 +1,126 @@
+name: Read-only production free-board verification
+on:
+  push:
+    branches: [qa/free-board-production-20260917]
+permissions:
+  contents: read
+jobs:
+  production-smoke:
+    if: github.repository == 'jason201385-commits/aussie-whv-compass'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      QA_DIR: /tmp/production-free-board-qa
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fc03c1262d96858cfccfb4f47ed9f40060d638b0
+          persist-credentials: false
+      - name: Verify deployed HTML and exact asset bytes with read-only GET requests
+        run: |
+          mkdir -p "$QA_DIR"
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,urllib.parse,hashlib,time,json,os,sys
+          origin='https://www.aussiewhvcompass.com'
+          out=Path(os.environ['QA_DIR']);results=[]
+          class SameHostRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,req,fp,code,msg,headers,newurl):
+                  u=urllib.parse.urlsplit(newurl)
+                  if u.scheme!='https' or u.netloc!='www.aussiewhvcompass.com': raise RuntimeError('Unexpected redirect')
+                  return super().redirect_request(req,fp,code,msg,headers,newurl)
+          opener=urllib.request.build_opener(SameHostRedirect())
+          def get(path):
+              request=urllib.request.Request(origin+path,headers={'User-Agent':'AussieWHVCompass-ReadOnly-QA/1.0','Cache-Control':'no-cache'},method='GET')
+              with opener.open(request,timeout=15) as r:
+                  assert r.status==200
+                  data=r.read(1000000)
+                  results.append({'path':path,'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+                  return data
+          try:
+              for attempt in range(8):
+                  try:
+                      html=get('/free.html').decode('utf-8')
+                      assert 'assets/free-board-navigation.js?v=20260917-01' in html
+                      assert 'class="fb-mobile-actions"' in html
+                      assert 'aria-current="page" href="free.html">免費二手' in html
+                      break
+                  except Exception:
+                      if attempt==7: raise
+                      time.sleep(10)
+              home=get('/').decode('utf-8')
+              assert 'class="home-free-entry"' in home
+              assert 'href="free.html#free-board">找免費物品' in home
+              assert 'href="free.html#publish">我要免費送' in home
+              english=get('/lang/en/visa/').decode('utf-8')
+              assert 'Free items (Chinese)' in english
+              for path in ['assets/free-board-navigation.js','assets/free-board.css','assets/style.css','assets/main.js','assets/search-index.js']:
+                  deployed=get('/'+path+'?v=20260917-01')
+                  assert hashlib.sha256(deployed).digest()==hashlib.sha256(Path(path).read_bytes()).digest(),path+' differs from published commit'
+              result={'ok':True,'commit':'fc03c1262d96858cfccfb4f47ed9f40060d638b0','checks':results,'scope':'Read-only HTTP retrieval and exact asset comparison; no inventory writes or account actions.'}
+          except Exception as e:
+              result={'ok':False,'error':str(e),'checks':results}
+          (out/'production-http.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          if not result['ok']:sys.exit(1)
+          PY
+      - name: Install isolated browser dependency
+        run: |
+          npm install --prefix /tmp/production-browser playwright@1.55.0
+          /tmp/production-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check the live website in desktop and mobile viewports without posting
+        env:
+          NODE_PATH: /tmp/production-browser/node_modules
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('node:fs');const path=require('node:path');const assert=require('node:assert/strict');
+          const origin='https://www.aussiewhvcompass.com';const out=process.env.QA_DIR;
+          (async()=>{
+            const browser=await chromium.launch({headless:true});const checks=[];
+            try{
+              for(const width of [390,1280]){
+                const c=await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'});let githubReads=0;const errors=[];
+                await c.route('**/*',route=>{
+                  const request=route.request();const u=new URL(request.url());
+                  if(u.hostname==='api.github.com')githubReads++;
+                  if(request.method()!=='GET'||u.origin!==origin)return route.abort();
+                  return route.continue();
+                });
+                const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));
+                const response=await p.goto(origin+'/',{waitUntil:'domcontentloaded'});assert.equal(response.status(),200);
+                await p.waitForSelector('.home-free-actions');
+                assert.equal(await p.locator('.home-free-actions a').count(),2);
+                assert.equal(await p.locator('.nav-links a').nth(1).textContent(),'免費二手');
+                assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+                await p.screenshot({path:path.join(out,'production-home-'+width+'.png')});
+                checks.push(width+': live homepage returns 200, direct entry and navigation visible');
+                await p.click('.nav-links a[href="free.html"]');await p.waitForSelector('#fb-share-controls:not([hidden])');
+                assert.equal(await p.locator('.nav-links a[aria-current="page"]').textContent(),'免費二手');
+                assert.equal(await p.locator('.fb-mobile-actions').isVisible(),width<=768);
+                assert.equal(githubReads,0);
+                await p.screenshot({path:path.join(out,'production-free-'+width+'.png')});
+                checks.push(width+': live free page, correct active tab and viewport-specific action bar');
+                await p.goto(origin+'/free.html#free-board?city=Perth%20WA',{waitUntil:'domcontentloaded'});
+                await p.waitForFunction(()=>document.getElementById('fb-city').value==='Perth WA');
+                assert.equal(await p.locator('#fb-post-city').inputValue(),'');
+                assert.equal(await p.locator('#fb-query').inputValue(),'');
+                assert.equal(githubReads,0);
+                assert.equal(await p.locator('#fb-load').isVisible(),true);
+                assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+                assert.deepEqual(errors,[]);
+                checks.push(width+': live city link restores only city; zero automatic GitHub reads, overflow or page errors');
+                await c.close();
+              }
+              const result={ok:true,checks,limitations:['External fonts and all third-party requests blocked','Only GET requests allowed','No actual share-sheet interaction, posting, inventory retrieval or physical device test']};
+              fs.writeFileSync(path.join(out,'production-browser.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
+            }finally{await browser.close();}
+          })().catch(e=>{fs.writeFileSync(path.join(out,'production-browser-error.txt'),e.stack||String(e));console.error(e);process.exitCode=1;});
+          JS
+      - name: Retain production verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: free-board-production-qa
+          path: /tmp/production-free-board-qa
+          retention-days: 7
