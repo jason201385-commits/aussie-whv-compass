@@ -15,6 +15,7 @@ jobs:
           persist-credentials: false
       - name: Check generated files without modifying content
         run: |
+          python scripts/build_task_answers.py --check
           python scripts/build_seo.py --check
           python scripts/build_i18n.py --check
           python scripts/build_search.py --check
@@ -22,3 +23,7 @@ jobs:
         run: python scripts/test_ai_reading.py
       - name: Preserve existing board and map behavior
         run: node --test scripts/test_free_board_access.cjs scripts/test_free_board.cjs scripts/test_map_postcode_regression.cjs
+      - name: Verify scoped answers and no-income scenario
+        run: |
+          python scripts/test_task_answers.py
+          node --test scripts/test_task_answers.cjs
