@@ -226,3 +226,16 @@ powershell -File scripts/check.ps1
 - 分享採裝置原生 share；不可用則複製，拒絕或失敗提供可手動複製的唯讀連結，取消不謊報成功。複製按鈕永遠可獨立使用。
 - 不調整 GitHub 投稿／審核契約，不新增資料庫、登入服務或分析追蹤。
 - 驗證：scripts/test_free_board_access.cjs（離線契約與分享函式）；scripts/test_free_board_access_browser.cjs（桌機、手機尺寸、鍵盤、深連結、分享失敗、no-JS）；原看板與地圖測試照常。
+
+
+## 8. AI／Claude 公開內容探索（P1-26）
+
+`build_seo.py` 與 `ai_reading.py` 同源產生 `ai/*.md`、`ai/en/*.md`、`ai-index.json` 與 `llms-full.txt`。只取 `PAGES` 與完整英文攻略的 main；不匯出 form、script、hidden、動態刊登、試算結果、API、CRM、測試或交接文件。不是為爬蟲另寫不同答案，也不抓取外部內容。
+
+原頁是 canonical；保留原始查核日期、來源連結、證據卡範圍、未經專業審校狀態。新格式產生不升級政策或查核日期。sitemap 的根層 lastmod 與既有 content-status 記錄一致，不再把新增頁標成共同舊日期。
+
+各匯出頁原生 head alternate 與 footer 提供逐頁純文字及索引；無 JS 可用。`llms.txt` 仍保留所有原頁，另連單頁 Markdown 與合併文字。Markdown 不包括即時二手庫存，不讀 GitHub 刊登、不繞過載入同意。
+
+Claude-SearchBot、Claude-User 的 robots group 明示允許公開內容，逐組重複私人端點排除；wildcard 的既有權限不放寬，訓練授權不另變更。robots 不是安全防護；Cloudflare 規則及驗證爬蟲存取為獨立層。
+
+驗收：`python scripts/build_seo.py --check`、`python scripts/test_ai_reading.py`、`build_i18n.py --check`、`build_search.py --check`。正式 GET 需比對檔案 bytes 與 UA 相容性；模擬 UA 不等於真實 Anthropic 爬蟲，HTTP 200 也不是收錄或引用證據。操作手冊見 AI_DISCOVERY.md。

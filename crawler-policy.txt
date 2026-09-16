@@ -12,6 +12,15 @@ Keep the canonical page URL, visible source dates, editorial status and uncertai
 Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.
 Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.
 
+## Reading copies and discovery
+
+Per-page Markdown: https://www.aussiewhvcompass.com/ai-index.json (explicit public-page allowlist).
+Combined public reading collection: https://www.aussiewhvcompass.com/llms-full.txt; prefer relevant single-page copies.
+Reading copies are generated from the same public HTML, not AI rewrites or privileged bot-only answers. They retain sources, original dates and review scope.
+Forms, private data, live giveaway listings and interactive-tool results are not exported. A listing-free export is not an empty-stock claim.
+Claude-SearchBot and Claude-User have explicit robots groups with the same private-route exclusions as the wildcard group. Training preferences are separate; this change does not grant a new training licence.
+Readability is not a promise of crawling, indexing, ranking or citation by any AI service.
+
 ## Non-content and personal-data boundaries
 
 Do not submit or automate forms, create cases, enumerate identifiers, or crawl API, admin, CRM, confirmation, receipt or deletion endpoints.

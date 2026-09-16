@@ -56,6 +56,7 @@
 | P1-22 | 釐清器與 AI 兜底指標（D+ 白名單擴充、GA4 事件表、判讀規則） | 未開始 | P0-3（CWA token、GA4 ID）與 P0-4（D+ 部署） | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
 | P1-23 | AI 兜底正式啟用（第一階段 links-only；intent 待命中率達標再重啟） | 已上線（2026-09-04） | red-team 驗收與命中率觀察仍待做 | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06、D-2026-09-04-01 |
 | P1-24 | 離澳免費二手版（審核制免費贈送） | 已上線 | 站長管理 GitHub 審核標籤；真實投稿與撤審端到端待驗收 | SPEC §6 | scripts/test_free_board.cjs、test_free_board_browser.cjs |
+| P1-26 | AI／Claude 公開內容探索、純文字閱讀與抓取驗收 | 程式完成／本機驗證 | Cloudflare 真實爬蟲事件需站長帳號驗收；不保證收錄 | SPEC §8 | scripts/test_ai_reading.py |
 | P1-25 | 免費二手入口、手機操作與同城分享 | 程式完成／本機驗證 | 正式發布及實機分享仍需驗收 | SPEC §7 | scripts/test_free_board_access.cjs、test_free_board_access_browser.cjs |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |

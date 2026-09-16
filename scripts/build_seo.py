@@ -10,6 +10,7 @@ import re
 import struct
 import sys
 from pathlib import Path
+from ai_reading import build_assets, build_robots, decorate_page, reading_path
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -62,6 +63,10 @@ RISK_LEVELS = {
 }
 
 
+def page_modified(page: str) -> str:
+    return "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED
+
+
 def page_url(page: str) -> str:
     return f"{ORIGIN}/" if page == "index.html" else f"{ORIGIN}/{page}"
 
@@ -94,7 +99,7 @@ def seo_block(page: str, source: str) -> str:
         "publishingPrinciples": f"{ORIGIN}/crawler-policy.txt",
         "subjectOf": f"{ORIGIN}/content-status.json",
         "image": OG_IMAGE,
-        "dateModified": "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED,
+        "dateModified": page_modified(page),
     }
     graph = [
         {
@@ -189,12 +194,13 @@ def i18n_urls() -> list[str]:
 def build_sitemap() -> str:
     rows = []
     urls = [page_url(page) for page in PAGES] + i18n_urls()
+    modified = {page_url(p): page_modified(p) for p in PAGES}
     for url in urls:
         rows.extend(
             [
                 "  <url>",
                 f"    <loc>{url}</loc>",
-                f"    <lastmod>{LAST_MODIFIED}</lastmod>",
+                f"    <lastmod>{modified.get(url, LAST_MODIFIED)}</lastmod>",
                 "  </url>",
             ]
         )
@@ -234,6 +240,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
             title = short_title(extract(r"<title>(.*?)</title>", source, page))
             description = extract(r'<meta name="description" content="(.*?)">', source, page)
             lines.append(f"- [{title}]({page_url(page)}): {description}")
+            lines.append(f"  - [本頁 Markdown]({ORIGIN}/{reading_path(page)})")
     lines.extend(
         [
             "",
@@ -258,6 +265,15 @@ def build_llms(page_sources: dict[str, str]) -> str:
             "",
         ]
     )
+    lines.extend(["", "## 純文字閱讀與機器索引", "",
+        f"- [首頁 Markdown]({ORIGIN}/ai/index.md): 主頁公開內容的靜態閱讀版本。",
+        f"- [逐頁與段落索引 JSON]({ORIGIN}/ai-index.json): 原頁、語言、段落連結、來源連結、審校範圍與內容雜湊。",
+        f"- [公開攻略合併文字]({ORIGIN}/llms-full.txt): 繁中主頁與完整英文攻略的閱讀摘錄；建議先讀單頁，避免載入不相關內容。",
+        "- 純文字由公開 HTML 自動產生，不是另一套改寫內容；沒有表單、個資、動態二手刊登或試算結果。",
+        "- 來源查核日期沿用原頁，匯出不代表重新查核；Markdown 只是補充格式，不保證任何 AI 收錄或引用。",
+        "", "### Full English reading copies", ""])
+    for slug in FULL_TRANSLATION_SLUGS:
+        lines.append(f"- [{slug} (Markdown)]({ORIGIN}/ai/en/{slug}.md): static reading copy; original English guide and official sources govern.")
     return "\n".join(lines)
 
 
@@ -295,7 +311,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
                 "evidenceCardCheckedAt": evidence_checked_at,
                 "evidenceStatus": evidence_status,
                 "evidenceCheckedAt": evidence_checked_at,
-                "lastModified": "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED,
+                "lastModified": page_modified(page),
             }
         )
 
@@ -394,6 +410,15 @@ def build_crawler_policy() -> str:
             "Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.",
             "Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.",
             "",
+            "## Reading copies and discovery",
+            "",
+            f"Per-page Markdown: {ORIGIN}/ai-index.json (explicit public-page allowlist).",
+            f"Combined public reading collection: {ORIGIN}/llms-full.txt; prefer relevant single-page copies.",
+            "Reading copies are generated from the same public HTML, not AI rewrites or privileged bot-only answers. They retain sources, original dates and review scope.",
+            "Forms, private data, live giveaway listings and interactive-tool results are not exported. A listing-free export is not an empty-stock claim.",
+            "Claude-SearchBot and Claude-User have explicit robots groups with the same private-route exclusions as the wildcard group. Training preferences are separate; this change does not grant a new training licence.",
+            "Readability is not a promise of crawling, indexing, ranking or citation by any AI service.",
+            "",
             "## Non-content and personal-data boundaries",
             "",
             "Do not submit or automate forms, create cases, enumerate identifiers, or crawl API, admin, CRM, confirmation, receipt or deletion endpoints.",
@@ -411,23 +436,19 @@ def build_crawler_policy() -> str:
 
 def expected_files() -> dict[Path, str]:
     sources = {page: (ROOT / page).read_text(encoding="utf-8") for page in PAGES}
-    output = {ROOT / page: update_page(page, sources[page]) for page in PAGES}
+    output = {ROOT / page: decorate_page(page, update_page(page, sources[page]), ORIGIN) for page in PAGES}
     output[ROOT / "sitemap.xml"] = build_sitemap()
-    output[ROOT / "robots.txt"] = (
-        "# Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.\n"
-        "User-agent: *\n"
-        "Allow: /\n"
-        "Disallow: /api/\n"
-        "Disallow: /admin/\n"
-        "Disallow: /crm/\n"
-        "Disallow: /contact/confirmation/\n"
-        "Disallow: /contact/receipt/\n"
-        "Disallow: /contact/delete/\n\n"
-        f"Sitemap: {ORIGIN}/sitemap.xml\n"
-    )
+    output[ROOT / "robots.txt"] = build_robots(ORIGIN)
     output[ROOT / "llms.txt"] = build_llms(sources)
     output[ROOT / "content-status.json"] = build_content_status(sources)
     output[ROOT / "crawler-policy.txt"] = build_crawler_policy()
+    reading_sources = {page: output[ROOT / page] for page in PAGES}
+    for slug in FULL_TRANSLATION_SLUGS:
+        page = f"lang/en/{slug}/index.html"
+        output[ROOT / page] = decorate_page(page, (ROOT / page).read_text(encoding="utf-8"), ORIGIN)
+        reading_sources[page] = output[ROOT / page]
+    for relative, text in build_assets(reading_sources, json.loads(output[ROOT / "content-status.json"]), ORIGIN).items():
+        output[ROOT / relative] = text
     return output
 
 
@@ -461,6 +482,7 @@ def main() -> int:
             continue
         stale.append(path.relative_to(ROOT).as_posix())
         if not args.check:
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(expected, encoding="utf-8", newline="\n")
     asset_errors = validate_share_assets()
     if args.check and (stale or asset_errors):

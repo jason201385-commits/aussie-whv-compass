@@ -1,0 +1,258 @@
+# 工作機會在哪裡？求職管道、雇主查核與證照
+
+- 原始網頁: https://www.aussiewhvcompass.com/work.html
+- 語言: zh-Hant
+- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 編輯狀態: human-edited-unreviewed-by-domain-professional
+- 證據卡範圍: first-action-only
+- 證據卡查核日期: 2026-08-30
+- License: CC BY-SA 4.0; original-page attribution required.
+
+> 本站為獨立編輯指南，不是政府或專業判定。請核對原頁相鄰官方來源；純文字匯出不代表重新查核。此版本不含表單、動態使用者刊登或試算結果，不能據此判斷物品庫存或個人資格。
+
+[先看集簽透明地圖](https://www.aussiewhvcompass.com/map.html)：官方郵遞區號圖層＋採收月份參考。
+
+# 工作機會在哪裡？
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+找工作的管道很多，但「查證雇主合法」永遠是第一步——這頁把兩件事一起講。2026-08 查核
+
+找工作417／462 適用2026-08 查核
+
+## 接工作前先核對雇主登記（ABN）與適用的最低薪資
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#work-first-action)
+
+- [我不知道可以去哪裡找工作](https://www.aussiewhvcompass.com/work.html#channels)
+
+- [這個月份來澳洲，可能有哪些工作？](https://www.aussiewhvcompass.com/work.html#seasons)
+
+- [我工作受傷，或現場現在不安全](https://www.aussiewhvcompass.com/work.html#injury)
+
+[做 5 分鐘合法性查核](https://www.aussiewhvcompass.com/work.html#verify-steps) [ABN Lookup 官方查詢（外部連結）](https://abr.business.gov.au/)
+
+官方依據：Australian Business Register（2026-08 查核）
+
+**為什麼：**求職網站與社群只提供刊登或交流，不替你確認雇主身分與薪資；先查證，再交證件、付費或開始工作。
+
+- 來源機構[Australian Business Register](https://abr.business.gov.au/)・[Fair Work Ombudsman](https://www.fairwork.gov.au/pay-and-wages)
+
+- 查核日期2026-08-30
+
+- 編輯狀態繁中人工整理・未經勞動或法律專業人士審校
+
+- 查核範圍只查核本卡的第一步；不代表整頁已由專業人士審校
+
+先用 [ABN Lookup](https://abr.business.gov.au/) 比對 ABN 狀態、登記名稱與對方說法，再用官方 [P.A.C.T. Pay Calculator](https://calculate.fairwork.gov.au/) 查職位費率；需要牌照的州別另查本頁牌照登記冊。
+
+ [以上都不是？看完整內容與參考資料](https://www.aussiewhvcompass.com/work.html#full-contents)
+
+**完整內容與參考資料** [我拿到 offer，但不知道雇主是否合法](https://www.aussiewhvcompass.com/work.html#verify) [求職管道](https://www.aussiewhvcompass.com/work.html#channels) [合法性查核](https://www.aussiewhvcompass.com/work.html#verify) [證照](https://www.aussiewhvcompass.com/work.html#certs) [履歷與推薦人](https://www.aussiewhvcompass.com/work.html#resume) [採收季節與淡旺季](https://www.aussiewhvcompass.com/work.html#seasons) [到職檢查清單](https://www.aussiewhvcompass.com/work.html#checklist) [受傷了怎麼辦](https://www.aussiewhvcompass.com/work.html#injury)
+
+## 一、求職管道
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#channels)
+
+**先講競爭現實：**2025 年起在澳背包客人數創歷史新高（破 21 萬，比疫情前多約 10 萬），大城市網路海投常常無回音。求職量級要對：**掃街是數十到上百份履歷，不是投五份就喊飽和**；線上＋線下管道要並行。來源：[ABC 2025-01-31](https://www.abc.net.au/news/2025-01-31/working-holidaymaker-visas-employment-travel/104798716)
+
+### 線上平台
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+| 平台 | 特色 | 注意 |
+| --- | --- | --- |
+| [Seek](https://www.seek.com.au/) | 澳洲最大求職網站，正職與 casual 都有 | 競爭者多，履歷要在地化（見下方） |
+| [Indeed](https://au.indeed.com/) | 職缺量大、投遞門檻低 | 同上 |
+| [Jora](https://au.jora.com/) | 職缺聚合搜尋（Seek 集團） | — |
+| [Workforce Australia](https://www.workforceaustralia.gov.au/individuals/jobs/search) | **政府官方職缺板**，農牧採收工作用關鍵字「harvest」搜尋，職缺標示 Award 薪資等級 | 取代已裁撤的 Harvest Trail（見下方警告） |
+| [Backpacker Job Board](https://www.backpackerjobboard.com.au/) | 專為背包客設計：農場、集簽、au pair、清潔 | 非官方平台，雇主仍要自行查證 |
+| [Gumtree Jobs](https://www.gumtree.com.au/jobs) | 分類廣告，多勞力型 casual 職缺 | **詐騙風險較高**，務必配合下方查核步驟 |
+
+**重要更正（很多舊攻略還在錯）：**政府的 Harvest Trail 採收職缺服務已於 **2024-06-30 裁撤**，專屬網站與各地辦公室都沒了。現在官方管道是 Workforce Australia 職缺板；網路上沿用「harvest trail」名稱的網站是私人經營，非官方。來源：[ABC 報導](https://www.abc.net.au/news/2024-06-11/harvest-trail-services-axed-after-26-years/103952646)・Workforce Australia 實測｜2026-08-28
+
+### 線下管道（新手最容易低估的主力）
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+- **掃街投履歷（walk-in）**：餐飲、零售、清潔大量職缺根本不上網。印 20 份履歷，挑非尖峰時段走進店裡，微笑遞給值班經理說 "Hi, I'm looking for work. Here's my resume."——這也是最好的英文練習（開場白見[英文頁](https://www.aussiewhvcompass.com/english.html#work-english)）。
+
+- **Working hostel**：付住宿費（約 $150–250/週，僅供參考）換旅舍介紹當地農場工作，集中在各採收重鎮。不保證天天有班；**「先繳幾週房租排隊等工作」是經典陷阱**，入住前先看[防詐騙第 2 條](https://www.aussiewhvcompass.com/scam.html#job)。
+
+- **Hostel 佈告欄與口耳相傳**：背包客棧的佈告欄、室友的內線消息，是偏遠地區找工的真實管道。
+
+- **直接打電話給農場／包裝廠**：採收季前一個月直接電話詢問，比在網路上等有效。
+
+### 社群管道（好用，但風險最高）
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+- **Facebook 社團**：中文澳打綜合社團、城市租屋找工版、農場集簽情報社團、產業版（肉廠/餐飲/清潔）。
+
+- **背包客棧論壇、LINE/微信群**：中文圈歷史悠久的資訊來源。
+
+- **生活社群不是求職查核：**本站的第三方 Perth 生活社群入口只放在首頁的一般生活交流區，不列為求職來源；在任何群組看到的工作都要走下方查核流程。
+
+- **風險分級（社群通報模式）**：社群管道同時是**黑工、低薪與收費「代辦」的最大集散地**。原則：社團拿到的任何職缺，都要走一遍下方查核流程；「先付介紹費／名額費」一律跳過（合法仲介的錢是雇主付，不是你付）——詳見[防詐騙](https://www.aussiewhvcompass.com/scam.html#chinese)。
+
+## 二、接工作前的合法性查核（5 分鐘）
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#verify)
+
+[回到答案卡](https://www.aussiewhvcompass.com/work.html#work-first-action)
+
+- **查雇主**：把對方給的 ABN 丟進 [ABN Lookup](https://abr.business.gov.au/)（官方、免費）——ABN 是否有效、登記名稱與對方自稱是否一致。
+
+- **查派遣仲介牌照**（透過仲介上工時）：
+
+  - VIC：[Labour Hire Authority 查詢](https://www.labourhireauthority.vic.gov.au/check-a-provider-s-licence-status/)（無牌仲介違法）
+
+  - QLD：[Labour Hire Licensing 登記冊](https://ols.oir.qld.gov.au/licence-register/)
+
+  - SA：**2026 年起牌照制度擴大到所有行業**（7 月底起全面強制），用 [CBS Find a licence holder](https://www.cbs.sa.gov.au/find-a-licence-holder) 查
+
+  - ACT：[WorkSafe ACT 登記冊](https://www.worksafe.act.gov.au/licensing-and-registration/labour-hire-licensing)
+
+  - 其他州目前無同類州級牌照制度（以各州官網現況為準），更要依賴 ABN 查核與 payslip 檢查。
+
+- **查薪資**：用官方 [P.A.C.T. 薪資計算器](https://calculate.fairwork.gov.au/)輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（2026 年 casual 絕對地板 $33.05/hr，見[物價與薪水](https://www.aussiewhvcompass.com/cost.html#wage)）。
+
+- **確認雇主是 registered WHM employer**：不是的話，稅金預扣就不是 15%（見[稅務](https://www.aussiewhvcompass.com/cost.html#tax)）。
+
+## 三、常見證照：哪些工作需要先考什麼
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#certs)
+
+| 證照 | 做什麼用 | 重點 |
+| --- | --- | --- |
+| **RSA**（酒類服務） | 端酒、賣酒的餐飲工作必備 | 全國課程代碼 SITHFAB021，但由**各州各自管制、原則上跨州不互認**：NSW 要換附照片的 competency card（5 年效期）；VIC 效期 3 年、有免費線上 refresher；QLD 允許開工後 30 天內補齊（規定細節與適用條件以 [OLGR 現行頁面](https://www.business.qld.gov.au/industries/hospitality-tourism-sport/liquor-gaming/liquor/training/rsa/certification)為準，上工前先跟雇主確認這樣安排）。跨州工作前先查目的州規定。 |
+| **White Card**（營建白卡） | 進任何工地的入場券 | 課程 CPCWHS1001，**全國承認**（一州取得各州通用）；NSW 要求面授或線上直播課，純自學線上課無效——報名前確認課程是該州核可的 RTO。 |
+| **叉車證**（Forklift LF） | 倉儲、工廠、包裝廠加薪利器 | 屬 High Risk Work Licence，須年滿 18、經 RTO 培訓考核，**全國承認**、5 年換發。 |
+| **Q fever 疫苗證明** | 肉廠、屠宰場入職條件 | 接種前要先做血清與皮膚測試（分次就診約一週）；**自費**。想進肉廠的人要提早安排。 |
+| 咖啡師課程 | 咖啡廳求職加分 | **沒有法定證照**（此為業界慣例描述）——短期課程可加分，但作品是你打奶泡的手；供酒場所仍需該州 RSA。 |
+
+來源：[Service NSW RSA](https://www.service.nsw.gov.au/transaction/apply-for-an-rsa-or-rcg-competency-card)・[VIC RSA](https://www.vic.gov.au/rsa-training)・[WorkSafe QLD 叉車](https://www.worksafe.qld.gov.au/licensing-and-registrations/work-health-and-safety-licences/what-licence-do-i-need/forklift-truck)・[澳洲免疫手冊 Q fever](https://immunisationhandbook.health.gov.au/contents/vaccine-preventable-diseases/q-fever)｜2026-08-28 查核。WA/SA/TAS/NT 的 RSA 細則請以各州官網為準。
+
+## 四、澳式履歷與推薦人文化
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#resume)
+
+- **一頁到兩頁、無照片、無出生年月日**——澳洲履歷不放個人敏感資訊（反歧視文化）。
+
+- **推薦人（referee）**：澳洲雇主真的會打電話查核。標準是 2–3 位；履歷上通常寫 "References available upon request" 即可，不用直接放聯絡方式；列人之前務必先徵得對方同意。
+
+- **第一份澳洲工作最值錢的產出是 referee**：working hostel 介紹的農場、換宿的雇主，都可能成為你下一份工作的推薦人——離開前開口要，多數人願意。
+
+- 官方免費教學：維州政府 [Youth Central 履歷指南](https://www.youthcentral.vic.gov.au/jobs/resumes-and-cover-letters/how-write-resume)（含範本）。
+
+## 五、採收季節與淡旺季
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#seasons)
+
+零打字快查
+
+### 官方採收季節月曆
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#season-title)
+
+選一個月份，看 VIC、TAS、NT 官方表列出的採收項目。其他州／領地若找不到同等級官方月表，會直接標示，不用民間資料補空白。
+
+來源：[Agriculture Victoria](https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest/how-to-get-a-harvest-job)・[NRE Tasmania](https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs)・[NT Government](https://nt.gov.au/industry/agriculture/food-crops-plants-and-quarantine/fruit-crops/fruit-availability-and-storage)｜2026-08-30 查核
+
+先看職缺，再決定抵達日
+
+### 四季可能職缺與抵達時機
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#season-guide-title)
+
+這是規劃地圖，不是「哪個月一定有工作」排行榜。澳洲跨氣候帶，同一月份在不同州可能完全相反；以下只把可追溯來源支持的訊號整理成下一步。
+
+12–2 月・夏季
+
+#### 採收＋購物／假期季節招募
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+**可能職缺：**VIC／TAS 莓果、櫻桃、蔬果的採摘、分級、包裝；零售與假期相關季節職缺。
+
+**時機判斷：**Jobs and Skills Australia 指出 11 月常見購物與假期季節招募。若目標是這類工作，**10–11 月開始看職缺與投遞**是本站的規劃建議；12 月才零準備抵達，選擇可能較少。
+
+**可能困境：**南部高溫與火災天氣；北部 10–4 月雨季、11–4 月熱帶氣旋季，可能影響道路與戶外班次。
+
+3–5 月・秋季
+
+#### 水果、葡萄與農產處理
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+**可能職缺：**VIC 蘋果梨、鮮食葡萄、柑橘；TAS 蘋果、莓果、釀酒葡萄、馬鈴薯的採收、包裝、分級與農場助手。
+
+**時機判斷：**目前已查證的 VIC／TAS 表在這段期間列出較多項目，但這**不是全澳職缺數比較**。只有查到仍有效的職缺，且交通、住宿與預算能接上時，才算條件式較適合。
+
+**可能困境：**短產季陸續收尾，工時與計件收入受果量、品種與天候影響；北部至 4 月底仍在熱帶氣旋季。
+
+6–8 月・冬季
+
+#### 修剪、農產處理＋雪季工作
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+**可能職缺：**TAS 葡萄修剪、馬鈴薯加工、蔬菜與剪羊毛棚助手；雪場的纜車、造雪／整備、餐飲、廚房、房務、客服與零售。
+
+**時機判斷：**Perisher 2026 雪季職缺 2 月初開放，Thredbo 1 月開放。想做雪季，**年初投遞、依雇主 onboarding 日抵達**較合理；6 月才無 offer、無住宿直接到雪鎮，風險較高。
+
+**可能困境：**雪鎮臨時住宿與交通難度、戶外寒冷與天候；北部乾季則進入火災天氣較高風險期。
+
+9–11 月・春季
+
+#### 剪羊毛、穀物、初夏採收＋節慶前招募
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#main-content)
+
+**可能職缺：**VIC 剪羊毛、穀物、莓果／櫻桃前段；TAS 葉菜、啤酒花整枝、犢牛飼育；NT 芒果與鮮食葡萄只作產季訊號。
+
+**時機判斷：**適合開始追蹤跨季職缺與 11 月前後的購物／假期招募；但看到作物進入產季，不等於當地正缺人。
+
+**可能困境：**前後工作交接的無薪空窗；北部火災天氣延續、10 月起進入雨季，南部晚春逐漸提高火災天氣風險。
+
+**比較推薦抵達：**已看到有效職缺或拿到書面 offer，並確認開工日、預期工時／薪資、住宿、交通與至少一個退路。
+
+**比較不推薦抵達：**只憑月曆搬去偏遠產區、產季已開始才找、沒有交通／住宿備案，或工作與住宿綁在同一個未查核對象手上。
+
+**沒有全澳通用的最好／最差月份：**若還沒鎖定州與產業，先在有住宿和交通備案的落腳點投遞，再為已確認的工作移動，比追著「聽說旺季」跑更可控。
+
+來源：[Agriculture Victoria 採收職類與月份](https://agriculture.vic.gov.au/crops-and-horticulture/Workforce-and-Harvest/how-to-get-a-harvest-job)・[NRE Tasmania 職類與短產季說明](https://nre.tas.gov.au/agriculture/multifaceted-agriculture/harvest-jobs/harvest-jobs-faqs)・[Perisher 雪季招募](https://www.perisher.com.au/perisher-jobs)・[Thredbo 招募時程](https://www.thredbo.com.au/about-thredbo/jobs/recruitment-process/)・[Jobs and Skills Australia 季節招募訊號](https://www.jobsandskills.gov.au/news/slight-uplift-recruitment-activity-november)・[BOM 澳洲季節／北部雨季](https://www.bom.gov.au/news-and-media/solstices-equinoxes-and-the-seasons)・[BOM 各地火災天氣季節](https://www.bom.gov.au/resources/learn-and-explore/fire-weather-knowledge-centre/fire-weather-seasons)・[BOM 熱帶氣旋季](https://www.bom.gov.au/climate/cyclones/australia/)｜2026-08-30 查核。抵達與困境提示為本站依來源做的規劃推論，不是錄取或天氣保證；出發前查即時預報與警報。
+
+## 六、到職檢查清單
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#checklist)
+
+**到職三件套，缺一就走：**① 書面約定（offer/合約，載明時薪與職位）② 填 TFN declaration ③ 第一週拿到 payslip。
+
+**上工後的例行動作：**
+
+- 下載 FWO 官方 **Record My Hours** App，逐日記錄工時（計件工同時記採量）——欠薪爭議時這就是證據。
+
+- 每次發薪核對 payslip：時薪、時數、super 提撥。
+
+- 發薪後兩週內上 myGov→ATO 確認 super 真的入帳（2026-07 起發薪即繳）。
+
+- 集簽者：payslip 立刻存雲端（見[集簽證據](https://www.aussiewhvcompass.com/visa.html#evidence)）。
+
+- 同一雇主做超過 6 個月前，確認你符合豁免（農牧、餐旅等多數背包客工作有豁免，見[6 個月限制](https://www.aussiewhvcompass.com/visa.html#sixmonth)）。
+
+## 七、工作受傷了怎麼辦
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#injury)
+
+- 澳洲每個州都有**工傷保險（workers' compensation）**制度，由雇主強制投保，**casual 與簽證持有人同樣受保障**——這是合法工作與黑工的生死差別：黑工受傷，連申請的入口都沒有。
+
+- 受傷當下：先就醫（緊急撥 000）→ 盡快書面通知雇主（email 留紀錄）→ 請醫師開具工傷診斷證明（certificate of capacity）→ 向所在州的工傷保險機構提出 claim。搜尋「`workers compensation + 你所在州名`」找官方機構；不確定流程可打 FWO 13 13 94（中文口譯 131 450）問方向。
+
+- 台灣與澳洲**沒有**互惠醫療協議（Medicare 不涵蓋台灣人），非工傷的就醫費用要靠自己的保險——保險怎麼選、就醫怎麼分流，見[健康安全](https://www.aussiewhvcompass.com/health.html)。
+
+- 職場性騷擾的申訴管道與自保，見[健康安全・女性安全](https://www.aussiewhvcompass.com/health.html#women)。
+
+來源：[FWO workers compensation 總覽](https://www.fairwork.gov.au/employment-conditions/workers-compensation)・[互惠醫療協議國家清單（無台灣）](https://www.servicesaustralia.gov.au/reciprocal-health-care-agreements)｜2026-08-28 查核
+
+找到工作只是開始——記得同步看[防詐騙](https://www.aussiewhvcompass.com/scam.html)的求職類手法（先付錢、假承攬、無薪試工、super 沒繳），九成的坑都集中在到職前後兩週。
