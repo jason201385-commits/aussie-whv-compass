@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
 LAST_MODIFIED = "2026-09-02"
-ASSET_VERSION = "20260905-03"
+ASSET_VERSION = "20260916-01"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -30,6 +30,7 @@ PAGES = [
     "cost.html",
     "housing.html",
     "market.html",
+    "free.html",
     "work.html",
     "map.html",
     "scam.html",
@@ -49,6 +50,7 @@ RISK_LEVELS = {
     "cost.html": "high",
     "housing.html": "high",
     "market.html": "high",
+    "free.html": "medium",
     "work.html": "high",
     "scam.html": "high",
     "health.html": "high",
@@ -92,7 +94,7 @@ def seo_block(page: str, source: str) -> str:
         "publishingPrinciples": f"{ORIGIN}/crawler-policy.txt",
         "subjectOf": f"{ORIGIN}/content-status.json",
         "image": OG_IMAGE,
-        "dateModified": LAST_MODIFIED,
+        "dateModified": "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED,
     }
     graph = [
         {
@@ -210,7 +212,7 @@ def build_sitemap() -> str:
 def build_llms(page_sources: dict[str, str]) -> str:
     groups = [
         ("開始前", ["why.html", "visa.html", "prep.html", "simulator.html"]),
-        ("在澳洲生活與工作", ["cost.html", "housing.html", "market.html", "work.html", "map.html", "scam.html", "english.html", "health.html", "communities.html"]),
+        ("在澳洲生活與工作", ["cost.html", "housing.html", "market.html", "free.html", "work.html", "map.html", "scam.html", "english.html", "health.html", "communities.html"]),
         ("離開或留下", ["leave.html", "pr.html"]),
         ("關於與合作", ["about.html"]),
     ]
@@ -293,7 +295,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
                 "evidenceCardCheckedAt": evidence_checked_at,
                 "evidenceStatus": evidence_status,
                 "evidenceCheckedAt": evidence_checked_at,
-                "lastModified": LAST_MODIFIED,
+                "lastModified": "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED,
             }
         )
 
@@ -341,7 +343,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
 
     manifest = {
         "schemaVersion": 2,
-        "generatedAt": LAST_MODIFIED,
+        "generatedAt": "2026-09-16",
         "canonicalOrigin": ORIGIN,
         "siteEditorialStatus": "independent-open-source-community-guide",
         "isOfficialGovernmentService": False,

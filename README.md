@@ -143,3 +143,7 @@ P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空�
 本專案作者不是澳洲註冊移民代理（RMA）。內容為公開資料整理、編輯轉譯與一般資訊，
 不構成移民、法律、稅務或財務建議。一切以
 [澳洲內政部](https://immi.homeaffairs.gov.au/) 及各官方機構公告為準。
+
+## 離澳免費二手版
+
+[免費贈送看板](https://www.aussiewhvcompass.com/free.html)提供同城物品篩選與公開刊登草稿。瀏覽不用登入；刊登、留言與管理自己的原貼使用 GitHub 帳號。原貼送出即公開，本站顯示須經 `free-board-approved` 審核；用 `free-board-reserved` 標預約，送出後關閉 Issue。本文修改會移除 approved，需重審。沒有站內金流、匿名後端、電話或住址欄位，不串 CRM。此公開流程與原本 market.html 的本機買賣草稿不同，完整契約與版主操作見 docs/SPEC.md §6。
