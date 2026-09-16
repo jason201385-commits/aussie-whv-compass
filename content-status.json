@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-16",
+  "generatedAt": "2026-09-17",
   "canonicalOrigin": "https://www.aussiewhvcompass.com",
   "siteEditorialStatus": "independent-open-source-community-guide",
   "isOfficialGovernmentService": false,
@@ -26,6 +26,11 @@
     "english-fallback": "English fallback is shown because a reviewed translation is not available."
   },
   "legacyFieldPolicy": "editorialStatus, evidenceStatus and evidenceCheckedAt are retained for compatibility; use pageReviewStatus and evidenceCard* fields for scope-aware status.",
+  "sectionAnswerRegistry": {
+    "url": "https://www.aussiewhvcompass.com/answers.json",
+    "scope": "Source/operation checks apply only to the named task card, not the entire page or an individual case.",
+    "reviewDuePolicy": "Editorial maintenance deadline, not a guarantee of unchanged rules; sourceCheckedAt is not automatically refreshed by a build."
+  },
   "primaryPages": [
     {
       "url": "https://www.aussiewhvcompass.com/",
@@ -41,7 +46,7 @@
       "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
-      "lastModified": "2026-09-16"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/why.html",
@@ -73,7 +78,7 @@
       "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/prep.html",
@@ -89,7 +94,7 @@
       "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/simulator.html",
@@ -121,7 +126,7 @@
       "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/housing.html",
@@ -137,7 +142,7 @@
       "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/market.html",
@@ -169,7 +174,7 @@
       "evidenceCardCheckedAt": null,
       "evidenceStatus": "not-applicable",
       "evidenceCheckedAt": null,
-      "lastModified": "2026-09-16"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/work.html",
@@ -185,7 +190,7 @@
       "evidenceCardCheckedAt": "2026-08-30",
       "evidenceStatus": "checked",
       "evidenceCheckedAt": "2026-08-30",
-      "lastModified": "2026-09-02"
+      "lastModified": "2026-09-17"
     },
     {
       "url": "https://www.aussiewhvcompass.com/map.html",

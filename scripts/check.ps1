@@ -210,7 +210,7 @@ if ($uniqueAssetVersions.Count -eq 1 -and @($contentStatusVersions | Where-Objec
 $answerCardPages = @('visa.html', 'cost.html', 'housing.html', 'work.html', 'scam.html')
 $answerCardContract = @{
   'visa.html'    = @{ Id = 'visa-first-action';    Points = @('#first', '#apply', '#evidence');    Tool = '#postcode-tool';       TocQuestion = '#where';             Official = 'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417' }
-  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#math', '#food', '#car-checklist'); Tool = '#save-calc';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
+  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#runway', '#food', '#car-checklist'); Tool = 'https://calculate.fairwork.gov.au/';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
   'housing.html' = @{ Id = 'housing-first-action'; Points = @('#find', '#bond', '#contract');      Tool = '#housing-search-tool'; TocQuestion = '#book';              Official = 'https://www.consumerprotection.wa.gov.au/publications/looking-rental-home-tenants-guide-1' }
   'work.html'    = @{ Id = 'work-first-action';    Points = @('#channels', '#seasons', '#injury'); Tool = '#verify-steps';        TocQuestion = '#verify';            Official = 'https://abr.business.gov.au/' }
   'scam.html'    = @{ Id = 'scam-first-action';    Points = @('#help', '#job', '#rent');           Tool = '#help-kit';            TocQuestion = '#scam-first-action'; Official = 'https://www.scamwatch.gov.au/stop-check-protect/help-to-spot-and-avoid-scams' }
@@ -297,10 +297,16 @@ foreach ($answerCardPage in $answerCardPages) {
     }
   }
   # 主按鈕直達工具輸入區：目標必須是 input|select|button|form，或標有 data-answer-target="tool" 的容器，不能是標題。
-  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="(#[^"]+)">')
+  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="([^"]+)"[^>]*>')
   if (-not $answerPrimary.Success -or $answerPrimary.Groups[1].Value -ne $contract.Tool) {
     Write-Output "FAIL [$answerCardPage] 主按鈕必須直達 $($contract.Tool)"
     $errors++
+  } elseif ($answerCardPage -eq 'cost.html' -and $contract.Tool -eq 'https://calculate.fairwork.gov.au/') {
+    # P1-27: the wage question must lead to the exact official pay calculator, not a savings tool.
+    if (-not $answerPrimary.Value.Contains('rel="noopener noreferrer"')) {
+      Write-Output "FAIL [cost.html] 官方薪資計算器主連結必須保留安全 rel"
+      $errors++
+    }
   } else {
     $toolId = $contract.Tool.Substring(1)
     $toolTag = [regex]::Match($answerText, '<([a-z0-9]+)\b[^>]*\bid="' + [regex]::Escape($toolId) + '"[^>]*>')
@@ -3479,7 +3485,7 @@ if (-not $toolsJs.Contains('澳打指南針 ・ 公開攻略免費 ・ 資料只
   Write-Output 'FAIL [tools.js] 行前海報未同步公開攻略免費定位'
   $errors++
 }
-foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
+foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '比較住得起、到得了、做得來', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
   if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
 }
 # P0-8：使命句自首頁 hero 移到 about.html 開頭，且只在 about 出現

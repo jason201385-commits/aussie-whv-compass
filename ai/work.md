@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/work.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-09-02
+- 來源內容修改日期（不是本次事實查核）: 2026-09-17
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-08-30
@@ -54,6 +54,28 @@
 
 [Section permalink](https://www.aussiewhvcompass.com/work.html#channels)
 
+### 沒車、英文不好，怎麼開始找工作？
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#task-find-work-title)
+
+先確認能到達的工作區與班次，再按已有技能搜尋；面試前練習工時、薪資和安全指示的確認方式。
+
+**適用：**尚未取得工作的讀者；不是零英文就能上工的承諾。
+
+**先核對：**需確認工作權利、職務證照與溝通要求；求職入口不保證有合適職缺。
+
+[按地區與職類找公開入口](https://www.aussiewhvcompass.com/map.html#open-job-portals)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[Workforce Australia：公開求職入口](https://www.workforceaustralia.gov.au/individuals/jobs/)・[Fair Work：簽證持有人職場權益](https://www.fairwork.gov.au/find-help-for/visa-holders-migrants)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=work.html%23channels&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%B2%92%E8%BB%8A%E3%80%81%E8%8B%B1%E6%96%87%E4%B8%8D%E5%A5%BD%EF%BC%8C%E6%80%8E%E9%BA%BC%E9%96%8B%E5%A7%8B%E6%89%BE%E5%B7%A5%E4%BD%9C%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 **先講競爭現實：**2025 年起在澳背包客人數創歷史新高（破 21 萬，比疫情前多約 10 萬），大城市網路海投常常無回音。求職量級要對：**掃街是數十到上百份履歷，不是投五份就喊飽和**；線上＋線下管道要並行。來源：[ABC 2025-01-31](https://www.abc.net.au/news/2025-01-31/working-holidaymaker-visas-employment-travel/104798716)
 
 ### 線上平台
@@ -99,6 +121,28 @@
 
 [Section permalink](https://www.aussiewhvcompass.com/work.html#verify)
 
+### 接工作前先查什麼？
+
+[Section permalink](https://www.aussiewhvcompass.com/work.html#task-job-check-title)
+
+核對雇主名稱與 ABN、工作內容、薪資條件及紀錄方式；ABN 有效不代表這份工作已被驗證。
+
+**適用：**準備接受工作；仲介、承攬或不同薪資制度需另查適用條件。
+
+**先核對：**先取得職務、僱用型態、工時與適用 award 或 agreement；本站不判定個案是否合法。
+
+[先核對企業登記資訊](https://abr.business.gov.au/)
+
+本卡來源核對：2026-09-17・下次複核：2026-10-17
+
+依據、適用範圍與更正
+
+來源：[ABN Lookup：企業登記資訊](https://abr.business.gov.au/)・[Fair Work：簽證持有人職場權益](https://www.fairwork.gov.au/find-help-for/visa-holders-migrants)｜2026-09-17 查核
+
+只核對本卡所列來源或本站操作，不代表整頁已審校，亦非專業人士的個案判定。複核日期是維護排程，不保證之前沒有變更。
+
+[回報本卡問題（GitHub 公開）](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml&page=work.html%23verify&title=%5B%E7%AD%94%E6%A1%88%E5%8D%A1%5D+%E6%8E%A5%E5%B7%A5%E4%BD%9C%E5%89%8D%E5%85%88%E6%9F%A5%E4%BB%80%E9%BA%BC%EF%BC%9F)；需登入，請勿附上證件、聯絡方式、薪資單或第三人資料。
+
 [回到答案卡](https://www.aussiewhvcompass.com/work.html#work-first-action)
 
 - **查雇主**：把對方給的 ABN 丟進 [ABN Lookup](https://abr.business.gov.au/)（官方、免費）——ABN 是否有效、登記名稱與對方自稱是否一致。
@@ -115,7 +159,7 @@
 
   - 其他州目前無同類州級牌照制度（以各州官網現況為準），更要依賴 ABN 查核與 payslip 檢查。
 
-- **查薪資**：用官方 [P.A.C.T. 薪資計算器](https://calculate.fairwork.gov.au/)輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（2026 年 casual 絕對地板 $33.05/hr，見[物價與薪水](https://www.aussiewhvcompass.com/cost.html#wage)）。
+- **查薪資**：用官方 [P.A.C.T. 薪資計算器](https://calculate.fairwork.gov.au/)輸入行業與職級，算出你「依法至少該領多少」，再跟對方開的條件比（適用條件見[薪資查核](https://www.aussiewhvcompass.com/cost.html#wage)，不能用單一 casual 時薪當所有工作的絕對地板）。
 
 - **確認雇主是 registered WHM employer**：不是的話，稅金預扣就不是 15%（見[稅務](https://www.aussiewhvcompass.com/cost.html#tax)）。
 

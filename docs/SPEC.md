@@ -239,3 +239,18 @@ powershell -File scripts/check.ps1
 Claude-SearchBot、Claude-User 的 robots group 明示允許公開內容，逐組重複私人端點排除；wildcard 的既有權限不放寬，訓練授權不另變更。robots 不是安全防護；Cloudflare 規則及驗證爬蟲存取為獨立層。
 
 驗收：`python scripts/build_seo.py --check`、`python scripts/test_ai_reading.py`、`build_i18n.py --check`、`build_search.py --check`。正式 GET 需比對檔案 bytes 與 UA 相容性；模擬 UA 不等於真實 Anthropic 爬蟲，HTTP 200 也不是收錄或引用證據。操作手冊見 AI_DISCOVERY.md。
+
+
+## 9. 新手任務與適用條件答案（P1-27）
+
+`answers.json` 是任務摘要、適用範圍、待確認條件、下一步及來源的唯一輸入；`scripts/build_task_answers.py` 產生既有頁面上的原生答案卡與首頁直達入口。卡片數與題目以此登記檔為準，不另維護問答資料庫。`sourceCheckedAt` 是本卡來源／本站操作的人工核對日；`reviewDue` 是維護排程，不是新鮮度保證；`reviewedByDomainProfessional` 保持 false，既有全頁與證據卡查核範圍不變。
+
+首頁仍保留四階段與 21 個出口。第一站城市問題保留舊出口 ID 以相容分享，但實際目的地改為 `prep.html#first-city`。已知問題可直接走三個主要任務或其他問題連結，不必先交護照資訊。
+
+搜尋只在整句正規化後唯一命中已登記 queries 時顯示編輯答案；並非模型即時回答，也不把原演算法的模糊匹配當成確認答案。其他查詢沿用原搜尋。`needs-review`、日期缺漏／不合理或 UTC+8 已到 `reviewDue` 時，瀏覽器不顯示舊摘要，保留條件與查核出口。靜態頁明示核對與複核日期；無 JS 不承諾自動按今日隱藏，到期維護仍須人工或建置處理。純文字同源，沒有新增「最新／已專業審校」宣稱。
+
+`cost.html#runway-tool` 為本機無收入情境試算：可動用現金減尚未支付的一次性支出、未付押金、不動用保留金，再除以每週必要開支。以整數 cents 計算，金額限非負且最多兩位小數，週開支須正數；輸出可用生活金、完整週數、向下取到一位小數的週數、達到使用者目標的資金差額。負可用金另顯示前置費用缺口，不輸出負週數。沒有收入、固定支出、押金期間內不退的假設必須可見；已從現金扣過或已預付的費用不可重複扣。範例需明示非建議金額，不預填讀者的金額。修改輸入清空舊結果；結果與表單不進搜尋、AI 閱讀版。無 JS 保留公式，表單隱藏。新工具不讀寫 storage、不連網、不計算稅率、簽證財力或找工機率。
+
+來源回報只預填卡片名稱與固定網址到現有 GitHub issue form，原貼公開且需要登入，不能附個資。核對入口含單獨 417／462 規則與不確定出口；ABN 登記不作為雇主安全保證，國家最低工資參考不代替 award／agreement 個案核對。
+
+驗收：生成器 check、Python 來源／anchor／字串安全檢查、Node 搜尋與金額邊界、Chromium 桌機／手機／無 JS／逾期／隱私檢查。完整基線保留既存失敗，不宣稱真人完成率或導流成效。

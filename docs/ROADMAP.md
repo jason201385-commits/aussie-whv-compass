@@ -58,6 +58,7 @@
 | P1-24 | 離澳免費二手版（審核制免費贈送） | 已上線 | 站長管理 GitHub 審核標籤；真實投稿與撤審端到端待驗收 | SPEC §6 | scripts/test_free_board.cjs、test_free_board_browser.cjs |
 | P1-26 | AI／Claude 公開內容探索、純文字閱讀與抓取驗收 | 程式完成／本機驗證 | Cloudflare 真實爬蟲事件需站長帳號驗收；不保證收錄 | SPEC §8 | scripts/test_ai_reading.py |
 | P1-25 | 免費二手入口、手機操作與同城分享 | 程式完成／本機驗證 | 正式發布及實機分享仍需驗收 | SPEC §7 | scripts/test_free_board_access.cjs、test_free_board_access_browser.cjs |
+| P1-27 | 新手任務入口、適用條件答案卡與無收入緩衝期 | 程式完成／本機驗證 | 正式發布待驗收；真人任務測試與推廣未執行 | SPEC §9、TASK_FIRST_ROLLOUT.md | scripts/test_task_answers.py、test_task_answers.cjs、test_task_answers_browser.cjs |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |

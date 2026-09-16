@@ -11,12 +11,15 @@ import struct
 import sys
 from pathlib import Path
 from ai_reading import build_assets, build_robots, decorate_page, reading_path
+from build_task_answers import load as load_task_answers
 
 
 ROOT = Path(__file__).resolve().parent.parent
+TASK_DATA = load_task_answers()
+TASK_PAGES = {"index.html"} | {a["href"].split("#", 1)[0] for a in TASK_DATA["answers"]}
 ORIGIN = "https://www.aussiewhvcompass.com"
 LAST_MODIFIED = "2026-09-02"
-ASSET_VERSION = "20260917-01"
+ASSET_VERSION = "20260917-02"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -64,6 +67,8 @@ RISK_LEVELS = {
 
 
 def page_modified(page: str) -> str:
+    if page in TASK_PAGES:
+        return TASK_DATA["updatedAt"]
     return "2026-09-16" if page in {"free.html", "index.html", "market.html", "leave.html", "about.html"} else LAST_MODIFIED
 
 
@@ -359,7 +364,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
 
     manifest = {
         "schemaVersion": 2,
-        "generatedAt": "2026-09-16",
+        "generatedAt": max("2026-09-16", TASK_DATA["updatedAt"]),
         "canonicalOrigin": ORIGIN,
         "siteEditorialStatus": "independent-open-source-community-guide",
         "isOfficialGovernmentService": False,
@@ -385,6 +390,11 @@ def build_content_status(page_sources: dict[str, str]) -> str:
             "english-fallback": "English fallback is shown because a reviewed translation is not available.",
         },
         "legacyFieldPolicy": "editorialStatus, evidenceStatus and evidenceCheckedAt are retained for compatibility; use pageReviewStatus and evidenceCard* fields for scope-aware status.",
+        "sectionAnswerRegistry": {
+            "url": f"{ORIGIN}/answers.json",
+            "scope": "Source/operation checks apply only to the named task card, not the entire page or an individual case.",
+            "reviewDuePolicy": "Editorial maintenance deadline, not a guarantee of unchanged rules; sourceCheckedAt is not automatically refreshed by a build.",
+        },
         "primaryPages": primary_pages,
         "fullEnglishGuides": full_english_guides,
         "quickStartCoverageVersion": data.get("version"),
