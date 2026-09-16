@@ -36,7 +36,7 @@ test('homepage entry is beside stages, before panels; the old duplicate is remov
 test('all language quick starts and full English pages have explicit Chinese-board links', () => {
   const walk = dir => fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => e.isDirectory() ? walk(path.join(dir,e.name)) : e.name.endsWith('.html') ? [path.join(dir,e.name)] : []);
   for (const file of walk(path.join(root,'lang'))) {
-    assert.match(fs.readFileSync(file,'utf8'), /href="\/free.html" hreflang="zh-Hant">Free items · 中文<\/a>/, file);
+    assert.match(fs.readFileSync(file,'utf8'), /href="\/free.html" hreflang="zh-Hant">Free items \(Chinese\)<\/a>/, file);
   }
 });
 test('context entry and both mobile targets exist without JS', () => {

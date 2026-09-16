@@ -144,7 +144,7 @@ def header(home_label: str = "Aussie WHV Compass") -> str:
   <nav class="nav-inner" aria-label="Primary">
     <a class="brand" href="/"><span class="logo" aria-hidden="true">A</span>{esc(home_label)}</a>
     <a class="language-hub-link" href="/lang/">All languages</a>
-    <a class="language-hub-link" href="/free.html" hreflang="zh-Hant">Free items · 中文</a>
+    <a class="language-hub-link" href="/free.html" hreflang="zh-Hant">Free items (Chinese)</a>
   </nav>
 </header>'''
 
