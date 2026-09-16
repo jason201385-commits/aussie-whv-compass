@@ -1,0 +1,112 @@
+name: Build and verify task-first answers
+on:
+  push:
+    branches: [feat/task-first-answers-20260917]
+    paths: [.github/workflows/assemble-task-first.yml]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TZ: Asia/Taipei
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Record original production baseline
+        run: |
+          mkdir -p /tmp/task-first-qa
+          git worktree add --detach /tmp/task-baseline ce0b8338b08f586b81d2e42d1e6778a717d27e47
+          set +e
+          (cd /tmp/task-baseline && pwsh -NoProfile -File scripts/check.ps1) > /tmp/task-first-qa/full-before.txt 2>&1
+          echo $? > /tmp/task-first-qa/full-before-exit.txt
+          exit 0
+      - name: Apply auditable source changes and generate all derived formats
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json
+          for path in sorted(Path('scripts').glob('task-first-*.patch')):
+              patch=path.read_text().replace('\n diff --git ', '\ndiff --git ')
+              subprocess.run(['git','apply','--recount','--whitespace=nowarn','-'],input=patch,text=True,check=True)
+          p=Path('answers.json');p.write_text(json.dumps(json.loads(p.read_text()),ensure_ascii=False,indent=2)+'\n')
+          for path in Path('.').rglob('*'):
+              if '.git' in path.parts or not path.is_file() or path.suffix not in ('.html','.js','.py','.mjs','.cjs','.json','.ps1'):continue
+              text=path.read_text(encoding='utf-8')
+              if '20260917-01' in text:path.write_text(text.replace('20260917-01','20260917-02'),encoding='utf-8',newline='\n')
+          p=Path('docs/DECISIONS.md');text=p.read_text()
+          assert 'D-2026-09-17-03' not in text
+          p.write_text(text+'\n\n## D-2026-09-17-03 — P1-27 新手任務答案與無收入緩衝\n\n站長授權「做吧」，本批只落地十個任務、同源編輯答案、城市正確落點與本機無收入情境試算；不是宣稱四週真人研究與推廣全部完成。官方來源與本卡核對範圍登記於 answers.json。TFN 與到職用途依 myGov 說明，薪資需按適用規範核對，不把順序或單一時薪套用所有情況。生成日不代替事實查核日，原整頁及證據卡查核狀態不提升。測試基線、瀏覽器結果及正式部署證據以本批 PR 與 CI artifact 為準。未邀訪真人、未發社群稿、未啟用追蹤或更動刊登權限。TASK_FIRST_ROLLOUT.md 提供未發布素材與自願測試模板。\n')
+          PY
+          python scripts/build_task_answers.py
+          python scripts/build_i18n.py
+          python scripts/build_search.py
+          python scripts/build_seo.py
+      - name: Verify scoped answers, privacy, arithmetic and generated parity
+        run: |
+          set -o pipefail
+          python scripts/build_task_answers.py --check
+          python scripts/build_i18n.py --check
+          python scripts/build_search.py --check
+          python scripts/build_seo.py --check
+          python scripts/test_task_answers.py 2>&1 | tee /tmp/task-first-qa/task-python.txt
+          python scripts/test_ai_reading.py 2>&1 | tee /tmp/task-first-qa/ai-python.txt
+          node --check assets/main.js
+          node --check assets/cash-runway.js
+          node --test scripts/test_task_answers.cjs scripts/test_free_board_access.cjs scripts/test_free_board.cjs scripts/test_map_postcode_regression.cjs | tee /tmp/task-first-qa/node-tests.txt
+          node scripts/test_analytics.cjs > /tmp/task-first-qa/analytics.txt
+          node scripts/test_housing_search.mjs
+          node scripts/test_job_router.mjs
+          node scripts/test_search.mjs
+          git diff --exit-code ce0b8338b08f586b81d2e42d1e6778a717d27e47 -- worker assets/api-config.js assets/analytics-config.js assets/tools.js assets/free-board.js .github/ISSUE_TEMPLATE
+      - name: Require no extra full-suite failures
+        run: |
+          set +e
+          pwsh -NoProfile -File scripts/check.ps1 > /tmp/task-first-qa/full-after.txt 2>&1
+          echo $? > /tmp/task-first-qa/full-after-exit.txt
+          set -e
+          python - <<'PY'
+          import pathlib,re,collections,json
+          p=pathlib.Path('/tmp/task-first-qa')
+          def fails(name):
+              text=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',p.joinpath(name).read_text())
+              return collections.Counter(x.strip() for x in text.splitlines() if x.strip().startswith('FAIL'))
+          old=fails('full-before.txt');new=fails('full-after.txt');extra=new-old
+          report={'before':dict(old),'after':dict(new),'extra':dict(extra),'beforeExit':p.joinpath('full-before-exit.txt').read_text().strip(),'afterExit':p.joinpath('full-after-exit.txt').read_text().strip()}
+          p.joinpath('baseline-comparison.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          assert not extra, json.dumps(dict(extra),ensure_ascii=False)
+          assert report['beforeExit']==report['afterExit'],'Unexpected exit difference'
+          print('No additional full-suite failure; baseline failures remain explicitly recorded.')
+          PY
+      - name: Install isolated browser dependency
+        run: |
+          npm install --prefix /tmp/task-browser playwright@1.55.0
+          /tmp/task-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Exercise new and existing desktop and mobile behavior
+        env:
+          NODE_PATH: /tmp/task-browser/node_modules
+          QA_DIR: /tmp/task-first-qa
+        run: |
+          node scripts/test_task_answers_browser.cjs
+          node scripts/test_free_board_access_browser.cjs
+          node scripts/test_free_board_browser.cjs
+      - name: Commit verified integration on feature branch only
+        run: |
+          test "$GITHUB_REF" = refs/heads/feat/task-first-answers-20260917
+          git rm scripts/task-first-*.patch .github/workflows/assemble-task-first.yml
+          git add -A
+          git diff --cached --stat > /tmp/task-first-qa/change-stat.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'feat(P1-27): integrate verified task answers and private cash runway'
+          git push origin HEAD:feat/task-first-answers-20260917
+          git rev-parse HEAD > /tmp/task-first-qa/commit.txt
+          git archive --format=tar HEAD > /tmp/task-first-qa/tested-source.tar
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: task-first-qa
+          path: /tmp/task-first-qa
+          retention-days: 7
