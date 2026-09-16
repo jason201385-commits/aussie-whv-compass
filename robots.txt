@@ -1,11 +1,32 @@
-# Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.
-User-agent: *
-Allow: /
+# Public guides are readable; this is not authentication or a training licence.
+# Claude-SearchBot = search; Claude-User = user-directed retrieval.
+# Training bots retain the existing wildcard crawl policy; training preferences are separate.
+
+User-agent: Claude-SearchBot
 Disallow: /api/
 Disallow: /admin/
 Disallow: /crm/
 Disallow: /contact/confirmation/
 Disallow: /contact/receipt/
 Disallow: /contact/delete/
+Allow: /
+
+User-agent: Claude-User
+Disallow: /api/
+Disallow: /admin/
+Disallow: /crm/
+Disallow: /contact/confirmation/
+Disallow: /contact/receipt/
+Disallow: /contact/delete/
+Allow: /
+
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Disallow: /crm/
+Disallow: /contact/confirmation/
+Disallow: /contact/receipt/
+Disallow: /contact/delete/
+Allow: /
 
 Sitemap: https://www.aussiewhvcompass.com/sitemap.xml

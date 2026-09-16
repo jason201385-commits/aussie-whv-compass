@@ -11,31 +11,48 @@
 ## 開始前
 
 - [自我釐清：我為什麼要去打工度假？](https://www.aussiewhvcompass.com/why.html): 用 2 分鐘快思測驗與慢想工作表，從自主動機、人生價值、現實準備與支持底線釐清澳洲打工度假。答案只存在自己的瀏覽器。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/why.md)
 - [簽證與集簽：417 一簽、二簽、三簽官方查核入口](https://www.aussiewhvcompass.com/visa.html): 台灣人申請澳洲打工度假簽證（417）2026 現行規則：費用、申請流程、二簽三簽的 88/179 天指定工作怎麼算、哪些產業地區可以集簽、怎麼保存證據與保護自己。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/visa.md)
 - [行前準備與落地 SOP](https://www.aussiewhvcompass.com/prep.html): 澳洲打工度假行前時間軸、行李帶什麼不帶什麼、落地 72 小時、第一週三大號（銀行、TFN、super）的正確順序——照著做就不會卡關。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/prep.md)
 - [澳洲打工度假模擬器：抵澳 30 天](https://www.aussiewhvcompass.com/simulator.html): 先用 5 分鐘建立角色，再走過抵澳 30 天的住宿、求職、薪資、健康與預算情境；每一步都能回到官方來源與安全下一步。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/simulator.md)
 
 ## 在澳洲生活與工作
 
 - [物價與薪水：帶多少錢、賺多少錢？](https://www.aussiewhvcompass.com/cost.html): 澳洲打工度假 2026-08 查核：最低時薪、WHM 稅率、房租交通參考，以及 Perth 省錢採買、簡易食譜、二手衣與安全買車入口。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/cost.md)
 - [住宿與租屋：找房、押金、Share House 生存](https://www.aussiewhvcompass.com/housing.html): 澳洲打工度假住宿與租屋入口：先選短住、Share House、正式整租或偏鄉住宿，再開最相關的平台，並依房屋所在地查 bond、inspection 與退租規則。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/housing.md)
 - [離澳出清 × 初登澳補給站](https://www.aussiewhvcompass.com/market.html): 澳洲打工度假二手交換工具：產生離澳出清或初登澳徵求文案，安全開啟第三方平台，並在交易前完成詐騙、商品安全與私人交易權利檢查。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/market.md)
 - [離澳免費二手版](https://www.aussiewhvcompass.com/free.html): 離澳免費贈送看板：依城市與分類找生活用品，預覽刊登草稿，再到 GitHub 公開送出。本站顯示須經審核，不收訂金或運費。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/free.md)
 - [工作機會在哪裡？求職管道、雇主查核與證照](https://www.aussiewhvcompass.com/work.html): 澳洲打工度假找工作：官方採收月份、四季可能職缺、較適合與高風險的抵達時機，並整理求職管道、雇主查核、薪資權益與常見證照。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/work.md)
 - [集簽透明地圖：指定工作地區與採收月份](https://www.aussiewhvcompass.com/map.html): 用官方指定工作郵遞區號與州政府採收月份，視覺化查看澳洲打工度假二簽／三簽可能地區。永久免費、可回查來源，不蒐集雇主名單。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/map.md)
 - [常見詐騙手法：認手法，不認名字](https://www.aussiewhvcompass.com/scam.html): 澳洲打工度假常見詐騙與剝削手法：先付錢才有工作、賣 88 天、假房東、假移民局電話、黑工假承攬，並依情境整理官方求助入口。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/scam.md)
 - [英文不好怎麼辦？](https://www.aussiewhvcompass.com/english.html): 澳洲打工度假的英文解方：出發前免費自學資源、抵澳後的免費會話班與語言交換、各類工作實際需要的英文程度。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/english.md)
 - [保險、就醫、心理與安全](https://www.aussiewhvcompass.com/health.html): 台灣人在澳洲不能用 Medicare：保險怎麼買（旅平險 vs OVHC、體力勞動除外條款）、就醫分流、心理健康資源、女性安全與職場性騷擾申訴、行車安全。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/health.md)
 - [各地社團目錄：依地區與需求找公開入口](https://www.aussiewhvcompass.com/communities.html): 依地區與需求查詢澳洲打工度假的公開社群入口。高風險需求只提供平台搜尋轉接，不列特定社團；本站不經營、不管理、不背書任何社群，也不代為聯繫。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/communities.md)
 
 ## 離開或留下
 
 - [報稅、退休金與離澳](https://www.aussiewhvcompass.com/leave.html): 澳洲打工度假的報稅查核入口、super 帳戶管理、DASP 申請與扣繳估算、離澳 checklist 及回台職涯銜接。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/leave.md)
 - [如果想長期留澳：PR 公開路徑與官方查核入口](https://www.aussiewhvcompass.com/pr.html): 整理雇主擔保、DAMA、技術移民與畢業後簽證的官方入口、必要查核項目與限制；不替個人推薦路徑或預測簽證結果。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/pr.md)
 
 ## 關於與合作
 
 - [關於本站・資料來源・聯絡](https://www.aussiewhvcompass.com/about.html): 了解澳打指南針如何區分官方資料、本站編輯整理與社群第一手回報，以及如何回報錯誤、分享經驗或聯絡站長。
+  - [本頁 Markdown](https://www.aussiewhvcompass.com/ai/about.md)
 
 ## 使用與授權
 
@@ -55,3 +72,22 @@
 - [English healthcare, insurance and personal-safety guide](https://www.aussiewhvcompass.com/lang/en/health/): Medicare and visitor-cover checks, care routing, medicines, workplace injury, mental-health and violence-support contacts; editorial beta, not medical, insurance, legal or emergency advice.
 - 文字內容採 CC BY-SA 4.0；程式碼採 MIT。轉載或改作時請註明澳打指南針與原頁網址，並遵守相同方式分享的授權條件。
 - 不要把社群經驗、估算值或互動工具輸出描述成官方判定；請保留頁面上的查核日期與限制。
+
+
+## 純文字閱讀與機器索引
+
+- [首頁 Markdown](https://www.aussiewhvcompass.com/ai/index.md): 主頁公開內容的靜態閱讀版本。
+- [逐頁與段落索引 JSON](https://www.aussiewhvcompass.com/ai-index.json): 原頁、語言、段落連結、來源連結、審校範圍與內容雜湊。
+- [公開攻略合併文字](https://www.aussiewhvcompass.com/llms-full.txt): 繁中主頁與完整英文攻略的閱讀摘錄；建議先讀單頁，避免載入不相關內容。
+- 純文字由公開 HTML 自動產生，不是另一套改寫內容；沒有表單、個資、動態二手刊登或試算結果。
+- 來源查核日期沿用原頁，匯出不代表重新查核；Markdown 只是補充格式，不保證任何 AI 收錄或引用。
+
+### Full English reading copies
+
+- [visa (Markdown)](https://www.aussiewhvcompass.com/ai/en/visa.md): static reading copy; original English guide and official sources govern.
+- [prep (Markdown)](https://www.aussiewhvcompass.com/ai/en/prep.md): static reading copy; original English guide and official sources govern.
+- [cost (Markdown)](https://www.aussiewhvcompass.com/ai/en/cost.md): static reading copy; original English guide and official sources govern.
+- [housing (Markdown)](https://www.aussiewhvcompass.com/ai/en/housing.md): static reading copy; original English guide and official sources govern.
+- [work (Markdown)](https://www.aussiewhvcompass.com/ai/en/work.md): static reading copy; original English guide and official sources govern.
+- [scam (Markdown)](https://www.aussiewhvcompass.com/ai/en/scam.md): static reading copy; original English guide and official sources govern.
+- [health (Markdown)](https://www.aussiewhvcompass.com/ai/en/health.md): static reading copy; original English guide and official sources govern.

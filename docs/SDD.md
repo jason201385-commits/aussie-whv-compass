@@ -316,3 +316,8 @@ inline link 持續顯示底線，不只靠顏色辨識；官方來源連結必�
 ## 7. 公開贈送看板增補（P1-24）
 
 站長在 2026-09-16 明確要求新增「離澳免費二手版」，沿用已授權 repo 部署。此功能例外允許使用者在明示同意後自行向 GitHub 公開刊登，不擴張 Worker／CRM 資料範圍；表單未確認前仍只在本機。新增 `free.html`、`assets/free-board.js`、`assets/free-board.css` 與 GitHub Issue template。GitHub 公開 API 是由使用者按鈕啟動的第三方連線，不傳送篩選字詞或憑證，GA4 排除此頁。行為見 SPEC §6，站長決策見 DECISIONS D-2026-09-16-01。
+
+
+## AI 閱讀衍生格式（P1-26）
+
+靜態 HTML 仍為唯一內容來源，既有 SEO 產生器同時匯出明列白名單頁面的閱讀副本，不引入網站執行時建置、RAG、外部模型或資料庫。`scripts/ai_reading.py` 使用 Python 標準庫；`scripts/test_ai_reading.py` 驗證同源、來源與隱私排除。`ai-index.json` 提供來源網址、語言、段落與 SHA-256，不增加第三方追蹤。

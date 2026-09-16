@@ -1,0 +1,24 @@
+name: AI discovery consistency
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  offline-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check generated files without modifying content
+        run: |
+          python scripts/build_seo.py --check
+          python scripts/build_i18n.py --check
+          python scripts/build_search.py --check
+      - name: Verify public-only reading copies and source links
+        run: python scripts/test_ai_reading.py
+      - name: Preserve existing board and map behavior
+        run: node --test scripts/test_free_board_access.cjs scripts/test_free_board.cjs scripts/test_map_postcode_regression.cjs
