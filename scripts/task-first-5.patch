@@ -1,0 +1,8 @@
+diff --git a/scripts/check.ps1 b/scripts/check.ps1
+--- a/scripts/check.ps1
++++ b/scripts/check.ps1
+@@ -3488,3 +3488,3 @@
+-foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
++foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '比較住得起、到得了、做得來', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
+   if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
+ }
