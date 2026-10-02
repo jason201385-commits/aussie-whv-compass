@@ -14,8 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://www.aussiewhvcompass.com"
-LAST_MODIFIED = "2026-09-12"
-ASSET_VERSION = "20260912-03"
+LAST_MODIFIED = "2026-10-02"
+ASSET_VERSION = "20261002-01"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -38,6 +38,7 @@ PAGES = [
     "leave.html",
     "pr.html",
     "communities.html",
+    "news.html",
     "about.html",
 ]
 
@@ -57,6 +58,7 @@ RISK_LEVELS = {
     "prep.html": "medium",
     "simulator.html": "medium",
     "why.html": "medium",
+    "news.html": "medium",
 }
 
 
@@ -210,7 +212,7 @@ def build_sitemap() -> str:
 def build_llms(page_sources: dict[str, str]) -> str:
     groups = [
         ("開始前", ["why.html", "visa.html", "prep.html", "simulator.html"]),
-        ("在澳洲生活與工作", ["cost.html", "housing.html", "market.html", "work.html", "map.html", "scam.html", "english.html", "health.html", "communities.html"]),
+        ("在澳洲生活與工作", ["news.html", "cost.html", "housing.html", "market.html", "work.html", "map.html", "scam.html", "english.html", "health.html", "communities.html"]),
         ("離開或留下", ["leave.html", "pr.html"]),
         ("關於與合作", ["about.html"]),
     ]
@@ -388,13 +390,14 @@ def build_crawler_policy() -> str:
             "## Public guide content",
             "",
             "Public HTML guide pages, llms.txt, sitemap.xml, content-status.json and third-party-register.json may be discovered, indexed, summarised and reasonably cited.",
+            "The read-only public endpoint https://api.aussiewhvcompass.com/api/news may be fetched at a reasonable rate for verified official-news metadata. Preserve each item's original source URL and verification timestamp; do not imply the endpoint covers all Australian news.",
             "Keep the canonical page URL, visible source dates, editorial status and uncertainty boundaries with any summary or citation.",
             "Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.",
             "Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.",
             "",
             "## Non-content and personal-data boundaries",
             "",
-            "Do not submit or automate forms, create cases, enumerate identifiers, or crawl API, admin, CRM, confirmation, receipt or deletion endpoints.",
+            "Do not submit or automate forms, create cases, enumerate identifiers, or crawl any API other than the public GET /api/news endpoint; admin, CRM, confirmation, receipt and deletion endpoints remain non-content.",
             "Do not collect form-submitted email addresses, form responses, case records, tokens or other personal data even if a future application error exposes them.",
             "The public robots.txt disallows these route families. Absence of a disallow rule never grants access to authenticated, private or personal data.",
             "",
@@ -415,6 +418,7 @@ def expected_files() -> dict[Path, str]:
         "# Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.\n"
         "User-agent: *\n"
         "Allow: /\n"
+        "Allow: /api/news\n"
         "Disallow: /api/\n"
         "Disallow: /admin/\n"
         "Disallow: /crm/\n"

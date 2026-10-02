@@ -1,6 +1,6 @@
 # 澳打指南針 — 現況行為契約（SPEC）
 
-> 版本 2.0｜最後更新 2026-09-12｜本文件只寫「現在的行為是什麼、怎麼驗證」。
+> 版本 2.0｜最後更新 2026-10-02｜本文件只寫「現在的行為是什麼、怎麼驗證」。
 > 待辦與狀態在 `ROADMAP.md`，為什麼與證據在 `DECISIONS.md`，原則與架構在 `SDD.md`，
 > 閱讀路線在 `README.md`。改動任何功能行為時，必須在同一個 commit 更新本文件對應列並更新標頭日期。
 
@@ -23,11 +23,11 @@
 
 ## 1. 現況基線（＝驗收基線）
 
-### 1.1 頁面清單（根層 15 頁＋404）
+### 1.1 頁面清單（根層 18 頁＋404）
 
 | 檔案 | 旅程階段 | 內容 | 問題入口 | 證據卡 |
 |---|---|---|---|---|
-| `index.html` | 入口 | 安全列（5 個直達連結）、緊湊 hero（問句 h1）、釐清器（4 階段 × 護照 radiogroup × 需求 → 21 個出口；462 摘要卡）、6 題找職類、搜尋（8 個錨點 chip、查詢改寫）、AI 兜底（未啟用）、三張入口卡（社團目錄、工具箱、續讀／收藏）、社團目錄、遊戲區、頁尾承諾一行 | — | — |
+| `index.html` | 入口 | 安全列（5 個直達連結）、緊湊 hero（問句 h1）、釐清器（4 階段 × 護照 radiogroup × 需求 → 21 個出口；462 摘要卡）、6 題找職類、搜尋（8 個錨點 chip、查詢改寫）、AI 兜底、四張入口卡（新聞、社團目錄、工具箱、續讀／收藏）、社團目錄、遊戲區、頁尾承諾一行 | — | — |
 | `why.html` | 還在考慮 | 自我釐清快思測驗＋慢想工作表 | 有 | — |
 | `visa.html` | 還在考慮 | 簽證與集簽＋郵遞區號初篩 | 有 | 有 |
 | `prep.html` | 決定要去 | 行前準備與落地 SOP＋互動清單＋行前海報 | 有 | — |
@@ -42,6 +42,7 @@
 | `leave.html` | 回程與延續 | 報稅退休金離澳＋DASP 粗估＋離澳收尾清單 | 有 | 有 |
 | `market.html` | 回程與延續／初登澳 | 離澳出清 × 初登澳補給：交換草稿產生器與平台入口 | 有 | 有 |
 | `communities.html` | 落地後找人 | 各地社團目錄：地區 × 需求的公開入口；不進全站 nav（同工具頁規則） | 有 | 有 |
+| `news.html` | 全階段 | 今天／本週／本月的官方消息；關鍵字優先、每則回鏈來源；不進全站 nav | — | — |
 | `pr.html` | 已在澳洲 | PR 路徑總覽 | 有 | 有 |
 | `about.html` | 回程與延續（旅程第 12 站） | 關於、資料分層、回報、私人需求單、自願找路測試、共編、合作治理、贊助、授權、免責 | — | — |
 | `404.html` | 復原 | noindex；保留導覽與四階段旅程復原入口 | — | — |
@@ -50,7 +51,7 @@
   housing → work → scam → pr（已在澳洲）→ leave → about（回程與延續）；`index`、`simulator`、`market` 不在線性順序內。
   上表「旅程階段」欄以此為準。
 - 每頁：toc（長頁為「完整內容與參考資料」）、來源標註、頁尾免責、回饋列。
-- 導覽：內容頁 `.nav-links` 統一 12 連結（why→about）。`simulator.html`、`market.html`、`communities.html` 與 `map.html` 是工具頁，不進全站 nav、頁內不標 `aria-current`（站長 2026-09-02 決定；`map.html` 從簽證頁、找工作頁與首頁內文進入，`check.ps1` 強制）。
+- 導覽：內容頁 `.nav-links` 統一 12 連結（why→about）。`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，不進全站 nav、頁內不標 `aria-current`（`news.html` 從首頁入口卡與搜尋進入，`check.ps1` 強制）。
 - 內容基準日 2026-08-28／29；換匯段落 2026-09-01 查核。
 
 ### 1.2 互動工具契約
@@ -82,6 +83,7 @@
 | 6 題找職類 | 首頁 `#job-quiz`（由 `#job-quiz` hash 開啟；靜態六大類清單無 JS 可用） | 6 題各 3 個 chips：工作地點、體力、英文口說、互動程度、證照意願、偏遠意願 | 純前端計分到六大職類（採收與農場／餐飲與服務／清潔與房務／工廠倉儲與物流／零售與門市／辦公與專業）；答案不保存 | 職類結果＋`work.html` 錨點連結 | check.ps1 首頁區塊；vm 煙霧測試 78 斷言（暫存區，未入 repo） |
 | 各地社團目錄（首頁快覽） | 首頁 `#communities` | 地點搜尋框（60 字）、平台 select（全部／LINE／Reddit）、9 格州別地圖鈕、清除 | `main.js` 只在當頁過濾 `data-community-*` 條目；Facebook／Reddit 平台搜尋 href 由輸入或州名 `encodeURIComponent` 組成；不寫 storage、不 fetch；9 個公開入口（1 LINE＋8 Reddit）皆登錄 `third-party-register.json` | 過濾後清單＋狀態文字＋空結果提示＋兩個平台搜尋鈕 | check.ps1「商業合作與第三方入口」區塊（LINE 邀請連結全站只在首頁）；篩選邏輯無自動測試（人工） |
 | 各地社團目錄（完整頁，P1-21） | `communities.html`；入口為首頁入口卡與 21 個釐清器出口的「看公開討論」（帶 `?need=`） | 8 州＋全部地區 chips × 12 需求 chips；`?region=&need=` 可直接預套 | `community-directory.json` 是單一事實來源，HTML 是手寫鏡像，`check.ps1` 比對 id／entryType／到期日／入口網址；風險分級決定入口型態——`high-risk-intermediary`（找工作、租屋、集簽情報）永遠只有平台搜尋或說明卡，不得直連；`main.js` 只讀 `URLSearchParams`，不寫 storage、不改網址、不 fetch；平台搜尋依所選地區改寫查詢字串並顯示給使用者看 | 卡片含平台／入口型態／風險等級標籤、風險提示、邊界句、查核日與到期日；空結果提示 | check.ps1「社團目錄（P1-21）」區塊 7 項；到期的直連若仍出現 `entryUrl` 即 FAIL |
+| 自動核對新聞（P1-25） | `news.html`＋`assets/news.js`；`GET /api/news` | 今天／本週／本月、固定主題 chips；URL query 只接受 `window=day|week|month` 與白名單 topic；同一則消息可屬多個固定主題 | Worker 每 6 小時讀固定官方 feed；項目需同時通過官方來源白名單、HTTPS 原文同網域、日期合理、原文 HTML 可取、標題相符度至少 0.6 才寫 D1 公開表；不儲存未核對全文、不用 AI 摘要或自由分類；來源失敗保留狀態且不把空結果說成無新聞；前端只用 `textContent`／DOM API，`credentials:omit`、`no-referrer`、不寫 storage；`/robots.txt` 只開放此公開 read-only endpoint，其他 API 禁止爬取 | 每則最多 5 個固定關鍵字、一句 feed 摘要、官方原文、發布時間、核對時間；來源最近同步狀態；最多 40 則 | `worker/test/news.test.ts` 8 案例＋`scripts/test_news_ui.mjs`；check.ps1「自動核對新聞（P1-25）」；尚未部署時不得宣稱已自動更新 |
 | AI 兜底（C-4） | **全站**：首頁 `#assist`（釐清器與搜尋之後）內嵌；其餘根層頁面由 `main.js` 注入同一份標記到 `#assist-dialog`，元素 id 相同故邏輯共用一份。導覽列「問 AI」入口只在 `assistSettings()` 為真時建立，排在搜尋鈕之後。`lang/` 不載入 `main.js`，不受影響 | 一句話 4–200 字＋Turnstile | 只在 `apiBaseUrl` 與 `turnstileSiteKey` 都非空時渲染表單，否則只顯示「站內 AI 兜底尚未啟用」；送出前顯示第三方揭露（MiniMax、本站不保存、供應商可能依其條款處理）；`POST /api/assist` `{question, turnstileToken}`，`credentials: omit`、`no-referrer`；模型只回傳站內目錄連結，答案由伺服端固定模板組成（模型文字永不渲染）；回覆以 `textContent` 渲染，連結只接受同站白名單；任何錯誤 fail closed 顯示固定文案 | kind：`answer`（固定模板＋目錄連結）／`official_exit`（敏感輸入或個人判定類問題）／`over_cap`／`refused`；前端另以 429 回應的 `error.code` 區分 `rate_limited`（稍等再試）與 `assist_daily_cap`（額度用完） | check.ps1 首頁區塊（`#assist` 預設 hidden、origin 空時無 fetch）、全域區塊（注入版含 13 個相同元素、站內連結必須帶 `index.html`、導覽鈕以 `assistSettings()` 為條件）與 worker 區塊（assist.ts 禁 `console.`）；`worker/test/assist.test.ts` 19 案例（含 red-team 分流對照表、console spy、主機白名單、缺 IP）；2026-09-04 已上線（D-2026-09-04-01、D-2026-09-04-07） |
 | 全站搜尋（P0-9） | header 搜尋鈕＋首頁 `#search`（h2「卡片裡沒有你的說法？直接搜尋」）＋JS dialog；手機釐清器底部固定「搜尋」鈕 | 關鍵詞；8 個熱門 chip 皆為 `<a href>` 直接綁錨點（`work.html#verify`、`visa.html#counting`、`housing.html#bond`、`prep.html#first-week`、`english.html#reality`、`cost.html#budget`、`lang/en/visa/#choose`、`health.html#insurance`；首頁與 dialog 一致，無 JS 可點）；鍵盤 `/` | 首次使用才載入 `search-index.js`（頁數與入口數以 `scripts/build_search.py` 的 `ALL_PAGES` 與產物 `entries` 為準；含 `lang/en/visa/` 與 21 個出口卡 `data-search-entry`）；查詢改寫：NFKC → 去疑問詞／語助詞（`SEARCH_STOP_WORDS`）後 AND 比對 → 仍零結果才二字詞 OR 降級（命中過半）並標示「已用相近詞找」；原詞 1.0、同義詞（索引 `keywords`，48 題意圖表）0.7；排除 `hidden`、`data-search-ui` 與未啟用 UI；不保存、不送出；動態文字只用 `textContent` | 最多 8 個同站深連結；零結果依序：釐清器 4 階段 chip → 安全列入口 → 只揭露「問一次 AI」按鈕（不自動開啟、不移焦點、不載入 Turnstile）→ GitHub 連結最後 | `python scripts/build_search.py --check` 與 `node scripts/test_search.mjs`（10 句零結果數 0、指定第 1 名、不回歸集；皆由 check.ps1 執行）；check.ps1「站內搜尋」「P0-9 搜尋強化」區塊；索引大小前後見 DECISIONS D-2026-09-03-02 |
 | 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；7 個完整英文頁為 editorial beta，未經母語專業校對不得標 reviewed | `python scripts/build_i18n.py --check`；check.ps1 七個「完整英文…頁」區塊 |
@@ -170,7 +172,7 @@ label「需要查證」）＋`idea.yml`（許願池）＋`thanks.yml`（公開�
 powershell -File scripts/check.ps1
 ```
 
-`scripts/check.ps1` 全部通過輸出 `ALL CHECKS PASSED (15 pages)` 並以 0 結束。它涵蓋：
+`scripts/check.ps1` 全部通過輸出 `ALL CHECKS PASSED (18 pages)` 並以 0 結束。它涵蓋：
 
 1. 結構＋內部連結＋錨點＋nav 數量（12／13 例外寫死）、canonical／og:url／sitemap／robots 鎖定正式網域、
    404 契約、唯一 h1／main、`zh-Hant`、viewport、ID 不重複、`noopener`、`button type`、skip link、

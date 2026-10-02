@@ -1,6 +1,7 @@
 # Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.
 User-agent: *
 Allow: /
+Allow: /api/news
 Disallow: /api/
 Disallow: /admin/
 Disallow: /crm/

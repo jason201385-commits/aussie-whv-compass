@@ -1,6 +1,6 @@
 # 澳打指南針 — 路線圖與待辦狀態（ROADMAP）
 
-> 版本 2.0｜最後更新 2026-09-12｜這是全部 P0／P1／P2 編號的**唯一來源**。
+> 版本 2.0｜最後更新 2026-10-02｜這是全部 P0／P1／P2 編號的**唯一來源**。
 > 任何規格檔（`SPEC.md`、`PERFORMANCE_AND_RETENTION_SPEC.md`、`CLARIFIER_SPEC.md`）
 > 只能引用這裡已存在的 ID；新增 ID 先在本表登記，`scripts/check.ps1` 會檢查。
 > 狀態敘述與證據不寫在這裡，寫在 `DECISIONS.md`，本表只留一行狀態與指標。
@@ -56,6 +56,7 @@
 | P1-22 | 釐清器與 AI 兜底指標（D+ 白名單擴充、GA4 事件表、判讀規則） | 未開始 | P0-3（CWA token、GA4 ID）與 P0-4（D+ 部署） | OPTIMIZATION_PLAN.md | D-2026-09-02-06 |
 | P1-23 | AI 兜底正式啟用（第一階段 links-only；intent 待命中率達標再重啟） | 已上線（2026-09-04） | red-team 驗收與命中率觀察仍待做 | OPTIMIZATION_PLAN.md、worker/README.md | D-2026-09-02-05、D-2026-09-02-06、D-2026-09-04-01 |
 | P1-24 | 常見問題研究與情境模擬器 v2 | 本機完成（研究、互動實作、程式回放、桌機／390px 瀏覽器 E2E） | 正式站回放須等本輪部署後執行 | WHV_COMMON_PROBLEMS_RESEARCH.md、SPEC §1.2 | D-2026-09-12-01～03 |
+| P1-25 | 官方消息自動核對與關鍵字新聞區 | 程式完成／本機驗證 | 正式 D1 0004–0005、Worker Cron/API 與前端須協調部署；部署後做來源同步與 live 回放 | SPEC §1.2、SDD §3.1 | D-2026-10-02-01 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |

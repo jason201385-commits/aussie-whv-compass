@@ -96,10 +96,11 @@ describe("verified official news", () => {
     const irrelevant = classifyNews(source, "Annual office report", "A review of internal governance");
 
     expect(relevant).toMatchObject({ relevant: true, primaryTopic: "work" });
+    expect(relevant.topics).toEqual(["work", "money", "safety"]);
     expect(relevant.keywords).toContain("工作");
     expect(relevant.keywords).toContain("Scamwatch");
     expect(relevant.keywords.length).toBeLessThanOrEqual(5);
-    expect(irrelevant).toEqual({ relevant: false, primaryTopic: "general", keywords: [] });
+    expect(irrelevant).toEqual({ relevant: false, primaryTopic: "general", topics: [], keywords: [] });
   });
 
   it("requires the original article page to substantially match the feed title", () => {
@@ -155,6 +156,27 @@ describe("verified official news", () => {
     expect(body.sources.every((source) => source.status === "healthy")).toBe(true);
   });
 
+  it("returns a story through every matched topic instead of only its primary topic", async () => {
+    await syncOfficialNews(env.DB, { newsFetch: successfulNewsFetch, now: () => fixedNow });
+    const app = createApp({ now: () => fixedNow });
+    const ctx = createExecutionContext();
+    const response = await app.fetch(
+      new Request("https://api.example.test/api/news?window=month&topic=safety"),
+      env as unknown as AppEnv,
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    const body = await response.json<{ items: Array<{ title: string; primaryTopic: string; topics: string[] }> }>();
+
+    expect(response.status).toBe(200);
+    const jobScam = body.items.find((item) => item.title === SOURCE_FIXTURES.scamwatch?.title);
+    expect(jobScam).toMatchObject({
+      title: SOURCE_FIXTURES.scamwatch?.title,
+      primaryTopic: "work",
+      topics: ["work", "money", "safety"],
+    });
+  });
+
   it("rejects unsupported window and topic values", async () => {
     const app = createApp({ now: () => fixedNow });
     for (const query of ["window=year", "window=day&topic=politics"]) {
@@ -167,5 +189,18 @@ describe("verified official news", () => {
       await waitOnExecutionContext(ctx);
       expect(response.status).toBe(400);
     }
+  });
+
+  it("publishes a robots exception only for the read-only news endpoint", async () => {
+    const app = createApp({ now: () => fixedNow });
+    const ctx = createExecutionContext();
+    const response = await app.fetch(
+      new Request("https://api.example.test/robots.txt"),
+      env as unknown as AppEnv,
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(response.status).toBe(200);
+    await expect(response.text()).resolves.toBe("User-agent: *\nAllow: /api/news\nDisallow: /\n");
   });
 });

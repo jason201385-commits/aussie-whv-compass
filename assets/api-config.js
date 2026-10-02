@@ -13,6 +13,8 @@
     contactSubmitEnabled: false,
     // D+ 匿名彙總量測仍未啟用（P1-22）。
     dplusMetricsEnabled: false,
-    accommodationSearchEnabled: false
+    accommodationSearchEnabled: false,
+    // 新聞只讀 API：正式部署必須與 0004_verified_news migration 和 Worker 排程同批上線。
+    newsEnabled: true
   });
 })();

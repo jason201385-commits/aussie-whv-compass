@@ -132,16 +132,18 @@ export function parseOfficialFeed(xml: string, source: NewsSource, now: Date): P
 export function classifyNews(source: NewsSource, title: string, summary: string): {
   relevant: boolean;
   primaryTopic: NewsTopic;
+  topics: NewsTopic[];
   keywords: string[];
 } {
   const text = compact(`${title} ${summary}`);
-  if (!source.relevancePattern.test(text)) return { relevant: false, primaryTopic: "general", keywords: [] };
+  if (!source.relevancePattern.test(text)) return { relevant: false, primaryTopic: "general", topics: [], keywords: [] };
   const matched = TOPIC_RULES.filter((rule) => rule.pattern.test(text));
   const primary = matched[0] ?? { id: "general" as const, label: "生活情報", pattern: /$^/ };
+  const topics = matched.length > 0 ? matched.map((rule) => rule.id) : [primary.id];
   const labels = [primary.label, ...matched.slice(1).map((rule) => rule.label)];
   labels.push(source.jurisdiction === "VIC" ? "VIC" : "全澳");
   labels.push(source.name);
-  return { relevant: true, primaryTopic: primary.id, keywords: [...new Set(labels)].slice(0, 5) };
+  return { relevant: true, primaryTopic: primary.id, topics: [...new Set(topics)], keywords: [...new Set(labels)].slice(0, 5) };
 }
 
 async function readBoundedResponse(response: Response, maxBytes: number): Promise<string> {
@@ -293,6 +295,7 @@ async function syncOneSource(
         sourceContentHash: evidence.hash,
         keywords: candidate.classification.keywords,
         primaryTopic: candidate.classification.primaryTopic,
+        topics: candidate.classification.topics,
         jurisdiction: source.jurisdiction,
       });
       base.verifiedCount += 1;
@@ -381,6 +384,7 @@ export async function getVerifiedNews(request: Request, db: D1Database, now = ne
       publishedAt: item.publishedAt,
       keywords: item.keywords,
       primaryTopic: item.primaryTopic,
+      topics: item.topics,
       jurisdiction: item.jurisdiction,
       source: { id: item.sourceId, name: item.sourceName, feedUrl: item.feedUrl },
       verification: {

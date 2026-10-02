@@ -79,7 +79,15 @@ function createFetchHandler(dependencies: AppDependencies) {
       }
 
       let response: Response;
-      if (request.method === "GET" && url.pathname === "/api/health") {
+      if (request.method === "GET" && url.pathname === "/robots.txt") {
+        response = new Response("User-agent: *\nAllow: /api/news\nDisallow: /\n", {
+          headers: {
+            "Cache-Control": "public, max-age=86400",
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-Content-Type-Options": "nosniff",
+          },
+        });
+      } else if (request.method === "GET" && url.pathname === "/api/health") {
         response = jsonResponse({
           ok: true,
           service: "aussie-whv-compass-api",

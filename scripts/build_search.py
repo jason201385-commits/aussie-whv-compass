@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
-VERSION = "2026-09-03"
+VERSION = "2026-10-02"
 # P0-9 驗收 8：索引檔大小增加不得超過改版前（178,908 bytes）的 30%。
 MAX_INDEX_BYTES = 232580
 INACTIVE_UI_SENTINELS = {
@@ -51,6 +51,7 @@ PAGES = [
     "leave.html",
     "pr.html",
     "communities.html",
+    "news.html",
     "about.html",
     "index.html",
 ]
@@ -75,6 +76,7 @@ ALIASES = {
     "leave.html": "回台 離澳 報稅 tax 退休金 super DASP 退租 清單",
     "pr.html": "永居 移民 PR 雇主擔保 技術移民 留澳",
     "communities.html": "社團 社群 群組 找人 line facebook reddit 在地 認識 朋友 公開討論 微信",
+    "news.html": "新聞 消息 最新 今天 本週 本月 工作 租屋 防詐 健康 官方 來源 關鍵字",
     "about.html": "關於 合作 幫忙 聯絡 email 需求單 贊助 授權 免責 回饋",
     "lang/en/visa/index.html": "462 中國 大陸 抽籤 名額 Work and Holiday 學歷 英文",
 }

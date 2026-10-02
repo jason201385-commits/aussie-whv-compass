@@ -13,6 +13,7 @@ export interface VerifiedNewsRecord {
   sourceContentHash: string;
   keywords: readonly string[];
   primaryTopic: string;
+  topics: readonly string[];
   jurisdiction: string;
 }
 
@@ -47,6 +48,7 @@ export interface StoredNewsItem {
   sourceContentHash: string;
   keywords: string[];
   primaryTopic: string;
+  topics: string[];
   jurisdiction: string;
 }
 
@@ -69,8 +71,8 @@ export async function upsertVerifiedNews(db: D1Database, record: VerifiedNewsRec
         news_id, source_id, source_name, title, summary, source_url, feed_url,
         published_at, fetched_at, verified_at, verification_method,
         title_match_score, source_content_hash, keywords_json, primary_topic,
-        jurisdiction, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'official-feed+source-page', ?, ?, ?, ?, ?, ?, ?)
+        topics_json, jurisdiction, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'official-feed+source-page', ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(source_url) DO UPDATE SET
         source_name = excluded.source_name,
         title = excluded.title,
@@ -83,6 +85,7 @@ export async function upsertVerifiedNews(db: D1Database, record: VerifiedNewsRec
         source_content_hash = excluded.source_content_hash,
         keywords_json = excluded.keywords_json,
         primary_topic = excluded.primary_topic,
+        topics_json = excluded.topics_json,
         jurisdiction = excluded.jurisdiction,
         updated_at = excluded.updated_at`,
     )
@@ -101,6 +104,7 @@ export async function upsertVerifiedNews(db: D1Database, record: VerifiedNewsRec
       record.sourceContentHash,
       JSON.stringify(record.keywords),
       record.primaryTopic,
+      JSON.stringify(record.topics),
       record.jurisdiction,
       record.fetchedAt,
       record.fetchedAt,
@@ -203,17 +207,17 @@ export async function listVerifiedNews(
   topic: string | null,
   limit: number,
 ): Promise<StoredNewsItem[]> {
-  const topicClause = topic === null ? "" : " AND primary_topic = ?";
+  const topicClause = topic === null ? "" : " AND topics_json LIKE ?";
   const statement = db.prepare(
     `SELECT news_id, source_id, source_name, title, summary, source_url, feed_url,
             published_at, verified_at, title_match_score, source_content_hash,
-            keywords_json, primary_topic, jurisdiction
+            keywords_json, primary_topic, topics_json, jurisdiction
      FROM news_items
      WHERE published_at >= ?${topicClause}
      ORDER BY published_at DESC, news_id ASC
      LIMIT ?`,
   );
-  const bound = topic === null ? statement.bind(startAt, limit) : statement.bind(startAt, topic, limit);
+  const bound = topic === null ? statement.bind(startAt, limit) : statement.bind(startAt, `%\"${topic}\"%`, limit);
   const rows = await bound.all<Record<string, string | number>>();
   return rows.results.map((row) => ({
     newsId: String(row.news_id),
@@ -229,6 +233,7 @@ export async function listVerifiedNews(
     sourceContentHash: String(row.source_content_hash),
     keywords: JSON.parse(String(row.keywords_json)) as string[],
     primaryTopic: String(row.primary_topic),
+    topics: JSON.parse(String(row.topics_json)) as string[],
     jurisdiction: String(row.jurisdiction),
   }));
 }

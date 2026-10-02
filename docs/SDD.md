@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-09-12｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-10-02｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -26,8 +26,8 @@
    pixel、session replay 或跨頁識別。量測只允許 Cloudflare Web Analytics（無 cookie）與
    訪客同意後才載入的 GA4（`DECISIONS.md` D-2026-09-02-01 取代 2026-08-30「第一階段不啟用 GA4」
    的決定）；詐騙、健康、剝削等敏感頁不做個人層級量測，GA4 ID 填入前必須完成敏感頁排除。
-   獲准的最小後端只可處理私人需求單、確認信、刪除申請、無個人識別的 D+ 聚合計數與
-   已授權住宿搜尋轉發，不得把 CRM 與瀏覽行為連結。
+   獲准的最小後端只可處理私人需求單、確認信、刪除申請、無個人識別的 D+ 聚合計數、
+   已授權住宿搜尋轉發、AI 兜底與官方公開消息核對；不得把 CRM 與瀏覽行為連結。
 6. **能點選就不打字**：互動工具優先提供快選籤（chips）、滑桿、下拉選單。
 7. **不做簽證或移民代辦**：站長不是澳洲註冊移民代理或澳洲執業律師；不論是否收費，
    都不得提供個人簽證選項建議、準備或代填申請、代表申請人處理簽證事項。可連到 OMARA
@@ -55,8 +55,8 @@
   驗證剛部署的 HTML 時仍加獨立 cache-bust，否則可能看到舊版並誤判失敗。
 - **外部依賴**：現行前端為 Google Fonts，以及 `map.html` 的 Leaflet 1.9.4 CDN 與 OpenStreetMap 圖磚（無 Google Maps、無 API key）。GA4 程式保留但 ID 為空；Cloudflare Web Analytics
   尚未加入，啟用時必須同步登錄於本節與 `SPEC.md` §3。
-- **後端邊界**：GitHub Pages 提供全部內容；Cloudflare Worker 只提供六種能力：私人需求單、
-  查閱／更正／刪除申請、交易信、D+ 聚合計數、已授權住宿搜尋轉發、AI 兜底轉發（§3.1）。正式資源尚未完成
+- **後端邊界**：GitHub Pages 提供全部內容；Cloudflare Worker 只提供七種能力：私人需求單、
+  查閱／更正／刪除申請、交易信、D+ 聚合計數、已授權住宿搜尋轉發、AI 兜底轉發、官方公開消息核對（§3.1）。正式資源尚未完成
   P0-4 前，不得把本機 mock 或設定範本描述成已上線。
 
 ### 2.1 檔案地圖
@@ -87,6 +87,7 @@
 | `assets/main.js` | 全站共用：sprite、導覽、搜尋、續讀／收藏、回饋列、社團目錄篩選、首頁釐清器（hash 驅動）、AI 兜底（fail closed）、需求單、D+ |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP、住宿搜尋、市集草稿（特徵偵測按頁啟用） |
 | `assets/simulator.js` | 模擬器狀態機 |
+| `assets/news.js`、`news.html` | 關鍵字優先的官方消息前台；只顯示後端已核對資料 |
 | `assets/api-config.js` | 公開 API origin、Turnstile site key、住宿搜尋公開開關；留空即 fail closed；不得放 secret |
 | `assets/search-index.js` | 由 `build_search.py` 產生的靜態搜尋索引；產物不得手改 |
 | `assets/i18n-locales.json`、`i18n.js` | 護照國家／語言 registry 與語言切換；`i18n.js` 為產物 |
@@ -107,7 +108,7 @@
 | `scripts/test_tools.mjs` | 集簽快查器與存錢試算器固定案例回放（`SPEC.md` §4） |
 | `scripts/test_job_router.mjs` | 公開求職篩選導流：公開入口 URL 與 map.html 腳本引用 |
 | `scripts/test_analytics.cjs` | GA4 敏感頁排除行為測試（vm 沙盒） |
-| `worker/` | 獨立無框架 Cloudflare Worker：`src/`（http、cors、body、turnstile、rate-limit、tokens、repository、mail、contact、contact-validation、metrics、accommodation、assist、index）、`migrations/`（0001–0003）、`test/`、`wrangler.jsonc`（D1 ID 為全零佔位、無 `env`）、`README.md` |
+| `worker/` | 獨立無框架 Cloudflare Worker：含聯絡、量測、住宿、AI、官方新聞核對與路由；`migrations/` 0001–0005、`test/`、`wrangler.jsonc` |
 | `docs/` | 交接文件；分工見 `docs/README.md` |
 
 ### 2.2 頁面共同結構
@@ -117,9 +118,9 @@
 quick-answer hub → 高風險證據卡 → 完整內容與參考資料目錄 → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ 五支 `<script src defer>`。
 
-**導覽**：全部 15 頁的 `.nav-links` 統一 12 連結（why→about）；`simulator.html` 與 `market.html` 是工具頁，
+**導覽**：全部 18 頁的 `.nav-links` 統一 12 連結（why→about）；`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，
 不進全站 nav、不標 `aria-current`（站長 2026-09-02 決定，`check.ps1` 強制；理由見 §6 教訓 3）。
-**新增頁面時**：複製既有頁骨架；16 個根層 HTML（含 404）與 7 個 `lang/en/**` 頁的 nav 都要改
+**新增頁面時**：複製既有頁骨架；19 個根層 HTML（含 404）與 7 個 `lang/en/**` 頁的 nav 都要改
 （用腳本批次替換，別手改）；`build_seo.py`、`build_search.py` 的頁面清單加項並重跑；
 `SPEC.md` §1.1 加列。
 
@@ -132,7 +133,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
   HTTP success 與後端 `{ok:true}`；管理 token 只走同站 URL fragment，讀入後立刻 `history.replaceState` 清除，不寫 storage。
 - **站內搜尋**：首次開啟才載入 `search-index.js`；查詢不寫 storage、不 fetch、不送搜尋引擎；
   結果 URL 只能是 builder 的固定同站頁面／錨點；動態文字只用 `textContent`。
-- **多國語言**：繁中 15 頁是唯一完整內容集；`lang/<locale>/` 為靜態 Quick Start，`lang/en/<topic>/`
+- **多國語言**：繁中 18 頁是唯一完整內容集；`lang/<locale>/` 為靜態 Quick Start，`lang/en/<topic>/`
   漸進完整翻譯；語言切換不保存、不送出。機器翻譯不得移除風險聲明；`english-fallback` 直接顯示英文。
   台灣限定內容改寫成護照中立分流；單一 subclass 工具必須在輸入前、結果中、來源旁重複明示限制。
 - **GA4 邊界**：ID 不符 `G-[A-Z0-9]+` 立即停用；符合時也先等 `whv-analytics-consent-v1=granted`
@@ -151,7 +152,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 
 ### 3.1 最小後端資料契約
 
-- **路由**（`worker/src/index.ts`）：`GET /api/health`、`POST /api/contact`、`/api/contact/manage`、
+- **路由**（`worker/src/index.ts`）：`GET /api/health`、`GET /api/news`、`POST /api/contact`、`/api/contact/manage`、
   `/api/contact/update`、`/api/contact/delete`、`POST /api/metrics`、`POST /api/accommodation/search`、`POST /api/assist`。
 - **CRM 必填**：聯絡 Email、需求類型、需求說明；姓名／組織、希望時程、預算區間選填。
   **禁止欄位**：護照、簽證文件、健康／醫療、銀行／卡號、帳密、第三人個資、未公開客戶資料。
@@ -166,13 +167,14 @@ footer（免責聲明）→ 五支 `<script src defer>`。
   目的網域與顯示欄位白名單；每個候選 provider 必須附有效 `displayAuthorization`（本站 origin、核准用途、
   查核日、有效期限），過期或缺漏不呼叫上游；不寫 D1、不記錄搜尋內容。
 - **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`MINIMAX_API_KEY` 空值或 `ASSIST_BASE_URL` 主機不在白名單（`api.minimaxi.com`／`api.minimax.io`）時 503 fail closed；透過 OpenAI 相容 chat completions（`ASSIST_MODEL`）呼叫（`max_tokens` 1024、temperature 0），20 秒逾時，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
+- **官方消息核對**（`GET /api/news`＋Cron `47 */6 * * *`）：來源必須存在固定白名單，feed 與原文皆設大小與 12 秒逾時；原文網址限 HTTPS 同官方網域，發布時間不得晚於檢查時間 6 小時或早於 120 天，標題相符度至少 0.6；通過才寫 `news_items`，並保存來源、原文網址、查核時間、相符分數與內容 SHA-256。未通過全文不入庫；分類只用固定規則，不呼叫生成式 AI；同一則可寫入多個固定 `topics_json`，因此工作防詐等交叉消息能被每個相關 filter 找到。`news_source_state` 保留每個來源最近成功／失敗狀態；全部來源失敗時排程失敗，前台不得將空值描述為沒有新聞。
 - **安全**：所有 `POST` 路由要求 `Origin` 存在且在白名單，否則 `403 origin_not_allowed`（`GET /api/health` 例外）；
   Turnstile token server-side 驗證；輸入長度、rate limit 與 SQL 皆白名單／prepared statement；
   限流鍵以只存在 Worker secret 的 HMAC 產生，原始 Email 或 IP 不作 binding key。
   Cloudflare Rate Limiting 是 edge-local、最終一致，只作防濫用。基礎設施仍會為傳輸與防濫用處理必要連線資料，
   隱私文案不得寫成供應商完全看不到。
 - **狀態**：2026-09-04 已部署正式環境（`aussie-whv-compass-api`，自訂網域 `api.aussiewhvcompass.com`，
-  D1 `aussie-whv-compass` 位於 OC 區、三支 migration 已套用，三個 secret 已設定）。
+  D1 `aussie-whv-compass` 位於 OC 區、0001–0003 已套用，三個 secret 已設定）；新聞 0004–0005、第二支 Cron、`GET /api/news` 與前台截至 2026-10-02 只有本機驗證，尚未部署。
   `GET /api/health` 依 `ENVIRONMENT` 回報狀態，正式站回 `deploymentState: "live"`（不再硬寫 `local-scaffold`）。
   **只有 AI 兜底對外開啟**；站內聯絡送出、D+ 量測與住宿搜尋各自有前端旗標且維持關閉。
   證據見 `DECISIONS.md` D-2026-08-30-02、D-2026-08-31-02、D-2026-09-04-01。

@@ -8,13 +8,14 @@ Sitemap: https://www.aussiewhvcompass.com/sitemap.xml
 ## Public guide content
 
 Public HTML guide pages, llms.txt, sitemap.xml, content-status.json and third-party-register.json may be discovered, indexed, summarised and reasonably cited.
+The read-only public endpoint https://api.aussiewhvcompass.com/api/news may be fetched at a reasonable rate for verified official-news metadata. Preserve each item's original source URL and verification timestamp; do not imply the endpoint covers all Australian news.
 Keep the canonical page URL, visible source dates, editorial status and uncertainty boundaries with any summary or citation.
 Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.
 Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.
 
 ## Non-content and personal-data boundaries
 
-Do not submit or automate forms, create cases, enumerate identifiers, or crawl API, admin, CRM, confirmation, receipt or deletion endpoints.
+Do not submit or automate forms, create cases, enumerate identifiers, or crawl any API other than the public GET /api/news endpoint; admin, CRM, confirmation, receipt and deletion endpoints remain non-content.
 Do not collect form-submitted email addresses, form responses, case records, tokens or other personal data even if a future application error exposes them.
 The public robots.txt disallows these route families. Absence of a disallow rule never grants access to authenticated, private or personal data.
 

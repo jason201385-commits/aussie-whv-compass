@@ -1,6 +1,6 @@
 # 澳打指南針 — 決策與證據日誌（DECISIONS）
 
-> 版本 2.0｜最後更新 2026-09-12｜按日期遞增的決策紀錄（ADR 風格）。
+> 版本 2.0｜最後更新 2026-10-02｜按日期遞增的決策紀錄（ADR 風格）。
 > 規格檔只寫「現在是什麼」；為什麼變成這樣、誰在哪一天拍板、當時的本機證據與反方裁決，
 > 全部寫在這裡。新增條目只能往後加，不改舊條目；要推翻舊決策就寫新條目並標「取代 D-…」。
 > 條目格式：決策／理由／證據／影響／狀態。commit 以短 hash 指向 `main` 歷史。
@@ -527,3 +527,12 @@
 - 版面：實際 CSS viewport `innerWidth=390`、`clientWidth=367`、`scrollWidth=367`，角色 context grid 為單欄，沒有水平溢位；console error／warn 為 0。
 - 實測修正：E2E 發現「到Perth」閱讀黏連，已統一改為「到 Perth」，抵達事件標題也補空格。
 - 邊界：這是本機 HTTP server 的 E2E，不代表 production 已部署或 live certification 已完成；正式站仍須在部署後重播。
+
+## D-2026-10-02-01 P1-25 官方消息採白名單雙重核對，不以資料量為目標
+
+- 決策：新聞區只收具有穩定官方 RSS／Atom、可回到同一官方網域原文的來源。第一批為 Scamwatch、Jobs and Skills Australia、Australian Department of Health、Consumer Affairs Victoria；未取得穩定 feed 的政府頁不以 scraping、模擬登入或搜尋結果補量。
+- 上架 gate：feed 項目與官方原文頁都要成功；網址、日期、內容類型、標題相符度全部通過後才寫入公開 D1。資料庫保留 feed 摘要、原文連結、內容 SHA-256、核對時間與固定主題；不保存未核對原文全文，不使用生成式 AI 改寫或判定真偽。
+- 呈現：首頁加一張入口卡；新聞頁第一層只顯示今天／本週／本月、固定主題與最多五個關鍵字，每則都連官方原文。來源失敗或無符合項目時明說覆蓋不完整，不宣稱「沒有新聞」。
+- 排程：Worker 每 6 小時同步，400 天後由既有每日 retention 排程清除項目；任何來源可獨立降級，全部來源失敗則排程失敗。同一則可屬多個固定主題，避免「工作詐騙」只出現在工作、不出現在防詐。正式 D1 0004–0005、Cron、API 與前端必須同批部署後才可宣稱自動更新已上線。
+- AI／crawler 探索：`news.html` 提供 JSON alternate，Worker `/robots.txt` 只允許公開 `/api/news`；其他 API、表單與 CRM 維持禁止爬取。摘要或引用必須保留原始來源與核對時間，不得把有限來源描述成完整新聞。
+- 驗證：Worker 68 tests（其中新聞 8 案例）、`scripts/test_news_ui.mjs` 與 `scripts/check.ps1`；本條只記錄本機可重播證據，不是 production 證明。

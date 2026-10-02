@@ -1,7 +1,7 @@
 # 🧭 澳打指南針 — 澳洲打工度假開源攻略
 
 給準備去澳洲打工度假（Working Holiday, subclass 417）的中文背包客的一站式開源攻略，
-依旅程階段共 15 頁（含首頁、模擬器與離澳出清）：
+依旅程階段共 18 頁（另含工具、社團與新聞入口）：
 
 | 階段 | 頁面 |
 |---|---|
@@ -25,10 +25,13 @@
 
 ## 現行互動工具（純前端、不上傳填寫內容）
 
+新聞區例外使用只讀後端：它只處理官方公開 feed／原文與同步狀態，不接收訪客輸入。
+
 - **澳洲打工度假模擬器**（simulator.html）：5 分鐘角色設定＋抵澳 30 天固定情境；遊戲資源、關卡與固定選項只在目前分頁的 session 暫存，從攻略返回或重新整理可繼續，關閉分頁或重新開始即清除；不上傳答案，也不做成功、簽證或醫療預測。
 - **首頁釐清器**（index.html）：點階段、護照與需求三層 chips 直達 21 個出口，另有 6 題找職類；選項只在頁面內、不儲存、不送出；無 JavaScript 時整個漏斗仍可見。AI 兜底表單只在後端正式啟用後出現。
 - **離澳出清 × 初登澳補給草稿產生器**（market.html）：選賣出／徵求、分類、城市、狀況、價格與面交方式，產生可複製的刊登草稿與 Facebook Marketplace／eBay 搜尋入口；不儲存任何輸入，也不代刊登。
 - **各地社團目錄**（首頁 `#communities`）：地點搜尋、LINE／Reddit 篩選、州別地圖鈕與 Facebook／Reddit 平台搜尋；只列公開入口，本站無管理權，不做站內配對。
+- **官方消息新聞區**（news.html）：以今天／本週／本月和固定關鍵字顯示通過官方 feed＋原文一致性核對的消息；每則附原文與核對時間。程式已完成本機驗證，正式排程與 D1 migration 尚待協調部署。
 - **集簽郵遞區號初篩**（visa.html）：郵遞區號＋工作類型 → 比對留存的 subclass 417 清單；不取代實際職務、日期、支薪與個人資格查核。
 - **集簽透明地圖**（map.html）：Leaflet + OpenStreetMap 真實地理州界圖，依指定工作圖層著色，並疊加可回查的採收月份；不含雇主名單。
   資料檔 `assets/postcodes.js` 抓取自內政部 specified-work 官方頁（2026-08-29），
@@ -37,7 +40,7 @@
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
-- Header 與首頁提供**全站搜尋**：搜尋 15 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
+- Header 與首頁提供**全站搜尋**：搜尋 18 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
 ## 多國語言 Quick Start
@@ -79,7 +82,7 @@ P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空�
 
 ## 搜尋引擎與 AI 探索
 
-- 15 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
+- 18 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
 - `robots.txt` 開放所有公開頁，`sitemap.xml` 列出正式網址；`llms.txt` 提供 AI 可讀導覽、授權與事實界線。
 - 修改頁名、description 或頁面清單後，先跑 `python scripts/build_seo.py`，再跑 `scripts/check.ps1`。
 - `llms.txt` 是輔助理解的社群提案，不保證搜尋排名、收錄或任何 AI 服務採用。

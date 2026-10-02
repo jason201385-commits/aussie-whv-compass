@@ -143,7 +143,7 @@ foreach ($p in $pages) {
   if (-not $t.Contains($ogUrlTag)) { Write-Output "FAIL [$p] og:url 錯誤或缺少：$pageUrl"; $errors++ }
 
   # 本機資產必須共用版本查詢碼，避免 Pages 的 10 分鐘舊快取混版
-  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|simulator\.js|postcodes\.js|seasons\.js|map-transparency\.js|job-router\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
+  foreach ($asset in [regex]::Matches($t, '(?:href|src)="assets/(?:style\.css|main\.js|i18n\.js|tools\.js|simulator\.js|news\.js|postcodes\.js|seasons\.js|map-transparency\.js|job-router\.js|analytics-config\.js|analytics\.js|api-config\.js)(?:\?v=([^"]+))?"')) {
     if (-not $asset.Groups[1].Success) { Write-Output "FAIL [$p] 本機資產缺 ?v= 版本"; $errors++ }
     else { $assetVersions += $asset.Groups[1].Value }
   }
@@ -156,9 +156,9 @@ foreach ($p in $pages) {
     $links = ($nav -split '<a ').Count - 1
     $expectedNavLinks = 12
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
-    if ($nav -match 'href="(?:simulator|market|communities|map)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html、communities.html 或 map.html（站長 2026-09-02 決定；工具頁不進 nav）"; $errors++ }
+    if ($nav -match 'href="(?:simulator|market|communities|map|news)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html、communities.html、map.html 或 news.html（工具／動態資訊頁不進 nav）"; $errors++ }
   }
-  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html')
+  $offNavPages = @('simulator.html', 'market.html', 'communities.html', 'map.html', 'news.html')
   if ($p -in $offNavPages) {
     if ([regex]::Matches($t, 'aria-current="page"').Count -ne 0) {
       Write-Output "FAIL [$p] 不在全站 nav 的工具頁不得標 aria-current=page"; $errors++
@@ -1956,7 +1956,7 @@ if (-not (Test-Path $contentStatusPath)) {
     if ($contentStatus.schemaVersion -ne 2 -or $contentStatus.canonicalOrigin -ne $canonicalOrigin) { Write-Output 'FAIL content-status.json schema 或 canonical 錯誤'; $errors++ }
     if ($contentStatus.isOfficialGovernmentService -ne $false -or $contentStatus.providesMigrationLegalMedicalOrTaxAdvice -ne $false) { Write-Output 'FAIL content-status.json 未守住非官方／非專業服務界線'; $errors++ }
     if ($contentStatus.publicContentCrawlable -ne $true -or $contentStatus.formsApiCrmAndPersonalDataCrawlable -ne $false) { Write-Output 'FAIL content-status.json crawler 公私界線錯誤'; $errors++ }
-    if (@($contentStatus.primaryPages).Count -ne 17) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應為 17）"; $errors++ }
+    if (@($contentStatus.primaryPages).Count -ne $pages.Count) { Write-Output "FAIL content-status.json 繁中主頁數=$(@($contentStatus.primaryPages).Count)（應與根層主頁 $($pages.Count) 一致）"; $errors++ }
     if (@($contentStatus.fullEnglishGuides).Count -ne 7) { Write-Output "FAIL content-status.json 完整英文頁數=$(@($contentStatus.fullEnglishGuides).Count)（應為 7）"; $errors++ }
     if (@($contentStatus.quickStartLocales).Count -ne 37) { Write-Output "FAIL content-status.json Quick Start 語言數=$(@($contentStatus.quickStartLocales).Count)（應為 37）"; $errors++ }
     $checkedEvidence = @($contentStatus.primaryPages | Where-Object { $_.evidenceCardStatus -eq 'checked' })
@@ -2322,15 +2322,15 @@ if (-not $searchJump.Success -or $searchJump.Index -le $indexText.IndexOf('<sect
 }
 $entryCards = [regex]::Match($indexText, '(?s)<nav class="home-entry-cards" aria-label="接下來可以去">.*?</nav>')
 if (-not $entryCards.Success) {
-  Write-Output 'FAIL [index.html] 缺三張入口卡 nav.home-entry-cards'
+  Write-Output 'FAIL [index.html] 缺四張入口卡 nav.home-entry-cards'
   $errors++
 } else {
   $entryHrefs = @([regex]::Matches($entryCards.Value, '<a class="home-entry-card"[^>]*href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
-  if ($entryHrefs.Count -ne 3 -or ($entryHrefs -join ',') -ne 'communities.html,#games,#journey-resume') {
-    Write-Output "FAIL [index.html] 入口卡必須恰好三張且依序連 communities.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
+  if ($entryHrefs.Count -ne 4 -or ($entryHrefs -join ',') -ne 'news.html,communities.html,#games,#journey-resume') {
+    Write-Output "FAIL [index.html] 入口卡必須恰好四張且依序連 news.html、communities.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
     $errors++
   }
-  foreach ($entryCardNeedle in @('找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
+  foreach ($entryCardNeedle in @('今天有什麼變化？', '只列通過自動核對的消息', '找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
     if (-not $entryCards.Value.Contains($entryCardNeedle)) { Write-Output "FAIL [index.html] 入口卡文案或續讀卡預設 hidden 缺失：$entryCardNeedle"; $errors++ }
   }
   if ($entryCards.Index -le $indexText.IndexOf('id="assist"') -or $entryCards.Index -ge $indexText.IndexOf('id="communities"')) {
@@ -3383,7 +3383,7 @@ if (-not (Test-Path $apiConfigPath)) {
     $errors++
   }
   # 每個 API 功能各有旗標：填 apiBaseUrl 不得順手打開別的功能。
-  foreach ($apiConfigNeedle in @('assistEnabled:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'Public values only', 'P0-4')) {
+  foreach ($apiConfigNeedle in @('assistEnabled:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'newsEnabled: true', 'Public values only', 'P0-4')) {
     if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] 缺功能旗標或來源註記：$apiConfigNeedle"; $errors++ }
   }
   # 尚未備妥正式資源的功能必須維持關閉（交易信、D+ 部署、住宿平台授權）。
@@ -3564,7 +3564,12 @@ $workerRequired = @(
   'src\metrics.ts',
   'src\accommodation.ts',
   'src\assist.ts',
+  'src\news.ts',
+  'src\news-sources.ts',
+  'src\news-repository.ts',
   'migrations\0003_assist_daily_usage.sql',
+  'migrations\0004_verified_news.sql',
+  'migrations\0005_news_topics.sql',
   'test\http.test.ts',
   'test\contact.test.ts',
   'test\metrics.test.ts',
@@ -3572,7 +3577,8 @@ $workerRequired = @(
   'test\security.test.ts',
   'test\repository.test.ts',
   'test\mail.test.ts',
-  'test\assist.test.ts'
+  'test\assist.test.ts',
+  'test\news.test.ts'
 )
 foreach ($workerFile in $workerRequired) {
   if (-not (Test-Path (Join-Path $workerDir $workerFile))) {
@@ -3632,6 +3638,89 @@ if (Test-Path $assistWorkerPath) {
     }
   }
 }
+
+# 自動核對新聞（P1-25）：前台只讀已核對資料，後端固定官方來源與雙層 gate。
+$newsPagePath = Join-Path $dir 'news.html'
+$newsJsPath = Join-Path $dir 'assets\news.js'
+$newsWorkerPath = Join-Path $workerDir 'src\news.ts'
+$newsSourcesPath = Join-Path $workerDir 'src\news-sources.ts'
+$newsMigrationPath = Join-Path $workerDir 'migrations\0004_verified_news.sql'
+$newsTopicsMigrationPath = Join-Path $workerDir 'migrations\0005_news_topics.sql'
+if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Test-Path $newsWorkerPath) -or -not (Test-Path $newsSourcesPath) -or -not (Test-Path $newsMigrationPath) -or -not (Test-Path $newsTopicsMigrationPath)) {
+  Write-Output 'FAIL [P1-25] 缺 news.html、assets/news.js、Worker 新聞模組或 0004–0005 migration'
+  $errors++
+} else {
+  $newsPageText = [System.IO.File]::ReadAllText($newsPagePath, [System.Text.Encoding]::UTF8)
+  $newsJsText = [System.IO.File]::ReadAllText($newsJsPath, [System.Text.Encoding]::UTF8)
+  $newsWorkerText = [System.IO.File]::ReadAllText($newsWorkerPath, [System.Text.Encoding]::UTF8)
+  $newsSourcesText = [System.IO.File]::ReadAllText($newsSourcesPath, [System.Text.Encoding]::UTF8)
+  $newsMigrationText = [System.IO.File]::ReadAllText($newsMigrationPath, [System.Text.Encoding]::UTF8)
+  $newsTopicsMigrationText = [System.IO.File]::ReadAllText($newsTopicsMigrationPath, [System.Text.Encoding]::UTF8)
+  foreach ($newsPageNeedle in @(
+    'data-news-window="day"',
+    'data-news-window="week"',
+    'data-news-window="month"',
+    'id="news-status"',
+    'id="news-lead"',
+    'id="news-list"',
+    'id="news-source-status"',
+    '每 6 小時自動檢查',
+    '這不是全澳新聞大全',
+    '不是對政策影響的個案判定',
+    'assets/news.js?v='
+    '<link rel="alternate" type="application/json" href="https://api.aussiewhvcompass.com/api/news?window=month&amp;topic=all"'
+  )) {
+    if (-not $newsPageText.Contains($newsPageNeedle)) { Write-Output "FAIL [news.html] 缺時間、來源或查核邊界：$newsPageNeedle"; $errors++ }
+  }
+  foreach ($newsJsNeedle in @(
+    'config.newsEnabled !== true',
+    '/api/news?window=',
+    'credentials: "omit"',
+    'referrerPolicy: "no-referrer"',
+    'textContent',
+    'response.ok',
+    'payload.ok !== true',
+    '不是『沒有新聞』'
+  )) {
+    if (-not $newsJsText.Contains($newsJsNeedle)) { Write-Output "FAIL [assets/news.js] 缺 fail-closed、隱私或安全渲染：$newsJsNeedle"; $errors++ }
+  }
+  foreach ($newsJsForbidden in @('innerHTML', 'localStorage', 'sessionStorage', 'document.write')) {
+    if ($newsJsText.Contains($newsJsForbidden)) { Write-Output "FAIL [assets/news.js] 新聞渲染不得使用：$newsJsForbidden"; $errors++ }
+  }
+  foreach ($sourceUrl in @(
+    'https://www.scamwatch.gov.au/rss/news-feed.xml',
+    'https://www.jobsandskills.gov.au/news_rss',
+    'https://www.health.gov.au/news/rss.xml',
+    'https://www.consumer.vic.gov.au/RSS.aspx?RssType=newsalerts'
+  )) {
+    if (-not $newsSourcesText.Contains($sourceUrl)) { Write-Output "FAIL [worker/src/news-sources.ts] 缺固定官方 feed：$sourceUrl"; $errors++ }
+  }
+  foreach ($gateNeedle in @('score < 0.6', '120 * 86_400_000', '6 * 3_600_000', 'ARTICLE_MAX_BYTES', 'FEED_MAX_BYTES', 'official-feed+source-page', 'results.every')) {
+    if (-not $newsWorkerText.Contains($gateNeedle)) { Write-Output "FAIL [worker/src/news.ts] 缺來源／日期／內容核對 gate：$gateNeedle"; $errors++ }
+  }
+  foreach ($tableNeedle in @('CREATE TABLE news_items', 'CREATE TABLE news_source_state', 'CREATE TABLE news_sync_runs', "verification_method = 'official-feed+source-page'")) {
+    if (-not $newsMigrationText.Contains($tableNeedle)) { Write-Output "FAIL [0004_verified_news.sql] 缺 verified-only 資料契約：$tableNeedle"; $errors++ }
+  }
+  if (-not $newsTopicsMigrationText.Contains('ADD COLUMN topics_json') -or -not $newsWorkerText.Contains('topics: candidate.classification.topics')) {
+    Write-Output 'FAIL [P1-25] 多主題新聞必須保存 topics_json，不能只靠 primary topic 篩選'
+    $errors++
+  }
+  if (-not $workerConfig.Contains('"47 */6 * * *"') -or -not $workerConfig.Contains('"17 3 * * *"')) {
+    Write-Output 'FAIL [worker/wrangler.jsonc] 必須同時保留每日 retention 與每 6 小時新聞同步排程'
+    $errors++
+  }
+  $workerIndexText = [System.IO.File]::ReadAllText((Join-Path $workerDir 'src\index.ts'), [System.Text.Encoding]::UTF8)
+  if (-not $workerIndexText.Contains('Allow: /api/news\nDisallow: /') -or -not $crawlerPolicyText.Contains('https://api.aussiewhvcompass.com/api/news')) {
+    Write-Output 'FAIL [P1-25] 公開新聞 JSON 必須有精確 crawler 例外，其他 API 維持禁止'
+    $errors++
+  }
+  & node (Join-Path $dir 'scripts\test_news_ui.mjs')
+  if ($LASTEXITCODE -ne 0) {
+    Write-Output 'FAIL [P1-25] 新聞前台渲染／篩選／降級回放未通過'
+    $errors++
+  }
+}
+
 $trackedSecretFiles = Get-ChildItem $workerDir -Recurse -File | Where-Object {
   $_.FullName -notmatch '[\\/](node_modules|\.wrangler|dist)[\\/]' -and
   $_.Name -notin @('.dev.vars.example', 'package-lock.json', 'worker-configuration.d.ts')

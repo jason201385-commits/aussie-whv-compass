@@ -615,7 +615,7 @@ body:not(.home-page) main > p { max-width: 76ch; }
 /* ---------- 首頁入口卡（P0-8）：社團目錄、工具箱、續讀／收藏 ---------- */
 .home-entry-cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin: 18px 0 0;
 }
@@ -637,6 +637,119 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .home-entry-kicker { color: var(--green-ink); font-size: .74rem; font-weight: 900; letter-spacing: .1em; }
 .home-entry-card strong { font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.4; }
 .home-entry-card small { color: var(--ink-soft); font-size: .8rem; line-height: 1.5; }
+
+/* ---------- 官方消息：少量、關鍵字優先、來源可回查 ---------- */
+.news-scope-note { margin: 20px 0 28px; }
+.news-controls,
+.news-results,
+.news-method,
+.news-sources {
+  margin: 28px 0;
+  padding: 24px;
+  border: 1px solid color-mix(in srgb, var(--line) 58%, transparent);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--shadow-pop-sm);
+}
+.news-controls h2,
+.news-results h2,
+.news-method h2,
+.news-sources h2 { margin-top: 0; }
+.news-window-tabs,
+.news-topic-tabs { display: flex; flex-wrap: wrap; gap: 9px; }
+.news-window-tabs { margin-bottom: 12px; }
+.news-window-tabs .chip[aria-pressed="true"],
+.news-topic-tabs .chip[aria-pressed="true"] {
+  border-color: var(--green-ink);
+  background: var(--green-soft);
+  color: var(--green-ink);
+}
+.news-status {
+  min-height: 1.6em;
+  margin: 18px 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.news-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.news-card {
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--line) 66%, transparent);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.news-card-featured {
+  border-color: color-mix(in srgb, var(--gold) 56%, var(--line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold-soft) 74%, var(--surface)), var(--surface));
+}
+.news-card-title { margin: 10px 0 8px; font-size: 1.15rem; }
+.news-card-featured .news-card-title { font-size: clamp(1.3rem, 3vw, 1.8rem); }
+.news-card-summary { color: var(--ink-soft); }
+.news-card-meta,
+.news-card-verified { margin: 6px 0; font-size: .82rem; color: var(--ink-soft); }
+.news-card-verified { color: var(--green-ink); font-weight: 700; }
+.news-card-action { margin: 14px 0 0; }
+.news-keywords { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; }
+.news-keyword {
+  display: inline-flex;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--ink);
+  font-size: .75rem;
+  font-weight: 900;
+}
+.news-method-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+  counter-reset: news-method;
+}
+.news-method-steps li {
+  counter-increment: news-method;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--blue-soft);
+}
+.news-method-steps li::before { content: counter(news-method); display: block; color: var(--gold); font-weight: 900; }
+.news-method-steps strong,
+.news-method-steps span { display: block; }
+.news-method-steps span { margin-top: 6px; color: var(--ink-soft); font-size: .84rem; }
+.news-source-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.news-source-card { padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+.news-source-card h3 { margin: 0 0 7px; font-size: 1rem; }
+.news-source-card p { margin: 4px 0; }
+.news-source-state { font-weight: 900; }
+.news-source-state-healthy { color: var(--green-ink); }
+.news-source-state-degraded { color: var(--danger); }
+.news-static-sources { line-height: 1.9; }
+
+@media (max-width: 800px) {
+  .home-entry-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .news-method-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .news-controls,
+  .news-results,
+  .news-method,
+  .news-sources { padding: 18px; }
+  .news-list,
+  .news-source-list,
+  .news-method-steps { grid-template-columns: 1fr; }
+  .news-window-tabs .chip,
+  .news-topic-tabs .chip { min-height: 44px; }
+}
 .home-zone-section { scroll-margin-top: 92px; }
 .home-zone-heading { max-width: 780px; }
 .home-zone-heading h2 { margin: .28em 0 .3em; }
