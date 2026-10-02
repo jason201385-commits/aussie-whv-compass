@@ -14,6 +14,14 @@ import {
 } from "./contact";
 import { errorResponse, jsonResponse } from "./http";
 import { recordAggregateMetric } from "./metrics";
+import {
+  getVerifiedNews,
+  NEWS_RETENTION_DAYS,
+  NEWS_SYNC_CRON,
+  syncOfficialNews,
+  type NewsDependencies,
+} from "./news";
+import { purgeOldNews } from "./news-repository";
 import { purgeExpiredContactCases } from "./repository";
 
 interface RuntimeSecrets {
@@ -29,7 +37,7 @@ export type AppEnv = Omit<Env, keyof AssistBindings> &
   AccommodationEnv;
 
 export interface AppDependencies
-  extends ContactDependencies, AccommodationDependencies, AssistDependencies {}
+  extends ContactDependencies, AccommodationDependencies, AssistDependencies, NewsDependencies {}
 
 function logResult(requestId: string, request: Request, status: number): void {
   const url = new URL(request.url);
@@ -79,6 +87,8 @@ function createFetchHandler(dependencies: AppDependencies) {
           deploymentState: env.ENVIRONMENT === "production" ? "live" : "local-scaffold",
           requestId,
         });
+      } else if (request.method === "GET" && url.pathname === "/api/news") {
+        response = await getVerifiedNews(request, env.DB, dependencies.now?.() ?? new Date());
       } else if (request.method === "POST" && url.pathname === "/api/contact") {
         response = await createContactCase(request, env, dependencies);
       } else if (request.method === "POST" && url.pathname === "/api/contact/manage") {
@@ -118,9 +128,28 @@ function createFetchHandler(dependencies: AppDependencies) {
 export function createApp(dependencies: AppDependencies = {}) {
   return {
     fetch: createFetchHandler(dependencies),
-    async scheduled(_controller, env): Promise<void> {
-      const purged = await purgeExpiredContactCases(env.DB, new Date().toISOString());
-      console.log(JSON.stringify({ event: "contact_retention_purge", purged }));
+    async scheduled(controller, env): Promise<void> {
+      if (controller.cron === NEWS_SYNC_CRON) {
+        const results = await syncOfficialNews(env.DB, dependencies);
+        console.log(JSON.stringify({
+          event: "official_news_sync",
+          sources: results.map((result) => ({
+            sourceId: result.sourceId,
+            status: result.status,
+            fetched: result.fetchedCount,
+            candidates: result.candidateCount,
+            verified: result.verifiedCount,
+            rejected: result.rejectedCount,
+            errorCode: result.errorCode,
+          })),
+        }));
+        return;
+      }
+      const now = dependencies.now?.() ?? new Date();
+      const purgedContacts = await purgeExpiredContactCases(env.DB, now.toISOString());
+      const newsBefore = new Date(now.getTime() - NEWS_RETENTION_DAYS * 86_400_000).toISOString();
+      const purgedNews = await purgeOldNews(env.DB, newsBefore);
+      console.log(JSON.stringify({ event: "retention_purge", purgedContacts, purgedNews }));
     },
   } satisfies ExportedHandler<AppEnv>;
 }

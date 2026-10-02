@@ -10,7 +10,7 @@
     "enabled": false
   },
   "triggers": {
-    "crons": ["17 3 * * *"]
+    "crons": ["17 3 * * *", "47 */6 * * *"]
   },
   "vars": {
     "ENVIRONMENT": "local",
@@ -71,7 +71,7 @@
       "workers_dev": false,
       "preview_urls": false,
       "observability": { "enabled": false },
-      "triggers": { "crons": ["17 3 * * *"] },
+      "triggers": { "crons": ["17 3 * * *", "47 */6 * * *"] },
       "routes": [
         { "pattern": "api.aussiewhvcompass.com", "custom_domain": true }
       ],
