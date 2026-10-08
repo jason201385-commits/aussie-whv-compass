@@ -125,6 +125,14 @@ ok(entries.some((entry) => entry.href === "lang/en/visa/" && entry.pageTitle ===
 ok(entries.filter((entry) => entry.href.startsWith("index.html#exit-") && entry.hub === 1).length === 21, "索引應有 21 個首頁出口 hub 項");
 ok(entries.filter((entry) => typeof entry.synonyms === "string" && entry.synonyms).length >= 48, "索引 synonyms 欄位應至少覆蓋 48 題");
 
+/* 7. 生活需求口語入口：已取得的匿名需求只改找路，不把個案傳聞寫成規則。 */
+expectHref("沒車怎麼找工", ["work.html#commute"]);
+expectHref("包bills", ["housing.html#rental-brief"]);
+expectHref("簽證還沒下來", ["visa.html#processing"]);
+expectHref("女生獨旅", ["health.html#women"]);
+expectHref("薪資單有問題", ["work.html#payslip-help"]);
+expectHref("夏令時間", ["news.html#daylight-saving-update"]);
+
 if (failures) {
   console.error("SEARCH TESTS FAILED: " + failures);
   process.exit(1);

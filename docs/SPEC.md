@@ -1,6 +1,6 @@
 # 澳打指南針 — 現況行為契約（SPEC）
 
-> 版本 2.0｜最後更新 2026-10-02｜本文件只寫「現在的行為是什麼、怎麼驗證」。
+> 版本 2.0｜最後更新 2026-10-03｜本文件只寫「現在的行為是什麼、怎麼驗證」。
 > 待辦與狀態在 `ROADMAP.md`，為什麼與證據在 `DECISIONS.md`，原則與架構在 `SDD.md`，
 > 閱讀路線在 `README.md`。改動任何功能行為時，必須在同一個 commit 更新本文件對應列並更新標頭日期。
 
@@ -42,7 +42,7 @@
 | `leave.html` | 回程與延續 | 報稅退休金離澳＋DASP 粗估＋離澳收尾清單 | 有 | 有 |
 | `market.html` | 回程與延續／初登澳 | 離澳出清 × 初登澳補給：交換草稿產生器與平台入口 | 有 | 有 |
 | `communities.html` | 落地後找人 | 各地社團目錄：地區 × 需求的公開入口；不進全站 nav（同工具頁規則） | 有 | 有 |
-| `news.html` | 全階段 | 今天／本週／本月的官方消息；關鍵字優先、每則回鏈來源；不進全站 nav | — | — |
+| `news.html` | 全階段 | 四張人工核對的近期重要提醒、官方快查、今天／本週／本月的自動新聞；來源與生效日期分列、每則回鏈來源；不進全站 nav | — | — |
 | `pr.html` | 已在澳洲 | PR 路徑總覽 | 有 | 有 |
 | `about.html` | 回程與延續（旅程第 12 站） | 關於、資料分層、回報、私人需求單、自願找路測試、共編、合作治理、贊助、授權、免責 | — | — |
 | `404.html` | 復原 | noindex；保留導覽與四階段旅程復原入口 | — | — |
@@ -54,7 +54,13 @@
 - 導覽：內容頁 `.nav-links` 統一 12 連結（why→about）。`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，不進全站 nav、頁內不標 `aria-current`（`news.html` 從首頁入口卡與搜尋進入，`check.ps1` 強制）。
 - 內容基準日 2026-08-28／29；換匯段落 2026-09-01 查核。
 
+手機導覽加固（P1-26）：站名與 AI 入口在第一列，語言與搜尋在第二列；主題仍維持單列橫向捲動。JavaScript 增強提供 44px 左右按鈕、首尾停用與依剩餘內容切換的邊緣遮罩，當前頁置中；桌機隱藏按鈕，無 JavaScript 保留原始主題連結。瀏覽器回放檢查站名完整、無全頁水平溢位、按鈕與 Tab 可到最後一個主題。
+
 ### 1.2 互動工具契約
+
+生活需求與重要提醒（P1-27）：首頁「生活卡關」提供十個直接深連結，涵蓋工資／薪資單、急搬、群傳政策、無車通勤、租屋 bills、車況、等待下簽、報稅、換匯與獨旅求助。新指南先列核對步驟與既有工具，不提供個案判定；住宿短住晚數加入 1 晚，使用者需核對目的地當地入住日。新聞頁上方的四張人工卡片包含適用地區、來源日期、啟用／開始／生效日期、官方原文、查核日與下一步；沒有可見來源日期時不猜填。卡片不依賴 API，不會自動重驗，並明示不代表即時緊急事故；官方快查另有 417／462 現行規則入口。下方 P1-25 自動 feed 仍保持獨立來源狀態與失敗降級。私人 LINE 匯出只用來發現需求，不發布逐字稿、可識別個案或群友資料；目前研究只涵蓋已取得的一個 Perth 群組，不能宣稱讀到所有澳洲群。
+
+搜尋互動加固（P1-26）：索引載入失敗或 10 秒逾時可在同頁重試並清理失敗 script／計時器；各入口共用 pending 與錯誤狀態。開啟立即聚焦輸入，載入完成不搶焦點；關閉後舊回應失效並返回來源，來源已移除、停用或 CSS 隱藏時返回 header 搜尋。中文 IME 組字期間不提交、不因 Escape 或斜線快捷鍵誤觸；正常狀態的重試鈕不顯示。
 
 「驗證指標」指向 `scripts/check.ps1` 的區塊註解、獨立測試檔或人工步驟；列「人工」者尚無自動化。
 
@@ -65,7 +71,7 @@
 | 行前互動清單 | `prep.html` `#prep-checklist`；`lang/en/prep/`（獨立 key） | 21 項勾選（3 組，JS 產生） | `whv-prep-check-v1`／`whv-prep-check-en-v1`、進度條、100% 文案、清空需 confirm | 進度 x/21 | check.ps1 頁面基線；「完整英文行前頁」 |
 | 我的行前海報 | `prep.html` | 工作表答案＋清單進度＋試算結果（皆 localStorage） | Canvas A4 直式 PNG 本機生成；下載／長按儲存備援；空資料引導 | PNG | 桌機／390px E2E 通過；iPhone Safari／Android Chrome 實機為人工 gate（P1-2） |
 | 抵澳 30 天模擬器 | `simulator.html` `#simulator-profile-form`＋`#simulator-stage` | 抵達月份／落腳地／交通 3 個固定 select＋5 組固定單選；10 個固定事件各 3 個白名單選項 | 月份、落腳地與交通只改變情境文案，不輸出 vacancy、城市排名或成功預測；資源與關卡只寫 `sessionStorage` `whv-simulator-progress-v1`（envelope v2，嚴格驗證；v1 依事件對照遷移）；不用 localStorage、fetch、自由文字；delta 可重播且恢復不重複套用；緊急就醫事件選項前顯示 `tel:000`；重開需確認；分數不得描述為成功率、適合度、診斷或簽證判定 | 情境化角色快照＋落地手續／住宿／找工等待與通勤／詐騙／薪資／非緊急與緊急就醫／預算／生活支持取捨＋官方出口＋第 30 天行動地圖；no-JS 只顯示靜態入口 | `scripts/test_simulator.mjs`（6 案例）＋ check.ps1「模擬器」區塊 |
-| 住宿合法混合搜尋 | `housing.html`／`lang/en/housing/` `#housing-search-tool` | 先選短住／Share House／整租／農區，再輸入地址或地區；入住日、7／14／28 晚、1–4 人；8 個城市 chips | 依類型把 1–2 個入口置頂、其餘折疊（入口適配度，非價格排名）；預設不呼叫 API；完整地址只取 suburb／州／郵遞區號；公開開關 `accommodationSearchEnabled` 為 true 時才以 `credentials:omit`、`no-referrer` 呼叫 Worker；後端只查有 `displayAuthorization` 的 provider、限流、4 秒 timeout、欄位／網域白名單、不寫 D1／不記錄搜尋內容；失敗保留原始入口；不寫 storage | 情境摘要＋風險提醒＋降級方案；五個原始入口（Hostelworld、Booking.com、Flatmates、realestate.com.au、Domain）；已授權結果按平台分組並揭露關係，不合併排名 | `scripts/test_housing_search.mjs`（check.ps1 執行）；`worker/test/accommodation.test.ts`；check.ps1「住宿搜尋轉接器」；現況公開開關 false、production provider 空 |
+| 住宿合法混合搜尋 | `housing.html`／`lang/en/housing/` `#housing-search-tool` | 先選短住／Share House／整租／農區，再輸入地址或地區；入住日、1／7／14／28 晚、1–4 人；8 個城市 chips | 依類型把 1–2 個入口置頂、其餘折疊（入口適配度，非價格排名）；預設不呼叫 API；完整地址只取 suburb／州／郵遞區號；公開開關 `accommodationSearchEnabled` 為 true 時才以 `credentials:omit`、`no-referrer` 呼叫 Worker；後端只查有 `displayAuthorization` 的 provider、限流、4 秒 timeout、欄位／網域白名單、不寫 D1／不記錄搜尋內容；失敗保留原始入口；不寫 storage | 情境摘要＋風險提醒＋降級方案；五個原始入口（Hostelworld、Booking.com、Flatmates、realestate.com.au、Domain）；已授權結果按平台分組並揭露關係，不合併排名 | `scripts/test_housing_search.mjs`（check.ps1 執行）；`worker/test/accommodation.test.ts`；check.ps1「住宿搜尋轉接器」；現況公開開關 false、production provider 空 |
 | 離澳收尾清單 | `leave.html` `#leave-checklist-tool` | 9 項零打字勾選（無 JS 可閱讀） | `whv-leave-check-v1`、進度條、清空需 confirm；100% 顯示非強迫感謝銜接 | 進度 x/9 | check.ps1 頁面基線 |
 | 防詐測驗 | `scam.html` `#scam-quiz`；`lang/en/scam/` | 8 情境 ×（接受／快跑） | 正解以 `tools.js` 資料的 `run` 旗標為準（目前第 2、5 題為接受）；逐題回饋含紅旗解說；不寫 storage | 計分＋三級稱號（≥7／≥5／其餘） | check.ps1「完整英文防詐頁」 |
 | DASP 扣繳粗估 | `leave.html` `#dasp-calc` | 估計總額＋tax-free component＋4 個總額 chips | taxFree=clamp(input,0,total)；taxable=total−taxFree；withholding=taxable×0.65；payment=total−withholding | 估算金額＋component／個案限制警語；不得表述為實際可領款 | 人工（§4） |
@@ -85,7 +91,7 @@
 | 各地社團目錄（完整頁，P1-21） | `communities.html`；入口為首頁入口卡與 21 個釐清器出口的「看公開討論」（帶 `?need=`） | 8 州＋全部地區 chips × 12 需求 chips；`?region=&need=` 可直接預套 | `community-directory.json` 是單一事實來源，HTML 是手寫鏡像，`check.ps1` 比對 id／entryType／到期日／入口網址；風險分級決定入口型態——`high-risk-intermediary`（找工作、租屋、集簽情報）永遠只有平台搜尋或說明卡，不得直連；`main.js` 只讀 `URLSearchParams`，不寫 storage、不改網址、不 fetch；平台搜尋依所選地區改寫查詢字串並顯示給使用者看 | 卡片含平台／入口型態／風險等級標籤、風險提示、邊界句、查核日與到期日；空結果提示 | check.ps1「社團目錄（P1-21）」區塊 7 項；到期的直連若仍出現 `entryUrl` 即 FAIL |
 | 自動核對新聞（P1-25） | `news.html`＋`assets/news.js`；`GET /api/news` | 今天／本週／本月、固定主題 chips；URL query 只接受 `window=day|week|month` 與白名單 topic；同一則消息可屬多個固定主題 | Worker 每 6 小時讀固定官方 feed；項目需同時通過官方來源白名單、HTTPS 原文同網域、日期合理、原文 HTML 可取、標題相符度至少 0.6 才寫 D1 公開表；不儲存未核對全文、不用 AI 摘要或自由分類；來源失敗保留狀態且不把空結果說成無新聞；前端只用 `textContent`／DOM API，`credentials:omit`、`no-referrer`、不寫 storage；`/robots.txt` 只開放此公開 read-only endpoint，其他 API 禁止爬取 | 每則最多 5 個固定關鍵字、一句 feed 摘要、官方原文、發布時間、核對時間；來源最近同步狀態；最多 40 則 | `worker/test/news.test.ts` 8 案例＋`scripts/test_news_ui.mjs`；check.ps1「自動核對新聞（P1-25）」；尚未部署時不得宣稱已自動更新 |
 | AI 兜底（C-4） | **全站**：首頁 `#assist`（釐清器與搜尋之後）內嵌；其餘根層頁面由 `main.js` 注入同一份標記到 `#assist-dialog`，元素 id 相同故邏輯共用一份。導覽列「問 AI」入口只在 `assistSettings()` 為真時建立，排在搜尋鈕之後。`lang/` 不載入 `main.js`，不受影響 | 一句話 4–200 字＋Turnstile | 只在 `apiBaseUrl` 與 `turnstileSiteKey` 都非空時渲染表單，否則只顯示「站內 AI 兜底尚未啟用」；送出前顯示第三方揭露（MiniMax、本站不保存、供應商可能依其條款處理）；`POST /api/assist` `{question, turnstileToken}`，`credentials: omit`、`no-referrer`；模型只回傳站內目錄連結，答案由伺服端固定模板組成（模型文字永不渲染）；回覆以 `textContent` 渲染，連結只接受同站白名單；任何錯誤 fail closed 顯示固定文案 | kind：`answer`（固定模板＋目錄連結）／`official_exit`（敏感輸入或個人判定類問題）／`over_cap`／`refused`；前端另以 429 回應的 `error.code` 區分 `rate_limited`（稍等再試）與 `assist_daily_cap`（額度用完） | check.ps1 首頁區塊（`#assist` 預設 hidden、origin 空時無 fetch）、全域區塊（注入版含 13 個相同元素、站內連結必須帶 `index.html`、導覽鈕以 `assistSettings()` 為條件）與 worker 區塊（assist.ts 禁 `console.`）；`worker/test/assist.test.ts` 19 案例（含 red-team 分流對照表、console spy、主機白名單、缺 IP）；2026-09-04 已上線（D-2026-09-04-01、D-2026-09-04-07） |
-| 全站搜尋（P0-9） | header 搜尋鈕＋首頁 `#search`（h2「卡片裡沒有你的說法？直接搜尋」）＋JS dialog；手機釐清器底部固定「搜尋」鈕 | 關鍵詞；8 個熱門 chip 皆為 `<a href>` 直接綁錨點（`work.html#verify`、`visa.html#counting`、`housing.html#bond`、`prep.html#first-week`、`english.html#reality`、`cost.html#budget`、`lang/en/visa/#choose`、`health.html#insurance`；首頁與 dialog 一致，無 JS 可點）；鍵盤 `/` | 首次使用才載入 `search-index.js`（頁數與入口數以 `scripts/build_search.py` 的 `ALL_PAGES` 與產物 `entries` 為準；含 `lang/en/visa/` 與 21 個出口卡 `data-search-entry`）；查詢改寫：NFKC → 去疑問詞／語助詞（`SEARCH_STOP_WORDS`）後 AND 比對 → 仍零結果才二字詞 OR 降級（命中過半）並標示「已用相近詞找」；原詞 1.0、同義詞（索引 `keywords`，48 題意圖表）0.7；排除 `hidden`、`data-search-ui` 與未啟用 UI；不保存、不送出；動態文字只用 `textContent` | 最多 8 個同站深連結；零結果依序：釐清器 4 階段 chip → 安全列入口 → 只揭露「問一次 AI」按鈕（不自動開啟、不移焦點、不載入 Turnstile）→ GitHub 連結最後 | `python scripts/build_search.py --check` 與 `node scripts/test_search.mjs`（10 句零結果數 0、指定第 1 名、不回歸集；皆由 check.ps1 執行）；check.ps1「站內搜尋」「P0-9 搜尋強化」區塊；索引大小前後見 DECISIONS D-2026-09-03-02 |
+| 全站搜尋（P0-9／P1-26） | header 搜尋鈕＋首頁 `#search`（h2「卡片裡沒有你的說法？直接搜尋」）＋JS dialog；手機釐清器底部固定「搜尋」鈕 | 關鍵詞；8 個熱門 chip 皆為 `<a href>` 直接綁錨點（`work.html#verify`、`visa.html#counting`、`housing.html#bond`、`prep.html#first-week`、`english.html#reality`、`cost.html#budget`、`lang/en/visa/#choose`、`health.html#insurance`；首頁與 dialog 一致，無 JS 可點）；鍵盤 `/` | 首次使用才載入 `search-index.js`（頁數與入口數以 `scripts/build_search.py` 的 `ALL_PAGES` 與產物 `entries` 為準；含 `lang/en/visa/` 與 21 個出口卡 `data-search-entry`）；查詢改寫：NFKC → 去疑問詞／語助詞（`SEARCH_STOP_WORDS`）後 AND 比對 → 仍零結果才二字詞 OR 降級（命中過半）並標示「已用相近詞找」；原詞 1.0、同義詞（索引 `keywords`，48 題意圖表）0.7；排除 `hidden`、`data-search-ui` 與未啟用 UI；不保存、不送出；動態文字只用 `textContent` | 最多 8 個同站深連結；零結果依序：釐清器 4 階段 chip → 安全列入口 → 只揭露「問一次 AI」按鈕（不自動開啟、不移焦點、不載入 Turnstile）→ GitHub 連結最後 | `python scripts/build_search.py --check` 與 `node scripts/test_search.mjs`（10 句零結果數 0、指定第 1 名、不回歸集；皆由 check.ps1 執行）；check.ps1「站內搜尋」「P0-9 搜尋強化」區塊；索引大小前後見 DECISIONS D-2026-09-03-02 |
 | 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；7 個完整英文頁為 editorial beta，未經母語專業校對不得標 reviewed | `python scripts/build_i18n.py --check`；check.ps1 七個「完整英文…頁」區塊 |
 | 頁尾旅程導覽 | 12 個線性內容頁（`main.js` 注入） | — | 依 `JOURNEY_ORDER` 產生上一站／完整旅程／下一站；首頁、模擬器與市集不注入 | 目前階段與第 x/12 頁 | check.ps1 頁面基線 |
 | 長頁答案卡與問題入口（P0-11） | visa、cost、housing、work、scam 五頁各一張 `section.answer-card`（取代 quick-answer hub 與證據卡）；其餘 7 頁（why、prep、market、english、health、leave、pr）維持 `#quick-answers` | — | 答案卡：類別標籤＋「417／462 適用」＋查核月 → 主結論 h2（≤ 35 字，無「，」「；」、無英文縮寫）→ 3 個要點（各 ≤ 25 字，同頁錨點）→ 主按鈕直達工具輸入區（visa `#postcode-tool`、cost `#save-calc`、housing `#housing-search-tool`、work `#verify`、scam `#help`）＋官方連結 → `<details class="answer-card-evidence">`（無 JS 可展開；`data-evidence-status="stale"` 時預設 `open`）→ `#full-contents`；quick-answers：4 張真實問題卡各一句「先做」＋同頁深連結；未命中提供 `#full-contents` 捷徑；生命危險卡用 `tel:000`；手機長距離錨點即時跳轉 | 直達段落或工具輸入區 | check.ps1「P0-11」與「長篇攻略先列真實問題」區塊（字數、縮寫、主按鈕目標元素、details）；答案卡高度與第一個正文 h2 位置見 DECISIONS D-2026-09-03-02 |
@@ -166,6 +172,8 @@ label「需要查證」）＋`idea.yml`（許願池）＋`thanks.yml`（公開�
 - repo 內不得出現 API key／secret；前端不得包含 D1、Turnstile secret 或寄信憑證。
 
 ## 4. 驗收程序（每次 push 前必跑）
+
+搜尋恢復加固（P1-26）另由 `scripts/test_search_ui.mjs` 回放：索引載入失敗或 10 秒逾時可在同頁重試，移除失敗 script 並清理計時器；所有入口共用錯誤狀態。開啟時立即聚焦輸入，載入完成不搶焦點；關閉後舊回應失效，焦點返回原入口；中文 IME 組字期間不提交搜尋。查詢不寫 storage、不送出，既有熱門／階段／安全出口仍可使用。此測試納入 `check.ps1`。
 
 ```powershell
 # 前置：python、node 在 PATH；worker/ 已執行 npm ci

@@ -158,6 +158,13 @@ assert.equal(elements["housing-rea-link"].href, "https://www.realestate.com.au/r
 assert.equal(elements["housing-domain-link"].href, "https://www.domain.com.au/rent/perth-wa-6000/");
 assert.equal(elements["housing-search-results"].hidden, false);
 
+// 急搬家可選一晚，跨月底仍要產生正確退房日。
+elements["housing-checkin"].value = "2026-12-31";
+elements["housing-stay-length"].value = "1";
+housingForm.requestSubmit();
+assert.match(elements["housing-booking-link"].href, /checkin=2026-12-31/);
+assert.match(elements["housing-booking-link"].href, /checkout=2027-01-01/);
+
 elements["housing-copy-location"].dispatch("click");
 assert.match(elements["housing-search-status"].textContent, /Perth WA 6000/);
 assert.doesNotMatch(elements["housing-search-status"].textContent, /123 Hay St/);

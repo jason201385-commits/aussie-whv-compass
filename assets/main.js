@@ -111,6 +111,7 @@
     + '</div>'
     + '<p class="site-search-privacy">搜尋在這台裝置內完成，不會把查詢送到本站或搜尋引擎，也不會保存搜尋紀錄。</p>'
     + '<p class="site-search-status" id="site-search-status" role="status" aria-live="polite">輸入一個主題，或先點熱門問題。</p>'
+    + '<button class="btn ghost" id="site-search-retry" type="button" hidden>重新載入搜尋</button>'
     + '<div id="site-search-results"></div>'
     + '</div>';
   document.body.appendChild(searchDialog);
@@ -127,14 +128,56 @@
     navInner.insertBefore(searchOpen, navLinks || null);
     if (navLinks) {
       var mobileNavQuery = window.matchMedia("(max-width: 768px)");
+      var navScroll = document.createElement("div");
+      navScroll.className = "nav-topic-scroll";
+      navInner.insertBefore(navScroll, navLinks);
+      var makeNavScrollButton = function (direction, label) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "nav-scroll-button";
+        button.setAttribute("aria-label", label);
+        button.innerHTML = '<svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="' + (direction < 0 ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6') + '"/></svg>';
+        button.hidden = true;
+        button.addEventListener("click", function () {
+          navLinks.scrollBy({
+            left: direction * Math.max(120, navLinks.clientWidth * 0.8),
+            behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+          });
+        });
+        return button;
+      };
+      var navPrevious = makeNavScrollButton(-1, "顯示前面的主題");
+      var navNext = makeNavScrollButton(1, "顯示後面的主題");
+      navScroll.appendChild(navPrevious);
+      navScroll.appendChild(navLinks);
+      navScroll.appendChild(navNext);
+      var updateNavScroll = function () {
+        var overflow = mobileNavQuery.matches && navLinks.scrollWidth > navLinks.clientWidth + 2;
+        navPrevious.hidden = navNext.hidden = !overflow;
+        navPrevious.disabled = navLinks.scrollLeft <= 2;
+        navNext.disabled = navLinks.scrollLeft >= navLinks.scrollWidth - navLinks.clientWidth - 2;
+        navScroll.classList.toggle("has-overflow", overflow);
+        navLinks.classList.toggle("has-before", overflow && !navPrevious.disabled);
+        navLinks.classList.toggle("has-after", overflow && !navNext.disabled);
+      };
       var positionCurrentNavLink = function () {
-        navLinks.setAttribute("aria-label", mobileNavQuery.matches ? "主題導覽，可左右滑動" : "主題導覽");
-        if (!mobileNavQuery.matches || !activeNavLink) return;
+        navLinks.setAttribute("aria-label", mobileNavQuery.matches ? "主題導覽，可左右滑動或用按鈕瀏覽" : "主題導覽");
+        updateNavScroll();
         window.requestAnimationFrame(function () {
-          var targetLeft = activeNavLink.offsetLeft - ((navLinks.clientWidth - activeNavLink.offsetWidth) / 2);
-          navLinks.scrollLeft = Math.max(0, targetLeft);
+          if (mobileNavQuery.matches && activeNavLink) {
+            var linkRect = activeNavLink.getBoundingClientRect();
+            var navRect = navLinks.getBoundingClientRect();
+            navLinks.scrollLeft += linkRect.left - navRect.left - ((navLinks.clientWidth - linkRect.width) / 2);
+          }
+          updateNavScroll();
         });
       };
+      navLinks.addEventListener("scroll", updateNavScroll, { passive: true });
+      if (typeof ResizeObserver === "function") {
+        new ResizeObserver(updateNavScroll).observe(navLinks);
+      } else {
+        window.addEventListener("resize", updateNavScroll);
+      }
       positionCurrentNavLink();
       if (typeof mobileNavQuery.addEventListener === "function") {
         mobileNavQuery.addEventListener("change", positionCurrentNavLink);
@@ -146,7 +189,13 @@
   var searchForm = document.getElementById("site-search-form");
   var searchStatus = document.getElementById("site-search-status");
   var searchResults = document.getElementById("site-search-results");
+  var searchRetry = document.getElementById("site-search-retry");
   var searchLoadPromise = null;
+  var searchLoadCancel = null;
+  var searchRequestId = 0;
+  var searchVisible = false;
+  var searchReturnFocus = null;
+  var searchComposing = false;
   // ==== search-core:start ====
   // 純函式、不碰 DOM。scripts/test_search.mjs 以這兩個標記把這段抽出來在 Node 執行，
   // 瀏覽器與驗收測試因此永遠用同一份演算法（OPTIMIZATION_PLAN P0-9 實作 1–3）。
@@ -305,21 +354,45 @@
       return Promise.resolve(window.WHV_SEARCH_INDEX.entries);
     }
     if (searchLoadPromise) return searchLoadPromise;
+    var script = document.createElement("script");
+    var timer = null;
+    var settled = false;
+    var resolveLoad;
+    var rejectLoad;
     searchLoadPromise = new Promise(function (resolve, reject) {
-      var script = document.createElement("script");
-      script.src = "assets/search-index.js?v=20261002-01";
-      script.async = true;
-      script.onload = function () {
-        if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
-          resolve(window.WHV_SEARCH_INDEX.entries);
-        } else {
-          reject(new Error("invalid search index"));
-        }
-      };
-      script.onerror = function () { reject(new Error("search index unavailable")); };
-      document.head.appendChild(script);
+      resolveLoad = resolve;
+      rejectLoad = reject;
     });
-    return searchLoadPromise;
+    var pendingPromise = searchLoadPromise;
+    var finish = function (error, entries) {
+      if (settled) return;
+      settled = true;
+      if (timer !== null) window.clearTimeout(timer);
+      script.onload = null;
+      script.onerror = null;
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (searchLoadPromise === pendingPromise) {
+        searchLoadPromise = null;
+        searchLoadCancel = null;
+      }
+      if (error) rejectLoad(error);
+      else resolveLoad(entries);
+    };
+    searchLoadCancel = function () { finish(new Error("search closed")); };
+    script.src = "assets/search-index.js?v=20261003-01";
+    script.async = true;
+    script.onload = function () {
+      if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
+        finish(null, window.WHV_SEARCH_INDEX.entries);
+      } else {
+        finish(new Error("invalid search index"));
+      }
+    };
+    script.onerror = function () { finish(new Error("search index unavailable")); };
+    timer = window.setTimeout(function () { finish(new Error("search index timeout")); }, 10000);
+    try { document.head.appendChild(script); }
+    catch (error) { finish(error); }
+    return pendingPromise;
   };
 
   var appendSearchLinks = function (parent, className, label, items) {
@@ -415,52 +488,110 @@
     }));
   };
 
+  var finishSearchClose = function () {
+    if (!searchVisible) return;
+    searchVisible = false;
+    searchRequestId += 1;
+    searchComposing = false;
+    if (searchLoadCancel) searchLoadCancel();
+    searchResults.setAttribute("aria-busy", "false");
+    var returnTarget = searchReturnFocus;
+    searchReturnFocus = null;
+    if (!returnTarget || !document.contains(returnTarget) || returnTarget.closest("[hidden]") || returnTarget.disabled
+      || (typeof returnTarget.getClientRects === "function" && returnTarget.getClientRects().length === 0)) returnTarget = searchOpen;
+    if (returnTarget && typeof returnTarget.focus === "function") returnTarget.focus();
+  };
+
   var closeSiteSearch = function () {
     if (typeof searchDialog.close === "function") searchDialog.close();
     else {
       searchDialog.removeAttribute("open");
       searchDialog.hidden = true;
-      searchOpen.focus();
     }
+    finishSearchClose();
   };
 
-  var openSiteSearch = function (initialQuery) {
+  // 所有搜尋入口共用錯誤收斂；每個請求有序號，關閉或新輸入後不讓舊回應改畫面。
+  var requestSiteSearch = function () {
+    if (!searchVisible) return Promise.resolve();
+    var requestId = ++searchRequestId;
+    searchRetry.hidden = true;
+    searchStatus.textContent = "正在準備本機搜尋索引…";
+    searchResults.setAttribute("aria-busy", "true");
+    searchResults.textContent = "";
+    return loadSearchIndex().then(function (entries) {
+      if (!searchVisible || requestId !== searchRequestId || searchComposing) return;
+      searchResults.setAttribute("aria-busy", "false");
+      renderSearch(entries, searchInput.value);
+    }).catch(function () {
+      if (!searchVisible || requestId !== searchRequestId || searchComposing) return;
+      searchResults.setAttribute("aria-busy", "false");
+      searchStatus.textContent = "搜尋索引目前無法載入。可重新載入搜尋，或使用熱門問題與上方導覽。";
+      searchResults.textContent = "";
+      searchRetry.hidden = false;
+    });
+  };
+
+  var openSiteSearch = function (initialQuery, source) {
+    if (!searchVisible) {
+      var opener = source || document.activeElement;
+      searchReturnFocus = opener && opener !== document.body && opener !== document.documentElement && !searchDialog.contains(opener) ? opener : searchOpen;
+    }
     searchDialog.hidden = false;
     if (typeof searchDialog.showModal === "function") {
       if (!searchDialog.open) searchDialog.showModal();
     } else {
       searchDialog.setAttribute("open", "");
     }
+    searchVisible = true;
     if (typeof initialQuery === "string") searchInput.value = initialQuery;
-    searchStatus.textContent = "正在準備本機搜尋索引…";
-    searchResults.textContent = "";
-    loadSearchIndex().then(function (entries) {
-      renderSearch(entries, searchInput.value);
-      window.setTimeout(function () { searchInput.focus(); searchInput.select(); }, 0);
-    }, function () {
-      searchStatus.textContent = "搜尋索引目前無法載入。你仍可使用上方導覽，或稍後重新整理再試。";
-      searchResults.textContent = "";
-    });
+    // 在點擊／按鍵當下聚焦，手機可直接輸入；載入完成不搶回使用者已移動的焦點。
+    searchInput.focus();
+    searchInput.select();
+    requestSiteSearch();
   };
   window.openWhvSearch = openSiteSearch;
 
-  searchOpen.addEventListener("click", function () { openSiteSearch(""); });
+  searchOpen.addEventListener("click", function () { openSiteSearch("", searchOpen); });
   searchDialog.querySelector(".site-search-close").addEventListener("click", closeSiteSearch);
+  searchDialog.addEventListener("cancel", function (event) {
+    event.preventDefault();
+    if (searchComposing || event.isComposing || event.keyCode === 229) return;
+    closeSiteSearch();
+  });
+  searchDialog.addEventListener("close", function () {
+    if (!searchDialog.open) finishSearchClose();
+  });
+  searchRetry.addEventListener("click", function () {
+    searchInput.focus();
+    requestSiteSearch();
+  });
   searchDialog.addEventListener("click", function (event) {
     if (event.target === searchDialog) closeSiteSearch();
   });
   searchDialog.addEventListener("keydown", function (event) {
     if (event.key !== "Escape") return;
+    if (searchComposing || event.isComposing || event.keyCode === 229) return;
     event.preventDefault();
     closeSiteSearch();
   });
   searchForm.addEventListener("submit", function (event) {
     event.preventDefault();
+    if (searchComposing || event.isComposing) return;
     if (!searchForm.checkValidity()) { searchForm.reportValidity(); return; }
-    loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); });
+    requestSiteSearch();
   });
-  searchInput.addEventListener("input", function () {
-    loadSearchIndex().then(function (entries) { renderSearch(entries, searchInput.value); });
+  searchInput.addEventListener("compositionstart", function () {
+    searchComposing = true;
+    searchRequestId += 1;
+  });
+  searchInput.addEventListener("compositionend", function () {
+    searchComposing = false;
+    requestSiteSearch();
+  });
+  searchInput.addEventListener("input", function (event) {
+    if (searchComposing || event.isComposing) return;
+    requestSiteSearch();
   });
   // 熱門 chip、結果、階段與安全出口都是 <a href>；點了就關閉 dialog，讓瀏覽器照常導向（同頁錨點也適用）。
   searchDialog.addEventListener("click", function (event) {
@@ -468,7 +599,7 @@
     if (link && searchDialog.contains(link)) closeSiteSearch();
   });
   document.addEventListener("keydown", function (event) {
-    if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey || event.isComposing || event.keyCode === 229) return;
     var target = event.target;
     var tag = target && target.tagName ? target.tagName.toLowerCase() : "";
     if (tag === "input" || tag === "textarea" || tag === "select" || (target && target.isContentEditable)) return;
@@ -483,7 +614,7 @@
       event.preventDefault();
       var query = homeSearchInput.value.trim();
       if (!query) { homeSearchInput.focus(); return; }
-      openSiteSearch(query);
+      openSiteSearch(query, homeSearchInput);
     });
   }
 
@@ -492,7 +623,7 @@
   if (clarifierSearchOpen) {
     clarifierSearchOpen.addEventListener("click", function (event) {
       event.preventDefault();
-      openSiteSearch("");
+      openSiteSearch("", clarifierSearchOpen);
     });
   }
 

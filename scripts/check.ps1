@@ -1787,6 +1787,11 @@ if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 站內搜尋驗收失敗（scripts/test_search.mjs；OPTIMIZATION_PLAN P0-9 驗收 1–2）'
   $errors++
 }
+& node (Join-Path $dir 'scripts\test_search_ui.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 搜尋載入恢復與焦點行為驗收失敗（scripts/test_search_ui.mjs；P1-26）'
+  $errors++
+}
 & node (Join-Path $dir 'scripts\clarifier-contract.mjs')
 if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 首頁釐清器契約測試失敗（scripts/clarifier-contract.mjs；OPTIMIZATION_PLAN P0-8 驗收 6）'
@@ -2330,7 +2335,7 @@ if (-not $entryCards.Success) {
     Write-Output "FAIL [index.html] 入口卡必須恰好四張且依序連 news.html、communities.html、#games、#journey-resume；目前：$($entryHrefs -join ', ')"
     $errors++
   }
-  foreach ($entryCardNeedle in @('今天有什麼變化？', '只列通過自動核對的消息', '找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
+  foreach ($entryCardNeedle in @('近期變更與重要提醒', '先看適用地區、生效日期與下一步，再回官方原文查證。', '找在地公開討論', '不配對、不代聊', '先在安全的地方試一次', '只在你的裝置上跑', '<a class="home-entry-card" id="home-entry-resume" href="#journey-resume" hidden>')) {
     if (-not $entryCards.Value.Contains($entryCardNeedle)) { Write-Output "FAIL [index.html] 入口卡文案或續讀卡預設 hidden 缺失：$entryCardNeedle"; $errors++ }
   }
   if ($entryCards.Index -le $indexText.IndexOf('id="assist"') -or $entryCards.Index -ge $indexText.IndexOf('id="communities"')) {
@@ -3665,12 +3670,29 @@ if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Te
     'id="news-list"',
     'id="news-source-status"',
     '每 6 小時自動檢查',
-    '這不是全澳新聞大全',
+    '覆蓋範圍有限，沒有列出不代表沒有消息',
     '不是對政策影響的個案判定',
     'assets/news.js?v='
     '<link rel="alternate" type="application/json" href="https://api.aussiewhvcompass.com/api/news?window=month&amp;topic=all"'
   )) {
     if (-not $newsPageText.Contains($newsPageNeedle)) { Write-Output "FAIL [news.html] 缺時間、來源或查核邊界：$newsPageNeedle"; $errors++ }
+  }
+  # P1-27：人工提醒獨立於 API，保留日期性質、適用地區與原文查核界線。
+  foreach ($importantNeedle in @(
+    'id="important-updates"',
+    'id="official-check"',
+    '2026-10-03 人工核對官方原文',
+    '這些卡片不會自動重驗',
+    '不代表目前發生緊急事故',
+    '適用地區',
+    '啟用日期',
+    '開始日期',
+    '生效日期',
+    '來源更新',
+    '來源發布',
+    '未接入當地警報'
+  )) {
+    if (-not $newsPageText.Contains($importantNeedle)) { Write-Output "FAIL [news.html] 重要提醒缺日期、地域或人工核對界線：$importantNeedle"; $errors++ }
   }
   foreach ($newsJsNeedle in @(
     'config.newsEnabled !== true',

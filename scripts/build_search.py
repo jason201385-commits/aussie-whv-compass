@@ -91,6 +91,7 @@ INTENT_SYNONYMS = {
     # visa.html
     "visa.html#first": "能不能申請 可以申請嗎 我能申請嗎 資格 年齡限制 幾歲 財力證明 存款證明 5000澳幣 打工度假簽證 WHV 打工簽 Working Holiday",
     "visa.html#apply": "怎麼申請 自己申請 送件 ImmiAccount 申請流程 申請步驟 体检 體檢 HAP",
+    "visa.html#processing": "簽證還沒下來 等下簽 下簽很慢 申請進度 審理時間 processing times",
     "visa.html#where": "算不算集簽 能不能集簽 指定工作 specified work 郵遞區號 postcode 農場簽 三個月農場 偏遠地區 regional",
     "visa.html#evidence": "集簽證明 雇主證明 1263 工作證明 payslip證明 二簽文件 留什麼證明 存證據",
     "visa.html#second": "二簽 三簽 集二簽 集簽 88天 179天 second visa third visa 2nd visa 農場簽 簽證到期 延簽 續簽 簽證過期 快到期 簽證快到了",
@@ -115,6 +116,7 @@ INTENT_SYNONYMS = {
     # housing.html
     "housing.html#book": "短住 今晚住哪 沒地方住 落腳處 Airbnb 青旅 hostel 背包客棧 backpacker YHA 訂房 過渡住宿 短租 民宿",
     "housing.html#find": "share house 合租 分租 雅房 群租 合租房 sharehouse 整租 lease 租屋 租房 找房 租整間 室友",
+    "housing.html#rental-brief": "租屋含不含bills 包bills 包帳單 包水電 入住日 家具 傢俱 找房條件 含網路",
     "housing.html#bond": "押金 bond 保證金 deposit 訂金 誠意金 先付押金 押金先給嗎 押金安全嗎 退押金",
     "housing.html#contract": "租約 agreement 合約看不懂 租金 修繕 退租 二房東 sublet 轉租 head tenant",
     # market.html
@@ -123,6 +125,8 @@ INTENT_SYNONYMS = {
     "market.html#safety-title": "多匯一筆 先付訂金 交易詐騙 退款 假買家 溢付",
     # work.html
     "work.html#channels": "哪裡找工作 找不到工作 找工 求職平台 Seek Indeed 投履歷 工作去哪找 找工作 沒工作",
+    "work.html#commute": "沒車找工 沒車怎麼找工 無車工作 早班公車 晚班回家 通勤 雇主接送 交通費 找工沒車",
+    "work.html#payslip-help": "工資有問題 薪資有問題 沒薪資單 沒payslip 拿不到薪資單 薪資單有問題 現金領薪 領現金 工時證據",
     "work.html#verify": "雇主合法嗎 這工合法嗎 這份工作合法嗎 查雇主 ABN 查核 offer 假工作 正規嗎 白工 合法工",
     "work.html#seasons": "這個月有什麼工作 採收季 季節 農場 採果 picking packing 包裝廠 果園 肉廠 meat works abattoir working hostel",
     "work.html#injury": "工作受傷 職災 工傷 現場不安全 workers compensation 受傷了",
@@ -146,6 +150,7 @@ INTENT_SYNONYMS = {
     "health.html#doctor": "看醫生 生病 GP 家庭醫生 診所 急診 urgent care healthdirect 掛號 bulk billing 生病看哪裡 看病",
     "health.html#mental": "心理 撐不住 憂鬱 焦慮 壓力 想家 崩潰 危機支援 Lifeline 孤單 想回家",
     "health.html#medicare": "Medicare 健保 澳洲健保 停保 公醫",
+    "health.html#women": "女生獨旅 女性安全 一個人旅行 獨旅安全 被跟蹤 1800RESPECT",
     # leave.html
     "leave.html#tax": "退稅 報稅 tax return myTax 報税 退税 財政年度 要不要報稅 ATO 退稅季",
     "leave.html#super": "super帳戶 好幾個super 整理super 退休金帳戶 合併 養老金 公積金",
@@ -156,6 +161,11 @@ INTENT_SYNONYMS = {
     "pr.html#employer": "雇主擔保 482 186 sponsor 提名 擔保簽證 老闆擔保",
     "pr.html#points": "技術移民 分數 EOI 189 190 491 州提名 skills assessment 偏遠地區 regional",
     "pr.html#reality": "找誰問 移民代理 OMARA RMA 律師 代辦",
+    # news.html: 官方原文人工核對的提醒。
+    "news.html#ausalert-update": "AusAlert 緊急警報 手機警報 澳洲警報",
+    "news.html#daylight-saving-update": "夏令時間 daylight saving 冬令時間 時差 調時鐘 10月4日",
+    "news.html#vic-rental-update": "VIC租屋新制 維州租屋改革 租屋申請費 押金求償 10月13日",
+    "news.html#investment-scam-update": "投資群組詐騙 假新聞投資 保證獲利 提領費",
     # index.html
     "index.html#communities-title": "社團 群組 群 LINE群 微信群 討論 同鄉會 伯斯 珀斯 Perth 墨爾本 墨尔本 Melbourne 布里斯本 布里斯班 Brisbane 雪梨 悉尼 Sydney 阿德雷德 阿德莱德 Adelaide 達爾文 达尔文 Darwin 荷巴特 霍巴特 Hobart 坎培拉 堪培拉 Canberra 黃金海岸 Gold Coast 凱恩斯 Cairns 塔斯 Tasmania 第一站 落地城市 去哪個城市",
     # lang/en/visa/

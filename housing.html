@@ -29,7 +29,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20261002-01" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20261003-01" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -61,7 +61,7 @@
       "publishingPrinciples": "https://www.aussiewhvcompass.com/crawler-policy.txt",
       "subjectOf": "https://www.aussiewhvcompass.com/content-status.json",
       "image": "https://www.aussiewhvcompass.com/assets/og-cover.png",
-      "dateModified": "2026-10-02"
+      "dateModified": "2026-10-03"
     },
     {
       "@type": "BreadcrumbList",
@@ -88,7 +88,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20261002-01">
+<link rel="stylesheet" href="assets/style.css?v=20261003-01">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 </head>
 <body data-i18n-topic="housing">
@@ -189,10 +189,12 @@
         <div class="housing-search-field" data-housing-shortstay-field>
           <label for="housing-stay-length">先搜幾晚</label>
           <select id="housing-stay-length" name="stayLength">
+            <option value="1">1 晚</option>
             <option value="7">7 晚</option>
             <option value="14" selected>14 晚</option>
             <option value="28">28 晚</option>
           </select>
+          <small>今晚需要短住？選 1 晚，並核對目的地當地的入住日期；空房與價格以平台為準。</small>
         </div>
         <div class="housing-search-field">
           <label for="housing-guests">人數</label>
@@ -331,6 +333,18 @@
       <tr><td>Gumtree</td><td>分類廣告</td><td>個人刊登多；不要把平台帳號或刊登時間當成身分驗證</td></tr>
     </tbody>
   </table></div>
+  <section class="note" id="rental-brief" data-search-entry="租屋含不含 bills？先列出找房條件|#rental-brief" aria-labelledby="rental-brief-title">
+    <h3 id="rental-brief-title">租屋含不含 bills？先列出找房條件</h3>
+    <p><strong>本站編輯整理：</strong>先用<a href="#housing-search-tool">住宿搜尋工具</a>選入住日期與人數，再把下列條件問清楚；刊登中的「包帳單」仍要確認涵蓋範圍。</p>
+    <ul>
+      <li>入住日、預計租期與退租通知方式。</li>
+      <li>每週總費用：水、電、瓦斯、網路是否包含，有沒有額度或額外收費。</li>
+      <li>床、床墊、書桌、洗衣與廚房設備；哪些家具需要自己準備。</li>
+      <li>地區、實際工作班次與通勤方式；用<a href="work.html#commute">無車通勤檢查</a>核對，不只看地圖距離。</li>
+      <li>共用空間、住戶人數與作息；押金、收據和<a href="#bond">官方保管方式</a>另行查核。</li>
+    </ul>
+  </section>
+
   <h3>看房（inspection）檢查清單</h3>
   <ul>
     <li><strong>鐵律一：沒進室內看過的房，一毛不匯。</strong>「人在海外」「視訊帶看就好」＝走人。</li>
@@ -402,11 +416,11 @@
   </div>
 </footer>
 
-<script src="assets/analytics-config.js?v=20261002-01" defer></script>
-<script src="assets/analytics.js?v=20261002-01" defer></script>
-<script src="assets/i18n.js?v=20261002-01" defer></script>
-<script src="assets/api-config.js?v=20261002-01" defer></script>
-<script src="assets/main.js?v=20261002-01" defer></script>
-<script src="assets/tools.js?v=20261002-01" defer></script>
+<script src="assets/analytics-config.js?v=20261003-01" defer></script>
+<script src="assets/analytics.js?v=20261003-01" defer></script>
+<script src="assets/i18n.js?v=20261003-01" defer></script>
+<script src="assets/api-config.js?v=20261003-01" defer></script>
+<script src="assets/main.js?v=20261003-01" defer></script>
+<script src="assets/tools.js?v=20261003-01" defer></script>
 </body>
 </html>
