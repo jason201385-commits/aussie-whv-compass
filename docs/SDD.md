@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-10-02｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-10-09｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -87,7 +87,7 @@
 | `assets/main.js` | 全站共用：sprite、導覽、搜尋、續讀／收藏、回饋列、社團目錄篩選、首頁釐清器（hash 驅動）、AI 兜底（fail closed）、需求單、D+ |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP、住宿搜尋、市集草稿（特徵偵測按頁啟用） |
 | `assets/simulator.js` | 模擬器狀態機 |
-| `assets/news.js`、`news.html` | 關鍵字優先的官方消息前台；只顯示後端已核對資料 |
+| `assets/news.js`、`news.html` | 人工核對的重要提醒與官方快查；下方自動新聞只顯示後端已核對資料 |
 | `assets/api-config.js` | 公開 API origin、Turnstile site key、住宿搜尋公開開關；留空即 fail closed；不得放 secret |
 | `assets/search-index.js` | 由 `build_search.py` 產生的靜態搜尋索引；產物不得手改 |
 | `assets/i18n-locales.json`、`i18n.js` | 護照國家／語言 registry 與語言切換；`i18n.js` 為產物 |
@@ -118,9 +118,9 @@
 quick-answer hub → 高風險證據卡 → 完整內容與參考資料目錄 → 內容）→ 回饋列（JS 注入）→
 footer（免責聲明）→ 五支 `<script src defer>`。
 
-**導覽**：全部 18 頁的 `.nav-links` 統一 12 連結（why→about）；`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，
+**導覽**：根層 `.nav-links` 統一 13 連結（自我釐清之後為「免費二手」，其餘順序不變；P1-25），英文完整頁與 Quick Start 另提供標示中文的免費二手入口；`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，
 不進全站 nav、不標 `aria-current`（站長 2026-09-02 決定，`check.ps1` 強制；理由見 §6 教訓 3）。
-**新增頁面時**：複製既有頁骨架；19 個根層 HTML（含 404）與 7 個 `lang/en/**` 頁的 nav 都要改
+**新增頁面時**：複製既有頁骨架；20 個根層 HTML（含 404）與 7 個 `lang/en/**` 頁的 nav 都要改
 （用腳本批次替換，別手改）；`build_seo.py`、`build_search.py` 的頁面清單加項並重跑；
 `SPEC.md` §1.1 加列。
 
@@ -133,7 +133,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
   HTTP success 與後端 `{ok:true}`；管理 token 只走同站 URL fragment，讀入後立刻 `history.replaceState` 清除，不寫 storage。
 - **站內搜尋**：首次開啟才載入 `search-index.js`；查詢不寫 storage、不 fetch、不送搜尋引擎；
   結果 URL 只能是 builder 的固定同站頁面／錨點；動態文字只用 `textContent`。
-- **多國語言**：繁中 18 頁是唯一完整內容集；`lang/<locale>/` 為靜態 Quick Start，`lang/en/<topic>/`
+- **多國語言**：繁中 19 頁是唯一完整內容集；`lang/<locale>/` 為靜態 Quick Start，`lang/en/<topic>/`
   漸進完整翻譯；語言切換不保存、不送出。機器翻譯不得移除風險聲明；`english-fallback` 直接顯示英文。
   台灣限定內容改寫成護照中立分流；單一 subclass 工具必須在輸入前、結果中、來源旁重複明示限制。
 - **GA4 邊界**：ID 不符 `G-[A-Z0-9]+` 立即停用；符合時也先等 `whv-analytics-consent-v1=granted`
@@ -314,3 +314,18 @@ inline link 持續顯示底線，不只靠顏色辨識；官方來源連結必�
 - **回放驗證**：宣稱完成前，實際打開線上站點測功能（不是看 code 覺得對）；
   狀態只能用 `ROADMAP.md` §0 的詞彙。
 - **驗收腳本**：`scripts/check.ps1`（`SPEC.md` §4）push 前必跑。
+
+## 7. 公開贈送看板增補（P1-24）
+
+站長在 2026-09-16 明確要求新增「離澳免費二手版」，沿用已授權 repo 部署。此功能例外允許使用者在明示同意後自行向 GitHub 公開刊登，不擴張 Worker／CRM 資料範圍；表單未確認前仍只在本機。新增 `free.html`、`assets/free-board.js`、`assets/free-board.css` 與 GitHub Issue template。GitHub 公開 API 是由使用者按鈕啟動的第三方連線，不傳送篩選字詞或憑證，GA4 排除此頁。行為見 SPEC §6，站長決策見 DECISIONS D-2026-09-16-01。
+
+
+## AI 閱讀衍生格式（P1-26）
+
+靜態 HTML 仍為唯一內容來源，既有 SEO 產生器同時匯出明列白名單頁面的閱讀副本，不引入網站執行時建置、RAG、外部模型或資料庫。`scripts/ai_reading.py` 使用 Python 標準庫；`scripts/test_ai_reading.py` 驗證同源、來源與隱私排除。`ai-index.json` 提供來源網址、語言、段落與 SHA-256，不增加第三方追蹤。
+
+
+## 9. 同源任務答案與緩衝期模組（P1-27）
+
+`answers.json` → `scripts/build_task_answers.py` → 原生 HTML 卡片；同一筆資料經 `build_search.py` 產生小型 `answer` 欄位供 `main.js` 的精確整題查詢使用，再由現有 `build_seo.py` 產生閱讀版。產生格式不等於重新查核。所有新內容對人與爬蟲一致；不新增新頁面、不增加問答 API，也不切換量測開關。
+`assets/cash-runway.js` 為獨立純函式與 DOM adaptor，不修改原本存錢試算器的資料／storage 契約。新增入口以原生連結為基線；缺 JavaScript 時仍能讀條件與公式。金額不進 URL、事件、storage 或遠端。操作結果加 `data-ai-exclude` 並排除搜尋。

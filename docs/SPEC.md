@@ -1,6 +1,6 @@
 # 澳打指南針 — 現況行為契約（SPEC）
 
-> 版本 2.0｜最後更新 2026-10-03｜本文件只寫「現在的行為是什麼、怎麼驗證」。
+> 版本 2.0｜最後更新 2026-10-09｜本文件只寫「現在的行為是什麼、怎麼驗證」。
 > 待辦與狀態在 `ROADMAP.md`，為什麼與證據在 `DECISIONS.md`，原則與架構在 `SDD.md`，
 > 閱讀路線在 `README.md`。改動任何功能行為時，必須在同一個 commit 更新本文件對應列並更新標頭日期。
 
@@ -23,7 +23,7 @@
 
 ## 1. 現況基線（＝驗收基線）
 
-### 1.1 頁面清單（根層 18 頁＋404）
+### 1.1 頁面清單（根層 19 頁＋404）
 
 | 檔案 | 旅程階段 | 內容 | 問題入口 | 證據卡 |
 |---|---|---|---|---|
@@ -40,6 +40,7 @@
 | `english.html` | 決定要去 | 英文資源與策略 | 有 | — |
 | `health.html` | 決定要去 | 保險就醫心理安全 | 有 | 有 |
 | `leave.html` | 回程與延續 | 報稅退休金離澳＋DASP 粗估＋離澳收尾清單 | 有 | 有 |
+| `free.html` | 回程與延續／初登澳（工具頁） | 離澳免費二手版；GitHub 公開 Issue＋審核標籤、同城篩選、刊登草稿 | 有 | — |
 | `market.html` | 回程與延續／初登澳 | 離澳出清 × 初登澳補給：交換草稿產生器與平台入口 | 有 | 有 |
 | `communities.html` | 落地後找人 | 各地社團目錄：地區 × 需求的公開入口；不進全站 nav（同工具頁規則） | 有 | 有 |
 | `news.html` | 全階段 | 四張人工核對的近期重要提醒、官方快查、今天／本週／本月的自動新聞；來源與生效日期分列、每則回鏈來源；不進全站 nav | — | — |
@@ -51,7 +52,7 @@
   housing → work → scam → pr（已在澳洲）→ leave → about（回程與延續）；`index`、`simulator`、`market` 不在線性順序內。
   上表「旅程階段」欄以此為準。
 - 每頁：toc（長頁為「完整內容與參考資料」）、來源標註、頁尾免責、回饋列。
-- 導覽：內容頁 `.nav-links` 統一 12 連結（why→about）。`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，不進全站 nav、頁內不標 `aria-current`（`news.html` 從首頁入口卡與搜尋進入，`check.ps1` 強制）。
+- 導覽：根層內容頁 `.nav-links` 統一 13 連結（why→free→visa→about）。`simulator.html`、`market.html`、`communities.html`、`map.html` 與 `news.html` 是工具／動態資訊頁，不進全站 nav、頁內不標 `aria-current`（`news.html` 從首頁入口卡與搜尋進入，`check.ps1` 強制）。
 - 內容基準日 2026-08-28／29；換匯段落 2026-09-01 查核。
 
 手機導覽加固（P1-30）：站名與 AI 入口在第一列，語言與搜尋在第二列；主題仍維持單列橫向捲動。JavaScript 增強提供 44px 左右按鈕、首尾停用與依剩餘內容切換的邊緣遮罩，當前頁置中；桌機隱藏按鈕，無 JavaScript 保留原始主題連結。瀏覽器回放檢查站名完整、無全頁水平溢位、按鈕與 Tab 可到最後一個主題。
@@ -180,7 +181,7 @@ label「需要查證」）＋`idea.yml`（許願池）＋`thanks.yml`（公開�
 powershell -File scripts/check.ps1
 ```
 
-`scripts/check.ps1` 全部通過輸出 `ALL CHECKS PASSED (18 pages)` 並以 0 結束。它涵蓋：
+`scripts/check.ps1` 全部通過輸出 `ALL CHECKS PASSED (19 pages)` 並以 0 結束。它涵蓋：
 
 1. 結構＋內部連結＋錨點＋nav 數量（12／13 例外寫死）、canonical／og:url／sitemap／robots 鎖定正式網域、
    404 契約、唯一 h1／main、`zh-Hant`、viewport、ID 不重複、`noopener`、`button type`、skip link、
@@ -211,3 +212,55 @@ powershell -File scripts/check.ps1
 | 每季 | 交通票價政策優惠（myki 半價 2027-01 到期、QLD 50c、Perth $2.80）、手機方案、匯率係數（tools.js 的 22.8）、換匯段落來源（ACCC／Moneysmart／AUSTRAC） |
 | 官方公告時 | `postcodes.js` 重抽（SDD §5 程序）；`seasons.js` 各州官方表；WHM 制度變動（88 天檢討、Workplace Justice 試辦狀態） |
 | 隨時 | Issue triage：「需要查證」→查官方→修→關單附證據；`third-party-register.json` 查核日期 |
+
+## 6. P1-24 離澳免費二手版
+
+`free.html` 是獨立工具頁；依 P1-25 納入全站主選單，首頁入口移至階段選擇旁，並於離澳、原市集、行前與住宿頁交叉連結。
+只收一般生活用品免費贈送，不做付款、運送、保管或身分認證。原市集付費買賣草稿保持獨立。
+
+- 輸入：固定城市／分類／狀況、50 字品名、90 字面交區域、300 字說明、今天至 90 天內截止日。日期統一用 Australia/Perth（UTC+8）。無聯絡資料欄位，不寫 storage。
+- 送出：先產生本機預覽，明示尚未刊登。經使用者同意，僅以標題與 body URL 參數前往 GitHub Markdown Issue template；不用 labels query（一般訪客不需標籤權限）。仍需登入 GitHub 自行 Submit。URL 含草稿並可能進入瀏覽紀錄。
+- 資料：只在按載入後讀 GitHub 公開 issues API，credentials omit／no-referrer；只列帶 `free-board-approved` 的 open、非 locked、非 PR、格式有效且未過期的 AUD 0 刊登。每批 50 筆，依 Link 判斷是否可載入更多，去除重複；API 失敗與空結果明確區分。
+- 顯示：城市、分類、關鍵字、狀態皆在記憶體篩選；截止或最新排序。用 textContent，連結依 issue number 組固定 repo URL，不採使用者 HTML 或圖片 URL。
+- 狀態：`free-board-reserved` 顯示已預約；關閉或本文已送出不顯示。修改原文由 `free-board-moderation.yml` 撤下 approved，須重審。到期只隱藏，不自動刪除 GitHub 原貼。
+- 審核：站長確認免費、允收範圍、格式、照片與文字沒有敏感個資，再手動加 approved；不是商品安全認證。預約加 reserved；不當刊登移除 approved 或關閉，涉及個資需另外處理原貼刪除。
+- 無 JavaScript／API 限流：原生 GitHub 瀏覽與模板連結仍可用；不虛構刊登或成功狀態。GA4 排除 free.html；公開刊登不連接私人需求資料。
+- 驗證：`node --test scripts/test_free_board.cjs`；`NODE_PATH=<playwright install>/node_modules node scripts/test_free_board_browser.cjs`；全站 `scripts/check.ps1`。
+
+## 7. P1-25 免費二手可發現性與分享
+
+- 根層所有頁面（含 404）提供第 2 個「免費二手」原生導覽連結；free.html 唯一 aria-current。其他工具頁仍不加入主選單。完整英文頁與語言 Quick Start 連至 /free.html 並標示中文，不宣稱完整翻譯。
+- 首頁雙入口位於四階段選擇之後、展開面板之前，直達 free.html#free-board 與 #publish；移除原下方重複卡，不改階段或護照判斷。行前與住宿頁補情境入口。
+- 免費二手頁 768px 以下提供底部找物／送物操作列，保留底部安全空間。編輯欄位時隱藏，列印不顯示；原生錨點在無 JS 時仍有效。
+- 分享僅讀城市選單，產生固定正式網域的 #free-board?city=... fragment；不含自由搜尋、表單內容或其他網址參數，不寫 storage、不定位、不自動讀取 GitHub。開啟連結僅預選有效城市並捲至看板，仍須使用者按載入才讀物品。
+- 分享採裝置原生 share；不可用則複製，拒絕或失敗提供可手動複製的唯讀連結，取消不謊報成功。複製按鈕永遠可獨立使用。
+- 不調整 GitHub 投稿／審核契約，不新增資料庫、登入服務或分析追蹤。
+- 驗證：scripts/test_free_board_access.cjs（離線契約與分享函式）；scripts/test_free_board_access_browser.cjs（桌機、手機尺寸、鍵盤、深連結、分享失敗、no-JS）；原看板與地圖測試照常。
+
+
+## 8. AI／Claude 公開內容探索（P1-26）
+
+`build_seo.py` 與 `ai_reading.py` 同源產生 `ai/*.md`、`ai/en/*.md`、`ai-index.json` 與 `llms-full.txt`。只取 `PAGES` 與完整英文攻略的 main；不匯出 form、script、hidden、動態刊登、試算結果、API、CRM、測試或交接文件。不是為爬蟲另寫不同答案，也不抓取外部內容。
+
+原頁是 canonical；保留原始查核日期、來源連結、證據卡範圍、未經專業審校狀態。新格式產生不升級政策或查核日期。sitemap 的根層 lastmod 與既有 content-status 記錄一致，不再把新增頁標成共同舊日期。
+
+各匯出頁原生 head alternate 與 footer 提供逐頁純文字及索引；無 JS 可用。`llms.txt` 仍保留所有原頁，另連單頁 Markdown 與合併文字。Markdown 不包括即時二手庫存，不讀 GitHub 刊登、不繞過載入同意。
+
+Claude-SearchBot、Claude-User 的 robots group 明示允許公開內容，逐組重複私人端點排除；wildcard 的既有權限不放寬，訓練授權不另變更。robots 不是安全防護；Cloudflare 規則及驗證爬蟲存取為獨立層。
+
+驗收：`python scripts/build_seo.py --check`、`python scripts/test_ai_reading.py`、`build_i18n.py --check`、`build_search.py --check`。正式 GET 需比對檔案 bytes 與 UA 相容性；模擬 UA 不等於真實 Anthropic 爬蟲，HTTP 200 也不是收錄或引用證據。操作手冊見 AI_DISCOVERY.md。
+
+
+## 9. 新手任務與適用條件答案（P1-27）
+
+`answers.json` 是任務摘要、適用範圍、待確認條件、下一步及來源的唯一輸入；`scripts/build_task_answers.py` 產生既有頁面上的原生答案卡與首頁直達入口。卡片數與題目以此登記檔為準，不另維護問答資料庫。`sourceCheckedAt` 是本卡來源／本站操作的人工核對日；`reviewDue` 是維護排程，不是新鮮度保證；`reviewedByDomainProfessional` 保持 false，既有全頁與證據卡查核範圍不變。
+
+首頁仍保留四階段與 21 個出口。第一站城市問題保留舊出口 ID 以相容分享，但實際目的地改為 `prep.html#first-city`。已知問題可直接走三個主要任務或其他問題連結，不必先交護照資訊。
+
+搜尋只在整句正規化後唯一命中已登記 queries 時顯示編輯答案；並非模型即時回答，也不把原演算法的模糊匹配當成確認答案。其他查詢沿用原搜尋。`needs-review`、日期缺漏／不合理或 UTC+8 已到 `reviewDue` 時，瀏覽器不顯示舊摘要，保留條件與查核出口。靜態頁明示核對與複核日期；無 JS 不承諾自動按今日隱藏，到期維護仍須人工或建置處理。純文字同源，沒有新增「最新／已專業審校」宣稱。
+
+`cost.html#runway-tool` 為本機無收入情境試算：可動用現金減尚未支付的一次性支出、未付押金、不動用保留金，再除以每週必要開支。以整數 cents 計算，金額限非負且最多兩位小數，週開支須正數；輸出可用生活金、完整週數、向下取到一位小數的週數、達到使用者目標的資金差額。負可用金另顯示前置費用缺口，不輸出負週數。沒有收入、固定支出、押金期間內不退的假設必須可見；已從現金扣過或已預付的費用不可重複扣。範例需明示非建議金額，不預填讀者的金額。修改輸入清空舊結果；結果與表單不進搜尋、AI 閱讀版。無 JS 保留公式，表單隱藏。新工具不讀寫 storage、不連網、不計算稅率、簽證財力或找工機率。
+
+來源回報只預填卡片名稱與固定網址到現有 GitHub issue form，原貼公開且需要登入，不能附個資。核對入口含單獨 417／462 規則與不確定出口；ABN 登記不作為雇主安全保證，國家最低工資參考不代替 award／agreement 個案核對。
+
+驗收：生成器 check、Python 來源／anchor／字串安全檢查、Node 搜尋與金額邊界、Chromium 桌機／手機／無 JS／逾期／隱私檢查。完整基線保留既存失敗，不宣稱真人完成率或導流成效。

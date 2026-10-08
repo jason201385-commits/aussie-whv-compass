@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-17",
+  "scope": "本卡來源與操作核對；不代表整頁已審校、不代表個案資格。",
+  "sources": {
+    "budget": {
+      "label": "ASIC Moneysmart：預算規劃",
+      "url": "https://moneysmart.gov.au/budgeting/how-to-do-a-budget",
+      "kind": "official"
+    },
+    "transport": {
+      "label": "NSW Transport：行程規劃",
+      "url": "https://transportnsw.info/plan",
+      "kind": "official"
+    },
+    "arrival": {
+      "label": "ABF：入境旅客申報",
+      "url": "https://www.abf.gov.au/crossing/Pages/incoming-passenger-card.aspx",
+      "kind": "official"
+    },
+    "tfn": {
+      "label": "myGov：取得或找回 TFN",
+      "url": "https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number",
+      "kind": "official"
+    },
+    "job-details": {
+      "label": "myGov：到職時提供的資料",
+      "url": "https://my.gov.au/en/services/work/starting-a-job/what-your-employer-needs-from-you/providing-financial-details-to-your-employer",
+      "kind": "official"
+    },
+    "super": {
+      "label": "myGov：super 與選擇基金",
+      "url": "https://my.gov.au/en/services/work/currently-employed/superannuation/how-super-works-and-choosing-a-fund",
+      "kind": "official"
+    },
+    "jobs": {
+      "label": "Workforce Australia：公開求職入口",
+      "url": "https://www.workforceaustralia.gov.au/individuals/jobs/",
+      "kind": "official"
+    },
+    "pay": {
+      "label": "Fair Work：簽證持有人職場權益",
+      "url": "https://www.fairwork.gov.au/find-help-for/visa-holders-migrants",
+      "kind": "official"
+    },
+    "award": {
+      "label": "Fair Work Commission：award 與薪資條件",
+      "url": "https://www.fwc.gov.au/work-conditions/minimum-wages-and-conditions/where-find-your-pay-and-conditions",
+      "kind": "official"
+    },
+    "abn": {
+      "label": "ABN Lookup：企業登記資訊",
+      "url": "https://abr.business.gov.au/",
+      "kind": "official"
+    },
+    "bond": {
+      "label": "QLD RTA：辨識租屋詐騙",
+      "url": "https://www.rta.qld.gov.au/before-renting/choosing-a-rental-property/rental-scams",
+      "kind": "official"
+    },
+    "rent": {
+      "label": "NSW Government：租屋規則入口",
+      "url": "https://www.nsw.gov.au/housing-and-construction/renting-a-place-to-live",
+      "kind": "official"
+    },
+    "specified": {
+      "label": "內政部：指定工作條件與適用例外",
+      "url": "https://immi.homeaffairs.gov.au/what-we-do/whm-program/specified-work-conditions",
+      "kind": "official"
+    },
+    "free": {
+      "label": "本站：免費二手版規與操作說明",
+      "url": "https://www.aussiewhvcompass.com/free.html#rules",
+      "kind": "site"
+    }
+  },
+  "answers": [
+    {
+      "id": "first-city",
+      "href": "prep.html#first-city",
+      "question": "第一站去哪？",
+      "summary": "先挑兩個候選城市，比同日期住宿總價、實際通勤與可做的工作；不要只按城市名決定。",
+      "scope": "準備選落地城市；這是比較方法，不是城市排名。",
+      "conditions": "需自行查入住日期、住處區域與上下班時間；沒有即時租金或職缺數據。",
+      "action": {
+        "label": "開官方交通入口比通勤",
+        "href": "prep.html#transport-planners"
+      },
+      "sourceIds": [
+        "transport",
+        "budget"
+      ],
+      "queries": [
+        "第一站去哪？",
+        "第一站去哪",
+        "先去哪個城市",
+        "落地城市怎麼選",
+        "第一站選哪裡"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-12-16",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "cash-runway",
+      "href": "cost.html#runway",
+      "question": "還沒找到工作，錢能撐多久？",
+      "summary": "用可動用現金扣除尚未支付的一次性支出、押金與保留金，再除以每週必要開支。",
+      "scope": "假設期間沒有收入、支出固定；不是找工時間或簽證財力預測。",
+      "conditions": "不要把借款額度、未收到的薪水、super 或押金退款當現金；避免重複扣款。",
+      "action": {
+        "label": "算自己的無收入緩衝期",
+        "href": "cost.html#runway-tool"
+      },
+      "sourceIds": [
+        "budget"
+      ],
+      "queries": [
+        "還沒找到工作，錢能撐多久？",
+        "錢能撐多久",
+        "沒收入能撐多久",
+        "找工作空窗",
+        "沒工作可以撐幾週"
+      ],
+      "kind": "calculation",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-12-16",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "arrival",
+      "href": "prep.html#72h",
+      "question": "剛落地 72 小時先做什麼？",
+      "summary": "先確認今晚住宿、網路、交通與付款備援，再安排行政手續；別在趕時間時決定長租。",
+      "scope": "所有剛抵澳者；這是本站建議順序，不是法定辦理期限。",
+      "conditions": "入境申報依航班與 ABF 指示；交通班次與付款方式依城市確認。",
+      "action": {
+        "label": "照落地行動清單逐項做",
+        "href": "prep.html#arrival-actions"
+      },
+      "sourceIds": [
+        "arrival",
+        "transport"
+      ],
+      "queries": [
+        "剛落地 72 小時先做什麼？",
+        "落地先做什麼",
+        "落地72小時",
+        "剛到澳洲要做什麼"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "first-week",
+      "href": "prep.html#first-week",
+      "question": "TFN、銀行、myGov、super 先辦哪個？",
+      "summary": "先分清四者用途：TFN 申請與銀行準備可分別進行；myGov 是服務入口，super 是退休金帳戶。",
+      "scope": "準備在澳洲工作者；TFN 申請方式依個人身分。",
+      "conditions": "到職需處理 TFN declaration、銀行與 super 資料；不是順序不同就固定扣某一稅率。",
+      "action": {
+        "label": "開官方 TFN 申請說明",
+        "href": "https://my.gov.au/en/services/work/currently-employed/tax-when-you-work/getting-a-tax-file-number"
+      },
+      "sourceIds": [
+        "tfn",
+        "job-details",
+        "super"
+      ],
+      "queries": [
+        "TFN、銀行、myGov、super 先辦哪個？",
+        "三大號先辦哪個",
+        "TFN銀行順序",
+        "落地第一週",
+        "第一週手續"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "find-work",
+      "href": "work.html#channels",
+      "question": "沒車、英文不好，怎麼開始找工作？",
+      "summary": "先確認能到達的工作區與班次，再按已有技能搜尋；面試前練習工時、薪資和安全指示的確認方式。",
+      "scope": "尚未取得工作的讀者；不是零英文就能上工的承諾。",
+      "conditions": "需確認工作權利、職務證照與溝通要求；求職入口不保證有合適職缺。",
+      "action": {
+        "label": "按地區與職類找公開入口",
+        "href": "map.html#open-job-portals"
+      },
+      "sourceIds": [
+        "jobs",
+        "pay"
+      ],
+      "queries": [
+        "沒車、英文不好，怎麼開始找工作？",
+        "沒車怎麼找工作",
+        "英文不好怎麼找工作",
+        "沒車英文不好找工作",
+        "第一份工作怎麼找"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "job-check",
+      "href": "work.html#verify",
+      "question": "接工作前先查什麼？",
+      "summary": "核對雇主名稱與 ABN、工作內容、薪資條件及紀錄方式；ABN 有效不代表這份工作已被驗證。",
+      "scope": "準備接受工作；仲介、承攬或不同薪資制度需另查適用條件。",
+      "conditions": "先取得職務、僱用型態、工時與適用 award 或 agreement；本站不判定個案是否合法。",
+      "action": {
+        "label": "先核對企業登記資訊",
+        "href": "https://abr.business.gov.au/"
+      },
+      "sourceIds": [
+        "abn",
+        "pay"
+      ],
+      "queries": [
+        "接工作前先查什麼？",
+        "接工作前先查什麼",
+        "雇主怎麼查",
+        "上工前查核",
+        "工作邀約要注意什麼"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "pay-check",
+      "href": "cost.html#wage",
+      "question": "薪水有沒有算對？",
+      "summary": "先查適用的 award 或 agreement、職級、年齡與工作時段；不能用一個全國時薪判斷所有工作。",
+      "scope": "澳洲僱員薪資核對；承攬、州制或特殊身分需另確認。",
+      "conditions": "準備稅前工資、工時、casual／part-time／full-time 與加成資料，不只看入帳淨額。",
+      "action": {
+        "label": "開 Fair Work 薪資計算器",
+        "href": "https://calculate.fairwork.gov.au/"
+      },
+      "sourceIds": [
+        "award",
+        "pay"
+      ],
+      "queries": [
+        "薪水有沒有算對？",
+        "薪水有沒有算對",
+        "時薪怎麼查",
+        "casual薪水怎麼算",
+        "薪水被少算"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "rental-bond",
+      "href": "housing.html#bond",
+      "question": "押金可以先付嗎？",
+      "summary": "先核對房源、收款者與書面條件；不要因為催促就匯款。押金流程要看房屋所在地與租住關係。",
+      "scope": "一般租屋防詐；住宅租約、分租、寄宿及短住可能適用不同規則。",
+      "conditions": "先確認州／領地與租住安排，再看當地 bond 規定；本文不把單一州規則套用全澳。",
+      "action": {
+        "label": "選房屋所在地的官方入口",
+        "href": "housing.html#bond-authorities"
+      },
+      "sourceIds": [
+        "bond",
+        "rent"
+      ],
+      "queries": [
+        "押金可以先付嗎？",
+        "押金可以先付嗎",
+        "還沒看房先匯款",
+        "租屋押金怎麼確認",
+        "bond要先付嗎"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "specified-work",
+      "href": "visa.html#where",
+      "question": "這份工作能集簽嗎？",
+      "summary": "先分清 417／462，再核對工作內容、地區、日期與證據；只看郵遞區號不足以判定。",
+      "scope": "需要核對二簽／三簽指定工作者；部分護照另有例外。",
+      "conditions": "需確認自己的適用規則。本站郵遞區號工具只使用留存的 417 資料，不做 462 資格判定。",
+      "action": {
+        "label": "先選 417／462 官方工作規則",
+        "href": "visa.html#specified-work-options"
+      },
+      "sourceIds": [
+        "specified"
+      ],
+      "queries": [
+        "這份工作能集簽嗎？",
+        "這份工作能集簽嗎",
+        "工作能不能集簽",
+        "集簽要查什麼",
+        "462工作能集簽嗎"
+      ],
+      "kind": "editorial",
+      "status": "source-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-10-17",
+      "reviewedByDomainProfessional": false
+    },
+    {
+      "id": "free-items",
+      "href": "free.html#browse-title",
+      "question": "怎麼找同城免費物品？",
+      "summary": "選城市後按「載入免費物品」，再到原貼確認狀態；瀏覽免登入，刊登與留言需 GitHub 帳號。",
+      "scope": "本站免費二手看板；只顯示符合版規、經審核且未到期的刊登。",
+      "conditions": "不是即時庫存；免費面交，不付訂金或運費。空清單不代表載入失敗。",
+      "action": {
+        "label": "進入免費物品篩選",
+        "href": "free.html#fb-browse-actions"
+      },
+      "sourceIds": [
+        "free"
+      ],
+      "queries": [
+        "怎麼找同城免費物品？",
+        "怎麼找免費物品",
+        "免費二手怎麼用",
+        "同城免費物品",
+        "離澳免費贈送"
+      ],
+      "kind": "site-feature",
+      "status": "site-checked",
+      "sourceCheckedAt": "2026-09-17",
+      "reviewDue": "2026-12-16",
+      "reviewedByDomainProfessional": false
+    }
+  ]
+}

@@ -6,6 +6,9 @@ $ErrorActionPreference = 'Stop'
 $dir = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Join-Path $dir 'index.html'))) { $dir = (Get-Location).Path }
 $errors = 0
+& node (Join-Path $dir 'scripts/test_free_board_access.cjs')
+if ($LASTEXITCODE -ne 0) { $errors++ }
+
 $assetVersions = @()
 $canonicalOrigin = 'https://www.aussiewhvcompass.com'
 
@@ -65,8 +68,8 @@ if (-not (Test-Path $notFoundPath)) {
     if (-not $notFoundText.Contains($required)) { Write-Output "FAIL [404.html] 缺復原要素：$required"; $errors++ }
   }
   $notFoundNav = [regex]::Matches($notFoundText, 'class="nav-links"[\s\S]*?</div>')
-  if ($notFoundNav.Count -ne 1 -or (($notFoundNav[0].Value -split '<a ').Count - 1) -ne 12) {
-    Write-Output 'FAIL [404.html] 主導覽必須維持 12 個連結'
+  if ($notFoundNav.Count -ne 1 -or (($notFoundNav[0].Value -split '<a ').Count - 1) -ne 13) {
+    Write-Output 'FAIL [404.html] 主導覽必須維持 13 個連結（含免費二手）'
     $errors++
   }
   if ($notFoundText.Contains('rel="canonical"') -or $notFoundText.Contains('property="og:url"')) {
@@ -148,13 +151,13 @@ foreach ($p in $pages) {
     else { $assetVersions += $asset.Groups[1].Value }
   }
 
-  # 導覽：單一 nav、12 連結
+  # 導覽：單一 nav、13 連結（含已上線免費二手入口）
   $navBlocks = [regex]::Matches($t, '<div class="nav-links">')
   if ($navBlocks.Count -ne 1) { Write-Output "FAIL [$p] nav-links 區塊數=$($navBlocks.Count)"; $errors++ }
   else {
     $nav = [regex]::Matches($t, 'class="nav-links"[\s\S]*?</div>')[0].Value
     $links = ($nav -split '<a ').Count - 1
-    $expectedNavLinks = 12
+    $expectedNavLinks = 13
     if ($links -ne $expectedNavLinks) { Write-Output "FAIL [$p] nav 連結數=$links（應為 $expectedNavLinks；工具頁不進全站 nav，見 docs/SPEC.md §1.1）"; $errors++ }
     if ($nav -match 'href="(?:simulator|market|communities|map|news)\.html"') { Write-Output "FAIL [$p] 全站 nav 不得含 simulator.html、market.html、communities.html、map.html 或 news.html（工具／動態資訊頁不進 nav）"; $errors++ }
   }
@@ -207,7 +210,7 @@ if ($uniqueAssetVersions.Count -eq 1 -and @($contentStatusVersions | Where-Objec
 $answerCardPages = @('visa.html', 'cost.html', 'housing.html', 'work.html', 'scam.html')
 $answerCardContract = @{
   'visa.html'    = @{ Id = 'visa-first-action';    Points = @('#first', '#apply', '#evidence');    Tool = '#postcode-tool';       TocQuestion = '#where';             Official = 'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417' }
-  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#math', '#food', '#car-checklist'); Tool = '#save-calc';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
+  'cost.html'    = @{ Id = 'cost-first-action';    Points = @('#runway', '#food', '#car-checklist'); Tool = 'https://calculate.fairwork.gov.au/';           TocQuestion = '#cost-first-action'; Official = 'https://www.fairwork.gov.au/pay-and-wages/minimum-wages' }
   'housing.html' = @{ Id = 'housing-first-action'; Points = @('#find', '#bond', '#contract');      Tool = '#housing-search-tool'; TocQuestion = '#book';              Official = 'https://www.consumerprotection.wa.gov.au/publications/looking-rental-home-tenants-guide-1' }
   'work.html'    = @{ Id = 'work-first-action';    Points = @('#channels', '#seasons', '#injury'); Tool = '#verify-steps';        TocQuestion = '#verify';            Official = 'https://abr.business.gov.au/' }
   'scam.html'    = @{ Id = 'scam-first-action';    Points = @('#help', '#job', '#rent');           Tool = '#help-kit';            TocQuestion = '#scam-first-action'; Official = 'https://www.scamwatch.gov.au/stop-check-protect/help-to-spot-and-avoid-scams' }
@@ -294,10 +297,16 @@ foreach ($answerCardPage in $answerCardPages) {
     }
   }
   # 主按鈕直達工具輸入區：目標必須是 input|select|button|form，或標有 data-answer-target="tool" 的容器，不能是標題。
-  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="(#[^"]+)">')
+  $answerPrimary = [regex]::Match($answerCard, '<a class="btn answer-card-primary" href="([^"]+)"[^>]*>')
   if (-not $answerPrimary.Success -or $answerPrimary.Groups[1].Value -ne $contract.Tool) {
     Write-Output "FAIL [$answerCardPage] 主按鈕必須直達 $($contract.Tool)"
     $errors++
+  } elseif ($answerCardPage -eq 'cost.html' -and $contract.Tool -eq 'https://calculate.fairwork.gov.au/') {
+    # P1-27: the wage question must lead to the exact official pay calculator, not a savings tool.
+    if (-not $answerPrimary.Value.Contains('rel="noopener noreferrer"')) {
+      Write-Output "FAIL [cost.html] 官方薪資計算器主連結必須保留安全 rel"
+      $errors++
+    }
   } else {
     $toolId = $contract.Tool.Substring(1)
     $toolTag = [regex]::Match($answerText, '<([a-z0-9]+)\b[^>]*\bid="' + [regex]::Escape($toolId) + '"[^>]*>')
@@ -2416,8 +2425,8 @@ foreach ($marketNeedle in @(
   'id="market-draft-output"',
   'id="market-facebook-link"',
   'id="market-ebay-link"',
-  '本站目前不收刊登、不保存聯絡資料，也不介入付款',
-  '不保存刊登內容、不驗證身分、不檢驗商品',
+  '本頁草稿工具不收刊登、不保存聯絡資料，也不介入付款',
+  '本頁不保存草稿內容、不驗證身分、不檢驗商品',
   '多數 consumer guarantees 不適用',
   '商品所有權、買方不受干擾持有，以及沒有未揭露債務／權利負擔'
 )) {
@@ -2871,8 +2880,7 @@ if (-not (Test-Path $assistTsPath)) {
   $errors++
 } else {
   $assistTs = [System.IO.File]::ReadAllText($assistTsPath, [System.Text.Encoding]::UTF8)
-  $sensitiveGroups = [regex]::Matches($assistTs, '(?s)const (SENSITIVE_[A-Z_]+) =(.*?);?
-')
+  $sensitiveGroups = [regex]::Matches($assistTs, '(?s)const (SENSITIVE_[A-Z_]+) =(.*?);\r?\n')
   if ($sensitiveGroups.Count -lt 10) {
     Write-Output "FAIL [worker/src/assist.ts] 敏感題分組樣式只有 $($sensitiveGroups.Count) 組，應為 12 組以上"
     $errors++
@@ -3033,8 +3041,8 @@ foreach ($privateId in @('private-contact', 'private-email-direct', 'contact-bri
   if (-not $aboutText.Contains("id=`"$privateId`"")) { Write-Output "FAIL [about.html] 缺私人合作需求單元件：$privateId"; $errors++ }
 }
 foreach ($privateNeedle in @(
-  'mailto:chunaenqiu6@gmail.com',
-  'https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chunaenqiu6%40gmail.com',
+  'mailto:chuanenqiu6@gmail.com',
+  'https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=chuanenqiu6%40gmail.com',
   '內容不會送到本站或儲存',
   '最後仍由你確認並寄出',
   '是否承接、工作範圍、費用與交付都要另行確認',
@@ -3352,7 +3360,7 @@ if (-not $briefScript.Success) {
   Write-Output 'FAIL [main.js] 缺私人合作需求單功能塊'
   $errors++
 } else {
-  foreach ($briefNeedle in @('briefForm.checkValidity()', 'briefForm.reportValidity()', 'briefGmailLink.href = "https://mail.google.com/mail/?view=cm', 'encodeURIComponent("chunaenqiu6@gmail.com")', 'encodeURIComponent(subject)', 'encodeURIComponent(briefText)', 'navigator.clipboard.writeText(briefPreview.value)', 'briefPreview.select()')) {
+  foreach ($briefNeedle in @('briefForm.checkValidity()', 'briefForm.reportValidity()', 'briefGmailLink.href = "https://mail.google.com/mail/?view=cm', 'encodeURIComponent("chuanenqiu6@gmail.com")', 'encodeURIComponent(subject)', 'encodeURIComponent(briefText)', 'navigator.clipboard.writeText(briefPreview.value)', 'briefPreview.select()')) {
     if (-not $briefScript.Value.Contains($briefNeedle)) { Write-Output "FAIL [main.js] 私人需求單缺驗證／編碼／複製備援：$briefNeedle"; $errors++ }
   }
   if (-not $briefScript.Value.Contains('本站不提供簽證或移民代辦；這只是初步需求') -or -not $briefScript.Value.Contains('請再次確認未放入簽證、移民或其他敏感個案資料')) {
@@ -3485,7 +3493,7 @@ if (-not $toolsJs.Contains('澳打指南針 ・ 公開攻略免費 ・ 資料只
   Write-Output 'FAIL [tools.js] 行前海報未同步公開攻略免費定位'
   $errors++
 }
-foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '用快思看見準備輪廓', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
+foreach ($entryNeedle in @('澳洲打工度假，你現在在哪一步？', '先講你現在卡哪一步', '比較住得起、到得了、做得來', '快思測驗＋慢想工作表', '這些資料怎麼來？')) {
   if (-not $indexText.Contains($entryNeedle)) { Write-Output "FAIL [index.html] 首頁入口文案未同步最新功能：$entryNeedle"; $errors++ }
 }
 # P0-8：使命句自首頁 hero 移到 about.html 開頭，且只在 about 出現
@@ -3772,5 +3780,7 @@ if (-not (Test-Path $workerNodeModules)) {
 }
 
 Write-Output ("-" * 40)
+& node --test (Join-Path $dir "scripts/test_free_board.cjs")
+if ($LASTEXITCODE -ne 0) { $errors++ }
 if ($errors -eq 0) { Write-Output "ALL CHECKS PASSED ($($pages.Count) pages)"; exit 0 }
 else { Write-Output "$errors ERROR(S)"; exit 1 }

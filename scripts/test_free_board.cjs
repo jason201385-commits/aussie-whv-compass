@@ -1,0 +1,30 @@
+'use strict';
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const b = require('../assets/free-board.js');
+const now = Date.parse('2026-09-16T15:00:00Z');
+function draft(overrides) {return Object.assign({item:'電鍋＋碗',city:'Perth WA',category:b.CATEGORIES[0],condition:b.CONDITIONS[1],deadline:'2026-09-20',pickup:'Perth CBD 公共場所，傍晚',details:'正常使用，有刮痕；需自取。'},overrides);}
+function issue(overrides) {return Object.assign({number:2,state:'open',title:'[免費贈送] 電鍋＋碗',labels:['free-board-approved'],created_at:'2026-09-16T12:00:00Z',body:new URL(b.draftUrl(draft(),true,now).url).searchParams.get('body')},overrides);}
+test('AWST date uses UTC+8 boundary',()=>{assert.equal(b.today(now),'2026-09-16');assert.equal(b.today(Date.parse('2026-09-16T16:00:00Z')),'2026-09-17');});
+test('valid dates reject impossible dates',()=>{assert.equal(b.validDate('2026-02-30'),false);assert.equal(b.validDate('2028-02-29'),true);assert.equal(b.validDate('2026-9-20'),false);});
+test('draft requires explicit consent',()=>assert.throws(()=>b.draftUrl(draft(),false,now)));
+test('draft rejects missing field',()=>assert.throws(()=>b.validate(draft({item:''}),now)));
+test('draft rejects invalid city and category',()=>{assert.throws(()=>b.validate(draft({city:'invalid'}),now));assert.throws(()=>b.validate(draft({category:'藥品'}),now));});
+test('draft rejects past deadline and >90 days',()=>{assert.throws(()=>b.validate(draft({deadline:'2026-09-15'}),now));assert.throws(()=>b.validate(draft({deadline:'2027-01-01'}),now));});
+test('draft accepts deadline today and day 90',()=>{b.validate(draft({deadline:'2026-09-16'}),now);b.validate(draft({deadline:b.today(now+90*86400000)}),now);});
+test('draft rejects oversized content and heading injection',()=>{assert.throws(()=>b.validate(draft({details:'a'.repeat(301)}),now));assert.throws(()=>b.validate(draft({details:'safe\n### 價格\n100'}),now));});
+test('draft URL is fixed GitHub destination, encoded, no label permission parameter',()=>{const u=new URL(b.draftUrl(draft({item:'鍋 & ? # <b>'}),true,now).url);assert.equal(u.hostname,'github.com');assert.equal(u.pathname,'/jason201385-commits/aussie-whv-compass/issues/new');assert.equal(u.searchParams.get('template'),'free_item.md');assert.equal(u.searchParams.get('title'),'[免費贈送] 鍋 & ? # <b>');assert.equal(u.searchParams.has('labels'),false);});
+test('generated body round-trips via production parser',()=>{const x=b.readIssue(issue(),now);assert.equal(x.item,'電鍋＋碗');assert.equal(x.city,'Perth WA');assert.equal(x.status,'待領取');});
+test('unapproved posts excluded',()=>assert.equal(b.readIssue(issue({labels:['free-board']}),now),null));
+test('closed, locked, PRs and unrelated issues excluded',()=>{for(const x of [{state:'closed'},{locked:true},{pull_request:{}},{title:'not a listing'},{number:'2'}])assert.equal(b.readIssue(issue(x),now),null);});
+test('paid or given-away items excluded',()=>{assert.equal(b.readIssue(issue({body:issue().body.replace('免費（AUD 0）','AUD 10')}),now),null);assert.equal(b.readIssue(issue({body:issue().body.replace('待領取','已送出')}),now),null);});
+test('expired listings excluded',()=>assert.equal(b.readIssue(issue(),Date.parse('2026-09-21T00:00:00Z')),null));
+test('duplicate headings fail closed',()=>assert.equal(b.readIssue(issue({body:issue().body+'\n### 物品名稱\n\nother'}),now),null));
+test('reservation label overrides body status',()=>assert.equal(b.readIssue(issue({labels:[{name:'free-board-approved'},{name:'free-board-reserved'}]}),now).status,'已預約'));
+test('untrusted html_url is never followed',()=>assert.equal(b.readIssue(issue({html_url:'javascript:alert(1)'}),now).url,'https://github.com/jason201385-commits/aussie-whv-compass/issues/2'));
+test('city category keyword and status filters combine',()=>{const a=b.readIssue(issue(),now);assert.equal(b.filterItems([a],{city:'Perth WA',category:b.CATEGORIES[0],query:'電鍋',status:'待領取'},now).length,1);assert.equal(b.filterItems([a],{city:'Sydney NSW'},now).length,0);});
+test('sort by expiry or newest with deterministic ties',()=>{const a=b.readIssue(issue(),now),c=Object.assign({},a,{number:3,deadline:'2026-09-19',created:a.created-1000});assert.equal(b.filterItems([a,c],{},now)[0].number,3);assert.equal(b.filterItems([a,c],{sort:'newest'},now)[0].number,2);});
+test('filter refresh hides newly expired cached items',()=>{const a=b.readIssue(issue(),now);assert.equal(b.filterItems([a],{},Date.parse('2026-09-21')).length,0);});
+test('API pagination restricted to fixed repository',()=>{assert.match(b.apiUrl(2),/labels=free-board-approved.*page=2$/);assert.throws(()=>b.apiUrl(-1));assert.throws(()=>b.apiUrl('https://evil.invalid'));});
+test('production uses textContent and no unsafe rendering or storage',()=>{const s=fs.readFileSync(require.resolve('../assets/free-board.js'),'utf8');for(const key of ['innerHTML','localStorage','sessionStorage','eval('])assert.equal(s.includes(key),false);assert.match(s,/credentials: 'omit'/);assert.match(s,/referrerPolicy: 'no-referrer'/);});

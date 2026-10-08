@@ -12,6 +12,9 @@ scripts/test_search.mjs):
   synonyms at 0.7 of an original-text hit;
 - entries that are navigation hubs (quick-answers, *-first-action evidence cards, clarifier exits)
   carry "hub":1 so the client can down-weight them.
+- the wire payload deduplicates (page, pageTitle) pairs in "pages"; a fixed JS suffix restores
+  every entry's original string metadata and removes "pages" before consumers read the index.
+  Python consumers use parse_index(), which decodes the fixed wrapper without executing JS.
 """
 
 from __future__ import annotations
@@ -22,13 +25,21 @@ import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
+from build_task_answers import load as load_task_answers, search_answer
 
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
-VERSION = "2026-10-02"
+VERSION = "2026-10-09"
+TASK_DATA = load_task_answers()
+TASK_BY_HREF = {a["href"]: a for a in TASK_DATA["answers"]}
 # P0-9 驗收 8：索引檔大小增加不得超過改版前（178,908 bytes）的 30%。
 MAX_INDEX_BYTES = 232580
+INDEX_PREFIX = "window.WHV_SEARCH_INDEX = "
+INDEX_SUFFIX = (
+    ";(function(i){i.entries.forEach(function(e){var p=i.pages[e.page];"
+    "e.page=p[0];e.pageTitle=p[1];});delete i.pages;})(window.WHV_SEARCH_INDEX);\n"
+)
 INACTIVE_UI_SENTINELS = {
     "情境載入中",
     "需求已由後端接收",
@@ -44,6 +55,7 @@ PAGES = [
     "cost.html",
     "housing.html",
     "market.html",
+    "free.html",
     "work.html",
     "scam.html",
     "english.html",
@@ -61,6 +73,7 @@ EXTRA_PAGES = {
 }
 ALL_PAGES = PAGES + list(EXTRA_PAGES)
 ALIASES = {
+    "free.html": "離澳免費二手版 免費二手板 免費贈送 送物 搬家 出清 同城 面交 二手 生活補給 giveaway free stuff",
     "index.html": "澳洲打工度假 WHV 攻略 導覽 工具 搜尋",
     "why.html": "適不適合 自我探索 價值觀 心理 快思 慢想 決定 出發",
     "visa.html": "417 首簽 一簽 二簽 三簽 集簽 88天 179天 指定工作 郵遞區號",
@@ -84,6 +97,8 @@ ALIASES = {
 # 詞源為 questions.md §D 60 組（含台灣口語、中國用語、英文原詞與城市繁簡英對照）。
 # key 是索引裡的 href；--check 會確認每個 key 都對得到一筆 entry。
 INTENT_SYNONYMS = {
+    "prep.html#first-city": "第一站 落地城市 去哪個城市 城市比較 先去哪",
+    "cost.html#runway": "無收入緩衝 錢能撐多久 找工空窗 沒工作幾週",
     # why.html
     "why.html#quick-title": "適不適合 我適合嗎 該不該去 值不值得 還缺什麼 準備好了嗎 8題快思",
     "why.html#slow-title": "想逃 逃離現狀 只是想逃 跟家人談 伴侶反對 父母反對 底線 退場方案 慢想",
@@ -167,7 +182,7 @@ INTENT_SYNONYMS = {
     "news.html#vic-rental-update": "VIC租屋新制 維州租屋改革 租屋申請費 押金求償 10月13日",
     "news.html#investment-scam-update": "投資群組詐騙 假新聞投資 保證獲利 提領費",
     # index.html
-    "index.html#communities-title": "社團 群組 群 LINE群 微信群 討論 同鄉會 伯斯 珀斯 Perth 墨爾本 墨尔本 Melbourne 布里斯本 布里斯班 Brisbane 雪梨 悉尼 Sydney 阿德雷德 阿德莱德 Adelaide 達爾文 达尔文 Darwin 荷巴特 霍巴特 Hobart 坎培拉 堪培拉 Canberra 黃金海岸 Gold Coast 凱恩斯 Cairns 塔斯 Tasmania 第一站 落地城市 去哪個城市",
+    "index.html#communities-title": "社團 群組 群 LINE群 微信群 討論 同鄉會 伯斯 珀斯 Perth 墨爾本 墨尔本 Melbourne 布里斯本 布里斯班 Brisbane 雪梨 悉尼 Sydney 阿德雷德 阿德莱德 Adelaide 達爾文 达尔文 Darwin 荷巴特 霍巴特 Hobart 坎培拉 堪培拉 Canberra 黃金海岸 Gold Coast 凱恩斯 Cairns 塔斯 Tasmania",
     # lang/en/visa/
     "lang/en/visa/#choose": "462 抽籤 抽签 EOI ballot 名額 5000 中國護照 大陸 Work and Holiday 462抽籤 学历 學歷 Functional English 462签",
 }
@@ -300,6 +315,8 @@ def make_entry(page: str, page_title: str, title: str, href: str, text: str, key
         "text": text[:4000],
         "keywords": keywords,
     }
+    if href in TASK_BY_HREF:
+        entry["answer"] = search_answer(TASK_BY_HREF[href], TASK_DATA["sources"])
     synonyms = INTENT_SYNONYMS.get(href, "")
     if synonyms:
         entry["synonyms"] = synonyms
@@ -329,19 +346,70 @@ def entries_for(page: str) -> list[dict[str, object]]:
     return output
 
 
-def render() -> str:
+def build_payload() -> dict[str, object]:
     entries = []
     for page in ALL_PAGES:
         entries.extend(entries_for(page))
-    payload = {"version": VERSION, "entries": entries}
-    return "window.WHV_SEARCH_INDEX = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + ";\n"
+    return {"version": VERSION, "entries": entries}
+
+
+def render_payload(payload: dict[str, object]) -> str:
+    """Deduplicate only page metadata; preserve entry order, all fields and input values."""
+    if "pages" in payload:
+        raise ValueError("pages is reserved for encoded page metadata")
+    pages: list[list[str]] = []
+    page_ids: dict[tuple[str, str], int] = {}
+    entries = []
+    for entry in payload["entries"]:
+        pair = (entry["page"], entry["pageTitle"])
+        if not all(isinstance(value, str) for value in pair):
+            raise ValueError("page metadata must contain strings")
+        if pair not in page_ids:
+            page_ids[pair] = len(pages)
+            pages.append(list(pair))
+        encoded = dict(entry)
+        encoded["page"] = page_ids[pair]
+        del encoded["pageTitle"]
+        entries.append(encoded)
+    encoded_payload = {**payload, "pages": pages, "entries": entries}
+    return INDEX_PREFIX + json.dumps(encoded_payload, ensure_ascii=False, separators=(",", ":")) + INDEX_SUFFIX
+
+
+def parse_index(source: str) -> dict[str, object]:
+    """Decode the exact JSON prefix/suffix contract; never interpret JavaScript."""
+    if not source.startswith(INDEX_PREFIX) or not source.endswith(INDEX_SUFFIX):
+        raise ValueError("invalid search index wrapper")
+    encoded = json.loads(source[len(INDEX_PREFIX):-len(INDEX_SUFFIX)])
+    if not isinstance(encoded, dict) or not isinstance(encoded.get("entries"), list):
+        raise ValueError("invalid search index payload")
+    pages = encoded.get("pages")
+    if not isinstance(pages, list) or not all(
+        isinstance(pair, list) and len(pair) == 2 and all(isinstance(value, str) for value in pair)
+        for pair in pages
+    ):
+        raise ValueError("invalid search page metadata")
+    entries = []
+    for entry in encoded["entries"]:
+        if not isinstance(entry, dict) or "pageTitle" in entry:
+            raise ValueError("invalid encoded search entry")
+        page_id = entry.get("page")
+        if type(page_id) is not int or not 0 <= page_id < len(pages):
+            raise ValueError("invalid search page id")
+        restored = dict(entry)
+        restored["page"], restored["pageTitle"] = pages[page_id]
+        entries.append(restored)
+    return {key: entries if key == "entries" else value for key, value in encoded.items() if key != "pages"}
+
+
+def render() -> str:
+    return render_payload(build_payload())
 
 
 def check(current: str | None, expected: str) -> int:
     if current != expected:
         print("STALE SEARCH INDEX: run python scripts/build_search.py", file=sys.stderr)
         return 1
-    payload = json.loads(current.removeprefix("window.WHV_SEARCH_INDEX = ").removesuffix(";\n"))
+    payload = parse_index(current)
     entries = payload["entries"]
     pages = {entry["page"] for entry in entries}
     if pages != set(ALL_PAGES) or len(entries) < 100:
@@ -401,7 +469,7 @@ def main() -> int:
     if args.check:
         return check(current, expected)
     OUTPUT.write_text(expected, encoding="utf-8", newline="\n")
-    count = expected.count('"href":')
+    count = len(parse_index(expected)["entries"])
     print(f"SEARCH INDEX BUILT ({count} entries, {len(expected.encode('utf-8'))} bytes)")
     return 0
 

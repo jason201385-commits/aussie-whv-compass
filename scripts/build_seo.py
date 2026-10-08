@@ -10,12 +10,16 @@ import re
 import struct
 import sys
 from pathlib import Path
+from ai_reading import build_assets, build_robots, decorate_page, reading_path
+from build_task_answers import load as load_task_answers
 
 
 ROOT = Path(__file__).resolve().parent.parent
+TASK_DATA = load_task_answers()
+TASK_PAGES = {"index.html"} | {a["href"].split("#", 1)[0] for a in TASK_DATA["answers"]}
 ORIGIN = "https://www.aussiewhvcompass.com"
-LAST_MODIFIED = "2026-10-03"
-ASSET_VERSION = "20261003-01"
+LAST_MODIFIED = "2026-10-09"
+ASSET_VERSION = "20261009-01"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant"
 OG_IMAGE = f"{ORIGIN}/assets/og-cover.png"
 I18N_DATA = ROOT / "assets" / "i18n-locales.json"
@@ -30,6 +34,7 @@ PAGES = [
     "cost.html",
     "housing.html",
     "market.html",
+    "free.html",
     "work.html",
     "map.html",
     "scam.html",
@@ -50,6 +55,7 @@ RISK_LEVELS = {
     "cost.html": "high",
     "housing.html": "high",
     "market.html": "high",
+    "free.html": "medium",
     "work.html": "high",
     "scam.html": "high",
     "health.html": "high",
@@ -60,6 +66,12 @@ RISK_LEVELS = {
     "why.html": "medium",
     "news.html": "medium",
 }
+
+
+def page_modified(page: str) -> str:
+    if page in TASK_PAGES:
+        return max(LAST_MODIFIED, TASK_DATA["updatedAt"])
+    return LAST_MODIFIED
 
 
 def page_url(page: str) -> str:
@@ -94,7 +106,7 @@ def seo_block(page: str, source: str) -> str:
         "publishingPrinciples": f"{ORIGIN}/crawler-policy.txt",
         "subjectOf": f"{ORIGIN}/content-status.json",
         "image": OG_IMAGE,
-        "dateModified": LAST_MODIFIED,
+        "dateModified": page_modified(page),
     }
     graph = [
         {
@@ -189,12 +201,13 @@ def i18n_urls() -> list[str]:
 def build_sitemap() -> str:
     rows = []
     urls = [page_url(page) for page in PAGES] + i18n_urls()
+    modified = {page_url(p): page_modified(p) for p in PAGES}
     for url in urls:
         rows.extend(
             [
                 "  <url>",
                 f"    <loc>{url}</loc>",
-                f"    <lastmod>{LAST_MODIFIED}</lastmod>",
+                f"    <lastmod>{modified.get(url, LAST_MODIFIED)}</lastmod>",
                 "  </url>",
             ]
         )
@@ -212,7 +225,7 @@ def build_sitemap() -> str:
 def build_llms(page_sources: dict[str, str]) -> str:
     groups = [
         ("開始前", ["why.html", "visa.html", "prep.html", "simulator.html"]),
-        ("在澳洲生活與工作", ["news.html", "cost.html", "housing.html", "market.html", "work.html", "map.html", "scam.html", "english.html", "health.html", "communities.html"]),
+        ("在澳洲生活與工作", ["news.html", "cost.html", "housing.html", "market.html", "free.html", "work.html", "map.html", "scam.html", "english.html", "health.html", "communities.html"]),
         ("離開或留下", ["leave.html", "pr.html"]),
         ("關於與合作", ["about.html"]),
     ]
@@ -234,6 +247,7 @@ def build_llms(page_sources: dict[str, str]) -> str:
             title = short_title(extract(r"<title>(.*?)</title>", source, page))
             description = extract(r'<meta name="description" content="(.*?)">', source, page)
             lines.append(f"- [{title}]({page_url(page)}): {description}")
+            lines.append(f"  - [本頁 Markdown]({ORIGIN}/{reading_path(page)})")
     lines.extend(
         [
             "",
@@ -258,6 +272,15 @@ def build_llms(page_sources: dict[str, str]) -> str:
             "",
         ]
     )
+    lines.extend(["", "## 純文字閱讀與機器索引", "",
+        f"- [首頁 Markdown]({ORIGIN}/ai/index.md): 主頁公開內容的靜態閱讀版本。",
+        f"- [逐頁與段落索引 JSON]({ORIGIN}/ai-index.json): 原頁、語言、段落連結、來源連結、審校範圍與內容雜湊。",
+        f"- [公開攻略合併文字]({ORIGIN}/llms-full.txt): 繁中主頁與完整英文攻略的閱讀摘錄；建議先讀單頁，避免載入不相關內容。",
+        "- 純文字由公開 HTML 自動產生，不是另一套改寫內容；沒有表單、個資、動態二手刊登或試算結果。",
+        "- 來源查核日期沿用原頁，匯出不代表重新查核；Markdown 只是補充格式，不保證任何 AI 收錄或引用。",
+        "", "### Full English reading copies", ""])
+    for slug in FULL_TRANSLATION_SLUGS:
+        lines.append(f"- [{slug} (Markdown)]({ORIGIN}/ai/en/{slug}.md): static reading copy; original English guide and official sources govern.")
     return "\n".join(lines)
 
 
@@ -295,7 +318,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
                 "evidenceCardCheckedAt": evidence_checked_at,
                 "evidenceStatus": evidence_status,
                 "evidenceCheckedAt": evidence_checked_at,
-                "lastModified": LAST_MODIFIED,
+                "lastModified": page_modified(page),
             }
         )
 
@@ -343,7 +366,7 @@ def build_content_status(page_sources: dict[str, str]) -> str:
 
     manifest = {
         "schemaVersion": 2,
-        "generatedAt": LAST_MODIFIED,
+        "generatedAt": max(LAST_MODIFIED, TASK_DATA["updatedAt"]),
         "canonicalOrigin": ORIGIN,
         "siteEditorialStatus": "independent-open-source-community-guide",
         "isOfficialGovernmentService": False,
@@ -369,6 +392,11 @@ def build_content_status(page_sources: dict[str, str]) -> str:
             "english-fallback": "English fallback is shown because a reviewed translation is not available.",
         },
         "legacyFieldPolicy": "editorialStatus, evidenceStatus and evidenceCheckedAt are retained for compatibility; use pageReviewStatus and evidenceCard* fields for scope-aware status.",
+        "sectionAnswerRegistry": {
+            "url": f"{ORIGIN}/answers.json",
+            "scope": "Source/operation checks apply only to the named task card, not the entire page or an individual case.",
+            "reviewDuePolicy": "Editorial maintenance deadline, not a guarantee of unchanged rules; sourceCheckedAt is not automatically refreshed by a build.",
+        },
         "primaryPages": primary_pages,
         "fullEnglishGuides": full_english_guides,
         "quickStartCoverageVersion": data.get("version"),
@@ -395,6 +423,15 @@ def build_crawler_policy() -> str:
             "Do not present this independent guide, community experience, estimates or interactive-tool output as an Australian Government decision or professional advice.",
             "Text content is CC BY-SA 4.0 and code is MIT; reuse remains subject to those licences and attribution requirements.",
             "",
+            "## Reading copies and discovery",
+            "",
+            f"Per-page Markdown: {ORIGIN}/ai-index.json (explicit public-page allowlist).",
+            f"Combined public reading collection: {ORIGIN}/llms-full.txt; prefer relevant single-page copies.",
+            "Reading copies are generated from the same public HTML, not AI rewrites or privileged bot-only answers. They retain sources, original dates and review scope.",
+            "Forms, private data, live giveaway listings and interactive-tool results are not exported. A listing-free export is not an empty-stock claim.",
+            "Claude-SearchBot and Claude-User have explicit robots groups with the same private-route exclusions as the wildcard group. Training preferences are separate; this change does not grant a new training licence.",
+            "Readability is not a promise of crawling, indexing, ranking or citation by any AI service.",
+            "",
             "## Non-content and personal-data boundaries",
             "",
             "Do not submit or automate forms, create cases, enumerate identifiers, or crawl any API other than the public GET /api/news endpoint; admin, CRM, confirmation, receipt and deletion endpoints remain non-content.",
@@ -412,24 +449,22 @@ def build_crawler_policy() -> str:
 
 def expected_files() -> dict[Path, str]:
     sources = {page: (ROOT / page).read_text(encoding="utf-8") for page in PAGES}
-    output = {ROOT / page: update_page(page, sources[page]) for page in PAGES}
+    output = {ROOT / page: decorate_page(page, update_page(page, sources[page]), ORIGIN) for page in PAGES}
     output[ROOT / "sitemap.xml"] = build_sitemap()
-    output[ROOT / "robots.txt"] = (
-        "# Public guide content is crawlable. Forms, APIs, CRM and personal-data routes are not content.\n"
-        "User-agent: *\n"
-        "Allow: /\n"
-        "Allow: /api/news\n"
-        "Disallow: /api/\n"
-        "Disallow: /admin/\n"
-        "Disallow: /crm/\n"
-        "Disallow: /contact/confirmation/\n"
-        "Disallow: /contact/receipt/\n"
-        "Disallow: /contact/delete/\n\n"
-        f"Sitemap: {ORIGIN}/sitemap.xml\n"
+    # Keep the named AI bot groups and give only the public news endpoint an API exception.
+    output[ROOT / "robots.txt"] = build_robots(ORIGIN).replace(
+        "Disallow: /api/\n", "Allow: /api/news\nDisallow: /api/\n"
     )
     output[ROOT / "llms.txt"] = build_llms(sources)
     output[ROOT / "content-status.json"] = build_content_status(sources)
     output[ROOT / "crawler-policy.txt"] = build_crawler_policy()
+    reading_sources = {page: output[ROOT / page] for page in PAGES}
+    for slug in FULL_TRANSLATION_SLUGS:
+        page = f"lang/en/{slug}/index.html"
+        output[ROOT / page] = decorate_page(page, (ROOT / page).read_text(encoding="utf-8"), ORIGIN)
+        reading_sources[page] = output[ROOT / page]
+    for relative, text in build_assets(reading_sources, json.loads(output[ROOT / "content-status.json"]), ORIGIN).items():
+        output[ROOT / relative] = text
     return output
 
 
@@ -463,6 +498,7 @@ def main() -> int:
             continue
         stale.append(path.relative_to(ROOT).as_posix())
         if not args.check:
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(expected, encoding="utf-8", newline="\n")
     asset_errors = validate_share_assets()
     if args.check and (stale or asset_errors):

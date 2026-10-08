@@ -323,8 +323,26 @@
     });
   };
 
-  // mode：exact（原詞 AND）、rewritten（去疑問詞後 AND）、approximate（二字詞 OR 降級）、none。
+  var taskAnswerState = function (answer, now) {
+    if (!answer || ["source-checked", "site-checked"].indexOf(answer.status) < 0) return "needs-review";
+    var today = new Date((now == null ? Date.now() : now) + 8 * 3600000).toISOString().slice(0, 10);
+    var valid = function (date) { return /^\d{4}-\d{2}-\d{2}$/.test(date || "") && Number.isFinite(Date.parse(date + "T00:00:00Z")) && new Date(date + "T00:00:00Z").toISOString().slice(0,10) === date; };
+    if (!valid(answer.sourceCheckedAt) || !valid(answer.reviewDue) || answer.sourceCheckedAt > today || answer.reviewDue <= answer.sourceCheckedAt || today >= answer.reviewDue) return "needs-review";
+    return "dated-summary";
+  };
+  var findTaskAnswer = function (entries, query) {
+    var needle = normalizeSearch(query);
+    if (!needle) return null;
+    var matches = entries.filter(function (entry) {
+      return entry.answer && Array.isArray(entry.answer.queries) && entry.answer.queries.some(function (q) { return normalizeSearch(q) === needle; });
+    });
+    return matches.length === 1 ? matches[0] : null;
+  };
+
+  // mode：curated（整題對應的編輯答案）、exact（原詞 AND）、rewritten（去疑問詞後 AND）、approximate（二字詞 OR 降級）、none。
   var runSiteSearch = function (entries, query) {
+    var task = findTaskAnswer(entries, query);
+    if (task) return { matches: [{ entry: task, score: 1000 }], mode: "curated", tokens: splitSearchTokens(query) };
     var plan = rewriteSearchQuery(query);
     var tokens = plan.rewritten.length ? plan.rewritten : plan.original;
     if (!tokens.length) return { matches: [], mode: "none", tokens: [] };
@@ -379,7 +397,7 @@
       else resolveLoad(entries);
     };
     searchLoadCancel = function () { finish(new Error("search closed")); };
-    script.src = "assets/search-index.js?v=20261003-01";
+    script.src = "assets/search-index.js?v=20261009-01";
     script.async = true;
     script.onload = function () {
       if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -412,6 +430,35 @@
     parent.appendChild(row);
   };
 
+  // Answer metadata is authored in answers.json; never generated from user input.
+  var renderTaskSearchAnswer = function (entry) {
+    var a = entry.answer, box = document.createElement("section");
+    box.className = "task-search-answer";
+    var title = document.createElement("h3"); title.textContent = a.question; box.appendChild(title);
+    var line = function (text) { var p = document.createElement("p"); p.textContent = text; box.appendChild(p); };
+    var current = taskAnswerState(a) === "dated-summary";
+    line(current ? a.summary : "本卡已到複核日或待查證，先查看來源與完整條件，不把舊摘要當成現行規則。");
+    line("適用：" + a.scope); line("先核對：" + a.conditions);
+    var actions = document.createElement("p"); actions.className = "task-actions";
+    [[entry.href, "看完整條件與下一步"], [a.source.url, a.source.label]].forEach(function (item) {
+      var link = document.createElement("a"); link.href = item[0]; link.textContent = item[1]; link.rel = "noopener noreferrer"; actions.appendChild(link);
+    });
+    box.appendChild(actions);
+    line("本卡來源／操作核對 " + a.sourceCheckedAt + " · 下次複核 " + a.reviewDue + "；不是整頁或專業審校。");
+    searchResults.appendChild(box);
+  };
+  var refreshTaskDates = function () {
+    document.querySelectorAll("[data-task-answer]").forEach(function (card) {
+      var state = taskAnswerState({status: card.getAttribute("data-review-status"), sourceCheckedAt: card.getAttribute("data-source-checked-at"), reviewDue: card.getAttribute("data-review-due")});
+      var alert = card.querySelector("[data-task-review-alert]"), summary = card.querySelector("[data-task-summary]");
+      if (alert) alert.hidden = state !== "needs-review";
+      if (summary) summary.hidden = state === "needs-review";
+    });
+  };
+  refreshTaskDates();
+  window.addEventListener("pageshow", refreshTaskDates);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshTaskDates(); });
+
   var renderSearch = function (entries, query) {
     var cleaned = String(query || "").trim();
     searchResults.textContent = "";
@@ -421,7 +468,10 @@
     }
     var result = runSiteSearch(entries, cleaned);
     var matches = result.matches;
-    if (!matches.length) {
+    if (result.mode === "curated") {
+      searchStatus.textContent = "這題有已整理的答案；先確認適用條件。";
+      renderTaskSearchAnswer(matches[0].entry);
+    } else if (!matches.length) {
       searchStatus.textContent = "找不到符合「" + cleaned + "」的內容。";
       // 零結果狀態順序（P0-9 實作 5）：階段 chip → 安全列 → 問一次 AI（僅在啟用且使用者點擊後）→ GitHub 回報。
       var empty = document.createElement("div");
@@ -2260,8 +2310,8 @@
       var briefText = makeBrief();
       var subject = "[合作詢問] " + briefType.value.trim();
       briefPreview.value = briefText;
-      briefGmailLink.href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent("chunaenqiu6@gmail.com") + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
-      briefEmailLink.href = "mailto:chunaenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
+      briefGmailLink.href = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent("chuanenqiu6@gmail.com") + "&su=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
+      briefEmailLink.href = "mailto:chuanenqiu6@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(briefText);
       briefOutput.hidden = false;
       setBriefStatus("需求單已整理好；請再次確認未放入簽證、移民或其他敏感個案資料，再由你選擇方式寄出");
       briefGmailLink.focus();

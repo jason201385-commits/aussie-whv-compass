@@ -1,7 +1,7 @@
 # 🧭 澳打指南針 — 澳洲打工度假開源攻略
 
 給準備去澳洲打工度假（Working Holiday, subclass 417）的中文背包客的一站式開源攻略，
-依旅程階段共 18 頁（另含工具、社團與新聞入口）：
+依旅程階段共 19 頁（另含工具、社團與新聞入口）：
 
 | 階段 | 頁面 |
 |---|---|
@@ -40,7 +40,7 @@
 - **存錢試算器**（cost.html）、**行前互動清單**（prep.html）、
   **防詐實戰測驗**（scam.html）、**DASP 速算**（leave.html）、
   **自我釐清快思測驗＋慢想工作表**（why.html）、**私人合作需求單**（about.html）。
-- Header 與首頁提供**全站搜尋**：搜尋 18 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳；載入失敗可重試，中文組字不誤提交。手機導覽有左右按鈕，站名完整顯示。
+- Header 與首頁提供**全站搜尋**：搜尋 19 頁的頁面與段落入口，查詢只在裝置內比對、不保存也不上傳；載入失敗可重試，中文組字不誤提交。手機導覽有左右按鈕，站名完整顯示。
 - **生活需求快查**：首頁新增薪資單、急搬家、政策傳聞、沒車找工、租屋 bills、車況、下簽等待、報稅、換匯與獨旅安全入口。需求來自已取得的一個 Perth 群組匿名研究，群組個案不作為政策或法律依據；短住工具可選 1 晚。
 - 全站圖示為內嵌 SVG（`assets/main.js` 注入 sprite），不使用 emoji。
 
@@ -83,7 +83,7 @@ P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空�
 
 ## 搜尋引擎與 AI 探索
 
-- 18 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
+- 19 頁提供 canonical、Open Graph／Twitter 分享圖與 schema.org JSON-LD。
 - `robots.txt` 開放所有公開頁，`sitemap.xml` 列出正式網址；`llms.txt` 提供 AI 可讀導覽、授權與事實界線。
 - 修改頁名、description 或頁面清單後，先跑 `python scripts/build_seo.py`，再跑 `scripts/check.ps1`。
 - `llms.txt` 是輔助理解的社群提案，不保證搜尋排名、收錄或任何 AI 服務採用。
@@ -147,3 +147,12 @@ P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空�
 本專案作者不是澳洲註冊移民代理（RMA）。內容為公開資料整理、編輯轉譯與一般資訊，
 不構成移民、法律、稅務或財務建議。一切以
 [澳洲內政部](https://immi.homeaffairs.gov.au/) 及各官方機構公告為準。
+
+## 離澳免費二手版
+
+[免費贈送看板](https://www.aussiewhvcompass.com/free.html)提供同城物品篩選與公開刊登草稿。瀏覽不用登入；刊登、留言與管理自己的原貼使用 GitHub 帳號。原貼送出即公開，本站顯示須經 `free-board-approved` 審核；用 `free-board-reserved` 標預約，送出後關閉 Issue。本文修改會移除 approved，需重審。沒有站內金流、匿名後端、電話或住址欄位，不串 CRM。此公開流程與原本 market.html 的本機買賣草稿不同，完整契約與版主操作見 docs/SPEC.md §6。
+
+
+## AI／Claude 可讀性（P1-26）
+
+公開 HTML 為 canonical，`llms.txt` 列出原頁及同源 Markdown，`ai-index.json` 提供逐頁／段落／来源連結與原始審校範圍，`llms-full.txt` 合併公開閱讀文字。不含表單、私人資料、動態二手刊登或互動結果。修改攻略後請跑 `python scripts/build_seo.py` 與 `python scripts/test_ai_reading.py`，避免閱讀副本漂移。Cloudflare 排查見 [AI_DISCOVERY](docs/AI_DISCOVERY.md)；爬取成功不保證 AI 收錄或引用。
