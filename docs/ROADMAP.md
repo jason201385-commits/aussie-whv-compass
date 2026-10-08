@@ -63,7 +63,7 @@
 | P1-29 | 官方消息自動核對與關鍵字新聞區 | 程式完成／本機驗證 | 正式 D1 0004–0005、Worker Cron/API 與前端須協調部署；部署後做來源同步與 live 回放 | SPEC §1.2、SDD §3.1 | D-2026-10-02-01 |
 | P1-30 | 搜尋恢復與手機導覽加固 | 程式完成／本機驗證 | 正式站回放待部署 | SPEC §1.1～1.2 | D-2026-10-03-01 |
 | P1-31 | LINE 需求研究與近期重要消息入口 | 程式完成／本機驗證 | 僅取得一個澳洲群組；其他群組匯出尚未取得；正式新聞 API 2026-10-03 回 404，P1-29 仍待協調部署 | SPEC §1.2 | D-2026-10-03-02 |
-| P1-32 | 站內搜尋與 Cloudflare 單一 AI 入口 | 程式完成／本機驗證 | 預設 local 與 Cloudflare 專用路由完成；Cloudflare 帳號登入、正式 Worker／binding／模型驗收及舊 secret 清除未完成 | SPEC §1.2、worker/README.md | DECISIONS D-2026-10-09-03 |
+| P1-32 | 站內搜尋與 Cloudflare 單一 AI 入口 | 程式完成／本機驗證 | local 前端已發布並核對公開資產；正式瀏覽器回放、Cloudflare Worker／binding／模型驗收及舊 secret 清除未完成 | SPEC §1.2、worker/README.md | DECISIONS D-2026-10-09-03；PR #6 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |
