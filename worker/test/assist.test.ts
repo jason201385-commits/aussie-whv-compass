@@ -15,6 +15,7 @@ import {
   resolveProviderConfig,
   SITE_CATALOGUE,
   SYSTEM_PROMPT,
+  type WorkersAiBinding,
 } from "../src/assist";
 import { createApp, type AppDependencies, type AppEnv } from "../src/index";
 import type { RateLimitBinding } from "../src/rate-limit";
@@ -24,6 +25,7 @@ const allowedOrigin = "https://www.aussiewhvcompass.com";
 const clientIp = "203.0.113.7";
 const question = "我在 Perth 想找採收工作，要先看哪一頁？";
 const apiKey = "local-test-key";
+const cloudflareModel = "@cf/meta/llama-3.1-8b-instruct-fp8";
 
 const siteverifyOk: FetchTransport = async () =>
   Response.json({
@@ -367,7 +369,7 @@ describe("assist safety and abuse controls", () => {
     for (const host of ASSIST_ALLOWED_HOSTS) {
       expect(
         resolveProviderConfig({ ASSIST_BASE_URL: `https://${host}/v1/`, ASSIST_MODEL: "m", MINIMAX_API_KEY: "k" }),
-      ).toEqual({ baseUrl: `https://${host}/v1`, model: "m", apiKey: "k" });
+      ).toEqual({ provider: "minimax", baseUrl: `https://${host}/v1`, model: "m", apiKey: "k" });
     }
   });
 });
@@ -734,6 +736,254 @@ describe("assist router and server-composed answer", () => {
     for (const secret of [question, sensitive, verdict, token, apiKey, clientIp]) {
       expect(output).not.toContain(secret);
     }
+  });
+});
+
+describe("optional native Cloudflare assist provider", () => {
+  const now = new Date("2026-09-12T02:00:00.000Z");
+
+  function cloudflareEnvironment(binding: WorkersAiBinding): AppEnv {
+    const appEnv = assistEnvironment({
+      ASSIST_PROVIDER: "cloudflare",
+      CLOUDFLARE_ASSIST_MODEL: cloudflareModel,
+      AI: binding,
+    });
+    // Cloudflare must work without any MiniMax credential or provider URL.
+    delete appEnv.MINIMAX_API_KEY;
+    delete appEnv.ASSIST_MODEL;
+    delete appEnv.ASSIST_BASE_URL;
+    return appEnv;
+  }
+
+  it("uses only AI.run without a MiniMax key and returns the same server-composed catalogue template", async () => {
+    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({
+      response: JSON.stringify({ links: ["work.html#seasons"] }),
+    }));
+    const minimax = vi.fn(modelReply("{}"));
+    const appEnv = cloudflareEnvironment({ run });
+    const response = await dispatch(
+      { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now },
+      appEnv,
+      { question, turnstileToken: "private-turnstile-token" },
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      ok: true,
+      kind: "answer",
+      answer: `${ANSWER_LEAD}採收季節月曆——各州官方採收季節月曆。`,
+      links: [{ title: "採收季節月曆", href: "work.html#seasons" }],
+      provider: "cloudflare",
+    });
+    expect(run).toHaveBeenCalledExactlyOnceWith(cloudflareModel, {
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: question },
+      ],
+      max_tokens: 1024,
+      temperature: 0,
+      stream: false,
+    }, { signal: expect.any(AbortSignal) });
+    const sent = JSON.stringify(run.mock.calls[0]);
+    for (const privateValue of ["private-turnstile-token", apiKey, clientIp, allowedOrigin]) {
+      expect(sent).not.toContain(privateValue);
+    }
+    expect(minimax).not.toHaveBeenCalled();
+    await expect(storedCount("2026-09-12")).resolves.toBe(1);
+  });
+
+  it("rejects unknown selectors, missing bindings and non-native model IDs without calling either provider", async () => {
+    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
+    const minimax = vi.fn(modelReply("{}"));
+    const deps: AppDependencies = {
+      turnstileTransport: siteverifyOk,
+      assistTransport: minimax,
+      assistNow: () => now,
+    };
+    const configurations: AppEnv[] = ["", "auto", "openai", "Cloudflare", " cloudflare "].map((provider) =>
+      ({ ...cloudflareEnvironment({ run }), ASSIST_PROVIDER: provider }),
+    );
+    const noBinding = cloudflareEnvironment({ run });
+    delete noBinding.AI;
+    configurations.push(noBinding);
+    configurations.push({ ...cloudflareEnvironment({ run }), AI: {} as WorkersAiBinding });
+    for (const model of ["", "MiniMax-M2.7", "openai/gpt-4.1", "https://evil.example/model", "@cf/meta/../evil", "@cf/meta/model?gateway=x"]) {
+      configurations.push({ ...cloudflareEnvironment({ run }), CLOUDFLARE_ASSIST_MODEL: model });
+    }
+    for (const appEnv of configurations) {
+      expect(resolveProviderConfig(appEnv)).toBeNull();
+      const response = await dispatch(deps, appEnv, { question, turnstileToken: "ok-token" });
+      expect(response.status).toBe(503);
+      await expect(response.json()).resolves.toMatchObject({ error: { code: "assist_not_configured" } });
+    }
+    expect(run).not.toHaveBeenCalled();
+    expect(minimax).not.toHaveBeenCalled();
+  });
+
+  it("preserves explicit and legacy MiniMax selection without automatically switching to Cloudflare", async () => {
+    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
+    const appEnv = assistEnvironment({ AI: { run }, CLOUDFLARE_ASSIST_MODEL: cloudflareModel });
+    delete appEnv.ASSIST_PROVIDER;
+    const minimax = vi.fn(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
+    const response = await dispatch(
+      { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now },
+      appEnv,
+      { question, turnstileToken: "ok-token" },
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ provider: "minimax" });
+    expect(minimax).toHaveBeenCalledOnce();
+
+    const failed = await dispatch(
+      { turnstileTransport: siteverifyOk, assistTransport: async () => new Response("unavailable", { status: 503 }), assistNow: () => now },
+      { ...appEnv, ASSIST_PROVIDER: "minimax" },
+      { question, turnstileToken: "ok-token" },
+    );
+    expect(failed.status).toBe(502);
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("keeps safety and personal determinations ahead of Turnstile, rate limits, quota and AI.run", async () => {
+    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
+    const minimax = vi.fn(modelReply("{}"));
+    const turnstile = vi.fn(siteverifyOk);
+    const limiter = vi.fn(async () => ({ success: true }));
+    const appEnv = { ...cloudflareEnvironment({ run }), ASSIST_RATE_LIMITER: { limit: limiter } };
+    for (const text of ["我剛匯款給仲介，現在被威脅扣護照", "我可以申請二簽嗎？"]) {
+      const response = await dispatch(
+        { turnstileTransport: turnstile, assistTransport: minimax, assistNow: () => now },
+        appEnv,
+        { question: text, turnstileToken: "any-token" },
+        { clientIp: null },
+      );
+      expect(response.status).toBe(200);
+      await expect(response.json()).resolves.toMatchObject({ kind: "official_exit" });
+    }
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(limiter).not.toHaveBeenCalled();
+    expect(run).not.toHaveBeenCalled();
+    expect(minimax).not.toHaveBeenCalled();
+    await expect(storedCount("2026-09-12")).resolves.toBeNull();
+  });
+
+  it("never invokes AI.run when the origin, client IP, Turnstile, limiter or daily cap blocks the request", async () => {
+    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
+    const minimax = vi.fn(modelReply("{}"));
+    const deps: AppDependencies = { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now };
+    const appEnv = cloudflareEnvironment({ run });
+    const body = { question, turnstileToken: "ok-token" };
+    const rejected = [
+      await dispatch(deps, appEnv, body, { origin: "https://evil.example" }),
+      await dispatch(deps, appEnv, body, { clientIp: null }),
+      await dispatch({ ...deps, turnstileTransport: async () => Response.json({ success: false }) }, appEnv, body),
+      await dispatch(deps, { ...appEnv, ASSIST_RATE_LIMITER: { limit: async () => ({ success: false }) } }, body),
+      await dispatch(deps, { ...appEnv, ASSIST_DAILY_CAP: "0" }, body),
+    ];
+    expect(rejected.map((response) => response.status)).toEqual([403, 400, 400, 429, 429]);
+    const codes: string[] = [];
+    for (const response of rejected) {
+      const result = await response.json() as { error: { code: string } };
+      codes.push(result.error.code);
+    }
+    expect(codes).toEqual(["origin_not_allowed", "client_ip_missing", "turnstile_failed", "rate_limited", "assist_daily_cap"]);
+    expect(run).not.toHaveBeenCalled();
+    expect(minimax).not.toHaveBeenCalled();
+    await expect(storedCount("2026-09-12")).resolves.toBeNull();
+  });
+
+  it("filters native replies through the same href allow-list and never renders generated titles or judgements", async () => {
+    const leaked = "你一定符合資格，保證核准；https://evil.example/steal";
+    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: JSON.stringify({
+      answer: leaked,
+      intent: leaked,
+      links: [
+        "https://evil.example/steal", "work.html#missing", "../work.html#channels",
+        { href: "work.html#seasons", title: leaked, lead: leaked },
+        "work.html#seasons", "work.html#channels", "work.html#certs", "cost.html#wage",
+      ],
+    }) }));
+    const response = await dispatch(
+      { turnstileTransport: siteverifyOk, assistNow: () => now },
+      cloudflareEnvironment({ run }),
+      { question, turnstileToken: "ok-token" },
+    );
+    const body = await response.json() as { kind: string; answer: string; links: Array<{ href: string }> };
+    expect(response.status).toBe(200);
+    expect(body.kind).toBe("answer");
+    expect(body.links.map((link) => link.href)).toEqual(["work.html#seasons", "work.html#channels", "work.html#certs"]);
+    expect(JSON.stringify(body)).not.toContain(leaked);
+    expect(JSON.stringify(body)).not.toMatch(/evil\.example|missing|一定|核准|\.\.\//);
+  });
+
+  it("returns the fixed refusal for malformed text or replies containing no allowed catalogue links", async () => {
+    for (const content of ["not json", "", '{"links":["https://evil.example/"]}', '{"answer":"你一定符合資格"}']) {
+      const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: content }));
+      const response = await dispatch(
+        { turnstileTransport: siteverifyOk, assistNow: () => now },
+        cloudflareEnvironment({ run }),
+        { question, turnstileToken: "ok-token" },
+      );
+      expect(response.status).toBe(200);
+      await expect(response.json()).resolves.toMatchObject({
+        kind: "refused",
+        links: [{ href: "index.html#search" }, { href: "index.html#communities" }],
+        provider: "cloudflare",
+      });
+    }
+  });
+
+  it("maps binding errors and invalid or oversized envelopes to a fixed 502 without logging or paid failover", async () => {
+    const spy = spyConsole();
+    const minimax = vi.fn(modelReply("{}"));
+    const cases: WorkersAiBinding["run"][] = [
+      async () => { throw new Error(`private upstream payload ${question} ${apiKey}`); },
+      async () => undefined,
+      async () => ({ error: "account limited" }),
+      async () => ({ response: { links: ["work.html#seasons"] } }),
+      async () => ({ response: "字".repeat(30_000) }),
+    ];
+    for (const implementation of cases) {
+      const run = vi.fn<WorkersAiBinding["run"]>(implementation);
+      const response = await dispatch(
+        { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now },
+        { ...cloudflareEnvironment({ run }), MINIMAX_API_KEY: apiKey, ASSIST_MODEL: "MiniMax-M2.7", ASSIST_BASE_URL: "https://api.minimaxi.com/v1" },
+        { question, turnstileToken: "ok-token" },
+      );
+      expect(response.status).toBe(502);
+      await expect(response.json()).resolves.toEqual({
+        ok: false,
+        error: { code: "assist_unavailable", message: "AI 暫時無法回覆，請改用站內搜尋或到各地社團問人。" },
+      });
+      expect(run).toHaveBeenCalledOnce();
+    }
+    expect(minimax).not.toHaveBeenCalled();
+    expect(spy.calls()).toBe(0);
+    await expect(storedCount("2026-09-12")).resolves.toBe(cases.length);
+  });
+
+  it("aborts at the deadline even if the binding ignores cancellation and discards its late reply", async () => {
+    const spy = spyConsole();
+    let signal: AbortSignal | undefined;
+    let finish: ((value: unknown) => void) | undefined;
+    const run = vi.fn<WorkersAiBinding["run"]>((_model, _inputs, options) => {
+      signal = options?.signal;
+      return new Promise((resolve) => { finish = resolve; });
+    });
+    const minimax = vi.fn(modelReply("{}"));
+    const response = await dispatch(
+      { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now, assistTimeoutMs: 500 },
+      cloudflareEnvironment({ run }),
+      { question, turnstileToken: "ok-token" },
+    );
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toMatchObject({ error: { code: "assist_unavailable" } });
+    expect(signal?.aborted).toBe(true);
+    finish?.({ response: JSON.stringify({ links: ["work.html#seasons"] }) });
+    await Promise.resolve();
+    expect(run).toHaveBeenCalledOnce();
+    expect(minimax).not.toHaveBeenCalled();
+    expect(spy.calls()).toBe(0);
+    await expect(storedCount("2026-09-12")).resolves.toBe(1);
   });
 });
 

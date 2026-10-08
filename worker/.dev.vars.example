@@ -1,9 +1,16 @@
 # Copy to .dev.vars for local manual testing only. Never commit the real file.
 TURNSTILE_SECRET_KEY=replace-with-local-test-secret
 RATE_LIMIT_HMAC_KEY=replace-with-at-least-32-random-bytes
-# AI fallback (POST /api/assist). Leave empty to keep the route fail-closed (503 assist_not_configured).
-# The real key lives only in Cloudflare protected settings after P0-4; never commit it.
+# MiniMax mode only (ASSIST_PROVIDER=minimax, also the legacy default).
+# Leave empty to keep MiniMax fail-closed (503 assist_not_configured).
+# The real key lives only in Cloudflare protected settings; never commit it.
 MINIMAX_API_KEY=
+# P1-32 optional native Workers AI mode: uses the AI binding, not MINIMAX_API_KEY.
+# Do not enable during ordinary local tests: native AI inference is remote and counts toward usage.
+# The test suite sets remoteBindings:false and supplies a mock AI.run instead.
+# After the separate rollout and disclosure review, the corresponding Wrangler vars are:
+# ASSIST_PROVIDER=cloudflare
+# CLOUDFLARE_ASSIST_MODEL=@cf/meta/llama-3.1-8b-instruct-fp8
 
 # Resend transactional mail (POST /api/contact receipts). Leave empty to keep DisabledMailTransport.
 # Production: npx wrangler secret put RESEND_API_KEY --env production (never commit the real key).

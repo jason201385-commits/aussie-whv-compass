@@ -70,16 +70,24 @@ GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連�
 站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；
 即使啟用，訪客未同意前仍不載入 Google tag，搜尋字詞與表單內容不會送往 GA。
 
-## Cloudflare 後端狀態
+## 站內找答案與 Cloudflare 後端
 
-`worker/` 已有獨立無框架 Worker、本機 D1 migration、CORS 白名單、16 KiB JSON 上限、
-Turnstile server-side validation、HMAC 化限流鍵、prepared statements 與可替換的 mock mail transport。
-需求建立、回執、確認信成功／排隊狀態、查閱、更正、永久刪除與 24 個月清除路由也已通過本機測試。
-另有只接受 7 個固定類別的 D+ 每日彙總 endpoint，以及不收姓名、Email 或自由文字的自願找路測試；
-答案與精確計時只留在當頁，D1 不建立個別事件列，metrics route 不寫 application request log。
-這些項目目前只有程式與本機證據；Cloudflare Worker、D1、Turnstile、寄信資源及 secrets 尚未完成
-P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空值，現行私人需求單仍只在瀏覽器內
-產生 Email／複製備援，D+ 也不發出 request；兩者都不會冒充正式後端成功。
+本分支的 P1-32 替代處理預設使用 **站內找答案**：`assets/api-config.js` 的
+`assistEnabled: true`、`assistMode: "local"` 讓訪客直接用既有公開搜尋索引與主題分流，
+不需要 MiniMax key、API origin 或 Turnstile，不送出問題，也不耗模型配額。
+常見問法先找對應內容；沒有可信命中時提供分類與搜尋入口，不把固定導覽冒充 AI 生成。
+
+若需遠端語意路由，前端可改 `assistMode: "remote"`，並把 `assistProvider` 與 Worker
+的 `ASSIST_PROVIDER` 同步選為 `minimax` 或 `cloudflare`。MiniMax 沿用既有 key／主機白名單；
+Cloudflare 透過 `AI` binding，不要求第三方模型 key，仍有 Cloudflare 的配額和計費。
+後端只讓模型挑站內白名單連結，答案文字仍是固定模板；兩個供應商不互相自動切換。
+完整設定、回復方式與驗證見 [`worker/README.md`](worker/README.md)。
+
+`worker/` 已有獨立無框架 API、D1 migrations、CORS 白名單、Turnstile server-side validation、
+HMAC 化限流及每日模型次數上限。既有正式 Worker 健康路由可用，不代表任一模型推論正常。
+站內聯絡送出、D+ 與住宿搜尋仍各自保持關閉；新聞部署有自己的 migration／排程要求。
+本機替代模式可隨靜態網站發布，Cloudflare AI adapter 在完成正式 binding 與受控驗收前
+只算程式能力，不能宣稱已切換或正式可用。
 
 ## 搜尋引擎與 AI 探索
 

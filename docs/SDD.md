@@ -65,7 +65,7 @@
 
 | 路徑 | 角色 |
 |---|---|
-| `index.html` | 首頁：安全出口、釐清器（4 階段 × 護照 × 需求 → 21 個出口）、6 題找職類、搜尋、AI 兜底（未啟用）、各地社團、續讀與收藏、遊戲區 |
+| `index.html` | 首頁：安全出口、釐清器（4 階段 × 護照 × 需求 → 21 個出口）、6 題找職類、搜尋、站內找答案與可選 AI、各地社團、續讀與收藏、遊戲區 |
 | `why.html` | 自我釐清雙模式（快思測驗＋慢想工作表） |
 | `visa.html` | 簽證與集簽＋集簽郵遞區號初篩 |
 | `prep.html` | 行前準備與落地 SOP＋互動清單＋行前海報 |
@@ -84,7 +84,7 @@
 | `404.html` | 錯誤復原頁（noindex，保留導覽與旅程復原入口） |
 | `assets/style.css` | 全站唯一樣式表（設計 token 見 §4） |
 | `assets/lemon-pattern.svg`、`og-cover.svg`、`og-cover.png` | 本地裝飾圖樣與 1200×630 分享圖 |
-| `assets/main.js` | 全站共用：sprite、導覽、搜尋、續讀／收藏、回饋列、社團目錄篩選、首頁釐清器（hash 驅動）、AI 兜底（fail closed）、需求單、D+ |
+| `assets/main.js` | 全站共用：sprite、導覽、搜尋、續讀／收藏、回饋列、社團目錄篩選、首頁釐清器（hash 驅動）、站內找答案與可選 AI（fail closed）、需求單、D+ |
 | `assets/tools.js` | 工具頁專用：快查器、試算器、清單、測驗、DASP、住宿搜尋、市集草稿（特徵偵測按頁啟用） |
 | `assets/simulator.js` | 模擬器狀態機 |
 | `assets/news.js`、`news.html` | 人工核對的重要提醒與官方快查；下方自動新聞只顯示後端已核對資料 |
@@ -166,7 +166,8 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 - **住宿搜尋**：只接受四個固定欄位、2 KiB body、固定類別限流、provider timeout、每平台最多 8 筆、
   目的網域與顯示欄位白名單；每個候選 provider 必須附有效 `displayAuthorization`（本站 origin、核准用途、
   查核日、有效期限），過期或缺漏不呼叫上游；不寫 D1、不記錄搜尋內容。
-- **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`MINIMAX_API_KEY` 空值或 `ASSIST_BASE_URL` 主機不在白名單（`api.minimaxi.com`／`api.minimax.io`）時 503 fail closed；透過 OpenAI 相容 chat completions（`ASSIST_MODEL`）呼叫（`max_tokens` 1024、temperature 0），20 秒逾時，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
+- **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`ASSIST_PROVIDER` 明確選擇 `minimax` 或 `cloudflare`；MiniMax 仍要求 `MINIMAX_API_KEY` 與固定主機白名單，Cloudflare 只使用 `AI` binding 與獨立模型設定，不讀 MiniMax key；未知 provider、缺綁定或設定無效時 503 fail closed，不自動改用另一供應商；遠端呼叫有 20 秒逾時與回覆大小限制，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
+- **免模型站內導覽**（P1-32）：公開 `assistMode: "local"` 在前端以既有搜尋索引與固定意圖處理；不需 API origin、site key、Turnstile、模型或 D1。`remote` 可先使用可信站內命中，其他輸入才進上述 AI 路徑。訪客文字不持久化，不把近似搜尋或固定導覽標成 AI 生成；具體 UI 與模式設定以 SPEC §1.2 為準。
 - **官方消息核對**（`GET /api/news`＋Cron `47 */6 * * *`）：來源必須存在固定白名單，feed 與原文皆設大小與 12 秒逾時；原文網址限 HTTPS 同官方網域，發布時間不得晚於檢查時間 6 小時或早於 120 天，標題相符度至少 0.6；通過才寫 `news_items`，並保存來源、原文網址、查核時間、相符分數與內容 SHA-256。未通過全文不入庫；分類只用固定規則，不呼叫生成式 AI；同一則可寫入多個固定 `topics_json`，因此工作防詐等交叉消息能被每個相關 filter 找到。`news_source_state` 保留每個來源最近成功／失敗狀態；全部來源失敗時排程失敗，前台不得將空值描述為沒有新聞。
 - **安全**：所有 `POST` 路由要求 `Origin` 存在且在白名單，否則 `403 origin_not_allowed`（`GET /api/health` 例外）；
   Turnstile token server-side 驗證；輸入長度、rate limit 與 SQL 皆白名單／prepared statement；

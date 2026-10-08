@@ -1,6 +1,8 @@
-# Cloudflare Worker（本機骨架）
+# Cloudflare Worker
 
-這個目錄是 GitHub Pages 靜態前端之外的獨立無框架 API。現階段只有程式與本機測試，沒有建立、綁定或部署任何正式 Cloudflare 資源。
+這個目錄是 GitHub Pages 靜態前端之外的獨立無框架 API。既有 MiniMax 路由的正式啟用紀錄見
+`docs/DECISIONS.md` D-2026-09-04-01。P1-32 新增的 Workers AI 選項只完成程式與本機 mock 驗證；
+準備設定不等於已部署，也不代表已通過真實模型的中文導覽驗收。
 
 本機已實作 `POST /api/contact`、`/api/contact/manage`、`/api/contact/update`、
 `/api/contact/delete`、`/api/metrics`、`/api/accommodation/search`、`/api/assist` 與每日 retention purge。住宿端點只接受嚴格白名單欄位，
@@ -18,9 +20,8 @@
 工作／法律 `work.html#verify`＋`scam.html#help`，無主題線索時四類各一個；不呼叫模型、不算額度）
 → 缺 `CF-Connecting-IP` 即 `400 client_ip_missing`（fail closed，不共用限流桶）→ Turnstile
 → 以 `HMAC(CF-Connecting-IP)` 限流 → 每日總額度（`assist_daily_usage` 一天一列的 atomic 計數，超額 `429 assist_daily_cap`）
-→ `MINIMAX_API_KEY` 為空、或 `ASSIST_BASE_URL` 不是 https、或主機不在 `ASSIST_ALLOWED_HOSTS`
-（`api.minimaxi.com`、`api.minimax.io`）即 `503 assist_not_configured`
-→ 呼叫 MiniMax OpenAI 相容 `chat/completions`（`max_tokens` 1024、temperature 0、20 秒逾時，失敗 `502 assist_unavailable`）。
+→ 驗證明確選擇的 `ASSIST_PROVIDER` 與該供應商設定（缺漏或陌生值即 `503 assist_not_configured`）
+→ 只呼叫選定的供應商（`max_tokens` 1024、temperature 0、20 秒逾時，失敗 `502 assist_unavailable`）。
 2026-09-02 受控呼叫實測（D-2026-09-02-05）：MiniMax-M2.7 把推理放在 `content` 的 `<think>` 區塊，`max_tokens` 200 會被推理吃光而截斷成零連結；
 1024 加上系統提示規則 5（思考極短）後 24 題全部回傳有效站內連結，最長 7 秒、中位數約 5 秒。
 `kind` 仍是 `answer`／`official_exit`／`over_cap`／`refused`：`answer.answer` 是伺服器模板文字，`links` 只含
@@ -28,17 +29,66 @@
 問題文字、模型回覆與 token 不寫 D1、不進 log；`assist.ts` 完全不使用 `console`，這條路由和 `/api/metrics`
 一樣沒有 request log 行。
 
+## P1-32：免模型站內導航與選用 Workers AI
+
+前端 `assets/api-config.js` 的 `assistMode: 'local'` 為本輪預設：問題只用瀏覽器中的本站答案與搜尋索引分流，
+不載入 Turnstile、不呼叫 `/api/assist`，也不需要模型 key。`assistEnabled` 仍是入口總開關。
+`assistMode: 'remote'` 先使用有把握的本地結果，弱命中時才在揭露後走這個 Worker；
+舊設定未填 `assistMode` 時維持 remote，相容既有配置；陌生模式或 provider 則停用入口。
+
+Worker 的模型供應商獨立選擇，**沒有自動重試或跨供應商付費備援**：
+
+| `ASSIST_PROVIDER` | 必要設定 | 呼叫方式 | 缺漏時 |
+|---|---|---|---|
+| `minimax`，或未定義此變數 | `MINIMAX_API_KEY`、`ASSIST_MODEL`、HTTPS `ASSIST_BASE_URL`；主機只能是 `api.minimaxi.com`／`api.minimax.io`，不接受帳密、額外 port、query 或 fragment | 既有 `chat/completions` HTTP 呼叫 | 503 `assist_not_configured` |
+| `cloudflare` | `AI` 原生 binding、`CLOUDFLARE_ASSIST_MODEL`；模型 ID 必須為 `@cf/<author>/<model>` | `env.AI.run(...)`，不讀 MiniMax key／URL | 503 `assist_not_configured` |
+| 空字串或其他值 | 不接受 | 不呼叫任何模型 | 503 `assist_not_configured` |
+
+兩種供應商都沿用上方的安全分類、Origin、Turnstile、HMAC 限流、每日聚合額度與 links-only 固定模板。
+Workers AI 回覆必須是含字串 `response` 的非串流物件；超出 64 KiB、格式不符、配額或供應商錯誤一律回固定 502，
+不輸出錯誤細節、不記問題或回覆。字串內的 JSON 不完整或沒有白名單連結時，沿用 `refused` 固定搜尋出口。
+20 秒期限會送出取消訊號並結束等待；已開始的遠端推論是否產生用量，以 Cloudflare 計費為準。
+
+`wrangler.jsonc` 已在頂層和 `env.production` 各備妥 `"ai": { "binding": "AI" }`；
+兩處 `ASSIST_PROVIDER` 都維持 `minimax`，新增 binding **不會自行改用 Workers AI**。
+候選 `CLOUDFLARE_ASSIST_MODEL` 為 `@cf/meta/llama-3.1-8b-instruct-fp8`：
+[官方模型頁](https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fp8/)
+在 2026-10-09 查核時有 `messages`、`max_tokens`、`temperature` 與 `response: string` 的介面。
+本輪只驗證介面與邊界，**尚未實測這個模型的中文命中率、延遲或實際用量**；換模型前須核對它支援相同介面。
+舊文件示例中的 `@cf/meta/llama-3.1-8b-instruct` 模型頁目前導向 unavailable，因此不能僅照抄舊 ID。
+
+原生 binding 省去 MiniMax／OpenAI 等第三方模型 key，但仍需 Cloudflare 帳戶、可用模型與配額，
+也仍會把問題送到 Cloudflare 推論。免費額度與超額價格以
+[Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) 為準，不能把「免外部 key」當成「無限免費」。
+[Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/) 說明 bindings、vars 與 secrets 不會由頂層繼承，
+所以用 `--env production` 時必須保留生產區塊內的對應設定。
+
+### 日後切換 Workers AI 的同批設定
+
+這是待正式驗收的操作說明，本輪沒有執行部署或真實模型呼叫：
+
+1. 確認 Cloudflare 帳戶模型權限、用量安排與送出前的資料處理揭露。
+2. 將 Worker 的 `env.production.vars.ASSIST_PROVIDER` 設為 `cloudflare`，核對
+   `env.production.ai.binding` 為 `AI`，以及 `CLOUDFLARE_ASSIST_MODEL` 為已確認相容的原生模型 ID。
+3. 同批將前端 `assistProvider` 設為 `cloudflare`，確認即將送出的第三方揭露與 About 說明都為 Cloudflare；
+   `assistMode` 要保留 `local`，直到 Worker 部署與受控驗收完成才改成 `remote`。
+   **只切 Worker 而不改前端揭露，會讓訪客看到錯誤的資料接收者，不能這樣上線。**
+4. 依既有 gate 完成 Worker 的 `--env production` 部署、真實 Turnstile 與中文導覽驗收，
+   然後再啟用前端 remote；同步資產版本並記錄回執。模型回覆不得代替官方條件判定。
+
+回到免模型模式：前端 `assistMode` 設回 `local` 即停止模型請求，保留站內導航。
+回到 MiniMax：在保留 local 模式期間，把 Worker provider、MiniMax 設定與前端 `assistProvider: 'minimax'`
+及揭露一併復原；驗收後才恢復 remote。程式不會因 Cloudflare 失敗而自行切換 MiniMax。
+
 ## 邊界
 
 - 僅承接需求單、確認信／刪除流程、無個人識別的 D+ 聚合計數、日後已取得書面授權的平台住宿單次搜尋，以及首頁 AI 兜底的單次轉發。
 - 所有 `POST` 路由（含 `/api/metrics`）都要求請求帶 `Origin` 且在 `ALLOWED_ORIGINS` 白名單內；缺少或不在名單一律 `403 origin_not_allowed`，用 curl 做煙霧測試時要加 `-H "Origin: http://localhost:4175"`。`GET /api/health` 不受此限。
 - 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`MINIMAX_API_KEY`、`RESEND_API_KEY` 或寄信憑證。
-- AI 兜底的公開設定是 `wrangler.jsonc` 的 `ASSIST_DAILY_CAP`（每 Perth 日 200 次）、`ASSIST_MODEL`、
-  `ASSIST_BASE_URL`（只接受 https，且主機必須在 `ASSIST_ALLOWED_HOSTS` 內）；secret 只有 `MINIMAX_API_KEY`。
-  三者任一為空或主機不在名單就 fail closed，不會有任何對外呼叫，也不會把 key 或問題送到別的主機。
-  **2026-09-04 起正式站已啟用**：`assets/api-config.js` 的 `apiBaseUrl` 指向 `https://api.aussiewhvcompass.com`、
-  `turnstileSiteKey` 為公開 site key、`assistEnabled: true`。其餘 API 功能（`contactSubmitEnabled`、
-  `dplusMetricsEnabled`、`accommodationSearchEnabled`）各有旗標且維持 `false`——填 `apiBaseUrl` 不等於全開。
+- AI 兜底的公開設定與供應商必要條件見 P1-32 表格；兩種模式共享 `ASSIST_DAILY_CAP`（每 Perth 日 200 次）。
+  `MINIMAX_API_KEY` 只在 MiniMax 模式使用；Turnstile 與 HMAC secrets 仍是遠端路由共同必要條件。
+  2026-09-04 的既有正式啟用紀錄不等於本輪 Workers AI 已上線；本輪前端預設 local。
+  其餘 API 功能（`contactSubmitEnabled`、`dplusMetricsEnabled`、`accommodationSearchEnabled`）各有旗標且維持 `false`——填 `apiBaseUrl` 不等於全開。
 - `env.production` 的 D1 `database_id` 已是正式資源；**頂層那份仍刻意保留全零佔位值**，
   讓沒有帶 `--env production` 的 `wrangler deploy` 依舊失敗，不會誤把 dev 形狀的 Worker 推上去。
 - Rate Limit `namespace_id=1001`～`1004` 已隨 `--env production` 部署，帳戶內未與其他 Worker 衝突。
@@ -58,9 +108,13 @@ npm ci
 npm run check
 ```
 
-需要手動啟動本機 API 時，先把 `.dev.vars.example` 複製為不受版控的 `.dev.vars`，只填 Cloudflare 官方測試值或本機隨機值，再執行 `npx wrangler dev --local`。
+`vitest.config.ts` 明確使用 `remoteBindings: false`，Cloudflare 案例全部提供 mock `AI.run`；測試不建立遠端 binding session，
+也不呼叫真實模型。Wrangler 仍可能印出 AI 原生 binding 的通用遠端用量提醒；這不是已經做過真實模型測試的證據。
 
-## 正式啟用步驟（P0-4）
+需要手動啟動本機 API 時，先把 `.dev.vars.example` 複製為不受版控的 `.dev.vars`，只填 Cloudflare 官方測試值或本機隨機值，再執行 `npx wrangler dev --local`。
+**`--local` 不會把 Workers AI 變成本地模型**；一般開發與本輪驗證使用上面的 mock 測試，不切換真實 Cloudflare provider。
+
+## 正式啟用步驟（P0-4，既有 MiniMax 流程）
 
 > **這道閘門是「授權」，不是「能力」。** 在 wrangler 已登入、且 `aussiewhvcompass.com` 這個 zone
 > 就在同一個 Cloudflare 帳號的前提下，步驟 1、2、3、5 agent 技術上執行得了。

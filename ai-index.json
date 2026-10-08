@@ -15,7 +15,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "cacb3f86effd9279f63d7971a8080c17dbdf1d9ca7ba551236917c53745f85ff",
+      "markdownSha256": "fc3e654eb1444af720f2c8d94d86a7227ef2804b79d0104e7b8e82472626d37b",
       "sections": [
         {
           "title": "澳洲打工度假，你現在在哪一步？",
@@ -266,7 +266,7 @@
         "https://www.aussiewhvcompass.com/scam.html#help",
         "https://www.aussiewhvcompass.com/scam.html#quiz",
         "https://www.aussiewhvcompass.com/simulator.html",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-01",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02",
         "https://www.aussiewhvcompass.com/visa.html",
         "https://www.aussiewhvcompass.com/visa.html#apply",
         "https://www.aussiewhvcompass.com/visa.html#counting",
@@ -982,7 +982,7 @@
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-09-01",
-      "markdownSha256": "a11d10d1e8efaaf22ea6967981b9d0b603e13136a32d0fcb225d851cac7d4572",
+      "markdownSha256": "3a4216b0df8b1ac120337211ff087f581293b580701f935107da01e74c48a27f",
       "sections": [
         {
           "title": "離澳出清 × 初登澳補給站",
@@ -1052,7 +1052,7 @@
         "https://www.aussiewhvcompass.com/market.html#rights",
         "https://www.aussiewhvcompass.com/market.html#safety",
         "https://www.aussiewhvcompass.com/scam.html#help",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-01",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02",
         "https://www.ebay.com.au/sch/i.html?_nkw=working+holiday",
         "https://www.facebook.com/help/123884166448529/",
         "https://www.facebook.com/marketplace/search/?query=working%20holiday",
@@ -1822,7 +1822,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "7c12e7a5919468b16d5b26c6ad61e9727822498eb1608befdba6a7ac645b88e5",
+      "markdownSha256": "cefae0894d3c18f68412fdfb04499b118c2073923e1457081d8a54fa7eeb6921",
       "sections": [
         {
           "title": "各地社團目錄",
@@ -1907,7 +1907,7 @@
       ],
       "sourceLinks": [
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=community.yml",
-        "https://www.aussiewhvcompass.com/community-directory.json?v=20261009-01",
+        "https://www.aussiewhvcompass.com/community-directory.json?v=20261009-02",
         "https://www.aussiewhvcompass.com/index.html#perth-community",
         "https://www.aussiewhvcompass.com/index.html#support-hub",
         "https://www.aussiewhvcompass.com/scam.html#help",
@@ -2016,7 +2016,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "6a13689de79db8dde9d859555ea6d8f84c304ec003f33997e88136b83e5bf703",
+      "markdownSha256": "eff8654ff71a851a2da69b931cc8e36a1a95d28ddbf1ea1da781d2e5a3b4c513",
       "sections": [
         {
           "title": "關於本站",
@@ -2091,31 +2091,23 @@
           "url": "https://www.aussiewhvcompass.com/about.html#analytics"
         },
         {
-          "title": "站內 AI 兜底：什麼時候送出、送出什麼",
+          "title": "站內找答案：資料怎麼處理",
           "url": "https://www.aussiewhvcompass.com/about.html#ai-assist"
         },
         {
-          "title": "送出去的是什麼",
+          "title": "何時會送給 AI",
           "url": "https://www.aussiewhvcompass.com/about.html#main-content"
         },
         {
-          "title": "本站保存什麼",
+          "title": "送出與保存的範圍",
           "url": "https://www.aussiewhvcompass.com/about.html#main-content"
         },
         {
-          "title": "你看到的字不是 AI 寫的",
+          "title": "內容從哪裡來",
           "url": "https://www.aussiewhvcompass.com/about.html#main-content"
         },
         {
-          "title": "有些問題根本不會送出去",
-          "url": "https://www.aussiewhvcompass.com/about.html#main-content"
-        },
-        {
-          "title": "人機驗證",
-          "url": "https://www.aussiewhvcompass.com/about.html#main-content"
-        },
-        {
-          "title": "請你自己也留一道界線",
+          "title": "遠端驗證與供應商處理",
           "url": "https://www.aussiewhvcompass.com/about.html#main-content"
         },
         {
@@ -2133,6 +2125,7 @@
       ],
       "sourceLinks": [
         "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant",
+        "https://developers.cloudflare.com/workers-ai/",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=idea.yml",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml",
@@ -2148,7 +2141,7 @@
         "https://www.aussiewhvcompass.com/about.html#private-contact",
         "https://www.aussiewhvcompass.com/free.html",
         "https://www.aussiewhvcompass.com/free.html#rules",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-01",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02",
         "https://www.fairwork.gov.au/",
         "https://www.mara.gov.au/",
         "https://www.minimax.io/"

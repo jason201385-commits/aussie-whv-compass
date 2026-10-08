@@ -12,14 +12,18 @@
   "triggers": {
     "crons": ["17 3 * * *", "47 */6 * * *"]
   },
+  // P1-32: prepared binding only; selecting cloudflare is a separate, explicit rollout.
+  "ai": { "binding": "AI" },
   "vars": {
     "ENVIRONMENT": "local",
     "ALLOWED_ORIGINS": "https://www.aussiewhvcompass.com,https://aussiewhvcompass.com,http://127.0.0.1:4175,http://localhost:4175",
     "TURNSTILE_EXPECTED_HOSTNAME": "www.aussiewhvcompass.com",
     "TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2",
     "ASSIST_DAILY_CAP": "200",
+    "ASSIST_PROVIDER": "minimax",
     "ASSIST_MODEL": "MiniMax-M2.7",
     "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
+    "CLOUDFLARE_ASSIST_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8",
     "MAIL_FROM": "noreply@aussiewhvcompass.com",
     "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"
   },
@@ -72,6 +76,7 @@
       "preview_urls": false,
       "observability": { "enabled": false },
       "triggers": { "crons": ["17 3 * * *", "47 */6 * * *"] },
+      "ai": { "binding": "AI" },
       "routes": [
         { "pattern": "api.aussiewhvcompass.com", "custom_domain": true }
       ],
@@ -81,10 +86,12 @@
         "TURNSTILE_EXPECTED_HOSTNAME": "www.aussiewhvcompass.com",
         "TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2",
         "ASSIST_DAILY_CAP": "200",
+        "ASSIST_PROVIDER": "minimax",
         "ASSIST_MODEL": "MiniMax-M2.7",
         "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
-    "MAIL_FROM": "noreply@aussiewhvcompass.com",
-    "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"
+        "CLOUDFLARE_ASSIST_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8",
+        "MAIL_FROM": "noreply@aussiewhvcompass.com",
+        "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"
       },
       "d1_databases": [
         {

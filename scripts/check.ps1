@@ -1801,6 +1801,12 @@ if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 搜尋載入恢復與焦點行為驗收失敗（scripts/test_search_ui.mjs；P1-30）'
   $errors++
 }
+# P1-32：驗證本機模式不連外、遠端明示供應商、錯誤備援與取消後晚回應。
+& node (Join-Path $dir 'scripts/test_local_assist.mjs')
+if ($LASTEXITCODE -ne 0) {
+  Write-Output 'FAIL 免模型站內導覽與遠端備援契約未通過（P1-32）'
+  $errors++
+}
 & node (Join-Path $dir 'scripts\clarifier-contract.mjs')
 if ($LASTEXITCODE -ne 0) {
   Write-Output 'FAIL 首頁釐清器契約測試失敗（scripts/clarifier-contract.mjs；OPTIMIZATION_PLAN P0-8 驗收 6）'
@@ -2725,7 +2731,7 @@ foreach ($jobFamily in $jobFamilyIds) {
 }
 # AI 兜底：未設定時只顯示固定句；打字框、揭露句與 Turnstile 全部預設 hidden
 $assistOff = [regex]::Match($indexText, '<p class="clarifier-assist-off" id="assist-off" hidden>(.*?)</p>')
-if (-not $assistOff.Success -or ([regex]::Replace($assistOff.Groups[1].Value, '<[^>]+>', '') -ne '站內 AI 兜底尚未啟用；可用上方搜尋，或到各地社團問人。')) {
+if (-not $assistOff.Success -or ([regex]::Replace($assistOff.Groups[1].Value, '<[^>]+>', '') -ne '站內找答案尚未啟用；可用上方搜尋，或到各地社團問人。')) {
   Write-Output 'FAIL [index.html] AI 兜底未啟用句必須預設 hidden 且文案固定'
   $errors++
 }
@@ -2733,7 +2739,7 @@ foreach ($assistNeedle in @(
   '<div class="clarifier-assist-box" id="assist-box" hidden>',
   '<form class="clarifier-assist-form" id="assist-form" novalidate hidden>',
   'id="assist-disclosure"',
-  '你的問題會送到第三方模型（MiniMax）產生回覆；本站伺服器不保存問題文字，但供應商可能依其條款處理。請不要輸入姓名、護照、帳號或他人資料。',
+  '用本站已整理的資料找下一步。問題只在這台裝置處理，不送到模型、不保存；結果會標明本站整理與來源。請不要輸入姓名、護照、帳號或他人資料。',
   '<textarea id="assist-input" rows="2" maxlength="200"',
   'id="assist-open"',
   'id="assist-turnstile" hidden',
@@ -2741,7 +2747,7 @@ foreach ($assistNeedle in @(
   'id="assist-cancel"',
   'id="assist-status"',
   'id="assist-answer"',
-  '不做簽證、法律、醫療、稅務判定'
+  '不做個人簽證、法律、醫療、稅務判定'
 )) {
   if (-not $indexText.Contains($assistNeedle)) { Write-Output "FAIL [index.html] AI 兜底區塊缺失或未預設隱藏：$assistNeedle"; $errors++ }
 }
@@ -2907,9 +2913,9 @@ if (-not (Test-Path $assistTsPath)) {
   }
 }
 
-# main.js 釐清器：hash 驅動、零儲存；AI 兜底只有一個 fetch，且雙設定齊全才啟用
+# main.js 釐清器：hash 驅動、問題零儲存；本機先找答案，遠端兜底只有一個 fetch 且雙設定齊全才啟用
 $clarifierScript = [regex]::Match($mainJs, '(?s)// ---------- 首頁釐清器.*?// ---------- D\+ 匿名彙總量測')
-if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 站內 AI 兜底')) {
+if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 站內找答案：')) {
   Write-Output 'FAIL [main.js] 缺首頁釐清器／AI 兜底功能塊或標記順序錯誤'
   $errors++
 } else {
@@ -3396,7 +3402,7 @@ if (-not (Test-Path $apiConfigPath)) {
     $errors++
   }
   # 每個 API 功能各有旗標：填 apiBaseUrl 不得順手打開別的功能。
-  foreach ($apiConfigNeedle in @('assistEnabled:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'newsEnabled: true', 'Public values only', 'P0-4')) {
+  foreach ($apiConfigNeedle in @('assistEnabled:', 'assistMode:', 'assistProvider:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'newsEnabled: true', 'Public values only', 'P0-4')) {
     if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] 缺功能旗標或來源註記：$apiConfigNeedle"; $errors++ }
   }
   # 尚未備妥正式資源的功能必須維持關閉（交易信、D+ 部署、住宿平台授權）。
@@ -3769,7 +3775,8 @@ if (-not (Test-Path $workerNodeModules)) {
 } else {
   Push-Location $workerDir
   try {
-    & npm.cmd run check
+    $npmExecutable = if (Get-Command npm.cmd -ErrorAction SilentlyContinue) { 'npm.cmd' } else { 'npm' }
+    & $npmExecutable run check
     if ($LASTEXITCODE -ne 0) {
       Write-Output 'FAIL [worker] TypeScript／Vitest／D1 local migration／Wrangler dry-run 未通過'
       $errors++

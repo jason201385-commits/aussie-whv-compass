@@ -339,10 +339,34 @@
     return matches.length === 1 ? matches[0] : null;
   };
 
-  // mode：curated（整題對應的編輯答案）、exact（原詞 AND）、rewritten（去疑問詞後 AND）、approximate（二字詞 OR 降級）、none。
+  // 明確生活意圖先於二字詞降級：不讓「到澳洲／比較」壓過「省錢」。
+  // 只選既有索引的固定 href，不從使用者文字生成內容或網址。
+  var searchIntentMatches = function (entries, hrefs) {
+    return hrefs.map(function (href, order) {
+      var entry = entries.find(function (candidate) { return candidate.href === href; });
+      return entry ? { entry: entry, score: 500 - order, order: order } : null;
+    }).filter(Boolean);
+  };
+  var findMoneySearchIntent = function (entries, query) {
+    var question = String(query || "");
+    var saving = /省錢|省钱|省開銷|省开销|節省(?:生活費|開銷|支出)|节省(?:生活费|开销|支出)|降低(?:生活費|生活费|開銷|开销|支出)|\bsave money\b|\bcut costs\b/i.test(question);
+    var savingPlan = /存錢|存钱|存款計畫|存款计划/i.test(question);
+    if (!saving && !savingPlan) return null;
+    var hrefs = savingPlan ? ["cost.html#math", "cost.html#runway", "cost.html#food"] : ["cost.html#food", "cost.html#math", "housing.html"];
+    if (/英文|英語|英语|\benglish\b/i.test(question)) hrefs = ["english.html#after", "english.html"];
+    else if (/衣服|買衣|买衣|衣物/.test(question)) hrefs = ["cost.html#clothes", "free.html#browse-title"];
+    else if (/房租|住宿|租屋|租房/.test(question)) hrefs = ["housing.html", "cost.html#math", "cost.html#runway"];
+    else if (/交通|通勤|搭車|搭车/.test(question)) hrefs = ["prep.html#transport-planners", "work.html#commute", "cost.html#math"];
+    var matches = searchIntentMatches(entries, hrefs);
+    return matches.length ? { matches: matches, mode: "intent", tokens: [savingPlan ? "存錢" : "省錢"] } : null;
+  };
+
+  // mode：curated（整題編輯答案）、intent（明確生活意圖）、exact、rewritten、approximate、none。
   var runSiteSearch = function (entries, query) {
     var task = findTaskAnswer(entries, query);
     if (task) return { matches: [{ entry: task, score: 1000 }], mode: "curated", tokens: splitSearchTokens(query) };
+    var intent = findMoneySearchIntent(entries, query);
+    if (intent) return intent;
     var plan = rewriteSearchQuery(query);
     var tokens = plan.rewritten.length ? plan.rewritten : plan.original;
     if (!tokens.length) return { matches: [], mode: "none", tokens: [] };
@@ -355,6 +379,43 @@
     }
     matches = searchApproximate(entries, tokens);
     return { matches: matches, mode: matches.length ? "approximate" : "none", tokens: tokens };
+  };
+
+  // 本機找路不把二字詞近似命中當成答案。常見意圖只導到固定站內入口；
+  // 其他查詢至少要命中標題或編輯關鍵詞，只有內文碰巧出現不算。
+  var runLocalAssistSearch = function (entries, query) {
+    var result = runSiteSearch(entries, query);
+    if (result.mode === "curated" || result.mode === "intent") return result;
+    var routes = [
+      [/剛到澳洲|剛落地|刚到澳洲|刚落地|落地先|抵澳第一/i, ["prep.html#72h", "prep.html#first-week"]],
+      [/換匯|换汇|匯款方式|汇款方式/i, ["cost.html#exchange"]],
+      [/找工作|找工|求職|求职|投履歷|投简历/i, ["work.html#channels", "work.html#commute", "work.html#verify"]],
+      [/找房|找住宿|租屋|租房|合租/i, ["housing.html", "housing.html#bond"]],
+      [/買菜|买菜|煮飯|煮饭|便宜吃飯|便宜吃饭/i, ["cost.html#food"]],
+      [/買衣服|买衣服|二手衣/i, ["cost.html#clothes", "free.html#browse-title"]],
+      [/學英文|学英文|英文不好|英文很爛|英文很烂/i, ["english.html#reality", "english.html#after"]],
+      [/買車|买车|二手車|二手车/i, ["cost.html#car"]],
+      [/簽證|签证|二簽|二签|三簽|三签|集簽|集签/i, ["visa.html", "visa.html#postcode-tool"]],
+      [/離澳|离澳|回國收尾|回国收尾|退休金|\bdasp\b/i, ["leave.html", "leave.html#leave-checklist-tool"]],
+      [/社團|社团|群組|群组/i, ["index.html#communities"]]
+    ];
+    var matchedRoutes = routes.filter(function (route) { return route[0].test(query); });
+    if (matchedRoutes.length === 1) {
+      var navigation = searchIntentMatches(entries, matchedRoutes[0][1]);
+      if (navigation.length) return { matches: navigation, mode: "navigation", tokens: result.tokens };
+    }
+    var tokens = result.tokens.filter(function (token) {
+      return token.length >= 2 && !/^(?:澳洲|澳大利亞|澳大利亚|比較好|比较好|到澳洲|打工度假|australia|whv)$/.test(token);
+    });
+    var matches = result.mode === "exact" || result.mode === "rewritten" ? result.matches.filter(function (match) {
+      if (match.entry.hub === 1) return false;
+      var fields = searchFields(match.entry);
+      return tokens.some(function (token) {
+        return fields.title.indexOf(token) >= 0 || (fields.overview && fields.pageTitle.indexOf(token) >= 0)
+          || fields.synonyms.indexOf(token) >= 0 || fields.keywords.indexOf(token) >= 0;
+      });
+    }).slice(0, 3) : [];
+    return { matches: matches, mode: matches.length ? "navigation" : "none", tokens: tokens };
   };
 
   var makeSnippet = function (entry, token) {
@@ -397,7 +458,7 @@
       else resolveLoad(entries);
     };
     searchLoadCancel = function () { finish(new Error("search closed")); };
-    script.src = "assets/search-index.js?v=20261009-01";
+    script.src = "assets/search-index.js?v=20261009-02";
     script.async = true;
     script.onload = function () {
       if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {
@@ -431,7 +492,7 @@
   };
 
   // Answer metadata is authored in answers.json; never generated from user input.
-  var renderTaskSearchAnswer = function (entry) {
+  var renderTaskSearchAnswer = function (entry, target) {
     var a = entry.answer, box = document.createElement("section");
     box.className = "task-search-answer";
     var title = document.createElement("h3"); title.textContent = a.question; box.appendChild(title);
@@ -445,7 +506,7 @@
     });
     box.appendChild(actions);
     line("本卡來源／操作核對 " + a.sourceCheckedAt + " · 下次複核 " + a.reviewDue + "；不是整頁或專業審校。");
-    searchResults.appendChild(box);
+    (target || searchResults).appendChild(box);
   };
   var refreshTaskDates = function () {
     document.querySelectorAll("[data-task-answer]").forEach(function (card) {
@@ -491,7 +552,7 @@
       var aiLink = document.createElement("a");
       aiLink.className = "btn secondary";
       aiLink.href = "#assist";
-      aiLink.textContent = "問一次 AI";
+      aiLink.textContent = window.WHV_API_CONFIG && window.WHV_API_CONFIG.assistMode === "local" ? "站內找答案" : "問一次 AI";
       aiSlot.appendChild(aiLink);
       empty.appendChild(aiSlot);
       var emptyLink = document.createElement("a");
@@ -1641,7 +1702,7 @@
     });
   }
 
-  // ---------- 站內 AI 兜底（apiBaseUrl 與 turnstileSiteKey 都設定時才啟用） ----------
+  // ---------- 站內找答案：本機資料優先，可選遠端 AI 兜底 ----------
   // 首頁把它寫在漏斗裡；其餘頁面由這裡注入同一份標記到一個 dialog，
   // 元素 id 完全一致，所以底下整段邏輯（敏感題攔截、Turnstile、模板組字）兩邊共用一份。
   // 作法比照站內搜尋：不在 60 份 HTML 裡複製同一段標記。
@@ -1679,15 +1740,15 @@
 
     var assistHead = assistEl("div", { "class": "site-search-head" });
     var assistHeadText = document.createElement("div");
-    assistHeadText.appendChild(assistEl("span", { "class": "section-eyebrow" }, "LAST RESORT"));
-    assistHeadText.appendChild(assistEl("h2", { id: "assist-title" }, "問一次站內 AI"));
-    var assistHeadClose = assistEl("button", { "class": "site-search-close", id: "assist-dialog-close", type: "button", "aria-label": "關閉 AI 兜底" });
+    assistHeadText.appendChild(assistEl("span", { "class": "section-eyebrow" }, "FIND YOUR NEXT STEP"));
+    assistHeadText.appendChild(assistEl("h2", { id: "assist-title" }, "站內找答案"));
+    var assistHeadClose = assistEl("button", { "class": "site-search-close", id: "assist-dialog-close", type: "button", "aria-label": "關閉站內找答案" });
     assistHeadClose.appendChild(assistIcon("#i-x"));
     assistHead.appendChild(assistHeadText);
     assistHead.appendChild(assistHeadClose);
 
     var assistPanel = assistEl("section", { "class": "clarifier-assist", id: "assist", "data-assist": "", hidden: "" });
-    var assistOffLine = assistLine("clarifier-assist-off", "站內 AI 兜底尚未啟用；可用上方搜尋，或到", "index.html#communities", "各地社團");
+    var assistOffLine = assistLine("clarifier-assist-off", "站內找答案尚未啟用；可用上方搜尋，或到", "index.html#communities", "各地社團");
     assistOffLine.setAttribute("id", "assist-off");
     assistOffLine.setAttribute("hidden", "");
     assistOffLine.appendChild(document.createTextNode("問人。"));
@@ -1695,24 +1756,24 @@
     assistPanel.appendChild(assistOffLine);
 
     var assistBoxEl = assistEl("div", { "class": "clarifier-assist-box", id: "assist-box", hidden: "" });
-    assistBoxEl.appendChild(assistLine("clarifier-safety", "急事不要等 AI，先走", "index.html#support-hub", "安全出口"));
-    assistBoxEl.appendChild(assistEl("button", { "class": "btn secondary", id: "assist-open", type: "button", "aria-expanded": "false", "aria-controls": "assist-form" }, "問一次 AI"));
+    assistBoxEl.appendChild(assistLine("clarifier-safety", "急事先走", "index.html#support-hub", "安全出口"));
+    assistBoxEl.appendChild(assistEl("button", { "class": "btn secondary", id: "assist-open", type: "button", "aria-expanded": "false", "aria-controls": "assist-form" }, "站內找答案"));
 
     var assistFormEl = assistEl("form", { "class": "clarifier-assist-form", id: "assist-form", novalidate: "", hidden: "" });
     assistFormEl.appendChild(assistEl("p", { "class": "warn clarifier-assist-disclosure", id: "assist-disclosure" },
-      "你的問題會送到第三方模型（MiniMax）產生回覆；本站伺服器不保存問題文字，但供應商可能依其條款處理。請不要輸入姓名、護照、帳號或他人資料。"));
+      "用本站已整理的資料找下一步。問題只在這台裝置處理，不送到模型、不保存；結果會標明本站整理與來源。請不要輸入姓名、護照、帳號或他人資料。"));
     assistFormEl.appendChild(assistEl("label", { "for": "assist-input" }, "用一句話說你的情況"));
     assistFormEl.appendChild(assistEl("textarea", { id: "assist-input", rows: "2", maxlength: "200", autocomplete: "off" }));
     assistFormEl.appendChild(assistEl("div", { "class": "turnstile-slot", id: "assist-turnstile", hidden: "" }));
     var assistActions = assistEl("div", { "class": "clarifier-assist-actions" });
-    assistActions.appendChild(assistEl("button", { "class": "btn", id: "assist-submit", type: "submit" }, "送出"));
-    assistActions.appendChild(assistEl("button", { "class": "btn ghost", id: "assist-cancel", type: "button" }, "不送了"));
+    assistActions.appendChild(assistEl("button", { "class": "btn", id: "assist-submit", type: "submit" }, "找答案"));
+    assistActions.appendChild(assistEl("button", { "class": "btn ghost", id: "assist-cancel", type: "button" }, "取消"));
     assistFormEl.appendChild(assistActions);
     assistBoxEl.appendChild(assistFormEl);
 
     assistBoxEl.appendChild(assistEl("p", { "class": "clarifier-assist-status", id: "assist-status", role: "status", "aria-live": "polite" }));
     assistBoxEl.appendChild(assistEl("div", { "class": "clarifier-assist-answer", id: "assist-answer", tabindex: "-1", hidden: "" }));
-    assistBoxEl.appendChild(assistEl("p", { "class": "fact-meta" }, "AI 只給站內連結與一句導引，不做簽證、法律、醫療、稅務判定。"));
+    assistBoxEl.appendChild(assistEl("p", { "class": "fact-meta", id: "assist-boundary" }, "本站整理協助找路，不做個人簽證、法律、醫療、稅務判定；適用條件與官方來源請看完整頁面。"));
 
     assistPanel.appendChild(assistBoxEl);
     assistDialog.appendChild(assistHead);
@@ -1781,10 +1842,33 @@
       ].join("|"),
       "i",
     );
-    var ASSIST_FALLBACK_LINKS = [["用站內搜尋", "#search"], ["到各地社團問人", "#communities"]];
+    // 個人判定分類與 Worker 相同；本機模式同樣只導到官方入口。
+    var ASSIST_DETERMINATION =
+      /能不能申請|可不可以申請|(?:可以|可不可|能|能夠)申請[^，。？?!！]{0,8}(?:嗎|吗)|申請得(?:到|過|过)[^，。？?!！]{0,8}(?:嗎|吗)|有沒有資格|有[^，。？?!！]{0,8}資格(?:嗎|吗)|符不符合|符合[^，。？?!！]{0,8}(?:嗎|吗)|合法嗎|違法嗎|合不合法|該不該看醫生|要不要看醫生|需不需要看醫生|是不是[^，。？?!！]{0,12}病|退稅多少|退多少稅|能退多少|要繳多少稅|繳多少稅|會不會被拒|會被拒嗎|能不能過|會不會過|會過嗎|過不過得了|過得了嗎|領回多少|拿回多少|能領回多少|am i eligible|are we eligible|eligible for|can i apply|could i apply|may i apply|can i (?:still )?get (?:the |a )?(?:visa|417|462)|is (?:it|this|that) legal|is (?:it|this|that) illegal|(?:is|are) (?:my|our) (?:boss|employer|contract|pay|wage|job) (?:legal|illegal|allowed)|how much tax|tax refund|how much (?:will|do|would) i get back|should i see a doctor|do i need (?:a|to see a) doctor|do i have (?:a |an )?[a-z ]{0,20}(?:disease|illness|infection|cancer|covid)|will i be (?:rejected|refused|denied)|will (?:my|the) (?:visa|application) be (?:rejected|refused|denied|granted|approved)/i;
+    var ASSIST_TOPIC_VISA = /簽證|集簽|二簽|三簽|417|462|申請|移民|永居|\bPR\b|visa|eligib|apply|immigra/i;
+    var ASSIST_TOPIC_MEDICAL =
+      /醫|病|痛|症狀|看診|藥|診所|急診|doctor|sick|\bpain|\bill\b|illness|medic|hospital|symptom|disease|infection|cancer|covid/i;
+    var ASSIST_TOPIC_TAX = /稅|退休金|\bsuper\b|DASP|\bABN\b|\bTFN\b|\btax|refund|get back/i;
+    var ASSIST_TOPIC_WORK =
+      /雇主|老闆|工作|薪|合法|違法|仲介|農場|契約|合約|contract|employer|boss|wage|\bpay\b|legal|\bjob|\bwork|farm|agent/i;
+
+    var ASSIST_FALLBACK_LINKS = [["用站內搜尋", "index.html#search"], ["到各地社團問人", "index.html#communities"]];
+    var ASSIST_LOCAL_CHOICES = [["省錢與生活預算", "cost.html"], ["住宿與租屋", "housing.html"], ["找工作", "work.html"], ["行前與落地", "prep.html"]];
+    var ASSIST_LOCAL_LEADS = {
+      "cost.html#food": "比較同類商品的單位價格，再安排採買與菜單。",
+      "cost.html#clothes": "查看二手衣物入口，再比較真正需要買的用品。",
+      "cost.html#math": "把工時、房租與其他生活支出放在一起試算。",
+      "cost.html#runway": "用自己的現金與必要支出，試算沒有收入時能支撐多久。",
+      "housing.html": "分清短住、合租與整租，再看找房方法與付款前的核對步驟。",
+      "prep.html#transport-planners": "依城市查官方交通路線，再比較通勤時間與支出。",
+      "work.html#commute": "先確認能到達的工作地點與班次，再找公開職缺。"
+    };
     var assistToken = "";
     var assistWidgetId = null;
     var assistInFlight = false;
+    var assistRequestId = 0;
+    var assistController = null;
+    var assistTimer = null;
 
     function isSameSiteHref(h) {
       return typeof h === "string" && h.length > 0 && h.length <= 120 && h.indexOf("..") === -1 && ASSIST_SAME_SITE.test(h);
@@ -1792,11 +1876,33 @@
 
     function assistSettings() {
       var config = window.WHV_API_CONFIG;
-      var apiBaseUrl = getPublicApiBaseUrl();
       if (!config || config.assistEnabled !== true) return null;
+      // 舊快取設定沒有 assistMode 時保留原本 remote 語意；未知值不啟用。
+      var mode = typeof config.assistMode === "undefined" ? "remote" : config.assistMode;
+      if (mode === "local") return { mode: "local" };
+      if (mode !== "remote") return null;
+      var provider = typeof config.assistProvider === "undefined" ? "minimax" : config.assistProvider;
+      if (provider !== "minimax" && provider !== "cloudflare") return null;
+      var apiBaseUrl = getPublicApiBaseUrl();
       if (!apiBaseUrl || typeof config.turnstileSiteKey !== "string") return null;
       if (!config.turnstileSiteKey || config.turnstileSiteKey.length > 100) return null;
-      return { baseUrl: apiBaseUrl, siteKey: config.turnstileSiteKey };
+      return { mode: "remote", provider: provider, baseUrl: apiBaseUrl, siteKey: config.turnstileSiteKey };
+    }
+
+    function applyAssistCopy(settings) {
+      var remote = settings && settings.mode === "remote";
+      var title = document.getElementById("assist-title");
+      var disclosure = document.getElementById("assist-disclosure");
+      var boundary = document.getElementById("assist-boundary");
+      if (title) title.textContent = remote ? "站內找答案與 AI 導覽" : "站內找答案";
+      if (assistOpen) assistOpen.textContent = remote ? "問一次 AI" : "站內找答案";
+      if (assistSubmit) assistSubmit.textContent = remote ? "找答案，必要時問 AI" : "找答案";
+      if (disclosure) disclosure.textContent = remote
+        ? "先找本站已整理的資料；未能命中時，你的問題會送到第三方模型（" + (settings.provider === "cloudflare" ? "Cloudflare Workers AI" : "MiniMax") + "）挑選站內連結。本站伺服器不保存問題文字，但供應商可能依其條款處理。請不要輸入姓名、護照、帳號或他人資料。"
+        : "用本站已整理的資料找下一步。問題只在這台裝置處理，不送到模型、不保存；結果會標明本站整理與來源。請不要輸入姓名、護照、帳號或他人資料。";
+      if (boundary) boundary.textContent = remote
+        ? "本站整理與 AI 導覽會分開標示；AI 只選站內連結，不做個人簽證、法律、醫療、稅務判定。"
+        : "本站整理協助找路，不做個人簽證、法律、醫療、稅務判定；適用條件與官方來源請看完整頁面。";
     }
 
     function loadTurnstileApi() {
@@ -1860,17 +1966,71 @@
       assistAnswer.focus();
     }
 
-    function renderAssistResult(result) {
+    function localOfficialExits(question) {
+      var pairs = [];
+      if (ASSIST_TOPIC_VISA.test(question)) pairs = pairs.concat([["簽證申請的官方入口", "visa.html#apply"], ["公開制度與專業名冊入口", "pr.html#overview"]]);
+      if (ASSIST_TOPIC_MEDICAL.test(question)) pairs.push(["就醫分流與官方入口", "health.html#doctor"]);
+      if (ASSIST_TOPIC_TAX.test(question)) pairs = pairs.concat([["稅與退休金官方入口", "cost.html#tax"], ["DASP 官方說明與試算條件", "leave.html#dasp-calc"]]);
+      if (ASSIST_TOPIC_WORK.test(question)) pairs = pairs.concat([["工作條件官方查核", "work.html#verify"], ["求助與救濟入口", "scam.html#help"]]);
+      return pairs.length ? pairs : [["簽證官方入口", "visa.html#apply"], ["就醫官方入口", "health.html#doctor"], ["稅務官方入口", "cost.html#tax"], ["工作條件官方查核", "work.html#verify"]];
+    }
+
+    function renderLocalAssistResult(result, message) {
+      var matches = result && result.matches ? result.matches.slice(0, 3) : [];
+      assistAnswer.textContent = "";
+      var intro = document.createElement("p");
+      intro.textContent = message || (matches.length ? "先看與這個主題相關的本站整理：" : "目前沒有足夠明確的站內答案。可以換一個主題詞，或先選下方入口。");
+      assistAnswer.appendChild(intro);
+      if (result && result.mode === "curated" && matches.length) {
+        renderTaskSearchAnswer(matches[0].entry, assistAnswer);
+      } else {
+        matches.forEach(function (match) {
+          var entry = match.entry;
+          if (!isSameSiteHref(entry.href)) return;
+          var card = document.createElement("section");
+          card.className = "task-search-answer";
+          var heading = document.createElement("h3");
+          var link = document.createElement("a");
+          link.href = entry.href;
+          link.textContent = entry.title === "本頁總覽" ? entry.pageTitle : entry.title;
+          heading.appendChild(link);
+          card.appendChild(heading);
+          var lead = document.createElement("p");
+          lead.textContent = ASSIST_LOCAL_LEADS[entry.href] || "開啟這一節查看本站整理的步驟、適用條件與來源。";
+          card.appendChild(lead);
+          assistAnswer.appendChild(card);
+        });
+      }
+      if (!matches.length) appendAssistLinks(ASSIST_LOCAL_CHOICES);
+      var note = document.createElement("p");
+      note.className = "fact-meta";
+      note.textContent = "以上為本站編輯整理與固定導覽，並非模型產生的回答。";
+      assistAnswer.appendChild(note);
+      appendAssistLinks(ASSIST_FALLBACK_LINKS);
+      assistAnswer.hidden = false;
+      assistAnswer.focus();
+    }
+
+    function assistErrorMessage(result) {
+      var code = result && result.error && typeof result.error.code === "string" ? result.error.code : "";
+      if (code === "turnstile_failed" || code === "turnstile_token_invalid") return "驗證失敗或已逾時，請重新驗證；下方仍可直接查本站資料。";
+      if (code === "turnstile_unavailable") return "驗證服務暫時無法使用；先從下方本站入口繼續。";
+      if (code === "assist_not_configured" || code === "turnstile_not_configured") return "線上導覽尚未就緒；先從下方本站入口繼續。";
+      if (code === "origin_not_allowed" || code === "origin_required") return "目前頁面無法使用線上導覽；下方本站資料仍可使用。";
+      return "AI 暫時無法回覆；先從下方本站入口繼續。";
+    }
+
+    function renderAssistResult(result, localResult) {
       if (result && result.kind === "rate_limited") {
-        renderAssistAnswer("一分鐘內問太多次，稍等再試。", ASSIST_FALLBACK_LINKS);
+        renderLocalAssistResult(localResult, "一分鐘內問太多次，稍等再試；下方本站資料仍可使用。");
         return;
       }
       if (result && result.kind === "over_cap") {
-        renderAssistAnswer("今天的 AI 額度已用完。", ASSIST_FALLBACK_LINKS);
+        renderLocalAssistResult(localResult, "今天的 AI 額度已用完；下方本站資料仍可使用。");
         return;
       }
       if (result && result.ok === true && result.kind === "refused") {
-        renderAssistAnswer("這題 AI 不能答，請看官方入口。", filterAssistLinks(result.links));
+        renderLocalAssistResult(localResult, "AI 沒有找到可確認的站內入口；可以換一個主題詞，或選下方入口。");
         return;
       }
       if (result && result.ok === true && (result.kind === "answer" || result.kind === "official_exit")) {
@@ -1878,7 +2038,7 @@
         renderAssistAnswer(answer || "AI 暫時無法回覆。", filterAssistLinks(result.links));
         return;
       }
-      renderAssistAnswer("AI 暫時無法回覆。", ASSIST_FALLBACK_LINKS);
+      renderLocalAssistResult(localResult, assistErrorMessage(result));
     }
 
     function renderTurnstile(settings) {
@@ -1900,78 +2060,118 @@
     function openAssist() {
       var settings = assistSettings();
       if (!settings) return;
+      applyAssistCopy(settings);
+      if (assistDialog && !assistDialog.open) assistDialog.showModal();
       assistBox.hidden = false;
       assistForm.hidden = false;
       assistOpen.setAttribute("aria-expanded", "true");
-      renderTurnstile(settings);
+      if (settings.mode === "remote") renderTurnstile(settings);
       assistInput.focus();
     }
 
     function cancelAssist() {
+      assistRequestId += 1;
+      if (assistController) assistController.abort();
+      assistController = null;
+      if (assistTimer !== null) window.clearTimeout(assistTimer);
+      assistTimer = null;
+      assistInFlight = false;
+      assistSubmit.disabled = false;
       assistForm.hidden = true;
       assistInput.value = "";
       assistToken = "";
+      assistAnswer.textContent = "";
+      assistAnswer.hidden = true;
+      setAssistStatus("");
       assistOpen.setAttribute("aria-expanded", "false");
       assistOpen.focus();
     }
 
-    function finishAssist() {
+    function finishAssist(requestId) {
+      if (requestId !== assistRequestId) return;
       setAssistStatus("");
       assistSubmit.disabled = false;
       if (window.turnstile && assistWidgetId !== null) window.turnstile.reset(assistWidgetId);
       assistToken = "";
       assistInFlight = false;
+      assistController = null;
+      if (assistTimer !== null) window.clearTimeout(assistTimer);
+      assistTimer = null;
     }
 
     function submitAssist() {
       if (assistInFlight) return;
-      var question = assistInput.value.trim();
-      if (question.length < 4 || question.length > 200) {
-        setAssistStatus("先寫一句話，最多 200 字。");
-        assistInput.focus();
-        return;
-      }
-      if (ASSIST_SENSITIVE.test(question)) {
-        renderAssistAnswer("這種情況不要等 AI。", [["有人受傷或有立即危險", "health.html#emergency"], ["剛匯款、被威脅或扣證件", "scam.html#help"]]);
-        return;
-      }
       var settings = assistSettings();
       if (!settings) {
         assistOff.hidden = false;
         assistBox.hidden = true;
         return;
       }
-      if (assistToken === "") {
-        setAssistStatus("先完成驗證再送出。");
+      var question = assistInput.value.normalize("NFC").replace(/\s+/g, " ").trim();
+      if (question.length < 2 || question.length > 200) {
+        setAssistStatus("先寫一個主題或一句話，2 到 200 字。");
+        assistInput.focus();
         return;
       }
+      if (ASSIST_SENSITIVE.test(question)) {
+        renderAssistAnswer(settings.mode === "local" ? "這種情況先走安全出口。" : "這種情況不要等 AI。", [["有人受傷或有立即危險", "health.html#emergency"], ["剛匯款、被威脅或扣證件", "scam.html#help"]]);
+        return;
+      }
+      if (ASSIST_DETERMINATION.test(question)) {
+        renderAssistAnswer("這題涉及個人判定；請看官方入口或專業名冊。", localOfficialExits(question));
+        return;
+      }
+      var requestId = ++assistRequestId;
       assistInFlight = true;
       assistSubmit.disabled = true;
-      setAssistStatus("正在問 AI…");
-      fetch(settings.baseUrl + "/api/assist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: question, turnstileToken: assistToken }),
-        credentials: "omit",
-        referrerPolicy: "no-referrer"
-      }).then(function (response) {
-        if (response.status === 429) {
-          // Two different 429s: per-source rate limit vs. the site-wide daily cap (D-2026-09-02-06).
-          return response.json().then(function (body) {
-            var code = body && body.error && typeof body.error.code === "string" ? body.error.code : "";
-            return { ok: true, kind: code === "rate_limited" ? "rate_limited" : "over_cap" };
-          }, function () { return { ok: true, kind: "over_cap" }; });
+      assistAnswer.hidden = true;
+      setAssistStatus("正在找本站資料…");
+      loadSearchIndex().then(function (entries) {
+        if (requestId !== assistRequestId) return;
+        var localResult = runLocalAssistSearch(entries, question);
+        if (settings.mode === "local" || localResult.matches.length) {
+          renderLocalAssistResult(localResult, settings.mode === "remote" && localResult.matches.length ? "這題可先看本站整理，問題未送給模型：" : "");
+          finishAssist(requestId);
+          return;
         }
-        if (!response.ok) throw new Error("assist_http_" + response.status);
-        return response.json();
-      }).then(function (result) {
-        renderAssistResult(result);
+        if (question.length < 4 || assistToken === "") {
+          renderLocalAssistResult(localResult, question.length < 4 ? "請多寫一點情況，再決定是否使用 AI 導覽。" : "本站資料未能確認你的意思；完成驗證後可再送出給 AI，或先選下方入口。");
+          finishAssist(requestId);
+          return;
+        }
+        setAssistStatus("正在請 AI 找站內連結…");
+        assistController = typeof AbortController === "function" ? new AbortController() : null;
+        if (assistController) assistTimer = window.setTimeout(function () { if (assistController) assistController.abort(); }, 25000);
+        var init = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: question, turnstileToken: assistToken }),
+          credentials: "omit",
+          referrerPolicy: "no-referrer"
+        };
+        if (assistController) init.signal = assistController.signal;
+        return fetch(settings.baseUrl + "/api/assist", init).then(function (response) {
+          return response.json().catch(function () { return null; }).then(function (body) {
+            if (response.ok) return body;
+            var code = body && body.error && typeof body.error.code === "string" ? body.error.code : "";
+            if (response.status === 429 && code === "rate_limited") return { kind: "rate_limited" };
+            if (response.status === 429 && code === "assist_daily_cap") return { kind: "over_cap" };
+            return { ok: false, error: { code: code } };
+          });
+        }).then(function (result) {
+          if (requestId === assistRequestId) renderAssistResult(result, localResult);
+        }).catch(function () {
+          if (requestId === assistRequestId) renderAssistResult(null, localResult);
+        }).then(function () { finishAssist(requestId); });
       }).catch(function () {
-        renderAssistResult(null);
-      }).then(finishAssist);
+        if (requestId !== assistRequestId) return;
+        renderLocalAssistResult(null, "本站搜尋資料暫時無法載入；可重試，或直接使用下方主題入口。");
+        finishAssist(requestId);
+      });
     }
 
     assistSection.hidden = false;
+    applyAssistCopy(assistSettings());
     if (assistSettings()) {
       if (assistBox) assistBox.hidden = false;
     } else if (assistOff) {
@@ -1993,7 +2193,11 @@
       window.addEventListener("whv:search", function (event) {
         if (!(event.detail && event.detail.resultCount === 0 && assistSettings())) return;
         var searchAiSlot = document.getElementById("site-search-ai");
-        if (searchAiSlot) searchAiSlot.hidden = false;
+        if (searchAiSlot) {
+          searchAiSlot.hidden = false;
+          var searchAssistLink = searchAiSlot.querySelector("a");
+          if (searchAssistLink) searchAssistLink.textContent = assistSettings().mode === "local" ? "站內找答案" : "問一次 AI";
+        }
       });
       if ("#assist" === location.hash) openAssist();
       window.addEventListener("hashchange", function () {
@@ -2007,7 +2211,7 @@
         assistNavOpen.className = "assist-nav-open";
         assistNavOpen.id = "assist-nav-open";
         assistNavOpen.type = "button";
-        assistNavOpen.setAttribute("aria-label", "問一次站內 AI");
+        assistNavOpen.setAttribute("aria-label", assistSettings().mode === "local" ? "站內找答案" : "問一次站內 AI");
         if (assistDialog) {
           assistNavOpen.setAttribute("aria-haspopup", "dialog");
           assistNavOpen.setAttribute("aria-controls", "assist-dialog");
@@ -2020,7 +2224,7 @@
         assistNavSvg.appendChild(assistNavUse);
         assistNavOpen.appendChild(assistNavSvg);
         var assistNavLabel = document.createElement("span");
-        assistNavLabel.textContent = "問 AI";
+        assistNavLabel.textContent = assistSettings().mode === "local" ? "找答案" : "問 AI";
         assistNavOpen.appendChild(assistNavLabel);
         assistNavOpen.addEventListener("click", function () {
           if (!assistDialog) {

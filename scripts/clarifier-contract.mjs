@@ -821,7 +821,7 @@ await runCase("static: #assist 預設 hidden，內部表單與答案區皆 hidde
     expect(el && el.hasAttribute("hidden"), `#${id} 必須預設 hidden`);
   });
   const open = staticDoc.getElementById("assist-open");
-  expect(open && open.localName === "button" && open.getAttribute("aria-expanded") === "false" && open.textContent.trim() === "問一次 AI", "#assist-open 必須是 aria-expanded=false 的「問一次 AI」按鈕");
+  expect(open && open.localName === "button" && open.getAttribute("aria-expanded") === "false" && open.textContent.trim() === "站內找答案", "#assist-open 必須是 aria-expanded=false 的「站內找答案」按鈕");
   expect(!indexHtml.includes("challenges.cloudflare.com"), "index.html 不得靜態載入 Turnstile（challenges.cloudflare.com）");
 });
 
@@ -837,14 +837,14 @@ await runCase("static: 所有同站 <a href> 的頁面與錨點都存在", () =>
 
 /* ==================== B. 行為契約（node:vm 載入完整 main.js） ==================== */
 function createHarness(options = {}) {
-  const document = parseDocument(indexHtml);
+  const document = parseDocument(options.page ? read(options.page) : indexHtml);
   const hash = options.hash || "";
   const location = {
     hash,
-    pathname: "/index.html",
+    pathname: "/" + (options.page || "index.html"),
     hostname: "www.aussiewhvcompass.com",
     search: "",
-    get href() { return "https://www.aussiewhvcompass.com/index.html" + this.search + this.hash; }
+    get href() { return "https://www.aussiewhvcompass.com" + this.pathname + this.search + this.hash; }
   };
   const fetchCalls = [];
   const stored = {};
@@ -891,14 +891,15 @@ function createHarness(options = {}) {
     KeyboardEvent,
     URL,
     URLSearchParams,
+    AbortController,
     console,
     fetch(url, init) { fetchCalls.push({ url: String(url), init }); return Promise.reject(new Error("network disabled in contract test")); },
     confirm: () => false,
     scrollY: 0,
     matchMedia: (query) => ({ matches: false, media: query, addEventListener() {}, removeEventListener() {}, addListener() {} }),
     requestAnimationFrame: (fn) => setTimeout(() => fn(0), 0),
-    setTimeout,
-    clearTimeout,
+    setTimeout: options.setTimeout || setTimeout,
+    clearTimeout: options.clearTimeout || clearTimeout,
     listeners: new Map(),
     addEventListener: DomNode.prototype.addEventListener,
     removeEventListener: DomNode.prototype.removeEventListener,
@@ -910,7 +911,7 @@ function createHarness(options = {}) {
   window.self = window;
   document.defaultView = window;
   const context = vm.createContext(window);
-  vm.runInContext(read("assets/search-index.js"), context, { filename: "assets/search-index.js" });
+  if (options.preload !== false) vm.runInContext(read("assets/search-index.js"), context, { filename: "assets/search-index.js" });
   vm.runInContext(read("assets/api-config.js"), context, { filename: "assets/api-config.js" });
   if (options.config) window.WHV_API_CONFIG = Object.freeze({ ...window.WHV_API_CONFIG, ...options.config });
   vm.runInContext(mainJs, context, { filename: "assets/main.js" });
@@ -936,7 +937,7 @@ function createHarness(options = {}) {
   };
   const byId = (id) => document.getElementById(id);
   const panelVisibility = () => STAGES.map((stage) => (byId(stage).hidden ? "-" : stage)).filter((v) => v !== "-").join(",");
-  return { document, window, location, fetchCalls, stored, setHash, click, press, byId, panelVisibility, Event };
+  return { document, window, location, context, fetchCalls, stored, setHash, click, press, byId, panelVisibility, Event };
 }
 
 const visibleText = (el) => el.textContent.replace(/\s+/g, " ").trim();
@@ -1158,7 +1159,7 @@ if (!harnessError) {
   await runCase("behavior: 出貨設定（assets/api-config.js 原值）：AI 兜底開、聯絡送出與 D+ 與住宿搜尋皆關、載入時零請求", () => {
     const h = createHarness();
     const config = h.window.WHV_API_CONFIG;
-    expect(config.assistEnabled === true, "出貨設定必須啟用 AI 兜底");
+    expect(config.assistEnabled === true && config.assistMode === "local", "出貨設定必須啟用本機站內找答案");
     expect(/^https:\/\/[a-z0-9.-]+$/.test(config.apiBaseUrl), `apiBaseUrl 必須是純 https origin：${config.apiBaseUrl}`);
     expect(typeof config.turnstileSiteKey === "string" && config.turnstileSiteKey.startsWith("0x"), "turnstileSiteKey 必須是公開 site key");
     expect(config.contactSubmitEnabled === false, "站內聯絡送出必須維持關閉");
@@ -1182,7 +1183,7 @@ if (!harnessError) {
     expect(safety.map((a) => a.getAttribute("href")).join(",") === SAFETY_HREFS.join(","), `零結果安全列：${safety.map((a) => a.getAttribute("href")).join(",")}`);
     const aiSlot = h.byId("site-search-ai");
     expect(aiSlot && aiSlot.hidden, "assistEnabled 為 false 時「問一次 AI」槽位必須保持 hidden");
-    expect(aiSlot.querySelector('a[href="#assist"]').textContent === "問一次 AI", "槽位裡是連到 #assist 的「問一次 AI」");
+    expect(aiSlot.querySelector('a[href="#assist"]').textContent === "站內找答案", "槽位裡是連到 #assist 的「站內找答案」");
     expect(empty.querySelector('a[href^="https://github.com/"][target="_blank"][rel="noopener noreferrer"]'), "GitHub 回報連結必須 noopener");
     expect(h.byId("assist-form").hidden && !h.document.getElementById("turnstile-api-script"), "零結果不得開啟 AI 表單或載入 Turnstile");
     expect(h.fetchCalls.length === 0, `零結果不得發出 fetch：${h.fetchCalls.map((c) => c.url).join(",")}`);
@@ -1190,7 +1191,7 @@ if (!harnessError) {
   });
 
   await runCase("behavior: 搜尋零結果（AI 已啟用）：只揭露「問一次 AI」不 openAssist；明確點擊後才開表單並載入 Turnstile；仍零 /api/assist", async () => {
-    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true } });
+    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true, assistMode: "remote" } });
     expect(!h.byId("assist-box").hidden && h.byId("assist-off").hidden, "已設定時顯示 assist-box");
     h.window.openWhvSearch("qzxv 不存在的詞");
     await tick(); await tick();
@@ -1220,7 +1221,7 @@ if (!harnessError) {
   // 客戶端攔截是「問題文字不離開瀏覽器」這個承諾的唯一保證（about.html #ai-assist 有寫）。
   // 2026-09-04 red-team 之前，這裡只擋得住「剛匯款」那一類，其餘 12 類與全部英文都會送出去。
   await runCase("behavior: 送出前攔截涵蓋各類人身安全題，且不誤攔含數字的預算題", async () => {
-    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true } });
+    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true, assistMode: "remote" } });
     h.location.hash = "#assist";
     h.window.dispatchEvent(new h.Event("hashchange"));
 
