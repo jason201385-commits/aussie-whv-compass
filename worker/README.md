@@ -1,54 +1,93 @@
-# Cloudflare Worker（本機骨架）
+# Cloudflare Worker
 
-這個目錄是 GitHub Pages 靜態前端之外的獨立無框架 API。現階段只有程式與本機測試，沒有建立、綁定或部署任何正式 Cloudflare 資源。
+這個目錄是靜態前端之外的獨立無框架 API。P1-32 的目前版本以「站內找答案」為預設，
+選用 AI 入口只使用 Cloudflare Workers AI 原生 binding；外部模型 HTTP 呼叫、供應商切換與模型 API key 設定已移除。
+本輪決策見 `docs/DECISIONS.md` D-2026-10-09-03。程式、本機 mock 或 dry-run 通過，均不等於正式部署或模型品質驗收。
 
-本機已實作 `POST /api/contact`、`/api/contact/manage`、`/api/contact/update`、
-`/api/contact/delete`、`/api/metrics`、`/api/accommodation/search`、`/api/assist` 與每日 retention purge。住宿端點只接受嚴格白名單欄位，
-只輸出經平台網域與長度驗證的授權 provider 結果；目前 production provider 清單故意為空，所以只回傳五個平台的
-`external-link-only` 狀態，不會抓平台頁面或假造房源。預設 mail transport 故意停用；測試只使用記憶體 mock，
-所以 `emailStatus=sent` 是本機介面證據，不是外部送達證據。正式環境在設定 `RESEND_API_KEY` secret 後會改用 `ResendMailTransport`（見下方「啟用交易信」）；未設定時仍 fail closed。
+已實作 `POST /api/contact`、`/api/contact/manage`、`/api/contact/update`、`/api/contact/delete`、
+`/api/metrics`、`/api/accommodation/search`、`/api/assist/cloudflare`，以及 `GET /api/news`、官方消息同步與 retention purge。
+住宿端點只接受嚴格白名單欄位，只輸出經平台網域與長度驗證的授權 provider 結果；目前 production provider 清單為空，
+只回五個平台的 `external-link-only` 狀態，不會抓平台頁面或假造房源。預設 mail transport 停用；測試的
+`emailStatus=sent` 只證明 mock 介面。正式環境設定 `RESEND_API_KEY` 後才會使用 Resend（見下方交易信章節）。
 
-`POST /api/assist` 是首頁釐清器最後一層的 AI 兜底（`docs/CLARIFIER_SPEC.md` §4）。模型只當**路由器**：
-它只能回 `{"links":["<SITE_CATALOGUE href>", ...]}`（1 到 3 個；可多帶一個會被忽略的 `intent`），使用者看到的
-每一句話都由伺服器固定模板組成（固定導語＋每個目錄項目自己的一句 `lead`），模型的任何自由文字一律不呈現。
-只接受 `{ question, turnstileToken }` 兩個欄位（2 KiB、問題 4 到 200 字）；順序是敏感關鍵詞先攔（回固定安全出口，
-不驗 Turnstile、不算額度）→ 個人判定分類器 `ASSIST_DETERMINATION`（能不能申請、有沒有資格、合法嗎、該不該看醫生、
-退稅多少、am I eligible、is it legal、how much tax 等，命中即回 `official_exit` 固定文案＋依主題配對的官方出口：
-簽證 `visa.html#apply`＋`pr.html#overview`、醫療 `health.html#doctor`、稅務 `cost.html#tax`＋`leave.html#dasp-calc`、
-工作／法律 `work.html#verify`＋`scam.html#help`，無主題線索時四類各一個；不呼叫模型、不算額度）
-→ 缺 `CF-Connecting-IP` 即 `400 client_ip_missing`（fail closed，不共用限流桶）→ Turnstile
-→ 以 `HMAC(CF-Connecting-IP)` 限流 → 每日總額度（`assist_daily_usage` 一天一列的 atomic 計數，超額 `429 assist_daily_cap`）
-→ `MINIMAX_API_KEY` 為空、或 `ASSIST_BASE_URL` 不是 https、或主機不在 `ASSIST_ALLOWED_HOSTS`
-（`api.minimaxi.com`、`api.minimax.io`）即 `503 assist_not_configured`
-→ 呼叫 MiniMax OpenAI 相容 `chat/completions`（`max_tokens` 1024、temperature 0、20 秒逾時，失敗 `502 assist_unavailable`）。
-2026-09-02 受控呼叫實測（D-2026-09-02-05）：MiniMax-M2.7 把推理放在 `content` 的 `<think>` 區塊，`max_tokens` 200 會被推理吃光而截斷成零連結；
-1024 加上系統提示規則 5（思考極短）後 24 題全部回傳有效站內連結，最長 7 秒、中位數約 5 秒。
-`kind` 仍是 `answer`／`official_exit`／`over_cap`／`refused`：`answer.answer` 是伺服器模板文字，`links` 只含
-白名單站內連結；模型沒有回任何有效 href 時改為 `refused`（固定兜底文案＋站內搜尋、各地社團目錄）。
-問題文字、模型回覆與 token 不寫 D1、不進 log；`assist.ts` 完全不使用 `console`，這條路由和 `/api/metrics`
-一樣沒有 request log 行。
+## P1-32：站內搜尋與 Cloudflare AI 入口
+
+前端 `assets/api-config.js` 的 `assistMode: 'local'` 為預設，`assistEnabled` 是入口總開關。
+問題先在瀏覽器中比對本站答案與公開搜尋索引，不載入 Turnstile、不呼叫 AI 端點，也不需要模型 key。
+舊 `remote`、未填或陌生模式都只保留本機導航，不會沿用舊供應商。
+
+`assistMode: 'cloudflare'` 仍先做本機搜尋；沒有可靠結果時才提供「用 Cloudflare AI 找站內內容」。
+使用者點選後先看到 Cloudflare 資料處理揭露並完成 Turnstile，再明確送出才呼叫新端點。
+搜尋輸入本身不會自動送模型，也不會在模型失敗後改送其他服務。
+
+| 端點 | 行為 | 資料與用量 |
+|---|---|---|
+| `POST /api/assist/cloudflare` | 原生 `AI.run(...)` 協助挑選站內連結 | 通過防護後才推論；問題、答案與 token 不保存 |
+| `POST /api/assist` | 固定 `410 assist_endpoint_retired`，提示重新整理 | 不讀取 body、不驗 Turnstile、不觸碰 D1／限流／模型；共用 Origin gate 仍有效 |
+
+新端點讓快取中仍揭露舊供應商的前端失效，避免在使用者看見舊揭露時，悄悄把問題改送 Cloudflare。
+兩條路由都不產生 request log。
+
+### AI 只挑連結，答案由固定模板組成
+
+模型只回 `{"links":["<SITE_CATALOGUE href>", ...]}`，最多採用 3 個既有站內連結。
+使用者看到的每句話都由伺服器固定模板組成（固定導語＋各目錄項目的 `lead`）；
+模型自由文字、生成的標題、外部網址及不存在的 anchor 一律不呈現。
+
+只接受 `{ question, turnstileToken }` 兩個欄位，body 上限 2 KiB，問題 4 到 200 字。執行順序為：
+
+1. 敏感關鍵詞先回固定安全出口，不驗 Turnstile、不算額度、不呼叫模型。
+2. 個人簽證、法律、醫療或稅務判定回 `official_exit`，依主題提供既有官方查核入口，同樣不呼叫模型。
+3. 缺 `CF-Connecting-IP` 回 `400 client_ip_missing`；接著驗 Turnstile hostname/action、HMAC IP 限流。
+4. 原子保留每日總額度 `assist_daily_usage(day, count)`，每 Perth 日預設 200 次；額度不足回 `429 assist_daily_cap`。
+5. 確認 `AI` binding 及原生模型 ID，缺漏回 `503 assist_not_configured`；最多呼叫一次 `AI.run(...)`。
+
+推論使用 `max_tokens: 1024`、`temperature: 0`、非串流回覆，最多等 20 秒。
+Workers AI 必須回含字串 `response` 的物件；格式不符、超出 64 KiB、權限／額度錯誤或逾時都回固定
+`502 assist_unavailable`。模型文字不是有效 JSON 或沒有白名單連結，回 `refused` 加站內搜尋／社團入口。
+期限到會送取消訊號並停止等待；已開始的推論是否產生用量，以 Cloudflare 計費為準。
+
+成功回應的 `kind` 是 `answer`、`official_exit` 或 `refused`，統一帶 `provider: 'cloudflare'` 供前端核對此路由；
+`official_exit` 仍是 Worker 固定前置分類結果，這個欄位不代表已執行模型推論。
+每日超額另回 `over_cap`。不記問題、模型回覆、Turnstile token、IP 或每次請求資料；D1 只保留一天一列的計數。
+
+### 原生 binding 設定
+
+`wrangler.jsonc` 頂層及 `env.production` 均包含：
+
+```json
+{
+  "ai": { "binding": "AI" },
+  "vars": {
+    "CLOUDFLARE_ASSIST_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8",
+    "ASSIST_DAILY_CAP": "200"
+  }
+}
+```
+
+此為節錄，不能拿它覆蓋整份設定。模型 ID 必須符合 `@cf/<author>/<model>`；不接受外部模型、gateway 或自訂 URL。
+[官方模型頁](https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fp8/)
+在 2026-10-09 查核時提供 `messages`、`max_tokens`、`temperature` 及 `response: string` 介面。
+本輪尚未實測該模型的中文命中率、延遲與實際用量；換模型前須核對相同介面。
+
+原生 [Workers AI binding](https://developers.cloudflare.com/workers-ai/configuration/bindings/) 不需要外部模型 key，
+但仍需 Cloudflare 帳戶、模型權限與用量；真正呼叫 AI 時，問題會送至 Cloudflare。
+免費額度及超額價格以 [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) 為準。
+依 [Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/)，bindings、vars 與 secrets
+不會由頂層繼承到 production，因此兩處相應設定都要保留。
 
 ## 邊界
 
-- 僅承接需求單、確認信／刪除流程、無個人識別的 D+ 聚合計數、日後已取得書面授權的平台住宿單次搜尋，以及首頁 AI 兜底的單次轉發。
-- 所有 `POST` 路由（含 `/api/metrics`）都要求請求帶 `Origin` 且在 `ALLOWED_ORIGINS` 白名單內；缺少或不在名單一律 `403 origin_not_allowed`，用 curl 做煙霧測試時要加 `-H "Origin: http://localhost:4175"`。`GET /api/health` 不受此限。
-- 不在 repo、前端或 log 放 `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`MINIMAX_API_KEY`、`RESEND_API_KEY` 或寄信憑證。
-- AI 兜底的公開設定是 `wrangler.jsonc` 的 `ASSIST_DAILY_CAP`（每 Perth 日 200 次）、`ASSIST_MODEL`、
-  `ASSIST_BASE_URL`（只接受 https，且主機必須在 `ASSIST_ALLOWED_HOSTS` 內）；secret 只有 `MINIMAX_API_KEY`。
-  三者任一為空或主機不在名單就 fail closed，不會有任何對外呼叫，也不會把 key 或問題送到別的主機。
-  **2026-09-04 起正式站已啟用**：`assets/api-config.js` 的 `apiBaseUrl` 指向 `https://api.aussiewhvcompass.com`、
-  `turnstileSiteKey` 為公開 site key、`assistEnabled: true`。其餘 API 功能（`contactSubmitEnabled`、
-  `dplusMetricsEnabled`、`accommodationSearchEnabled`）各有旗標且維持 `false`——填 `apiBaseUrl` 不等於全開。
-- `env.production` 的 D1 `database_id` 已是正式資源；**頂層那份仍刻意保留全零佔位值**，
-  讓沒有帶 `--env production` 的 `wrangler deploy` 依舊失敗，不會誤把 dev 形狀的 Worker 推上去。
-- Rate Limit `namespace_id=1001`～`1004` 已隨 `--env production` 部署，帳戶內未與其他 Worker 衝突。
-- 住宿搜尋不寫 D1，不保存地點、日期、人數或房源快照；request log 只有 method、pathname、status 與隨機 request ID。
-- AI 兜底只寫 `assist_daily_usage(day, count)` 一列計數；不保存問題、回覆、token 或 IP；上游失敗只回固定的 `502 assist_unavailable`，不寫任何 log。
-- 正式 Turnstile widget 已建立（Managed 模式，hostname 只有 `www.aussiewhvcompass.com`）；site key 是公開值，
-  secret 只存在 Worker secret。
-- `workers_dev` 與 preview URL 都關閉；本機 dry-run 不等於已部署。
-- `observability.enabled` 維持 `false`（資料最小化）。要看即時日誌用 `npx wrangler tail --env production`；
-  沒有持久化的請求日誌可事後查，這是刻意的取捨。
+- 所有 POST（含退役端點與 `/api/metrics`）都要求白名單 `Origin`；缺少或不符回 `403 origin_not_allowed`。
+  `GET /api/health` 可供無 Origin 的健康檢查，但成功不表示 AI 權限、額度或模型功能正常。
+- `TURNSTILE_SECRET_KEY`、`RATE_LIMIT_HMAC_KEY`、`RESEND_API_KEY` 不放 repo、前端、檔案回執或 log。
+  AI 不需要模型 API key。Turnstile 與 HMAC secrets 只由遠端路由使用，本機搜尋不需要。
+- `contactSubmitEnabled`、`dplusMetricsEnabled`、`accommodationSearchEnabled` 維持既有各自旗標；AI 設定不會替其他功能開關。
+- `env.production` 已填正式 D1 ID；頂層故意保留全零，避免忘記 `--env production` 時誤部署。
+  既有 D1、Rate Limit namespace 及 Turnstile 應先核對並重用，不要因切換 AI 重建。
+- Turnstile hostname/action 是嚴格比對：正式 hostname 為 `www.aussiewhvcompass.com`，action 為 `turnstile-spin-v2`。
+- 住宿搜尋不寫 D1；AI 只寫 `assist_daily_usage(day, count)`。`observability.enabled`、`workers_dev`、preview URL 維持停用。
+- 此 Worker 也包含 P1-29 官方消息路由及排程；部署整個版本時要一併核對 `0004`、`0005` 等所需 migration，不能只驗 AI 就宣稱整版完成。
 
 ## 本機驗證
 
@@ -58,58 +97,46 @@ npm ci
 npm run check
 ```
 
-需要手動啟動本機 API 時，先把 `.dev.vars.example` 複製為不受版控的 `.dev.vars`，只填 Cloudflare 官方測試值或本機隨機值，再執行 `npx wrangler dev --local`。
+`vitest.config.ts` 使用 `remoteBindings: false`；所有 AI 案例提供 mock `AI.run`，不建立遠端 binding session，
+不呼叫真實模型。Wrangler 可能印出原生 AI 的通用遠端用量提醒，不能把它當成真實模型測試證據。
+一般回歸驗證只需此 mock 流程。
 
-## 正式啟用步驟（P0-4）
+若需手動啟動其他本機 API，先把 `.dev.vars.example` 複製為不受版控的 `.dev.vars`，只填官方測試值或本機隨機值，
+再執行 `npx wrangler dev --local`。**`--local` 不會把 Workers AI 變成本地模型**，不得在普通本機測試中意外呼叫新 AI 端點。
 
-> **這道閘門是「授權」，不是「能力」。** 在 wrangler 已登入、且 `aussiewhvcompass.com` 這個 zone
-> 就在同一個 Cloudflare 帳號的前提下，步驟 1、2、3、5 agent 技術上執行得了。
-> 需要站長明確授權的是**決定**本身：這會在站長帳號上開一個對外的付費 AI 端點，已被呼叫掉的用量收不回來。
-> 未取得授權前不得執行；執行時凡是 secret 一律只以管線送進 `wrangler secret put`，
-> 不 echo、不寫檔、不進 commit、不進對話（Hard Constraint #1／#2）。
+## 部署與正式驗收
 
-前提：`npx wrangler whoami` 顯示你的 Cloudflare 帳號；`wrangler.jsonc` 的 `env.production` 區塊已備妥
-（正式 `ALLOWED_ORIGINS` 不含 localhost、`ENVIRONMENT` 為 `production`、自訂網域 `api.aussiewhvcompass.com`）。
-以下每一步都在 `worker/` 目錄執行；凡是要輸入 secret 的指令，只由站長本人在自己的終端機輸入，不貼進任何聊天或檔案。
+2026-10-09 這次工作環境的 Wrangler 未登入 Cloudflare，程式變更不能代表已部署或已清除帳戶中的舊 secret。
+先完成下列帳戶操作，再把前端從 `local` 改為 `cloudflare`。本輪使用者已要求移除外部模型並改用 Cloudflare；
+是否有新資源或超出既有範圍的付費設定，依實際帳戶狀態與 `docs/SPEC.md` §0 核對，不重建已存在資源。
 
-1. 建立正式 D1，把回傳的 `database_id` 填進 `wrangler.jsonc` `env.production.d1_databases[0].database_id`（取代全零）：
-   `npx wrangler d1 create aussie-whv-compass`
-2. 套用三支 migration 到正式 D1：
-   `npx wrangler d1 migrations apply DB --remote --env production`
-3. 建立 Turnstile widget（Managed 模式），拿到 site key（公開）與 secret key（保密）。
-   **hostname 只填 `www.aussiewhvcompass.com` 一個**：`src/turnstile.ts` 對 siteverify 回傳的 `hostname`
-   做嚴格相等比對（單一值，不是清單），而裸網域 `aussiewhvcompass.com` 會 301 導到 `www`，
-   widget 不會在裸網域上繪製，多填一個 hostname 只會讓設定與程式碼失去對應。
-   前端 action 固定為 `turnstile-spin-v2`，與 `TURNSTILE_EXPECTED_ACTION` 一致。
-4. 輸入三個 secret（互動式提示，不要用 echo 管線留在 shell 歷史）：
-   `npx wrangler secret put TURNSTILE_SECRET_KEY --env production`
-   `npx wrangler secret put RATE_LIMIT_HMAC_KEY --env production`（至少 32 個隨機位元組，例如 `openssl rand -base64 48`）
-   `npx wrangler secret put MINIMAX_API_KEY --env production`（api.minimaxi.com 的金鑰；填入前先確認 About 已放 MiniMax 資料處理揭露）
-5. 確認 `env.production.ratelimits[*].namespace_id` 在你的帳戶內唯一（沿用 1001–1004 即可，除非別的 Worker 已用），然後部署：
-   `npx wrangler deploy --env production`
-6. 煙霧測試（把 ORIGIN 換成正式站）：
-   `curl -s https://api.aussiewhvcompass.com/api/health`（應回 `ok:true`、`environment:"production"`）
-   `curl -s -X POST https://api.aussiewhvcompass.com/api/assist -H "Origin: https://www.aussiewhvcompass.com" -H "Content-Type: application/json" -d "{\"question\":\"二簽要幾天\",\"turnstileToken\":\"x\"}"`
-   （應回 Turnstile 驗證失敗的 4xx，證明 CORS、路由與 fail-closed 都在；沒有任何 500）
-   `curl -s -X POST https://api.aussiewhvcompass.com/api/assist -H "Origin: https://evil.example" -H "Content-Type: application/json" -d "{}"`（應回 403 `origin_not_allowed`）
-7. 前端開關：把 `assets/api-config.js` 的 `apiBaseUrl` 填 `https://api.aussiewhvcompass.com`、`turnstileSiteKey` 填 site key，
-   升全站資產版本（`scripts/build_seo.py` 的 `ASSET_VERSION`）並重跑三支 build 腳本與 `scripts/check.ps1`，commit、push。
-8. 線上驗收（cache-bust 開首頁）：搜尋零結果後出現「問一次 AI」；送出「二簽要幾天」應得到固定模板＋站內連結；
-   DevTools Network 只看到一次 `/api/assist`、`credentials: omit`；D1 `assist_daily_usage` 當日一列 count 加 1，沒有問題文字。
-   連續送第 11 次應 429（限流），當日第 201 次應 429 `assist_daily_cap`。
-9. 在 `docs/DECISIONS.md` 新增條目記錄回執（health 回應、D1 列、前端截圖），ROADMAP P0-4 與 P0-7 狀態才可改為「已上線」。
+1. 在有存取權的終端機執行 `npx wrangler whoami`，核對正式 Worker、D1、Turnstile 與域名。
+   先用 `npx wrangler d1 migrations list DB --remote --env production` 核對現有 schema；
+   目前整版 Worker 需要 repo 中 `0001` 至 `0005` 的 migration。若仍有未套用項目，先審核完整變更與既有部署狀態，
+   再使用 `npx wrangler d1 migrations apply DB --remote --env production`；不要盲目再建立 D1。
+2. 核對 production 的 `ai.binding: 'AI'`、原生模型權限、`ASSIST_DAILY_CAP`、既有限流及 Turnstile hostname/action。
+   既有 Turnstile/HMAC secrets 若已存在，不要重新輸入或輪替。只有缺少時才在私有終端機以互動式
+   `npx wrangler secret put TURNSTILE_SECRET_KEY --env production` 或
+   `npx wrangler secret put RATE_LIMIT_HMAC_KEY --env production` 設定；不貼到聊天、不寫入版控。
+3. 完成根目錄 `scripts/check.ps1`，在 `worker/` 執行 `npx wrangler deploy --env production`。
+   這會發布整個 Worker，也會更新其他既有路由／排程；一併驗證 P1-29 的所需 schema 及正式回應。
+4. 用正式 Origin 驗證舊 `POST /api/assist` 回 `410 assist_endpoint_retired`，新
+   `POST /api/assist/cloudflare` 用無效 token 回 Turnstile 4xx、陌生 Origin 回 403，且不呼叫模型。
+   再用少量受控、真實 Turnstile 請求驗收中文導覽、白名單結果、固定文案、延遲及用量；每日限額／高頻限流用 mock 測試證明，
+   不為了測限流去消耗大量真實推論。記錄不含問題、token、secret 的必要部署回執。
+5. 新 Worker 驗收後，刪除帳戶中的舊模型 secret：
+   `npx wrangler secret delete MINIMAX_API_KEY --env production`。
+   此動作只移除 Cloudflare 端儲存的舊 secret；如需撤銷原供應商帳戶的金鑰，另在原供應商管理介面處理。
+   程式已不讀舊設定，刪除遠端 secret 的完成狀態必須由實際回執確認。
+6. 保留 `assistMode: 'local'` 直到前述驗收完成，再將前端改為 `assistMode: 'cloudflare'`，
+   核對送出前揭露、About 資料說明及 `apiBaseUrl`／公開 site key，同批更新資產版本、產物與完整檢查。
+   用正式網頁驗收本機搜尋不送 AI、明示確認後只有一次 `/api/assist/cloudflare`、`credentials: 'omit'`、取消不重繪、失敗保留站內入口。
+7. 在 DECISIONS／ROADMAP 記錄實際完成與未完成項目；只有正式回執與前端 E2E 都成立才標示 AI 已上線。
 
-回滾：把 `assets/api-config.js` 的 `assistEnabled` 改成 `false` 並 push，前端立即回到「尚未啟用」
-（`apiBaseUrl` 與 site key 可以留著，旗標才是開關）；Worker 可留著，無人呼叫即無費用。
-要連 Worker 一起收掉再執行 `npx wrangler delete --env production`。
-
-## 正式啟用前人工 gate
-
-1. 站長建立 Worker、D1、Turnstile 與可用的交易信資源。
-2. 用真實 D1 ID 取代全零佔位值，並把 secrets 放進 Cloudflare 受保護設定（含 `MINIMAX_API_KEY`；
-   在 P0-4 完成、站長審核過 MiniMax 資料處理條款揭露前，不得填入真實金鑰）。
-3. 受控驗證 CORS、Turnstile hostname/action、限流、migration、收件與退信。
-4. 只有取得正式 API 回執與前端 E2E 證據後，才能稱為已上線。
+回到本機模式：把 `assistMode` 改回 `local` 並發布前端，保留站內搜尋。
+這只停止新版前端提供 AI 送出入口；若要停掉伺服器的所有推論，將 production `ASSIST_DAILY_CAP` 設為 `0` 並重新部署，
+此時一般 AI 請求會固定走超額處理，安全與個人判定仍回固定出口，其他 API 不需刪除。
+不要以舊 Worker 版本回滾而重新引入已移除的外部模型路徑。
 
 ## 啟用交易信（Resend）
 

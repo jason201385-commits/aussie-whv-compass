@@ -1,6 +1,6 @@
 # 澳打指南針 — 全站優化規格（OPTIMIZATION_PLAN）
 
-> 版本 1.0｜最後更新 2026-09-03｜狀態：規格草案，尚未實作任何一項；§8 未驗證清單已於 2026-09-03 逐條查核（D-2026-09-03-01）｜對應 commit d123afb 之後的工作樹｜產生方式：主 session 研究 6 份＋ai-orchestra 三家外部模型（AGY 設計、Grok 受眾語感、MiniMax 架構）＋主 session 實測與裁決
+> 版本 1.0｜最後更新 2026-10-09｜狀態：規格草案，尚未實作任何一項；§8 未驗證清單已於 2026-09-03 逐條查核（D-2026-09-03-01）｜對應 commit d123afb 之後的工作樹｜產生方式：主 session 研究 6 份＋ai-orchestra 三家外部模型（AGY 設計、Grok 受眾語感、MiniMax 架構）＋主 session 實測與裁決
 
 閱讀順序：`SDD.md` §1.1 → `SPEC.md` §0 → `CLARIFIER_SPEC.md` §0.1（as-built）→ 本檔。本檔只登記 `ROADMAP.md` §1 已存在的 ID（P0-8～P0-11、P1-21～P1-23、P2-5、P2-6）；狀態一律以 `ROADMAP.md` 為準，本檔不寫日期敘事與量測表，證據放 `DECISIONS.md` D-2026-09-02-06。來源標示慣例：站內實測寫「本輪實測 2026-09-02」或研究檔名與章節；外部事實附機構與「2026-09 查核」。
 
@@ -239,6 +239,8 @@
 **風險**：同意率可能很低（第三方彙整：kukie.io 2026-03 平均 42–47%，「40–54%」指德國網站；Cookiebot／Usercentrics 2026 經 searchlab.nl 轉述 EU 行銷 cookie 46%、分析 cookie 61%；皆非本站族群，2026-09-02 查核；tech.md 原引用頁無此數字），所以以比率與 D+ 為主；D+ 新 key 增加 Worker 寫入量，D1 免費方案每日 100,000 列寫入（developers.cloudflare.com/workers/platform/pricing，2026-09 查核）綽綽有餘；`clarifier_abandon` 60 秒判定會有誤判，只作相對比較。
 
 ### P1-23 AI 兜底正式啟用
+
+> 下列內容只保留原供應商啟用方案與當時研究證據，不是現行操作指引。D-2026-10-09-03 已決定移除舊模型路徑；P1-32 現行站內搜尋、Cloudflare 單一 AI 與專用端點，以 `SPEC.md` §1.2、`CLARIFIER_SPEC.md` §0.2／§4 和 `worker/README.md` 為準。舊設定不再自動選任何模型，下列舊供應商命中率不能用作 Cloudflare 驗收。
 
 **現況**：程式完成／本機驗證（`worker/README.md`；vitest 18/18）；本輪實測參數 `max_tokens` 1024、20 秒逾時、提示規則 5（D-2026-09-02-05）；前端 `apiBaseUrl` 與 `turnstileSiteKey` 為空，零 request。
 

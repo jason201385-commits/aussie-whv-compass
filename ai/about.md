@@ -146,7 +146,7 @@ LEVEL 3
 
 - 恢復、修正或永久移除都在公開登錄表留下日期、理由與狀態；付款方不能要求刪除必要的負面資訊。
 
-[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-01) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
+[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
 
 ## 留下感謝與肯定
 
@@ -198,47 +198,35 @@ GA4 啟用後，你可以從每頁頁尾的「網站統計設定」改變選擇�
 
 **目的：**確認大家能不能快速找到安全下一步、看懂依據、找對專業求助。全程不要求姓名、Email 或自由文字；答案與精確秒數只留在本頁。D+ 啟用後，後端只會分開累加日期＋固定結果類別，不建立事件明細、cookie、client ID 或跨頁紀錄。
 
-## 站內 AI 兜底：什麼時候送出、送出什麼
+## 站內找答案：資料怎麼處理
 
 [Section permalink](https://www.aussiewhvcompass.com/about.html#ai-assist)
 
-**這是兜底，不是本站的主要功能。**只有在站內搜尋找不到結果、你自己按下按鈕、而且通過一次人機驗證之後，問題才會送出。不按就不會有任何對外請求；整站其他頁面不會因為這個功能多打任何一次 API。
+**站內找答案會在你的裝置比對本站資料。**一般查找不送出問題，不呼叫模型，也不需要人機驗證；載入的只是本站公開搜尋索引。找不到明確內容時，會提供分類與搜尋入口。
 
-### 送出去的是什麼
-
-[Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
-
-只有**你打的那一段問題文字**，交給 MiniMax 的 API（`api.minimaxi.com`）處理。不會一併送出你的姓名、Email、IP、瀏覽紀錄、自我釐清答案、清單內容或需求單內容。供應商資訊見 [MiniMax 官方網站](https://www.minimax.io/)。
-
-### 本站保存什麼
+### 何時會送給 AI
 
 [Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
 
-只有「日期＋當日次數」一列計數，用來守住每日上限（每個伯斯日 200 次）。**不保存問題文字、不保存回覆、不保存驗證 token、不保存 IP**，也不建立 cookie 或跨頁紀錄。
+站內資料未能確認你的意思時，可另選「請 Cloudflare AI 找站內連結」。只有你閱讀揭露、完成人機驗證，再按「同意並送給 Cloudflare AI」，問題才會交給 [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)。一般搜尋不會自動送給模型；AI 無法使用時，仍可從站內入口繼續。
 
-### 你看到的字不是 AI 寫的
-
-[Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
-
-模型只被允許回傳「本站既有頁面的連結」；畫面上每一句話都由本站的固定模板組出來，模型寫的自由文字一律不顯示。這是刻意的設計——避免 AI 生成沒有依據的簽證、法律或稅務說法。如果模型回的連結不在本站清單內，會直接退回站內搜尋與各地社團。
-
-### 有些問題根本不會送出去
+### 送出與保存的範圍
 
 [Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
 
-牽涉人身安全（例如受傷、被威脅、證件被扣、剛匯出款項）以及「我符不符合資格」這類個案判斷的問題，會**在送出前就攔下來**，直接顯示固定的官方求助出口，不經過 AI。本站不做個人簽證、法律、醫療或稅務判斷。
+遠端只取得問題文字與固定站內目錄，不附上瀏覽紀錄、清單或需求單。本站伺服器**不保存問題文字、不保存回覆、不保存驗證 token、不保存 IP**；遠端請求僅以「日期＋當日次數」計數守住每個伯斯日 200 次上限。本機查找不使用這個計數，也不建立查詢紀錄。
 
-### 人機驗證
-
-[Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
-
-送出前的驗證使用 Cloudflare Turnstile，目的只有防止濫用，不做行為分析或廣告用途；它會為了完成驗證處理必要的連線資料。
-
-### 請你自己也留一道界線
+### 內容從哪裡來
 
 [Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
 
-**不要在問題裡打護照號碼、簽證文件內容、帳號密碼、銀行或卡號、住址，或第三人的個資。**本站雖然不保存問題文字，但文字一旦送到第三方供應商，本站無法保證供應商完全看不到，也無法代你收回。需要保密的事情請改用[私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)，或直接找官方管道。
+站內模式顯示既有編輯內容與導覽；遠端模型只能選本站白名單連結，文字仍由本站固定模板組成。任何模型自由文字都不顯示。牽涉人身安全或個人簽證、法律、醫療、稅務判定的問題，直接提供固定的官方求助出口。
+
+### 遠端驗證與供應商處理
+
+[Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
+
+只有選擇 AI 後才載入 Cloudflare Turnstile；驗證服務會處理必要連線資料。問題交給 Cloudflare 後，依其[資料處理說明](https://developers.cloudflare.com/workers-ai/platform/data-usage/)處理。請不要填入護照、帳密、銀行或卡號、住址或第三人的個資；需個案協助時，請走相應的官方管道。
 
 ## 授權
 

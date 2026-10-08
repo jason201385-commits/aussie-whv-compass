@@ -133,6 +133,12 @@ expectHref("女生獨旅", ["health.html#women"]);
 expectHref("薪資單有問題", ["work.html#payslip-help"]);
 expectHref("夏令時間", ["news.html#daylight-saving-update"]);
 
+/* 8. 明確省錢意圖不可被「到澳洲／比較」的二字詞錯配到英文頁。 */
+expectHref("到澳洲怎麼省錢比較好?", ["cost.html#food"]);
+expectHref("到澳洲怎么省钱比较好?", ["cost.html#food"]);
+expectHref("學英文怎麼省錢", ["english.html#after"]);
+ok(search("到澳洲怎麼省錢比較好?").mode === "intent", "省錢完整問句應由明確生活意圖命中，不使用二字詞降級");
+
 if (failures) {
   console.error("SEARCH TESTS FAILED: " + failures);
   process.exit(1);

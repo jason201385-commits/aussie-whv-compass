@@ -70,16 +70,27 @@ GA4 consent 架構已就緒，但 Measurement ID 目前留空，因此不會連�
 站長完成 GA4 與 Search Console 人工前置後，依 [量測與收錄設定](docs/MEASUREMENT_SETUP.md) 啟用；
 即使啟用，訪客未同意前仍不載入 Google tag，搜尋字詞與表單內容不會送往 GA。
 
-## Cloudflare 後端狀態
+## 站內搜尋與 Cloudflare AI
 
-`worker/` 已有獨立無框架 Worker、本機 D1 migration、CORS 白名單、16 KiB JSON 上限、
-Turnstile server-side validation、HMAC 化限流鍵、prepared statements 與可替換的 mock mail transport。
-需求建立、回執、確認信成功／排隊狀態、查閱、更正、永久刪除與 24 個月清除路由也已通過本機測試。
-另有只接受 7 個固定類別的 D+ 每日彙總 endpoint，以及不收姓名、Email 或自由文字的自願找路測試；
-答案與精確計時只留在當頁，D1 不建立個別事件列，metrics route 不寫 application request log。
-這些項目目前只有程式與本機證據；Cloudflare Worker、D1、Turnstile、寄信資源及 secrets 尚未完成
-P0-4 人工前置，因此 API 沒有部署，`assets/api-config.js` 保持空值，現行私人需求單仍只在瀏覽器內
-產生 Email／複製備援，D+ 也不發出 request；兩者都不會冒充正式後端成功。
+P1-32 的一般查找會先用本站公開索引、編輯答案與固定主題分流：不需要模型 key、
+API origin 或人機驗證，不送出問題，也不保存查詢。沒有可靠命中時，仍提供分類與搜尋入口。
+目前公開設定為 `assistEnabled: true`、`assistMode: "local"`，可直接隨靜態前端發布。
+
+唯一的 AI 介接是 Cloudflare Workers AI 原生 `AI` binding；模型只挑站內白名單連結，
+答案文字由本站模板組成。一般搜尋不自動叫模型；完成後端驗收並把前端改為
+`assistMode: "cloudflare"` 後，未命中結果才顯示「請 Cloudflare AI 找站內連結」。
+選擇後才載入 Turnstile，閱讀揭露、完成驗證並按確認送出後，才會呼叫
+`POST /api/assist/cloudflare`。錯誤、取消與關閉都保留本機查找能力。
+
+前端不再有供應商選擇器，Worker 也不再接受外部模型 key／URL。舊 `POST /api/assist`
+在新版 Worker 固定回 410，不轉發問題，避免舊快取畫面的資料揭露與新接收者不一致。
+Workers AI 不需要第三方模型 key，仍受 Cloudflare 帳戶權限、模型配額與計費約束。
+完整啟用、舊設定清理與驗證步驟見 [`worker/README.md`](worker/README.md)。
+
+`worker/` 沿用獨立無框架 API、D1、Origin 白名單、Turnstile、HMAC 限流與每日模型上限。
+本機搜尋可先發布；Cloudflare 原生模型須等正式 Worker／binding 與受控驗收完成才開啟。
+`GET /api/health` 正常不代表模型推論正常。站內聯絡、D+、住宿與新聞各自的啟用狀態
+仍以原有功能旗標與部署文件為準。
 
 ## 搜尋引擎與 AI 探索
 
