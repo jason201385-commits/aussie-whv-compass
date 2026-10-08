@@ -27,7 +27,7 @@
 | P0-4 | Cloudflare 最小後端正式資源 | 已上線（AI 兜底所需部分）；寄信資源仍未建立 | 站內聯絡送出仍待交易信資源 | SDD §3.1、worker/README.md | 713f310（本機骨架）；D-2026-09-04-01 |
 | P0-5 | 五支腳本 render-blocking | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-5 | a823e88；D-2026-09-01-01 |
 | P0-6 | 無障礙倒退三項 | 已上線 | — | PERFORMANCE_AND_RETENTION_SPEC P0-6 | a823e88；D-2026-09-01-01 |
-| P0-7 | 首頁單一漏斗釐清器 | 已上線（含 AI 兜底，2026-09-04） | P0-4 與 `MINIMAX_API_KEY`（線路已實測，D-2026-09-02-05）；C-5 併入 P1-21、§6 指標併入 P1-22、radiogroup 併入 P0-10 | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
+| P0-7 | 首頁單一漏斗釐清器 | 已上線（含 AI 兜底，2026-09-04） | P0-4；新版 Cloudflare AI 入口與啟用狀態見 P1-32；C-5 併入 P1-21、§6 指標併入 P1-22、radiogroup 併入 P0-10 | CLARIFIER_SPEC.md（as-built §0.1） | D-2026-09-02-04；SPEC §1.2 三列 |
 | P0-8 | 首屏重構（問題句 hero、階段 chips 進第一屏、安全出口單列、四格入口刪除） | 已上線 | 驗收第 5 條 LCP 須部署後在正式站重量；驗收第 1 條後半（前兩階段第一個需求 chip 進 812px）本機未達，見 D-2026-09-03-02 | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
 | P0-9 | 搜尋強化（查詢改寫、意圖同義詞表、熱門 chip 綁錨點、462 英文頁進索引） | 已上線 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
 | P0-10 | 釐清器口語文案與護照分支（台灣／中國護照用語切換、462 摘要卡、radiogroup、「看公開討論」） | 已上線 | — | OPTIMIZATION_PLAN.md | D-2026-09-02-06；D-2026-09-03-02、D-2026-09-03-03 |
@@ -63,7 +63,7 @@
 | P1-29 | 官方消息自動核對與關鍵字新聞區 | 程式完成／本機驗證 | 正式 D1 0004–0005、Worker Cron/API 與前端須協調部署；部署後做來源同步與 live 回放 | SPEC §1.2、SDD §3.1 | D-2026-10-02-01 |
 | P1-30 | 搜尋恢復與手機導覽加固 | 程式完成／本機驗證 | 正式站回放待部署 | SPEC §1.1～1.2 | D-2026-10-03-01 |
 | P1-31 | LINE 需求研究與近期重要消息入口 | 程式完成／本機驗證 | 僅取得一個澳洲群組；其他群組匯出尚未取得；正式新聞 API 2026-10-03 回 404，P1-29 仍待協調部署 | SPEC §1.2 | D-2026-10-03-02 |
-| P1-32 | 免模型站內導覽與 Cloudflare AI 替代介面 | 程式完成／本機驗證 | 獨立替代分支；正式發布及 Cloudflare AI binding 啟用待驗收 | SPEC §1.2、worker/README.md | DECISIONS D-2026-10-09-02 |
+| P1-32 | 站內搜尋與 Cloudflare 單一 AI 入口 | 程式完成／本機驗證 | 預設 local 與 Cloudflare 專用路由完成；Cloudflare 帳號登入、正式 Worker／binding／模型驗收及舊 secret 清除未完成 | SPEC §1.2、worker/README.md | DECISIONS D-2026-10-09-03 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |
 | P2-3 | 手機捲動繪製成本 | 不排期／先量測 | 兩變體各 5 次隔離量測 | PERFORMANCE_AND_RETENTION_SPEC P2-3 | — |

@@ -15,7 +15,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "fc3e654eb1444af720f2c8d94d86a7227ef2804b79d0104e7b8e82472626d37b",
+      "markdownSha256": "f2af7fdc184b56142687f84d51e74e7ec16ef4bbc348a67ff3b30c875746b823",
       "sections": [
         {
           "title": "澳洲打工度假，你現在在哪一步？",
@@ -266,7 +266,7 @@
         "https://www.aussiewhvcompass.com/scam.html#help",
         "https://www.aussiewhvcompass.com/scam.html#quiz",
         "https://www.aussiewhvcompass.com/simulator.html",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03",
         "https://www.aussiewhvcompass.com/visa.html",
         "https://www.aussiewhvcompass.com/visa.html#apply",
         "https://www.aussiewhvcompass.com/visa.html#counting",
@@ -982,7 +982,7 @@
       "riskLevel": "high",
       "evidenceCardScope": "first-action-only",
       "evidenceCardCheckedAt": "2026-09-01",
-      "markdownSha256": "3a4216b0df8b1ac120337211ff087f581293b580701f935107da01e74c48a27f",
+      "markdownSha256": "f68a47f9f202b7a843a2c2554b11091657f179460d8ec8076efc42dd4958597c",
       "sections": [
         {
           "title": "離澳出清 × 初登澳補給站",
@@ -1052,7 +1052,7 @@
         "https://www.aussiewhvcompass.com/market.html#rights",
         "https://www.aussiewhvcompass.com/market.html#safety",
         "https://www.aussiewhvcompass.com/scam.html#help",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03",
         "https://www.ebay.com.au/sch/i.html?_nkw=working+holiday",
         "https://www.facebook.com/help/123884166448529/",
         "https://www.facebook.com/marketplace/search/?query=working%20holiday",
@@ -1822,7 +1822,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "cefae0894d3c18f68412fdfb04499b118c2073923e1457081d8a54fa7eeb6921",
+      "markdownSha256": "61dabb44305efcfcac6b1e701c884a3ce1bdea4638e184c8d82ba05779d30e23",
       "sections": [
         {
           "title": "各地社團目錄",
@@ -1907,7 +1907,7 @@
       ],
       "sourceLinks": [
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=community.yml",
-        "https://www.aussiewhvcompass.com/community-directory.json?v=20261009-02",
+        "https://www.aussiewhvcompass.com/community-directory.json?v=20261009-03",
         "https://www.aussiewhvcompass.com/index.html#perth-community",
         "https://www.aussiewhvcompass.com/index.html#support-hub",
         "https://www.aussiewhvcompass.com/scam.html#help",
@@ -2016,7 +2016,7 @@
       "riskLevel": "general",
       "evidenceCardScope": "no-evidence-card",
       "evidenceCardCheckedAt": null,
-      "markdownSha256": "eff8654ff71a851a2da69b931cc8e36a1a95d28ddbf1ea1da781d2e5a3b4c513",
+      "markdownSha256": "cb2c8c219c66d06a54b3cd677ee995b4a1ef00ac1919bcd7b855a4a3c0fae61d",
       "sections": [
         {
           "title": "關於本站",
@@ -2126,6 +2126,7 @@
       "sourceLinks": [
         "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant",
         "https://developers.cloudflare.com/workers-ai/",
+        "https://developers.cloudflare.com/workers-ai/platform/data-usage/",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=collaborate.yml",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=idea.yml",
         "https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml",
@@ -2141,10 +2142,9 @@
         "https://www.aussiewhvcompass.com/about.html#private-contact",
         "https://www.aussiewhvcompass.com/free.html",
         "https://www.aussiewhvcompass.com/free.html#rules",
-        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02",
+        "https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03",
         "https://www.fairwork.gov.au/",
-        "https://www.mara.gov.au/",
-        "https://www.minimax.io/"
+        "https://www.mara.gov.au/"
       ]
     },
     {

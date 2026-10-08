@@ -12,7 +12,7 @@
   "triggers": {
     "crons": ["17 3 * * *", "47 */6 * * *"]
   },
-  // P1-32: prepared binding only; selecting cloudflare is a separate, explicit rollout.
+  // P1-32: the only model route uses this native binding; frontend defaults to local search.
   "ai": { "binding": "AI" },
   "vars": {
     "ENVIRONMENT": "local",
@@ -20,9 +20,6 @@
     "TURNSTILE_EXPECTED_HOSTNAME": "www.aussiewhvcompass.com",
     "TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2",
     "ASSIST_DAILY_CAP": "200",
-    "ASSIST_PROVIDER": "minimax",
-    "ASSIST_MODEL": "MiniMax-M2.7",
-    "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
     "CLOUDFLARE_ASSIST_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8",
     "MAIL_FROM": "noreply@aussiewhvcompass.com",
     "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"
@@ -86,9 +83,6 @@
         "TURNSTILE_EXPECTED_HOSTNAME": "www.aussiewhvcompass.com",
         "TURNSTILE_EXPECTED_ACTION": "turnstile-spin-v2",
         "ASSIST_DAILY_CAP": "200",
-        "ASSIST_PROVIDER": "minimax",
-        "ASSIST_MODEL": "MiniMax-M2.7",
-        "ASSIST_BASE_URL": "https://api.minimaxi.com/v1",
         "CLOUDFLARE_ASSIST_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8",
         "MAIL_FROM": "noreply@aussiewhvcompass.com",
         "CONTACT_NOTIFY_TO": "chuanenqiu6@gmail.com"

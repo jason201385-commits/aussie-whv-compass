@@ -240,7 +240,7 @@
 
 ### P1-23 AI 兜底正式啟用
 
-> 本節保留原 MiniMax 啟用方案與當時證據；P1-32 增加的本機站內導覽及 Cloudflare AI 可選介面，以 `SPEC.md` §1.2、`CLARIFIER_SPEC.md` §0.2 和 `worker/README.md` 為準。未指定 provider 的舊環境仍使用 MiniMax；本批不重做或宣稱完成下列真實模型命中率驗收。
+> 下列內容只保留原供應商啟用方案與當時研究證據，不是現行操作指引。D-2026-10-09-03 已決定移除舊模型路徑；P1-32 現行站內搜尋、Cloudflare 單一 AI 與專用端點，以 `SPEC.md` §1.2、`CLARIFIER_SPEC.md` §0.2／§4 和 `worker/README.md` 為準。舊設定不再自動選任何模型，下列舊供應商命中率不能用作 Cloudflare 驗收。
 
 **現況**：程式完成／本機驗證（`worker/README.md`；vitest 18/18）；本輪實測參數 `max_tokens` 1024、20 秒逾時、提示規則 5（D-2026-09-02-05）；前端 `apiBaseUrl` 與 `turnstileSiteKey` 為空，零 request。
 

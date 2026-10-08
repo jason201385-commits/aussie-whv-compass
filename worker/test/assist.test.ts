@@ -3,7 +3,6 @@ import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ANSWER_LEAD,
-  ASSIST_ALLOWED_HOSTS,
   ASSIST_DETERMINATION,
   ASSIST_LEAD_FORBIDDEN,
   ASSIST_SAME_SITE,
@@ -12,7 +11,7 @@ import {
   JUDGMENT_ANSWER,
   officialExitLinks,
   parseModelReply,
-  resolveProviderConfig,
+  resolveCloudflareConfig,
   SITE_CATALOGUE,
   SYSTEM_PROMPT,
   type WorkersAiBinding,
@@ -24,7 +23,7 @@ import type { FetchTransport } from "../src/turnstile";
 const allowedOrigin = "https://www.aussiewhvcompass.com";
 const clientIp = "203.0.113.7";
 const question = "我在 Perth 想找採收工作，要先看哪一頁？";
-const apiKey = "local-test-key";
+const privateMarker = "private-upstream-value";
 const cloudflareModel = "@cf/meta/llama-3.1-8b-instruct-fp8";
 
 const siteverifyOk: FetchTransport = async () =>
@@ -34,12 +33,13 @@ const siteverifyOk: FetchTransport = async () =>
     action: "turnstile-spin-v2",
   });
 
-function modelReply(content: string): FetchTransport {
-  return async () =>
-    Response.json({
-      id: "chatcmpl-test",
-      choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
-    });
+function modelReply(content: string): WorkersAiBinding["run"] {
+  return async () => ({ response: content });
+}
+
+/** Injects the native binding only in tests; production has no model fetch transport. */
+interface TestDependencies extends AppDependencies {
+  assistRun?: WorkersAiBinding["run"];
 }
 
 const CONSOLE_METHODS = ["log", "error", "warn", "info", "debug", "trace"] as const;
@@ -72,15 +72,14 @@ function assistEnvironment(
     RATE_LIMIT_HMAC_KEY: "0123456789abcdef0123456789abcdef",
     ASSIST_RATE_LIMITER: limiter,
     ASSIST_DAILY_CAP: "200",
-    ASSIST_MODEL: "MiniMax-M2.7",
-    ASSIST_BASE_URL: "https://api.minimaxi.com/v1",
-    MINIMAX_API_KEY: apiKey,
+    CLOUDFLARE_ASSIST_MODEL: cloudflareModel,
+    AI: { run: modelReply("{}") },
     ...overrides,
   };
 }
 
 async function dispatch(
-  dependencies: AppDependencies,
+  dependencies: TestDependencies,
   appEnv: AppEnv,
   body: unknown,
   options: { origin?: string | null; suffix?: string; path?: string; clientIp?: string | null } = {},
@@ -89,13 +88,14 @@ async function dispatch(
   if (options.clientIp !== null) headers["CF-Connecting-IP"] = options.clientIp ?? clientIp;
   if (options.origin !== null) headers.Origin = options.origin ?? allowedOrigin;
   const ctx = createExecutionContext();
-  const response = await createApp(dependencies).fetch(
-    new Request(`https://api.example.test${options.path ?? "/api/assist"}${options.suffix ?? ""}`, {
+  const { assistRun, ...appDependencies } = dependencies;
+  const response = await createApp(appDependencies).fetch(
+    new Request(`https://api.example.test${options.path ?? "/api/assist/cloudflare"}${options.suffix ?? ""}`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
     }),
-    appEnv,
+    assistRun ? { ...appEnv, AI: { run: assistRun } } : appEnv,
     ctx,
   );
   await waitOnExecutionContext(ctx);
@@ -123,7 +123,7 @@ describe("assist input validation", () => {
   it("rejects extra fields, an overlong or empty question and a missing token before Turnstile", async () => {
     const turnstile = vi.fn(siteverifyOk);
     const model = vi.fn(modelReply("{}"));
-    const deps: AppDependencies = { turnstileTransport: turnstile, assistTransport: model };
+    const deps: TestDependencies = { turnstileTransport: turnstile, assistRun: model };
     const appEnv = assistEnvironment();
 
     const extra = await dispatch(deps, appEnv, { question, turnstileToken: "t", page: "index" });
@@ -153,7 +153,7 @@ describe("assist input validation", () => {
   it("rejects a POST without an Origin header through the shared gate", async () => {
     const model = vi.fn(modelReply("{}"));
     const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: model },
+      { turnstileTransport: siteverifyOk, assistRun: model },
       assistEnvironment(),
       { question, turnstileToken: "t" },
       { origin: null },
@@ -172,7 +172,7 @@ describe("assist input validation", () => {
     const model = vi.fn(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
     const keys: string[] = [];
     const now = new Date("2026-09-09T02:00:00.000Z");
-    const deps: AppDependencies = { turnstileTransport: turnstile, assistTransport: model, assistNow: () => now };
+    const deps: TestDependencies = { turnstileTransport: turnstile, assistRun: model, assistNow: () => now };
 
     const missing = await dispatch(deps, assistEnvironment({}, keys), { question, turnstileToken: "ok-token" }, {
       clientIp: null,
@@ -203,7 +203,7 @@ describe("assist safety and abuse controls", () => {
     const keys: string[] = [];
     const now = new Date("2026-09-10T04:00:00.000Z");
     const response = await dispatch(
-      { turnstileTransport: turnstile, assistTransport: model, assistNow: () => now },
+      { turnstileTransport: turnstile, assistRun: model, assistNow: () => now },
       assistEnvironment({}, keys),
       { question: "我剛匯款給仲介，現在被威脅扣護照", turnstileToken: "" },
     );
@@ -212,7 +212,7 @@ describe("assist safety and abuse controls", () => {
     await expect(response.json()).resolves.toMatchObject({ error: { code: "turnstile_token_invalid" } });
 
     const safety = await dispatch(
-      { turnstileTransport: turnstile, assistTransport: model, assistNow: () => now },
+      { turnstileTransport: turnstile, assistRun: model, assistNow: () => now },
       assistEnvironment({}, keys),
       { question: "我剛匯款給仲介，現在被威脅扣護照", turnstileToken: "any-token" },
     );
@@ -221,6 +221,7 @@ describe("assist safety and abuse controls", () => {
       ok: true,
       kind: "official_exit",
       answer: "這種情況不要等 AI。",
+      provider: "cloudflare",
       links: [
         { title: "緊急聯絡總表", href: "health.html#emergency" },
         { title: "中招救濟包", href: "scam.html#help" },
@@ -228,7 +229,7 @@ describe("assist safety and abuse controls", () => {
     });
 
     const english = await dispatch(
-      { turnstileTransport: turnstile, assistTransport: model, assistNow: () => now },
+      { turnstileTransport: turnstile, assistRun: model, assistNow: () => now },
       assistEnvironment({}, keys),
       { question: "I just wired money and now they threaten me", turnstileToken: "any-token" },
     );
@@ -237,7 +238,7 @@ describe("assist safety and abuse controls", () => {
 
     // Sensitive wins over the determination classifier: still the safety exits, even with a verdict phrasing.
     const both = await dispatch(
-      { turnstileTransport: turnstile, assistTransport: model, assistNow: () => now },
+      { turnstileTransport: turnstile, assistRun: model, assistNow: () => now },
       assistEnvironment({}, keys),
       { question: "雇主扣護照合法嗎？我剛匯款了", turnstileToken: "any-token" },
       { clientIp: null },
@@ -257,7 +258,7 @@ describe("assist safety and abuse controls", () => {
     const model = vi.fn(modelReply("{}"));
     const keys: string[] = [];
     const response = await dispatch(
-      { turnstileTransport: failedVerify, assistTransport: model },
+      { turnstileTransport: failedVerify, assistRun: model },
       assistEnvironment({}, keys),
       { question, turnstileToken: "expired-token" },
     );
@@ -275,7 +276,7 @@ describe("assist safety and abuse controls", () => {
     const model = vi.fn(modelReply("{}"));
     const keys: string[] = [];
     const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: model },
+      { turnstileTransport: siteverifyOk, assistRun: model },
       assistEnvironment({}, keys, false),
       { question, turnstileToken: "ok-token" },
     );
@@ -293,9 +294,9 @@ describe("assist safety and abuse controls", () => {
     const now = new Date("2026-09-11T02:00:00.000Z");
     await env.DB.prepare("INSERT INTO assist_daily_usage (day, count) VALUES (?, 1)").bind(day).run();
     const model = vi.fn(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
-    const deps: AppDependencies = {
+    const deps: TestDependencies = {
       turnstileTransport: siteverifyOk,
-      assistTransport: model,
+      assistRun: model,
       assistNow: () => now,
     };
     const appEnv = assistEnvironment({ ASSIST_DAILY_CAP: "2" });
@@ -319,59 +320,7 @@ describe("assist safety and abuse controls", () => {
     await expect(storedCount(day)).resolves.toBe(2);
   });
 
-  it("fails closed with 503 when the provider key or base URL is not configured", async () => {
-    const model = vi.fn(modelReply("{}"));
-    const deps: AppDependencies = { turnstileTransport: siteverifyOk, assistTransport: model };
 
-    const noKey = await dispatch(deps, assistEnvironment({ MINIMAX_API_KEY: "" }), {
-      question,
-      turnstileToken: "ok-token",
-    });
-    expect(noKey.status).toBe(503);
-    await expect(noKey.json()).resolves.toMatchObject({ error: { code: "assist_not_configured" } });
-
-    const plainHttp = await dispatch(
-      deps,
-      assistEnvironment({ ASSIST_BASE_URL: "http://api.minimaxi.com/v1" }),
-      { question, turnstileToken: "ok-token" },
-    );
-    expect(plainHttp.status).toBe(503);
-    await expect(plainHttp.json()).resolves.toMatchObject({ error: { code: "assist_not_configured" } });
-
-    expect(model).not.toHaveBeenCalled();
-  });
-
-  it("pins the provider host to ASSIST_ALLOWED_HOSTS and never sends the key or question elsewhere", async () => {
-    expect(ASSIST_ALLOWED_HOSTS).toEqual(["api.minimaxi.com", "api.minimax.io"]);
-    const model = vi.fn(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
-    const deps: AppDependencies = { turnstileTransport: siteverifyOk, assistTransport: model };
-    const rejected = [
-      "https://evil.example/v1",
-      "https://api.minimaxi.com.evil.example/v1",
-      "https://evil.example/api.minimaxi.com/v1",
-      "https://api.minimaxi.com:8443/v1",
-      "https://user:pw@api.minimaxi.com/v1",
-      "https://api.minimaxi.com/v1?x=1",
-      "https://api.minimaxi.com/v1#frag",
-      "https://minimaxi.com/v1",
-    ];
-    for (const baseUrl of rejected) {
-      const response = await dispatch(deps, assistEnvironment({ ASSIST_BASE_URL: baseUrl }), {
-        question,
-        turnstileToken: "ok-token",
-      });
-      expect(response.status, baseUrl).toBe(503);
-      await expect(response.json()).resolves.toMatchObject({ error: { code: "assist_not_configured" } });
-      expect(resolveProviderConfig({ ASSIST_BASE_URL: baseUrl, ASSIST_MODEL: "m", MINIMAX_API_KEY: "k" })).toBeNull();
-    }
-    expect(model).not.toHaveBeenCalled();
-
-    for (const host of ASSIST_ALLOWED_HOSTS) {
-      expect(
-        resolveProviderConfig({ ASSIST_BASE_URL: `https://${host}/v1/`, ASSIST_MODEL: "m", MINIMAX_API_KEY: "k" }),
-      ).toEqual({ provider: "minimax", baseUrl: `https://${host}/v1`, model: "m", apiKey: "k" });
-    }
-  });
 });
 
 describe("assist determination classifier", () => {
@@ -380,7 +329,7 @@ describe("assist determination classifier", () => {
     const model = vi.fn(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
     const keys: string[] = [];
     const now = new Date("2026-09-15T02:00:00.000Z");
-    const deps: AppDependencies = { turnstileTransport: turnstile, assistTransport: model, assistNow: () => now };
+    const deps: TestDependencies = { turnstileTransport: turnstile, assistRun: model, assistNow: () => now };
 
     const cases: Array<[string, string[]]> = [
       ["我 31 歲了還能不能申請 417 簽證？", ["visa.html#apply", "pr.html#overview"]],
@@ -412,7 +361,7 @@ describe("assist determination classifier", () => {
       expect(body.kind, text).toBe("official_exit");
       expect(body.answer, text).toBe(JUDGMENT_ANSWER);
       expect(body.links.map((link) => link.href), text).toEqual(hrefs);
-      expect(body.provider).toBeUndefined();
+      expect(body.provider).toBe("cloudflare");
     }
 
     expect(turnstile).not.toHaveBeenCalled();
@@ -520,12 +469,14 @@ describe("assist determination classifier", () => {
 
 describe("assist router and server-composed answer", () => {
   it("sends only the question with the fixed router prompt and renders a template from the chosen catalogue entries", async () => {
-    let upstreamUrl = "";
-    let upstreamInit: RequestInit | undefined;
+    let upstreamModel = "";
+    let upstreamInputs: Record<string, unknown> | undefined;
+    let upstreamSignal: AbortSignal | undefined;
     const leaked = "依你的情況，應選 417；雇主這樣違法；胸痛只是焦慮；今年會退稅一千澳幣。immi.homeaffairs.gov.au";
-    const model: FetchTransport = async (input, init) => {
-      upstreamUrl = String(input);
-      upstreamInit = init;
+    const model: WorkersAiBinding["run"] = async (modelId, inputs, options) => {
+      upstreamModel = modelId;
+      upstreamInputs = inputs;
+      upstreamSignal = options?.signal;
       return modelReply(
         [
           "```json",
@@ -545,11 +496,11 @@ describe("assist router and server-composed answer", () => {
           }),
           "```",
         ].join("\n"),
-      )(input, init);
+      )(modelId, inputs, options);
     };
     const now = new Date("2026-09-12T02:00:00.000Z");
     const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: model, assistNow: () => now },
+      { turnstileTransport: siteverifyOk, assistRun: model, assistNow: () => now },
       assistEnvironment(),
       { question, turnstileToken: "ok-token" },
     );
@@ -568,7 +519,7 @@ describe("assist router and server-composed answer", () => {
         { title: "多平台求職入口", href: "work.html#channels" },
         { title: "接工作前 5 分鐘查核", href: "work.html#verify" },
       ],
-      provider: "minimax",
+      provider: "cloudflare",
     });
     const serialized = JSON.stringify(body);
     expect(serialized).not.toContain("417");
@@ -578,20 +529,16 @@ describe("assist router and server-composed answer", () => {
     expect(serialized).not.toContain("homeaffairs");
     expect(serialized).not.toContain("evil.example");
 
-    expect(upstreamUrl).toBe("https://api.minimaxi.com/v1/chat/completions");
-    expect(upstreamInit?.method).toBe("POST");
-    const headers = new Headers(upstreamInit?.headers);
-    expect(headers.get("Authorization")).toBe(`Bearer ${apiKey}`);
-    expect(headers.get("Content-Type")).toBe("application/json");
-    expect(upstreamInit?.signal).toBeInstanceOf(AbortSignal);
-    expect(JSON.parse(String(upstreamInit?.body))).toEqual({
-      model: "MiniMax-M2.7",
+    expect(upstreamModel).toBe(cloudflareModel);
+    expect(upstreamSignal).toBeInstanceOf(AbortSignal);
+    expect(upstreamInputs).toEqual({
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: question },
       ],
       max_tokens: 1024,
       temperature: 0,
+      stream: false,
     });
     await expect(storedCount("2026-09-12")).resolves.toBe(1);
   });
@@ -651,15 +598,15 @@ describe("assist router and server-composed answer", () => {
   it("maps provider failures and timeouts to 502 with nothing written to the console", async () => {
     const spy = spyConsole();
     const now = new Date("2026-09-13T02:00:00.000Z");
-    const failing: FetchTransport = async () => new Response("upstream down", { status: 500 });
-    const hanging: FetchTransport = (_input, init) =>
+    const failing: WorkersAiBinding["run"] = async () => { throw new Error("upstream down"); };
+    const hanging: WorkersAiBinding["run"] = (_model, _inputs, options) =>
       new Promise((_resolve, reject) => {
-        init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
+        options?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
       });
-    const garbage: FetchTransport = async () => new Response("not json", { status: 200 });
+    const garbage: WorkersAiBinding["run"] = async () => ({ response: { invalid: true } });
 
     const failed = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: failing, assistNow: () => now },
+      { turnstileTransport: siteverifyOk, assistRun: failing, assistNow: () => now },
       assistEnvironment(),
       { question, turnstileToken: "ok-token" },
     );
@@ -670,7 +617,7 @@ describe("assist router and server-composed answer", () => {
     });
 
     const timedOut = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: hanging, assistNow: () => now, assistTimeoutMs: 500 },
+      { turnstileTransport: siteverifyOk, assistRun: hanging, assistNow: () => now, assistTimeoutMs: 500 },
       assistEnvironment(),
       { question, turnstileToken: "ok-token" },
     );
@@ -678,7 +625,7 @@ describe("assist router and server-composed answer", () => {
     await expect(timedOut.json()).resolves.toMatchObject({ error: { code: "assist_unavailable" } });
 
     const invalid = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: garbage, assistNow: () => now },
+      { turnstileTransport: siteverifyOk, assistRun: garbage, assistNow: () => now },
       assistEnvironment(),
       { question, turnstileToken: "ok-token" },
     );
@@ -696,25 +643,25 @@ describe("assist router and server-composed answer", () => {
     const verdict = "我這樣能不能申請 417 簽證？";
     const now = new Date("2026-09-14T02:00:00.000Z");
     const day = "2026-09-14";
-    const failing: FetchTransport = async () => new Response("upstream down", { status: 500 });
+    const failing: WorkersAiBinding["run"] = async () => { throw new Error("upstream down"); };
     const ok = modelReply(JSON.stringify({ links: ["work.html#seasons"] }));
 
     const outcomes: Array<[string, number]> = [];
-    const run = async (label: string, deps: AppDependencies, appEnv: AppEnv, body: unknown, clientIpOverride?: string | null) => {
+    const run = async (label: string, deps: TestDependencies, appEnv: AppEnv, body: unknown, clientIpOverride?: string | null) => {
       const response = await dispatch(deps, appEnv, body, clientIpOverride === undefined ? {} : { clientIp: clientIpOverride });
       outcomes.push([label, response.status]);
     };
 
-    await run("validation", { turnstileTransport: siteverifyOk, assistTransport: ok }, assistEnvironment(), { question, turnstileToken: token, extra: 1 });
-    await run("client_ip_missing", { turnstileTransport: siteverifyOk, assistTransport: ok }, assistEnvironment(), { question, turnstileToken: token }, null);
-    await run("safety", { turnstileTransport: siteverifyOk, assistTransport: ok }, assistEnvironment(), { question: sensitive, turnstileToken: token });
-    await run("official_exit", { turnstileTransport: siteverifyOk, assistTransport: ok }, assistEnvironment(), { question: verdict, turnstileToken: token });
-    await run("turnstile", { turnstileTransport: async () => Response.json({ success: false }), assistTransport: ok }, assistEnvironment(), { question, turnstileToken: token });
-    await run("rate_limited", { turnstileTransport: siteverifyOk, assistTransport: ok }, assistEnvironment({}, [], false), { question, turnstileToken: token });
-    await run("not_configured", { turnstileTransport: siteverifyOk, assistTransport: ok }, assistEnvironment({ ASSIST_BASE_URL: "https://evil.example/v1" }), { question, turnstileToken: token });
-    await run("over_cap", { turnstileTransport: siteverifyOk, assistTransport: ok, assistNow: () => now }, assistEnvironment({ ASSIST_DAILY_CAP: "0" }), { question, turnstileToken: token });
-    await run("model_error", { turnstileTransport: siteverifyOk, assistTransport: failing, assistNow: () => now }, assistEnvironment(), { question, turnstileToken: token });
-    await run("success", { turnstileTransport: siteverifyOk, assistTransport: ok, assistNow: () => now }, assistEnvironment(), { question, turnstileToken: token });
+    await run("validation", { turnstileTransport: siteverifyOk, assistRun: ok }, assistEnvironment(), { question, turnstileToken: token, extra: 1 });
+    await run("client_ip_missing", { turnstileTransport: siteverifyOk, assistRun: ok }, assistEnvironment(), { question, turnstileToken: token }, null);
+    await run("safety", { turnstileTransport: siteverifyOk, assistRun: ok }, assistEnvironment(), { question: sensitive, turnstileToken: token });
+    await run("official_exit", { turnstileTransport: siteverifyOk, assistRun: ok }, assistEnvironment(), { question: verdict, turnstileToken: token });
+    await run("turnstile", { turnstileTransport: async () => Response.json({ success: false }), assistRun: ok }, assistEnvironment(), { question, turnstileToken: token });
+    await run("rate_limited", { turnstileTransport: siteverifyOk, assistRun: ok }, assistEnvironment({}, [], false), { question, turnstileToken: token });
+    await run("not_configured", { turnstileTransport: siteverifyOk, assistRun: ok }, assistEnvironment({ CLOUDFLARE_ASSIST_MODEL: "https://evil.example/model" }), { question, turnstileToken: token });
+    await run("over_cap", { turnstileTransport: siteverifyOk, assistRun: ok, assistNow: () => now }, assistEnvironment({ ASSIST_DAILY_CAP: "0" }), { question, turnstileToken: token });
+    await run("model_error", { turnstileTransport: siteverifyOk, assistRun: failing, assistNow: () => now }, assistEnvironment(), { question, turnstileToken: token });
+    await run("success", { turnstileTransport: siteverifyOk, assistRun: ok, assistNow: () => now }, assistEnvironment(), { question, turnstileToken: token });
 
     expect(outcomes).toEqual([
       ["validation", 400],
@@ -733,37 +680,23 @@ describe("assist router and server-composed answer", () => {
     const output = spy.output();
     expect(spy.calls()).toBe(0);
     expect(output).toBe("");
-    for (const secret of [question, sensitive, verdict, token, apiKey, clientIp]) {
+    for (const secret of [question, sensitive, verdict, token, privateMarker, clientIp]) {
       expect(output).not.toContain(secret);
     }
   });
 });
 
-describe("optional native Cloudflare assist provider", () => {
+describe("native Cloudflare assist binding", () => {
   const now = new Date("2026-09-12T02:00:00.000Z");
 
-  function cloudflareEnvironment(binding: WorkersAiBinding): AppEnv {
-    const appEnv = assistEnvironment({
-      ASSIST_PROVIDER: "cloudflare",
-      CLOUDFLARE_ASSIST_MODEL: cloudflareModel,
-      AI: binding,
-    });
-    // Cloudflare must work without any MiniMax credential or provider URL.
-    delete appEnv.MINIMAX_API_KEY;
-    delete appEnv.ASSIST_MODEL;
-    delete appEnv.ASSIST_BASE_URL;
-    return appEnv;
-  }
-
-  it("uses only AI.run without a MiniMax key and returns the same server-composed catalogue template", async () => {
+  it("sends only the question and fixed catalogue prompt through AI.run without a REST request or credential", async () => {
     const run = vi.fn<WorkersAiBinding["run"]>(async () => ({
       response: JSON.stringify({ links: ["work.html#seasons"] }),
     }));
-    const minimax = vi.fn(modelReply("{}"));
-    const appEnv = cloudflareEnvironment({ run });
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("unexpected outbound fetch"));
     const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now },
-      appEnv,
+      { turnstileTransport: siteverifyOk, assistNow: () => now },
+      assistEnvironment({ AI: { run } }),
       { question, turnstileToken: "private-turnstile-token" },
     );
 
@@ -785,92 +718,63 @@ describe("optional native Cloudflare assist provider", () => {
       stream: false,
     }, { signal: expect.any(AbortSignal) });
     const sent = JSON.stringify(run.mock.calls[0]);
-    for (const privateValue of ["private-turnstile-token", apiKey, clientIp, allowedOrigin]) {
+    for (const privateValue of ["private-turnstile-token", privateMarker, clientIp, allowedOrigin]) {
       expect(sent).not.toContain(privateValue);
     }
-    expect(minimax).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
     await expect(storedCount("2026-09-12")).resolves.toBe(1);
   });
 
-  it("rejects unknown selectors, missing bindings and non-native model IDs without calling either provider", async () => {
+  it("fails closed for a missing binding, an incompatible binding or a non-native model ID", async () => {
     const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
-    const minimax = vi.fn(modelReply("{}"));
-    const deps: AppDependencies = {
-      turnstileTransport: siteverifyOk,
-      assistTransport: minimax,
-      assistNow: () => now,
-    };
-    const configurations: AppEnv[] = ["", "auto", "openai", "Cloudflare", " cloudflare "].map((provider) =>
-      ({ ...cloudflareEnvironment({ run }), ASSIST_PROVIDER: provider }),
-    );
-    const noBinding = cloudflareEnvironment({ run });
+    const noBinding = assistEnvironment();
     delete noBinding.AI;
-    configurations.push(noBinding);
-    configurations.push({ ...cloudflareEnvironment({ run }), AI: {} as WorkersAiBinding });
-    for (const model of ["", "MiniMax-M2.7", "openai/gpt-4.1", "https://evil.example/model", "@cf/meta/../evil", "@cf/meta/model?gateway=x"]) {
-      configurations.push({ ...cloudflareEnvironment({ run }), CLOUDFLARE_ASSIST_MODEL: model });
+    const noModel = assistEnvironment({ AI: { run } });
+    delete noModel.CLOUDFLARE_ASSIST_MODEL;
+    const configurations: AppEnv[] = [
+      noBinding,
+      assistEnvironment({ AI: {} as WorkersAiBinding }),
+      noModel,
+    ];
+    for (const model of ["", "external-model", "openai/gpt-4.1", "https://evil.example/model", "@cf/meta/../evil", "@cf/meta/model?gateway=x", "@cf/meta/" + "x".repeat(160)]) {
+      configurations.push(assistEnvironment({ AI: { run }, CLOUDFLARE_ASSIST_MODEL: model }));
     }
     for (const appEnv of configurations) {
-      expect(resolveProviderConfig(appEnv)).toBeNull();
-      const response = await dispatch(deps, appEnv, { question, turnstileToken: "ok-token" });
+      expect(resolveCloudflareConfig(appEnv)).toBeNull();
+      const response = await dispatch(
+        { turnstileTransport: siteverifyOk, assistNow: () => now },
+        appEnv,
+        { question, turnstileToken: "ok-token" },
+      );
       expect(response.status).toBe(503);
       await expect(response.json()).resolves.toMatchObject({ error: { code: "assist_not_configured" } });
     }
     expect(run).not.toHaveBeenCalled();
-    expect(minimax).not.toHaveBeenCalled();
+    expect(resolveCloudflareConfig({ AI: { run }, CLOUDFLARE_ASSIST_MODEL: ` ${cloudflareModel} ` }))
+      .toEqual({ binding: { run }, model: cloudflareModel });
   });
 
-  it("preserves explicit and legacy MiniMax selection without automatically switching to Cloudflare", async () => {
-    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
-    const appEnv = assistEnvironment({ AI: { run }, CLOUDFLARE_ASSIST_MODEL: cloudflareModel });
-    delete appEnv.ASSIST_PROVIDER;
-    const minimax = vi.fn(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
+  it("does not read removed provider settings even if a previous deployment still holds them", async () => {
+    const run = vi.fn<WorkersAiBinding["run"]>(modelReply(JSON.stringify({ links: ["work.html#seasons"] })));
+    const appEnv = assistEnvironment({ AI: { run } });
+    const removedSettings = ["ASSIST_PROVIDER", "ASSIST_MODEL", "ASSIST_BASE_URL", "MINIMAX_API_KEY"];
+    const readRemoved = vi.fn(() => { throw new Error("removed setting accessed"); });
+    for (const name of removedSettings) Object.defineProperty(appEnv, name, { get: readRemoved });
     const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now },
+      { turnstileTransport: siteverifyOk, assistNow: () => now },
       appEnv,
       { question, turnstileToken: "ok-token" },
     );
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toMatchObject({ provider: "minimax" });
-    expect(minimax).toHaveBeenCalledOnce();
-
-    const failed = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: async () => new Response("unavailable", { status: 503 }), assistNow: () => now },
-      { ...appEnv, ASSIST_PROVIDER: "minimax" },
-      { question, turnstileToken: "ok-token" },
-    );
-    expect(failed.status).toBe(502);
-    expect(run).not.toHaveBeenCalled();
-  });
-
-  it("keeps safety and personal determinations ahead of Turnstile, rate limits, quota and AI.run", async () => {
-    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
-    const minimax = vi.fn(modelReply("{}"));
-    const turnstile = vi.fn(siteverifyOk);
-    const limiter = vi.fn(async () => ({ success: true }));
-    const appEnv = { ...cloudflareEnvironment({ run }), ASSIST_RATE_LIMITER: { limit: limiter } };
-    for (const text of ["我剛匯款給仲介，現在被威脅扣護照", "我可以申請二簽嗎？"]) {
-      const response = await dispatch(
-        { turnstileTransport: turnstile, assistTransport: minimax, assistNow: () => now },
-        appEnv,
-        { question: text, turnstileToken: "any-token" },
-        { clientIp: null },
-      );
-      expect(response.status).toBe(200);
-      await expect(response.json()).resolves.toMatchObject({ kind: "official_exit" });
-    }
-    expect(turnstile).not.toHaveBeenCalled();
-    expect(limiter).not.toHaveBeenCalled();
-    expect(run).not.toHaveBeenCalled();
-    expect(minimax).not.toHaveBeenCalled();
-    await expect(storedCount("2026-09-12")).resolves.toBeNull();
+    await expect(response.json()).resolves.toMatchObject({ provider: "cloudflare" });
+    expect(readRemoved).not.toHaveBeenCalled();
+    expect(run).toHaveBeenCalledOnce();
   });
 
   it("never invokes AI.run when the origin, client IP, Turnstile, limiter or daily cap blocks the request", async () => {
     const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: "{}" }));
-    const minimax = vi.fn(modelReply("{}"));
-    const deps: AppDependencies = { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now };
-    const appEnv = cloudflareEnvironment({ run });
+    const deps: TestDependencies = { turnstileTransport: siteverifyOk, assistNow: () => now };
+    const appEnv = assistEnvironment({ AI: { run } });
     const body = { question, turnstileToken: "ok-token" };
     const rejected = [
       await dispatch(deps, appEnv, body, { origin: "https://evil.example" }),
@@ -887,32 +791,7 @@ describe("optional native Cloudflare assist provider", () => {
     }
     expect(codes).toEqual(["origin_not_allowed", "client_ip_missing", "turnstile_failed", "rate_limited", "assist_daily_cap"]);
     expect(run).not.toHaveBeenCalled();
-    expect(minimax).not.toHaveBeenCalled();
     await expect(storedCount("2026-09-12")).resolves.toBeNull();
-  });
-
-  it("filters native replies through the same href allow-list and never renders generated titles or judgements", async () => {
-    const leaked = "你一定符合資格，保證核准；https://evil.example/steal";
-    const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: JSON.stringify({
-      answer: leaked,
-      intent: leaked,
-      links: [
-        "https://evil.example/steal", "work.html#missing", "../work.html#channels",
-        { href: "work.html#seasons", title: leaked, lead: leaked },
-        "work.html#seasons", "work.html#channels", "work.html#certs", "cost.html#wage",
-      ],
-    }) }));
-    const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistNow: () => now },
-      cloudflareEnvironment({ run }),
-      { question, turnstileToken: "ok-token" },
-    );
-    const body = await response.json() as { kind: string; answer: string; links: Array<{ href: string }> };
-    expect(response.status).toBe(200);
-    expect(body.kind).toBe("answer");
-    expect(body.links.map((link) => link.href)).toEqual(["work.html#seasons", "work.html#channels", "work.html#certs"]);
-    expect(JSON.stringify(body)).not.toContain(leaked);
-    expect(JSON.stringify(body)).not.toMatch(/evil\.example|missing|一定|核准|\.\.\//);
   });
 
   it("returns the fixed refusal for malformed text or replies containing no allowed catalogue links", async () => {
@@ -920,7 +799,7 @@ describe("optional native Cloudflare assist provider", () => {
       const run = vi.fn<WorkersAiBinding["run"]>(async () => ({ response: content }));
       const response = await dispatch(
         { turnstileTransport: siteverifyOk, assistNow: () => now },
-        cloudflareEnvironment({ run }),
+        assistEnvironment({ AI: { run } }),
         { question, turnstileToken: "ok-token" },
       );
       expect(response.status).toBe(200);
@@ -932,11 +811,11 @@ describe("optional native Cloudflare assist provider", () => {
     }
   });
 
-  it("maps binding errors and invalid or oversized envelopes to a fixed 502 without logging or paid failover", async () => {
+  it("maps binding errors and invalid or oversized envelopes to a fixed 502 without logging or external fallback", async () => {
     const spy = spyConsole();
-    const minimax = vi.fn(modelReply("{}"));
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("unexpected outbound fetch"));
     const cases: WorkersAiBinding["run"][] = [
-      async () => { throw new Error(`private upstream payload ${question} ${apiKey}`); },
+      async () => { throw new Error(`private upstream payload ${question} ${privateMarker}`); },
       async () => undefined,
       async () => ({ error: "account limited" }),
       async () => ({ response: { links: ["work.html#seasons"] } }),
@@ -945,8 +824,8 @@ describe("optional native Cloudflare assist provider", () => {
     for (const implementation of cases) {
       const run = vi.fn<WorkersAiBinding["run"]>(implementation);
       const response = await dispatch(
-        { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now },
-        { ...cloudflareEnvironment({ run }), MINIMAX_API_KEY: apiKey, ASSIST_MODEL: "MiniMax-M2.7", ASSIST_BASE_URL: "https://api.minimaxi.com/v1" },
+        { turnstileTransport: siteverifyOk, assistNow: () => now },
+        assistEnvironment({ AI: { run } }),
         { question, turnstileToken: "ok-token" },
       );
       expect(response.status).toBe(502);
@@ -956,7 +835,7 @@ describe("optional native Cloudflare assist provider", () => {
       });
       expect(run).toHaveBeenCalledOnce();
     }
-    expect(minimax).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(spy.calls()).toBe(0);
     await expect(storedCount("2026-09-12")).resolves.toBe(cases.length);
   });
@@ -969,10 +848,9 @@ describe("optional native Cloudflare assist provider", () => {
       signal = options?.signal;
       return new Promise((resolve) => { finish = resolve; });
     });
-    const minimax = vi.fn(modelReply("{}"));
     const response = await dispatch(
-      { turnstileTransport: siteverifyOk, assistTransport: minimax, assistNow: () => now, assistTimeoutMs: 500 },
-      cloudflareEnvironment({ run }),
+      { turnstileTransport: siteverifyOk, assistNow: () => now, assistTimeoutMs: 500 },
+      assistEnvironment({ AI: { run } }),
       { question, turnstileToken: "ok-token" },
     );
     expect(response.status).toBe(502);
@@ -981,9 +859,55 @@ describe("optional native Cloudflare assist provider", () => {
     finish?.({ response: JSON.stringify({ links: ["work.html#seasons"] }) });
     await Promise.resolve();
     expect(run).toHaveBeenCalledOnce();
-    expect(minimax).not.toHaveBeenCalled();
     expect(spy.calls()).toBe(0);
     await expect(storedCount("2026-09-12")).resolves.toBe(1);
+  });
+});
+
+describe("retired assist endpoint", () => {
+  it("returns a fixed 410 to cached clients without consuming the body or touching verification, D1 or AI", async () => {
+    const spy = spyConsole();
+    const run = vi.fn<WorkersAiBinding["run"]>(modelReply("{}"));
+    const turnstile = vi.fn(siteverifyOk);
+    const limit = vi.fn(async () => ({ success: true }));
+    const prepare = vi.fn(() => { throw new Error("retired endpoint touched D1"); });
+    const request = new Request("https://api.example.test/api/assist?private-query", {
+      method: "POST",
+      headers: { Origin: allowedOrigin, "Content-Type": "text/plain" },
+      body: "not-json-private-question-".repeat(200),
+    });
+    const ctx = createExecutionContext();
+    const response = await createApp({ turnstileTransport: turnstile }).fetch(request,
+      assistEnvironment({ AI: { run }, ASSIST_RATE_LIMITER: { limit }, DB: { prepare } as unknown as D1Database }), ctx);
+    await waitOnExecutionContext(ctx);
+    expect(response.status).toBe(410);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(allowedOrigin);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: { code: "assist_endpoint_retired", message: "站內找答案已更新，請重新整理網頁，或改用站內搜尋。" },
+    });
+    expect(request.bodyUsed).toBe(false);
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(limit).not.toHaveBeenCalled();
+    expect(prepare).not.toHaveBeenCalled();
+    expect(run).not.toHaveBeenCalled();
+    expect(spy.calls()).toBe(0);
+  });
+
+  it("keeps the shared Origin gate and log suppression on the retired endpoint", async () => {
+    const spy = spyConsole();
+    const run = vi.fn<WorkersAiBinding["run"]>(modelReply("{}"));
+    const turnstile = vi.fn(siteverifyOk);
+    for (const origin of [null, "https://evil.example"]) {
+      const response = await dispatch({ turnstileTransport: turnstile }, assistEnvironment({ AI: { run } }),
+        { question, turnstileToken: "private-token" }, { path: "/api/assist", origin });
+      expect(response.status).toBe(403);
+      expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+      await expect(response.json()).resolves.toMatchObject({ error: { code: "origin_not_allowed" } });
+    }
+    expect(run).not.toHaveBeenCalled();
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(spy.calls()).toBe(0);
   });
 });
 

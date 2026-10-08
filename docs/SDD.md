@@ -153,7 +153,7 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 ### 3.1 最小後端資料契約
 
 - **路由**（`worker/src/index.ts`）：`GET /api/health`、`GET /api/news`、`POST /api/contact`、`/api/contact/manage`、
-  `/api/contact/update`、`/api/contact/delete`、`POST /api/metrics`、`POST /api/accommodation/search`、`POST /api/assist`。
+  `/api/contact/update`、`/api/contact/delete`、`POST /api/metrics`、`POST /api/accommodation/search`、`POST /api/assist/cloudflare`；舊 `POST /api/assist` 僅回 410。
 - **CRM 必填**：聯絡 Email、需求類型、需求說明；姓名／組織、希望時程、預算區間選填。
   **禁止欄位**：護照、簽證文件、健康／醫療、銀行／卡號、帳密、第三人個資、未公開客戶資料。
 - **保存**：一般詢問與未成交需求以結案或最後聯絡時間為基準，24 個月後由排程刪除；
@@ -166,8 +166,8 @@ footer（免責聲明）→ 五支 `<script src defer>`。
 - **住宿搜尋**：只接受四個固定欄位、2 KiB body、固定類別限流、provider timeout、每平台最多 8 筆、
   目的網域與顯示欄位白名單；每個候選 provider 必須附有效 `displayAuthorization`（本站 origin、核准用途、
   查核日、有效期限），過期或缺漏不呼叫上游；不寫 D1、不記錄搜尋內容。
-- **AI 兜底**（`POST /api/assist`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；`ASSIST_PROVIDER` 明確選擇 `minimax` 或 `cloudflare`；MiniMax 仍要求 `MINIMAX_API_KEY` 與固定主機白名單，Cloudflare 只使用 `AI` binding 與獨立模型設定，不讀 MiniMax key；未知 provider、缺綁定或設定無效時 503 fail closed，不自動改用另一供應商；遠端呼叫有 20 秒逾時與回覆大小限制，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
-- **免模型站內導覽**（P1-32）：公開 `assistMode: "local"` 在前端以既有搜尋索引與固定意圖處理；不需 API origin、site key、Turnstile、模型或 D1。`remote` 可先使用可信站內命中，其他輸入才進上述 AI 路徑。訪客文字不持久化，不把近似搜尋或固定導覽標成 AI 生成；具體 UI 與模式設定以 SPEC §1.2 為準。
+- **Cloudflare AI 兜底**（`POST /api/assist/cloudflare`，SDD §1.1 第 10 條）：只接受 `{question, turnstileToken}`（問題 4–200 字，NFC 正規化、無控制字元）；缺 `CF-Connecting-IP` 直接 400 `client_ip_missing`；敏感關鍵詞（自傷、暴力、剛匯款、扣證件等）先回固定安全出口，個人判定類問題（能不能申請、合法嗎、該不該看醫生、退稅多少等）先回固定官方出口（`official_exit`），兩者都不呼叫 Turnstile 與模型；Turnstile 驗證；限流鍵 `assist:` + HMAC(CF-Connecting-IP)（`ASSIST_RATE_LIMITER`，10 次／60 秒）；每日總額度存 D1 `assist_daily_usage`（每 Perth 日一列聚合計數，`ASSIST_DAILY_CAP` 預設 200，超額 429）；唯一使用 Cloudflare 原生 `AI` binding 與 `CLOUDFLARE_ASSIST_MODEL`，模型 ID 限 `@cf/<author>/<model>`；缺綁定或設定無效時 503 fail closed，沒有外部模型 key、URL 或供應商切換；遠端呼叫有 20 秒逾時與回覆大小限制，失敗 502；**模型只回傳站內目錄連結（最多 3），答案由伺服端固定模板組成，模型文字永不送到前端**；問題、回覆與 token 不寫 log（assist.ts 禁用 `console.`）、不寫 D1。
+- **免模型站內導覽**（P1-32）：公開 `assistMode: "local"` 在前端以既有搜尋索引與固定意圖處理；不需 API origin、site key、Turnstile、模型或 D1。即使 `assistMode: "cloudflare"`，一般查找也只用本機；未命中後另選 AI、閱讀揭露、完成驗證與確認送出，才進上述路徑。舊 API 路由直接回 410，不讀 body、不驗證、不計數、不記 log，避免把舊畫面宣告的資料接收者偷偷更換。訪客文字不持久化，不把近似搜尋或固定導覽標成 AI 生成；具體 UI 與模式設定以 SPEC §1.2 為準。
 - **官方消息核對**（`GET /api/news`＋Cron `47 */6 * * *`）：來源必須存在固定白名單，feed 與原文皆設大小與 12 秒逾時；原文網址限 HTTPS 同官方網域，發布時間不得晚於檢查時間 6 小時或早於 120 天，標題相符度至少 0.6；通過才寫 `news_items`，並保存來源、原文網址、查核時間、相符分數與內容 SHA-256。未通過全文不入庫；分類只用固定規則，不呼叫生成式 AI；同一則可寫入多個固定 `topics_json`，因此工作防詐等交叉消息能被每個相關 filter 找到。`news_source_state` 保留每個來源最近成功／失敗狀態；全部來源失敗時排程失敗，前台不得將空值描述為沒有新聞。
 - **安全**：所有 `POST` 路由要求 `Origin` 存在且在白名單，否則 `403 origin_not_allowed`（`GET /api/health` 例外）；
   Turnstile token server-side 驗證；輸入長度、rate limit 與 SQL 皆白名單／prepared statement；

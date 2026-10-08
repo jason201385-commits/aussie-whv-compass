@@ -6,10 +6,10 @@
       所有同站 href 的頁面與錨點都存在。
    B. 行為契約：把同一棵樹當最小 DOM 替身，用 node:vm 載入真實 assets/search-index.js、assets/api-config.js 與完整 assets/main.js：
       applyHash（四階段／出口／全部看／未知 hash／空 hash／非釐清器錨點／同 hash 再點一次）的面板、出口、aria-current 與焦點；
-      462 換字 55 處與摘要卡、切回 417 還原；radiogroup 方向鍵；搜尋零結果只揭露「問一次 AI」而不 openAssist，
+      462 換字 55 處與摘要卡、切回 417 還原；radiogroup 方向鍵；搜尋零結果只揭露「站內找答案」而不 openAssist，
       明確點擊後才進 openAssist；全程零 fetch。
    仍需瀏覽器回放（本替身無法證明）：真實 CSP 標頭的阻擋結果、prefers-reduced-motion 的 CSS 動畫、瀏覽器返回鍵的歷史堆疊、
-   Tab 鍵的實際焦點順序、Turnstile 與 /api/assist 的真實網路請求數。 */
+   Tab 鍵的實際焦點順序、Turnstile 與 /api/assist/cloudflare 的真實網路請求數。 */
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -816,12 +816,14 @@ await runCase("static: 熱門 chip 8 個 <a>，與 main.js SEARCH_HOT_LINKS 同�
 await runCase("static: #assist 預設 hidden，內部表單與答案區皆 hidden", () => {
   const assist = staticDoc.querySelector("section#assist[data-assist]");
   expect(assist && assist.hasAttribute("hidden"), "#assist[data-assist] 必須預設 hidden");
-  ["assist-off", "assist-box", "assist-form", "assist-turnstile", "assist-answer"].forEach((id) => {
+  ["assist-off", "assist-box", "assist-form", "assist-turnstile", "assist-answer", "assist-ai-option", "assist-ai-panel"].forEach((id) => {
     const el = staticDoc.getElementById(id);
     expect(el && el.hasAttribute("hidden"), `#${id} 必須預設 hidden`);
   });
   const open = staticDoc.getElementById("assist-open");
   expect(open && open.localName === "button" && open.getAttribute("aria-expanded") === "false" && open.textContent.trim() === "站內找答案", "#assist-open 必須是 aria-expanded=false 的「站內找答案」按鈕");
+  expect(staticDoc.getElementById("assist-ai-submit").getAttribute("type") === "button", "Cloudflare AI 必須是獨立明示操作，不能搭在搜尋表單 submit");
+  expect(staticDoc.getElementById("assist-ai-panel").contains(staticDoc.getElementById("assist-turnstile")), "驗證只存在明示 Cloudflare AI 面板內");
   expect(!indexHtml.includes("challenges.cloudflare.com"), "index.html 不得靜態載入 Turnstile（challenges.cloudflare.com）");
 });
 
@@ -1155,11 +1157,12 @@ if (!harnessError) {
     expect(!outside.defaultPrevented, "radiogroup 之外的方向鍵不攔截");
   });
 
-  // 出貨守門：實際 assets/api-config.js 的值必須「只打開 AI 兜底」，其餘 API 功能維持關閉。
-  await runCase("behavior: 出貨設定（assets/api-config.js 原值）：AI 兜底開、聯絡送出與 D+ 與住宿搜尋皆關、載入時零請求", () => {
+  // 出貨守門：未完成 Cloudflare 原生模型驗收前，只打開本機找答案。
+  await runCase("behavior: 出貨設定（assets/api-config.js 原值）：本機找答案開、聯絡送出與 D+ 與住宿搜尋皆關、載入時零請求", () => {
     const h = createHarness();
     const config = h.window.WHV_API_CONFIG;
     expect(config.assistEnabled === true && config.assistMode === "local", "出貨設定必須啟用本機站內找答案");
+    expect(!Object.hasOwn(config, "assistProvider"), "出貨設定不再保留外部模型供應商選項");
     expect(/^https:\/\/[a-z0-9.-]+$/.test(config.apiBaseUrl), `apiBaseUrl 必須是純 https origin：${config.apiBaseUrl}`);
     expect(typeof config.turnstileSiteKey === "string" && config.turnstileSiteKey.startsWith("0x"), "turnstileSiteKey 必須是公開 site key");
     expect(config.contactSubmitEnabled === false, "站內聯絡送出必須維持關閉");
@@ -1170,7 +1173,7 @@ if (!harnessError) {
     expect(!h.document.getElementById("turnstile-api-script"), "載入時不得載入 Turnstile");
   });
 
-  await runCase("behavior: 搜尋零結果（AI 旗標關閉）：階段 4＋安全 5 皆為 <a>，問一次 AI 槽位保持 hidden，零 fetch、零 Turnstile", async () => {
+  await runCase("behavior: 搜尋零結果（找答案旗標關閉）：階段 4＋安全 5 皆為 <a>，找答案槽位保持 hidden，零 fetch、零 Turnstile", async () => {
     const h = createHarness({ config: { assistEnabled: false } });
     h.window.openWhvSearch("qzxv 不存在的詞");
     await tick(); await tick();
@@ -1182,7 +1185,7 @@ if (!harnessError) {
     const safety = empty.querySelectorAll(".site-search-safety a.chip");
     expect(safety.map((a) => a.getAttribute("href")).join(",") === SAFETY_HREFS.join(","), `零結果安全列：${safety.map((a) => a.getAttribute("href")).join(",")}`);
     const aiSlot = h.byId("site-search-ai");
-    expect(aiSlot && aiSlot.hidden, "assistEnabled 為 false 時「問一次 AI」槽位必須保持 hidden");
+    expect(aiSlot && aiSlot.hidden, "assistEnabled 為 false 時「站內找答案」槽位必須保持 hidden");
     expect(aiSlot.querySelector('a[href="#assist"]').textContent === "站內找答案", "槽位裡是連到 #assist 的「站內找答案」");
     expect(empty.querySelector('a[href^="https://github.com/"][target="_blank"][rel="noopener noreferrer"]'), "GitHub 回報連結必須 noopener");
     expect(h.byId("assist-form").hidden && !h.document.getElementById("turnstile-api-script"), "零結果不得開啟 AI 表單或載入 Turnstile");
@@ -1190,13 +1193,13 @@ if (!harnessError) {
     expect(h.document.activeElement === h.byId("site-search-input"), "焦點應留在搜尋框");
   });
 
-  await runCase("behavior: 搜尋零結果（AI 已啟用）：只揭露「問一次 AI」不 openAssist；明確點擊後才開表單並載入 Turnstile；仍零 /api/assist", async () => {
-    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true, assistMode: "remote" } });
+  await runCase("behavior: 搜尋零結果（Cloudflare 可用）：只揭露站內找答案，搜尋表單不載入 Turnstile；AI 另需明示操作", async () => {
+    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true, assistMode: "cloudflare" } });
     expect(!h.byId("assist-box").hidden && h.byId("assist-off").hidden, "已設定時顯示 assist-box");
     h.window.openWhvSearch("qzxv 不存在的詞");
     await tick(); await tick();
     const aiSlot = h.byId("site-search-ai");
-    expect(aiSlot && !aiSlot.hidden, "AI 已啟用時零結果應揭露「問一次 AI」槽位");
+    expect(aiSlot && !aiSlot.hidden, "零結果應揭露「站內找答案」槽位");
     expect(h.byId("assist-form").hidden && h.byId("assist-open").getAttribute("aria-expanded") === "false", "揭露按鈕不等於 openAssist：表單仍收起");
     expect(!h.document.getElementById("turnstile-api-script") && h.byId("assist-turnstile").hidden, "未點擊前零 Turnstile 載入");
     expect(h.document.activeElement === h.byId("site-search-input"), "不移焦點");
@@ -1205,11 +1208,9 @@ if (!harnessError) {
     h.click(aiSlot.querySelector('a[href="#assist"]'));
     expect(h.location.hash === "#assist", "點擊後 hash 進 #assist");
     expect(!h.byId("assist-form").hidden && h.byId("assist-open").getAttribute("aria-expanded") === "true", "明確點擊後才 openAssist");
-    const turnstileScript = h.document.getElementById("turnstile-api-script");
-    expect(turnstileScript && turnstileScript.getAttribute("src").startsWith("https://challenges.cloudflare.com/turnstile/v0/api.js"), "點擊後才載入 Turnstile");
-    expect(h.document.head.contains(turnstileScript), "Turnstile script 應掛在 head");
+    expect(!h.document.getElementById("turnstile-api-script") && h.byId("assist-turnstile").hidden, "開啟找答案也不得載入 Turnstile");
     expect(h.document.activeElement === h.byId("assist-input"), "openAssist 聚焦問題框");
-    expect(h.fetchCalls.filter((c) => c.url.includes("/api/assist")).length === 0, "尚未送出前零 /api/assist 請求");
+    expect(h.fetchCalls.length === 0, "開啟本機找答案零 fetch 請求");
     expect(h.byId("site-search-dialog").open === false, "點擊搜尋 dialog 內的連結後 dialog 關閉");
 
     h.byId("assist-input").value = "剛匯款給仲介";
@@ -1221,7 +1222,7 @@ if (!harnessError) {
   // 客戶端攔截是「問題文字不離開瀏覽器」這個承諾的唯一保證（about.html #ai-assist 有寫）。
   // 2026-09-04 red-team 之前，這裡只擋得住「剛匯款」那一類，其餘 12 類與全部英文都會送出去。
   await runCase("behavior: 送出前攔截涵蓋各類人身安全題，且不誤攔含數字的預算題", async () => {
-    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true, assistMode: "remote" } });
+    const h = createHarness({ config: { apiBaseUrl: "https://api.example.test", turnstileSiteKey: "1x00000000000000000000AA", assistEnabled: true, assistMode: "cloudflare" } });
     h.location.hash = "#assist";
     h.window.dispatchEvent(new h.Event("hashchange"));
 
@@ -1247,7 +1248,7 @@ if (!harnessError) {
     ]) {
       const answer = submit(text);
       expect(h.fetchCalls.length === 0, `「${text}」必須在送出前攔下，不得呼叫 /api/assist`);
-      expect(answer.includes("這種情況不要等 AI。"), `「${text}」必須回固定安全文案`);
+      expect(answer.includes("這種情況先走安全出口。"), `「${text}」必須回固定安全文案`);
       expect(h.byId("assist-answer").querySelector('a[href="scam.html#help"]'), `「${text}」必須帶救濟包連結`);
     }
 
@@ -1256,7 +1257,7 @@ if (!harnessError) {
       h.byId("assist-answer").textContent = "";
       h.byId("assist-answer").hidden = true;
       const answer = submit(text);
-      expect(!answer.includes("這種情況不要等 AI。"), `「${text}」是一般問題，不得顯示急難文案`);
+      expect(!answer.includes("這種情況先走安全出口。"), `「${text}」是一般問題，不得顯示急難文案`);
     }
   });
 

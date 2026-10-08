@@ -26,7 +26,7 @@
 <meta name="twitter:image:alt" content="澳打指南針：澳洲打工度假開源攻略">
 <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant">
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/llms.txt" title="澳打指南針 AI 導覽">
-<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20261009-02" title="澳打指南針內容狀態">
+<link rel="alternate" type="application/json" href="https://www.aussiewhvcompass.com/content-status.json?v=20261009-03" title="澳打指南針內容狀態">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,7 +85,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=optional">
-<link rel="stylesheet" href="assets/style.css?v=20261009-02">
+<link rel="stylesheet" href="assets/style.css?v=20261009-03">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c05621' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polygon points='16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76'/></svg>">
 <!-- AI_READING_BEGIN -->
 <link rel="alternate" type="text/markdown" href="https://www.aussiewhvcompass.com/ai/about.md" title="本頁純文字（Markdown）">
@@ -349,7 +349,7 @@
       <li>恢復、修正或永久移除都在公開登錄表留下日期、理由與狀態；付款方不能要求刪除必要的負面資訊。</li>
     </ol>
     <div class="contact-route-actions">
-      <a class="btn secondary" href="third-party-register.json?v=20261009-02">查看第三方關係登錄表（JSON）</a>
+      <a class="btn secondary" href="third-party-register.json?v=20261009-03">查看第三方關係登錄表（JSON）</a>
       <a class="btn secondary" href="https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml" target="_blank" rel="noopener noreferrer">公開回報錯誤或疑慮</a>
       <a class="btn secondary" href="#private-contact">含敏感資料時改用私人聯絡</a>
     </div>
@@ -427,7 +427,7 @@
     <p><strong>站內找答案會在你的裝置比對本站資料。</strong>一般查找不送出問題，不呼叫模型，也不需要人機驗證；載入的只是本站公開搜尋索引。找不到明確內容時，會提供分類與搜尋入口。</p>
 
     <h3>何時會送給 AI</h3>
-    <p>只有表單明示使用遠端 AI、你按下送出並完成驗證後，未由站內資料處理的問題才會交給所標示的供應商：<a href="https://www.minimax.io/" target="_blank" rel="noopener noreferrer">MiniMax</a>（<code>api.minimaxi.com</code>），或 <a href="https://developers.cloudflare.com/workers-ai/" target="_blank" rel="noopener noreferrer">Cloudflare Workers AI</a>。不會在供應商失敗時自動改送另一家。遠端 AI 無法使用時，仍提供站內查找入口。</p>
+    <p>站內資料未能確認你的意思時，可另選「請 Cloudflare AI 找站內連結」。只有你閱讀揭露、完成人機驗證，再按「同意並送給 Cloudflare AI」，問題才會交給 <a href="https://developers.cloudflare.com/workers-ai/" target="_blank" rel="noopener noreferrer">Cloudflare Workers AI</a>。一般搜尋不會自動送給模型；AI 無法使用時，仍可從站內入口繼續。</p>
 
     <h3>送出與保存的範圍</h3>
     <p>遠端只取得問題文字與固定站內目錄，不附上瀏覽紀錄、清單或需求單。本站伺服器<strong>不保存問題文字、不保存回覆、不保存驗證 token、不保存 IP</strong>；遠端請求僅以「日期＋當日次數」計數守住每個伯斯日 200 次上限。本機查找不使用這個計數，也不建立查詢紀錄。</p>
@@ -436,7 +436,7 @@
     <p>站內模式顯示既有編輯內容與導覽；遠端模型只能選本站白名單連結，文字仍由本站固定模板組成。任何模型自由文字都不顯示。牽涉人身安全或個人簽證、法律、醫療、稅務判定的問題，直接提供固定的官方求助出口。</p>
 
     <h3>遠端驗證與供應商處理</h3>
-    <p>遠端模式使用 Cloudflare Turnstile 防止濫用，驗證服務會處理必要連線資料。問題一旦交給供應商，可能依其條款處理；本站不保存不等於供應商不處理。請不要填入護照、帳密、銀行或卡號、住址或第三人的個資；需個案協助時，請走相應的官方管道。</p>
+    <p>只有選擇 AI 後才載入 Cloudflare Turnstile；驗證服務會處理必要連線資料。問題交給 Cloudflare 後，依其<a href="https://developers.cloudflare.com/workers-ai/platform/data-usage/" target="_blank" rel="noopener noreferrer">資料處理說明</a>處理。請不要填入護照、帳密、銀行或卡號、住址或第三人的個資；需個案協助時，請走相應的官方管道。</p>
   </div>
 
   <h2 id="license"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg> 授權</h2>
@@ -461,10 +461,10 @@
 <!-- AI_READING_FOOTER_END -->
 </footer>
 
-<script src="assets/analytics-config.js?v=20261009-02" defer></script>
-<script src="assets/analytics.js?v=20261009-02" defer></script>
-<script src="assets/i18n.js?v=20261009-02" defer></script>
-<script src="assets/api-config.js?v=20261009-02" defer></script>
-<script src="assets/main.js?v=20261009-02" defer></script>
+<script src="assets/analytics-config.js?v=20261009-03" defer></script>
+<script src="assets/analytics.js?v=20261009-03" defer></script>
+<script src="assets/i18n.js?v=20261009-03" defer></script>
+<script src="assets/api-config.js?v=20261009-03" defer></script>
+<script src="assets/main.js?v=20261009-03" defer></script>
 </body>
 </html>

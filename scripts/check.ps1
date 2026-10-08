@@ -2843,7 +2843,7 @@ if ($assistInjectedStart -lt 0 -or $assistInjectedStop -le $assistInjectedStart)
   $errors++
 } else {
   $assistInjectedText = $mainJs.Substring($assistInjectedStart, $assistInjectedStop - $assistInjectedStart)
-  foreach ($assistInjectedId in @('id: "assist"', '"data-assist"', '"assist-off"', 'id: "assist-box"', 'id: "assist-open"', 'id: "assist-form"', 'id: "assist-input"', 'id: "assist-turnstile"', 'id: "assist-submit"', 'id: "assist-cancel"', 'id: "assist-status"', 'id: "assist-answer"', 'id: "assist-dialog-close"')) {
+  foreach ($assistInjectedId in @('id: "assist"', '"data-assist"', '"assist-off"', 'id: "assist-box"', 'id: "assist-open"', 'id: "assist-form"', 'id: "assist-input"', 'id: "assist-turnstile"', 'id: "assist-submit"', 'id: "assist-cancel"', 'id: "assist-status"', 'id: "assist-answer"', 'id: "assist-dialog-close"', 'id: "assist-ai-option"', 'id: "assist-ai-panel"', 'id: "assist-ai-open"', 'id: "assist-ai-submit"', 'id: "assist-ai-cancel"', 'id: "assist-ai-disclosure"')) {
     if (-not $assistInjectedText.Contains($assistInjectedId)) {
       Write-Output "FAIL [main.js] 注入版 AI 兜底缺元素，與首頁內嵌版不一致：$assistInjectedId"
       $errors++
@@ -2863,7 +2863,7 @@ if ($assistInjectedStart -lt 0 -or $assistInjectedStop -le $assistInjectedStart)
     }
   }
 }
-# 導覽列的 AI 入口只有在 AI 真的啟用時才建立，且排在搜尋鈕之後（AI 是兜底，不是主要動作）。
+# 導覽列站內查找入口由 assistSettings() 控制，AI 的獨立揭露／送出另依 Cloudflare 設定控制。
 $assistNavStart = $mainJs.IndexOf('if (navInner && assistSettings())')
 if ($assistNavStart -lt 0) {
   Write-Output 'FAIL [main.js] 導覽列 AI 入口必須以 assistSettings() 為條件，未啟用時不得出現'
@@ -2913,6 +2913,11 @@ if (-not (Test-Path $assistTsPath)) {
   }
 }
 
+# P1-32 Cloudflare AI 為獨立動作：no-JS 時面板收合，基本搜尋按鈕不代替模型同意。
+foreach ($cloudflareUiNeedle in @('id="assist-ai-option" hidden', 'id="assist-ai-panel" aria-labelledby="assist-ai-title" hidden', 'id="assist-ai-open" type="button"', 'id="assist-ai-submit" type="button"', 'id="assist-ai-cancel" type="button"', 'id="assist-ai-disclosure"', '同意並送給 Cloudflare AI')) {
+  if (-not $indexText.Contains($cloudflareUiNeedle)) { Write-Output "FAIL [index.html] 缺獨立 Cloudflare AI 揭露／同意或預設隱藏：$cloudflareUiNeedle"; $errors++ }
+}
+
 # main.js 釐清器：hash 驅動、問題零儲存；本機先找答案，遠端兜底只有一個 fetch 且雙設定齊全才啟用
 $clarifierScript = [regex]::Match($mainJs, '(?s)// ---------- 首頁釐清器.*?// ---------- D\+ 匿名彙總量測')
 if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// ---------- 站內找答案：')) {
@@ -2920,7 +2925,7 @@ if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// -
   $errors++
 } else {
   foreach ($clarifierScriptNeedle in @(
-    '"/api/assist"',
+    '"/api/assist/cloudflare"',
     'turnstileToken',
     'credentials: "omit"',
     'referrerPolicy: "no-referrer"',
@@ -2946,8 +2951,8 @@ if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// -
   )) {
     if (-not $clarifierScript.Value.Contains($clarifierScriptNeedle)) { Write-Output "FAIL [main.js] 釐清器或 AI 兜底缺安全界線：$clarifierScriptNeedle"; $errors++ }
   }
-  if ([regex]::Matches($clarifierScript.Value, [regex]::Escape('"/api/assist"')).Count -ne 1 -or [regex]::Matches($clarifierScript.Value, 'fetch\(').Count -ne 1) {
-    Write-Output 'FAIL [main.js] AI 兜底只能有一個 fetch 與一個 /api/assist 路由'
+  if ([regex]::Matches($clarifierScript.Value, [regex]::Escape('"/api/assist/cloudflare"')).Count -ne 1 -or [regex]::Matches($clarifierScript.Value, 'fetch\(').Count -ne 1) {
+    Write-Output 'FAIL [main.js] Cloudflare AI 只能有一個 fetch 與一個 /api/assist/cloudflare 路由'
     $errors++
   }
   # P0-9 實作 5：零結果只揭露「問一次 AI」按鈕，不自動 openAssist、不移焦點、不載入 Turnstile
@@ -2964,7 +2969,7 @@ if (-not $clarifierScript.Success -or -not $clarifierScript.Value.Contains('// -
     if ($clarifierScript.Value.Contains($clarifierForbidden)) { Write-Output "FAIL [main.js] 釐清器不得保存狀態、寫入 HTML 字串或改寫網址：$clarifierForbidden"; $errors++ }
   }
 }
-foreach ($clarifierStyleNeedle in @('.clarifier-panel[hidden]', '.clarifier-exit[hidden]', '.clarifier-passport[hidden]', '.clarifier-passport-summary[hidden]', '.clarifier-chips .chip[aria-checked="true"]', '.job-quiz[hidden]', '.clarifier-assist[hidden]', '.clarifier-assist-box[hidden]')) {
+foreach ($clarifierStyleNeedle in @('.clarifier-panel[hidden]', '.clarifier-exit[hidden]', '.clarifier-passport[hidden]', '.clarifier-passport-summary[hidden]', '.clarifier-chips .chip[aria-checked="true"]', '.job-quiz[hidden]', '.clarifier-assist[hidden]', '.clarifier-assist-box[hidden]', '.clarifier-assist-ai[hidden]', '.clarifier-assist-ai-panel[hidden]')) {
   if (-not $styleText.Contains($clarifierStyleNeedle)) { Write-Output "FAIL [style.css] 釐清器 hidden 後援缺失：$clarifierStyleNeedle"; $errors++ }
 }
 $reducedMotionBlock = [regex]::Match($styleText, '(?s)@media \(prefers-reduced-motion: reduce\) \{.*?\n\}')
@@ -3402,7 +3407,7 @@ if (-not (Test-Path $apiConfigPath)) {
     $errors++
   }
   # 每個 API 功能各有旗標：填 apiBaseUrl 不得順手打開別的功能。
-  foreach ($apiConfigNeedle in @('assistEnabled:', 'assistMode:', 'assistProvider:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'newsEnabled: true', 'Public values only', 'P0-4')) {
+  foreach ($apiConfigNeedle in @('assistEnabled:', 'assistMode:', 'contactSubmitEnabled:', 'dplusMetricsEnabled:', 'accommodationSearchEnabled:', 'newsEnabled: true', 'Public values only', 'P0-4')) {
     if (-not $apiConfigText.Contains($apiConfigNeedle)) { Write-Output "FAIL [api-config.js] 缺功能旗標或來源註記：$apiConfigNeedle"; $errors++ }
   }
   # 尚未備妥正式資源的功能必須維持關閉（交易信、D+ 部署、住宿平台授權）。
@@ -3633,9 +3638,19 @@ if (Test-Path $assistWorkerPath) {
   foreach ($assistWorkerNeedle in @('over_cap', 'official_exit', 'ASSIST_SAME_SITE', 'perthDate', 'verifyTurnstile', 'ASSIST_DETERMINATION', 'client_ip_missing', 'composeAnswerText')) {
     if (-not $assistWorkerText.Contains($assistWorkerNeedle)) { Write-Output "FAIL [worker/src/assist.ts] AI 兜底缺 fail-closed 界線：$assistWorkerNeedle"; $errors++ }
   }
-  if (-not [regex]::IsMatch($assistWorkerText, 'ASSIST_ALLOWED_HOSTS(?:: readonly string\[\])? = \["api\.minimaxi\.com", "api\.minimax\.io"\]')) {
-    Write-Output 'FAIL [worker/src/assist.ts] ASSIST_ALLOWED_HOSTS 必須固定為 api.minimaxi.com 與 api.minimax.io'
-    $errors++
+  foreach ($cloudflareAiNeedle in @('CLOUDFLARE_ASSIST_MODEL', 'CLOUDFLARE_MODEL_ID', 'config.binding.run(', 'provider: "cloudflare"')) {
+    if (-not $assistWorkerText.Contains($cloudflareAiNeedle)) { Write-Output "FAIL [worker/src/assist.ts] 缺 Cloudflare 原生 AI 契約：$cloudflareAiNeedle"; $errors++ }
+  }
+  foreach ($activeAiFile in @('worker/src/assist.ts', 'worker/wrangler.jsonc', 'worker/.dev.vars.example', 'assets/main.js', 'assets/api-config.js', 'about.html')) {
+    $activeAiText = [System.IO.File]::ReadAllText((Join-Path $dir $activeAiFile), [System.Text.Encoding]::UTF8)
+    if ($activeAiText -match '(?i)minimax|minimaxi|ASSIST_BASE_URL|ASSIST_PROVIDER|assistProvider') {
+      Write-Output "FAIL [$activeAiFile] 現行程式、設定與公開揭露不得殘留已移除供應商的路徑或選擇器"
+      $errors++
+    }
+  }
+  $assistIndexText = [System.IO.File]::ReadAllText((Join-Path $workerDir 'src/index.ts'), [System.Text.Encoding]::UTF8)
+  foreach ($cloudflareRouteNeedle in @('"/api/assist/cloudflare"', '"assist_endpoint_retired"')) {
+    if (-not $assistIndexText.Contains($cloudflareRouteNeedle)) { Write-Output "FAIL [worker/src/index.ts] 缺專用 Cloudflare 路由或舊端點退役契約：$cloudflareRouteNeedle"; $errors++ }
   }
   if ([regex]::IsMatch($assistWorkerText, 'console\s*\.')) {
     Write-Output 'FAIL [worker/src/assist.ts] 不得使用任何 console 方法（問題文字、回覆與 token 不得進 log）'

@@ -146,7 +146,7 @@ LEVEL 3
 
 - 恢復、修正或永久移除都在公開登錄表留下日期、理由與狀態；付款方不能要求刪除必要的負面資訊。
 
-[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-02) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
+[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
 
 ## 留下感謝與肯定
 
@@ -208,7 +208,7 @@ GA4 啟用後，你可以從每頁頁尾的「網站統計設定」改變選擇�
 
 [Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
 
-只有表單明示使用遠端 AI、你按下送出並完成驗證後，未由站內資料處理的問題才會交給所標示的供應商：[MiniMax](https://www.minimax.io/)（`api.minimaxi.com`），或 [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)。不會在供應商失敗時自動改送另一家。遠端 AI 無法使用時，仍提供站內查找入口。
+站內資料未能確認你的意思時，可另選「請 Cloudflare AI 找站內連結」。只有你閱讀揭露、完成人機驗證，再按「同意並送給 Cloudflare AI」，問題才會交給 [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)。一般搜尋不會自動送給模型；AI 無法使用時，仍可從站內入口繼續。
 
 ### 送出與保存的範圍
 
@@ -226,7 +226,7 @@ GA4 啟用後，你可以從每頁頁尾的「網站統計設定」改變選擇�
 
 [Section permalink](https://www.aussiewhvcompass.com/about.html#main-content)
 
-遠端模式使用 Cloudflare Turnstile 防止濫用，驗證服務會處理必要連線資料。問題一旦交給供應商，可能依其條款處理；本站不保存不等於供應商不處理。請不要填入護照、帳密、銀行或卡號、住址或第三人的個資；需個案協助時，請走相應的官方管道。
+只有選擇 AI 後才載入 Cloudflare Turnstile；驗證服務會處理必要連線資料。問題交給 Cloudflare 後，依其[資料處理說明](https://developers.cloudflare.com/workers-ai/platform/data-usage/)處理。請不要填入護照、帳密、銀行或卡號、住址或第三人的個資；需個案協助時，請走相應的官方管道。
 
 ## 授權
 

@@ -4,7 +4,7 @@ import { createScopedRateLimitKey, enforceRateLimit, type RateLimitBinding } fro
 import { verifyTurnstile, type FetchTransport } from "./turnstile";
 
 /**
- * POST /api/assist — the last-layer AI fallback of the homepage clarifier
+ * POST /api/assist/cloudflare — the last-layer AI fallback of the homepage clarifier
  * (CLARIFIER_SPEC §4, SDD §1.1 principle 10).
  *
  * Design: the model is a ROUTER, not a writer. It may only return catalogue
@@ -19,8 +19,8 @@ import { verifyTurnstile, type FetchTransport } from "./turnstile";
  *   and never echoed into error messages;
  * - the only durable write is one aggregate counter row per Perth day;
  * - nothing is sent upstream before the client IP is known, Turnstile, the
- *   per-IP rate limit and the daily cap have all passed, and the explicitly
- *   selected provider is configured (fail closed, no cross-provider retries).
+ *   per-IP rate limit and the daily cap have all passed, and the native
+ *   Workers AI binding is configured (fail closed, no provider retries).
  */
 
 /** Only the native binding method this route needs; also permits an isolated test double. */
@@ -31,10 +31,6 @@ export interface WorkersAiBinding {
 export interface AssistBindings {
   ASSIST_RATE_LIMITER?: RateLimitBinding;
   ASSIST_DAILY_CAP?: string;
-  ASSIST_PROVIDER?: string;
-  ASSIST_MODEL?: string;
-  ASSIST_BASE_URL?: string;
-  MINIMAX_API_KEY?: string;
   CLOUDFLARE_ASSIST_MODEL?: string;
   AI?: WorkersAiBinding;
 }
@@ -49,7 +45,6 @@ export interface AssistEnv extends AssistBindings {
 
 export interface AssistDependencies {
   turnstileTransport?: FetchTransport;
-  assistTransport?: FetchTransport;
   assistNow?: () => Date;
   assistTimeoutMs?: number;
 }
@@ -75,10 +70,6 @@ interface CatalogueEntry {
   lead: string;
 }
 
-/** Legacy default only: existing environments without ASSIST_PROVIDER retain MiniMax. */
-export const ASSIST_PROVIDER = "minimax";
-/** The only hostnames ASSIST_BASE_URL may point at; anything else is "not configured" and never receives the key. */
-export const ASSIST_ALLOWED_HOSTS: readonly string[] = ["api.minimaxi.com", "api.minimax.io"];
 /** Native Cloudflare model IDs only; external-provider and gateway model IDs are rejected. */
 const CLOUDFLARE_MODEL_ID = /^@cf\/[a-zA-Z0-9][a-zA-Z0-9._-]*\/[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
 export const MAX_ASSIST_BODY_BYTES = 2 * 1024;
@@ -86,13 +77,7 @@ export const MIN_QUESTION_LENGTH = 4;
 export const MAX_QUESTION_LENGTH = 200;
 export const MAX_ANSWER_LENGTH = 600;
 export const MAX_ASSIST_LINKS = 3;
-/**
- * 2026-09-02 controlled calls against api.minimaxi.com (MiniMax-M2.7): the model
- * emits its reasoning as a <think> block inside `content`; with max_tokens 200 the
- * block alone exhausted the budget (finish_reason "length", no JSON) on 2 of 6
- * questions, and cold latency ranged 4-16 s. 1024 tokens plus rule 5 of the prompt
- * gave 6/6 routable replies with a 7 s worst case; the timeout keeps headroom.
- */
+/** Bound one native inference attempt; no automatic retry or fallback model. */
 export const DEFAULT_ASSIST_TIMEOUT_MS = 20_000;
 const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
 const MAX_UPSTREAM_RESPONSE_BYTES = 64 * 1024;
@@ -374,53 +359,18 @@ export async function reserveDailyQuota(db: D1Database, day: string, cap: number
   return result.success && (result.meta.changes ?? 0) > 0;
 }
 
-interface MiniMaxConfig {
-  provider: "minimax";
-  baseUrl: string;
-  model: string;
-  apiKey: string;
-}
-
 interface CloudflareConfig {
-  provider: "cloudflare";
   model: string;
   binding: WorkersAiBinding;
 }
 
-type ProviderConfig = MiniMaxConfig | CloudflareConfig;
-
-/**
- * An absent selector preserves the existing MiniMax configuration. An explicit
- * empty or unknown selector fails closed; it never selects a paid fallback.
- * Cloudflare needs its native binding and a separate @cf model ID, not a key.
- * MiniMax still requires its key and a plain HTTPS allow-listed provider URL.
- */
-export function resolveProviderConfig(env: AssistBindings): ProviderConfig | null {
-  const provider = env.ASSIST_PROVIDER ?? ASSIST_PROVIDER;
-  if (provider === "cloudflare") {
-    const model = (env.CLOUDFLARE_ASSIST_MODEL ?? "").trim();
-    if (!env.AI || typeof env.AI.run !== "function" || model.length > 160 || !CLOUDFLARE_MODEL_ID.test(model)) {
-      return null;
-    }
-    return { provider, model, binding: env.AI };
-  }
-  if (provider !== "minimax") return null;
-
-  const apiKey = (env.MINIMAX_API_KEY ?? "").trim();
-  const model = (env.ASSIST_MODEL ?? "").trim();
-  const baseUrl = (env.ASSIST_BASE_URL ?? "").trim().replace(/\/+$/, "");
-  if (!apiKey || !model || !baseUrl) return null;
-  let parsed: URL;
-  try {
-    parsed = new URL(baseUrl);
-  } catch {
+/** Native binding only: external URLs, gateways and third-party model IDs are never accepted. */
+export function resolveCloudflareConfig(env: AssistBindings): CloudflareConfig | null {
+  const model = (env.CLOUDFLARE_ASSIST_MODEL ?? "").trim();
+  if (!env.AI || typeof env.AI.run !== "function" || model.length > 160 || !CLOUDFLARE_MODEL_ID.test(model)) {
     return null;
   }
-  if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) {
-    return null;
-  }
-  if (parsed.port !== "" || !ASSIST_ALLOWED_HOSTS.includes(parsed.hostname)) return null;
-  return { provider, baseUrl, model, apiKey };
+  return { model, binding: env.AI };
 }
 
 /** One public error for every upstream failure; the reason is intentionally not logged (no console in this file). */
@@ -429,62 +379,10 @@ function unavailable(): HttpError {
 }
 
 /**
- * MiniMax's existing OpenAI-compatible chat completions wire format.
- */
-async function callMiniMax(
-  config: MiniMaxConfig,
-  question: string,
-  transport: FetchTransport,
-  timeoutMs: number,
-): Promise<string> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    let response: Response;
-    try {
-      response = await transport(`${config.baseUrl}/chat/completions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: config.model,
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content: question },
-          ],
-          max_tokens: UPSTREAM_MAX_TOKENS,
-          temperature: UPSTREAM_TEMPERATURE,
-        }),
-        signal: controller.signal,
-      });
-    } catch {
-      throw unavailable();
-    }
-    if (!response.ok) throw unavailable();
-
-    const text = await response.text();
-    if (new TextEncoder().encode(text).byteLength > MAX_UPSTREAM_RESPONSE_BYTES) throw unavailable();
-    let payload: unknown;
-    try {
-      payload = JSON.parse(text) as unknown;
-    } catch {
-      throw unavailable();
-    }
-    const content = extractMessageContent(payload);
-    if (content === null) throw unavailable();
-    return content;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-/**
  * Native Workers AI only. No REST token, gateway, retry or secondary provider.
- * Abort the request at the same deadline as MiniMax. The race also bounds the
- * response if a binding does not promptly acknowledge cancellation; aborting
- * is not a promise that already-started Cloudflare inference is unbilled.
+ * The deadline also bounds the response if a binding does not promptly
+ * acknowledge cancellation; aborting is not a promise that already-started
+ * Cloudflare inference is unbilled.
  */
 async function callCloudflare(
   config: CloudflareConfig,
@@ -522,13 +420,6 @@ async function callCloudflare(
   } finally {
     clearTimeout(timer);
   }
-}
-
-function extractMessageContent(payload: unknown): string | null {
-  if (!isRecord(payload) || !Array.isArray(payload.choices)) return null;
-  const first: unknown = payload.choices[0];
-  if (!isRecord(first) || !isRecord(first.message)) return null;
-  return typeof first.message.content === "string" ? first.message.content : null;
 }
 
 /** The only thing read from the model: candidate hrefs. Every other key ("intent", "answer", ...) is dropped. */
@@ -617,6 +508,7 @@ export async function answerAssistQuestion(
       kind: "official_exit",
       answer: SAFETY_ANSWER,
       links: catalogueLinks(SAFETY_LINK_HREFS),
+      provider: "cloudflare",
     });
   }
 
@@ -628,6 +520,7 @@ export async function answerAssistQuestion(
       kind: "official_exit",
       answer: JUDGMENT_ANSWER,
       links: officialExitLinks(input.question),
+      provider: "cloudflare",
     });
   }
 
@@ -658,7 +551,7 @@ export async function answerAssistQuestion(
   const reserved = await reserveDailyQuota(env.DB, perthDate(now), parseDailyCap(env.ASSIST_DAILY_CAP));
   if (!reserved) return overCapResponse();
 
-  const config = resolveProviderConfig(env);
+  const config = resolveCloudflareConfig(env);
   if (config === null) {
     throw new HttpError(503, "assist_not_configured", "站內 AI 兜底尚未啟用。");
   }
@@ -667,9 +560,7 @@ export async function answerAssistQuestion(
     DEFAULT_ASSIST_TIMEOUT_MS,
     Math.max(500, dependencies.assistTimeoutMs ?? DEFAULT_ASSIST_TIMEOUT_MS),
   );
-  const content = config.provider === "cloudflare"
-    ? await callCloudflare(config, input.question, timeoutMs)
-    : await callMiniMax(config, input.question, dependencies.assistTransport ?? fetch, timeoutMs);
+  const content = await callCloudflare(config, input.question, timeoutMs);
   const composed = composeAssistReply(parseModelReply(content));
 
   return jsonResponse({
@@ -677,6 +568,6 @@ export async function answerAssistQuestion(
     kind: composed.kind,
     answer: composed.answer,
     links: composed.links,
-    provider: config.provider,
+    provider: "cloudflare",
   });
 }
