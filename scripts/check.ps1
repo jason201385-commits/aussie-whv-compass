@@ -1789,7 +1789,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 & node (Join-Path $dir 'scripts\test_search_ui.mjs')
 if ($LASTEXITCODE -ne 0) {
-  Write-Output 'FAIL 搜尋載入恢復與焦點行為驗收失敗（scripts/test_search_ui.mjs；P1-26）'
+  Write-Output 'FAIL 搜尋載入恢復與焦點行為驗收失敗（scripts/test_search_ui.mjs；P1-30）'
   $errors++
 }
 & node (Join-Path $dir 'scripts\clarifier-contract.mjs')
@@ -3644,7 +3644,7 @@ if (Test-Path $assistWorkerPath) {
   }
 }
 
-# 自動核對新聞（P1-25）：前台只讀已核對資料，後端固定官方來源與雙層 gate。
+# 自動核對新聞（P1-29）：前台只讀已核對資料，後端固定官方來源與雙層 gate。
 $newsPagePath = Join-Path $dir 'news.html'
 $newsJsPath = Join-Path $dir 'assets\news.js'
 $newsWorkerPath = Join-Path $workerDir 'src\news.ts'
@@ -3652,7 +3652,7 @@ $newsSourcesPath = Join-Path $workerDir 'src\news-sources.ts'
 $newsMigrationPath = Join-Path $workerDir 'migrations\0004_verified_news.sql'
 $newsTopicsMigrationPath = Join-Path $workerDir 'migrations\0005_news_topics.sql'
 if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Test-Path $newsWorkerPath) -or -not (Test-Path $newsSourcesPath) -or -not (Test-Path $newsMigrationPath) -or -not (Test-Path $newsTopicsMigrationPath)) {
-  Write-Output 'FAIL [P1-25] 缺 news.html、assets/news.js、Worker 新聞模組或 0004–0005 migration'
+  Write-Output 'FAIL [P1-29] 缺 news.html、assets/news.js、Worker 新聞模組或 0004–0005 migration'
   $errors++
 } else {
   $newsPageText = [System.IO.File]::ReadAllText($newsPagePath, [System.Text.Encoding]::UTF8)
@@ -3677,7 +3677,7 @@ if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Te
   )) {
     if (-not $newsPageText.Contains($newsPageNeedle)) { Write-Output "FAIL [news.html] 缺時間、來源或查核邊界：$newsPageNeedle"; $errors++ }
   }
-  # P1-27：人工提醒獨立於 API，保留日期性質、適用地區與原文查核界線。
+  # P1-31：人工提醒獨立於 API，保留日期性質、適用地區與原文查核界線。
   foreach ($importantNeedle in @(
     'id="important-updates"',
     'id="official-check"',
@@ -3724,7 +3724,7 @@ if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Te
     if (-not $newsMigrationText.Contains($tableNeedle)) { Write-Output "FAIL [0004_verified_news.sql] 缺 verified-only 資料契約：$tableNeedle"; $errors++ }
   }
   if (-not $newsTopicsMigrationText.Contains('ADD COLUMN topics_json') -or -not $newsWorkerText.Contains('topics: candidate.classification.topics')) {
-    Write-Output 'FAIL [P1-25] 多主題新聞必須保存 topics_json，不能只靠 primary topic 篩選'
+    Write-Output 'FAIL [P1-29] 多主題新聞必須保存 topics_json，不能只靠 primary topic 篩選'
     $errors++
   }
   if (-not $workerConfig.Contains('"47 */6 * * *"') -or -not $workerConfig.Contains('"17 3 * * *"')) {
@@ -3733,12 +3733,12 @@ if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Te
   }
   $workerIndexText = [System.IO.File]::ReadAllText((Join-Path $workerDir 'src\index.ts'), [System.Text.Encoding]::UTF8)
   if (-not $workerIndexText.Contains('Allow: /api/news\nDisallow: /') -or -not $crawlerPolicyText.Contains('https://api.aussiewhvcompass.com/api/news')) {
-    Write-Output 'FAIL [P1-25] 公開新聞 JSON 必須有精確 crawler 例外，其他 API 維持禁止'
+    Write-Output 'FAIL [P1-29] 公開新聞 JSON 必須有精確 crawler 例外，其他 API 維持禁止'
     $errors++
   }
   & node (Join-Path $dir 'scripts\test_news_ui.mjs')
   if ($LASTEXITCODE -ne 0) {
-    Write-Output 'FAIL [P1-25] 新聞前台渲染／篩選／降級回放未通過'
+    Write-Output 'FAIL [P1-29] 新聞前台渲染／篩選／降級回放未通過'
     $errors++
   }
 }
