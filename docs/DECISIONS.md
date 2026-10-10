@@ -1,6 +1,6 @@
 # 澳打指南針 — 決策與證據日誌（DECISIONS）
 
-> 版本 2.0｜最後更新 2026-10-09｜按日期遞增的決策紀錄（ADR 風格）。
+> 版本 2.0｜最後更新 2026-10-11｜按日期遞增的決策紀錄（ADR 風格）。
 > 規格檔只寫「現在是什麼」；為什麼變成這樣、誰在哪一天拍板、當時的本機證據與反方裁決，
 > 全部寫在這裡。新增條目只能往後加，不改舊條目；要推翻舊決策就寫新條目並標「取代 D-…」。
 > 條目格式：決策／理由／證據／影響／狀態。commit 以短 hash 指向 `main` 歷史。
@@ -608,3 +608,12 @@ P1-24 已由 PR #2／Pages run 35111266701 成功發布，本次同步其 ROADMA
 - GitHub 發布：功能 commit `3ad5b495599a5cb384267415efd3b3975c6248f1` 與本機驗收 tree `b88bad13e47aba26247c1a452798f22a4e1be15f` 一致；[PR #6](https://github.com/jason201385-commits/aussie-whv-compass/pull/6) 合併為 `97194838d55ca6e19acdb59a887dfad830cf2ad2`。main 的 [AI discovery consistency](https://github.com/jason201385-commits/aussie-whv-compass/actions/runs/37850646906) 與 [GitHub Pages deployment](https://github.com/jason201385-commits/aussie-whv-compass/actions/runs/37850646154) 均回 success。
 - 公開檔案驗收：正式 `www` 網域的 `api-config.js`、`main.js`、`style.css`、`search-index.js` 均回 200，位元組與本機發布版相同；首頁與 About 已引用 `20261009-03` 且不含舊供應商。HTML 另有 Cloudflare 注入的 beacon 與 Email Obfuscation，不能將 HTML 稱為逐位元相同。直接用 Chromium 開正式網址回 `net::ERR_EMPTY_RESPONSE`，尚未進入互動；這是本環境驗收未完成的證據，不足以判定網站故障，也不能用本機 20 案代替正式回放。
 - 正式後端仍待部署：以正式 Origin、空 JSON body 作不會進模型的路由核對，舊 `/api/assist` 回 400 `assist_fields_invalid`，新 `/api/assist/cloudflare` 回 404 `not_found`。因此尚未把新 Worker 或舊路由 410 視為正式完成；本次沒有送出問題／Turnstile token、呼叫真實模型或刪除遠端 secret。前端 local 讓新版訪客可先使用搜尋，Cloudflare 帳戶內的部署與驗收仍依 Worker 手冊完成。
+
+## D-2026-10-11-01 P1-29 正式資料庫、新聞排程與真實資料匯入
+
+- 站長要求繼續完成自動新聞。正式 D1 只剩 0004／0005 待套用，兩者均成功；先保存 Time Travel bookmark、舊表名稱與前 Worker version。新 migration 只增加新聞資料表／欄位，不重跑舊的破壞性 migration、不讀寫 CRM 內容。
+- 獨立 QA 重現來源 headers 已到但 body 卡住的問題。12 秒期限改為涵蓋 fetch、狀態／類型／網址驗證與 bounded body，並取消 reader；無回應 transport／取消 Promise 都不能無限拖住來源輪替。新聞 focused tests 14 案例通過，並保留所有來源與內容 gate。
+- 保留 GitHub 最新 P1-32 本機找答案／Cloudflare 原生備援與退休的舊端點；前台 assistMode 維持 local，不呼叫模型。整合版 Worker 首次正式發布 version `490a0d80-5d5c-42e9-94ee-7887580e0013`（git `ee2b88f881815c38d4a1d3906ea8a8865c3d2648`），自訂 API 網域及兩支原 Cron 已更新。
+- 本機 HTTP 與遠端 preview 管理測試被 Cloudflare 1010／403 拒絕，沒有換 UA、改 WAF、擴 CORS 或新開 public trigger。改以既有 owner OAuth，在 loopback 專用單次 POST 管理入口、僅綁定正式 D1，使用相同 syncOfficialNews 與驗證規則做首次匯入。這是本機 workerd executor → 正式 D1 的真來源匯入，不冒充自然 Cron／Cloudflare executor 已完成抓取。
+- 第一次匯入 CAV 8 項全部通過官方原文、標題與內容雜湊核對；Scamwatch HTTP 403、JSA／Health 逾時，保留 degraded。8 項發布於 2026-08-04～2026-09-22，標題相符分數全部 1。10 月 1 日的買房公告不符合既有 WHV 類別，因此本月空結果正常；不改相關性條件或資料日期來補量。
+- 新增固定近 90 天入口，讓使用者能讀到已核對的跨月消息；保留今天／本週／本月與原 API 預設。公開網頁已以真瀏覽器讀到正式來源狀態；直接 health URL 仍被客戶端阻擋，沒有繞過。自然 Cron 的第一次觸發證據仍須另驗，不能由 deployment 回執代替。

@@ -3,6 +3,7 @@ import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppEnv } from "../src/index";
 import { articleTitleMatch, classifyNews, parseOfficialFeed, syncOfficialNews } from "../src/news";
+import { upsertVerifiedNews } from "../src/news-repository";
 import { NEWS_SOURCES, type NewsSource } from "../src/news-sources";
 
 const fixedNow = new Date("2026-10-02T00:00:00.000Z");
@@ -76,6 +77,50 @@ afterEach(() => { vi.useRealTimers(); });
 
 function inputUrl(input: Parameters<typeof fetch>[0]): string {
   return typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+}
+
+async function seedVerifiedDates(dates: string[]): Promise<void> {
+  // The Workers test database is shared within this file; replace only its news fixture rows.
+  await env.DB.prepare("DELETE FROM news_items").run();
+  const source = NEWS_SOURCES.find((candidate) => candidate.id === "consumer-vic");
+  if (source === undefined) throw new Error("missing source fixture");
+  const fixture = fixtureFor(source);
+  for (const [index, publishedAt] of dates.entries()) {
+    await upsertVerifiedNews(env.DB, {
+      newsId: `window-fixture-${index}`,
+      sourceId: source.id,
+      sourceName: source.name,
+      title: fixture.title,
+      summary: fixture.summary,
+      sourceUrl: `${fixture.url}-window-${index}`,
+      feedUrl: source.feedUrl,
+      publishedAt,
+      fetchedAt: "2026-10-11T00:00:00.000Z",
+      verifiedAt: "2026-10-11T00:00:00.000Z",
+      titleMatchScore: 1,
+      sourceContentHash: "a".repeat(64),
+      keywords: ["租屋", "VIC"],
+      primaryTopic: "housing",
+      topics: ["housing"],
+      jurisdiction: source.jurisdiction,
+    });
+  }
+}
+
+async function fetchNewsWindow(query: string, now: Date) {
+  const app = createApp({ now: () => now });
+  const ctx = createExecutionContext();
+  const response = await app.fetch(
+    new Request(`https://api.example.test/api/news${query}`, { headers: { Origin: "https://www.aussiewhvcompass.com" } }),
+    { ...env, TURNSTILE_SECRET_KEY: "unused-news-test", RATE_LIMIT_HMAC_KEY: "unused-news-test" },
+    ctx,
+  );
+  await waitOnExecutionContext(ctx);
+  const body = await response.json<{
+    window: { key: string; startAt: string };
+    items: Array<{ publishedAt: string; verification: { method: string; contentHash: string } }>;
+  }>();
+  return { response, body };
 }
 
 describe("verified official news", () => {
@@ -284,6 +329,8 @@ describe("verified official news", () => {
     expect(body.items.every((item) => item.keywords.length > 0)).toBe(true);
     expect(body.items.every((item) => item.verification.method === "official-feed+source-page")).toBe(true);
     expect(body.sources.every((source) => source.status === "healthy")).toBe(true);
+    expect((await fetchNewsWindow("?window=day", fixedNow)).body.window).toEqual({ key: "day", startAt: "2026-10-01T16:00:00.000Z" });
+    expect((await fetchNewsWindow("?window=week", fixedNow)).body.window).toEqual({ key: "week", startAt: "2026-09-27T16:00:00.000Z" });
   });
 
   it("returns a story through every matched topic instead of only its primary topic", async () => {
@@ -307,9 +354,53 @@ describe("verified official news", () => {
     });
   });
 
+  it("includes August and September verified news in recent while October month remains empty", async () => {
+    const dates = ["2026-08-04T00:00:00.000Z", "2026-09-22T00:00:00.000Z"];
+    await seedVerifiedDates(dates);
+    const now = new Date("2026-10-11T00:00:00.000Z");
+    const month = await fetchNewsWindow("?window=month", now);
+    const recent = await fetchNewsWindow("?window=recent", now);
+
+    expect(month.body.window).toEqual({ key: "month", startAt: "2026-09-30T16:00:00.000Z" });
+    expect(month.body.items).toEqual([]);
+    expect(recent.response.status).toBe(200);
+    expect(recent.response.headers.get("Access-Control-Allow-Origin")).toBe("https://www.aussiewhvcompass.com");
+    expect(recent.response.headers.get("Cache-Control")).toContain("max-age=300");
+    expect(recent.body.window).toEqual({ key: "recent", startAt: "2026-07-13T16:00:00.000Z" });
+    expect(recent.body.items.map((item) => item.publishedAt)).toEqual([...dates].reverse());
+    expect(recent.body.items.every((item) => item.verification.method === "official-feed+source-page" && /^[a-f0-9]{64}$/.test(item.verification.contentHash))).toBe(true);
+    expect((await fetchNewsWindow("?window=recent&topic=work", now)).body.items).toEqual([]);
+    expect((await fetchNewsWindow("?window=recent&topic=housing", now)).body.items).toHaveLength(2);
+  });
+
+  it("moves the inclusive 90-day cutoff at Perth midnight rather than UTC midnight", async () => {
+    const beforeCutoff = "2026-07-13T15:59:59.999Z";
+    const atCutoff = "2026-07-13T16:00:00.000Z";
+    await seedVerifiedDates([beforeCutoff, atCutoff]);
+    const before = await fetchNewsWindow("?window=recent", new Date("2026-10-10T15:59:59.999Z"));
+    const after = await fetchNewsWindow("?window=recent", new Date("2026-10-10T16:00:00.000Z"));
+
+    expect(before.body.window.startAt).toBe("2026-07-12T16:00:00.000Z");
+    expect(before.body.items.map((item) => item.publishedAt)).toEqual([atCutoff, beforeCutoff]);
+    expect(after.body.window.startAt).toBe("2026-07-13T16:00:00.000Z");
+    expect(after.body.items.map((item) => item.publishedAt)).toEqual([atCutoff]);
+  });
+
+  it("keeps the public 40-item limit for recent and the missing-window API default at day", async () => {
+    const dates = Array.from({ length: 41 }, (_item, index) => new Date(Date.parse("2026-09-22T00:00:00.000Z") + index * 60_000).toISOString());
+    await seedVerifiedDates(dates);
+    const now = new Date("2026-10-11T00:00:00.000Z");
+    const recent = await fetchNewsWindow("?window=recent", now);
+    const missing = await fetchNewsWindow("", now);
+
+    expect(recent.body.items.map((item) => item.publishedAt)).toEqual([...dates].reverse().slice(0, 40));
+    expect(missing.body.window).toEqual({ key: "day", startAt: "2026-10-10T16:00:00.000Z" });
+    expect(missing.body.items).toEqual([]);
+  });
+
   it("rejects unsupported window and topic values", async () => {
     const app = createApp({ now: () => fixedNow });
-    for (const query of ["window=year", "window=day&topic=politics"]) {
+    for (const query of ["window=year", "window=recently", "window=day&topic=politics", "window=recent&topic=politics"]) {
       const ctx = createExecutionContext();
       const response = await app.fetch(
         new Request(`https://api.example.test/api/news?${query}`),

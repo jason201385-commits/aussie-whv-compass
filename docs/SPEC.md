@@ -1,6 +1,6 @@
 # 澳打指南針 — 現況行為契約（SPEC）
 
-> 版本 2.0｜最後更新 2026-10-09｜本文件只寫「現在的行為是什麼、怎麼驗證」。
+> 版本 2.0｜最後更新 2026-10-11｜本文件只寫「現在的行為是什麼、怎麼驗證」。
 > 待辦與狀態在 `ROADMAP.md`，為什麼與證據在 `DECISIONS.md`，原則與架構在 `SDD.md`，
 > 閱讀路線在 `README.md`。改動任何功能行為時，必須在同一個 commit 更新本文件對應列並更新標頭日期。
 
@@ -43,7 +43,7 @@
 | `free.html` | 回程與延續／初登澳（工具頁） | 離澳免費二手版；GitHub 公開 Issue＋審核標籤、同城篩選、刊登草稿 | 有 | — |
 | `market.html` | 回程與延續／初登澳 | 離澳出清 × 初登澳補給：交換草稿產生器與平台入口 | 有 | 有 |
 | `communities.html` | 落地後找人 | 各地社團目錄：地區 × 需求的公開入口；不進全站 nav（同工具頁規則） | 有 | 有 |
-| `news.html` | 全階段 | 四張人工核對的近期重要提醒、官方快查、今天／本週／本月的自動新聞；來源與生效日期分列、每則回鏈來源；不進全站 nav | — | — |
+| `news.html` | 全階段 | 四張人工核對的近期重要提醒、官方快查、近 90 天／今天／本週／本月的自動新聞；來源與生效日期分列、每則回鏈來源；不進全站 nav | — | — |
 | `pr.html` | 已在澳洲 | PR 路徑總覽 | 有 | 有 |
 | `about.html` | 回程與延續（旅程第 12 站） | 關於、資料分層、回報、私人需求單、自願找路測試、共編、合作治理、贊助、授權、免責 | — | — |
 | `404.html` | 復原 | noindex；保留導覽與四階段旅程復原入口 | — | — |
@@ -62,6 +62,8 @@
 生活需求與重要提醒（P1-31）：首頁「生活卡關」提供十個直接深連結，涵蓋工資／薪資單、急搬、群傳政策、無車通勤、租屋 bills、車況、等待下簽、報稅、換匯與獨旅求助。新指南先列核對步驟與既有工具，不提供個案判定；住宿短住晚數加入 1 晚，使用者需核對目的地當地入住日。新聞頁上方的四張人工卡片包含適用地區、來源日期、啟用／開始／生效日期、官方原文、查核日與下一步；沒有可見來源日期時不猜填。卡片不依賴 API，不會自動重驗，並明示不代表即時緊急事故；官方快查另有 417／462 現行規則入口。下方 P1-29 自動 feed 仍保持獨立來源狀態與失敗降級。私人 LINE 匯出只用來發現需求，不發布逐字稿、可識別個案或群友資料；目前研究只涵蓋已取得的一個 Perth 群組，不能宣稱讀到所有澳洲群。
 
 站內搜尋與 Cloudflare AI（P1-32）：一般查找始終先在本機完成。`assistMode: "local"` 為尚未驗收遠端時的公開設定；只有明確 `cloudflare` 且 API origin／site key 完整，才提供未命中後的獨立 AI 動作。未指定、舊 `remote`、未知模式或遠端設定缺漏都只保留本機，不回到任何舊供應商。後端唯一原生 binding、專用路由與正式切換見 `worker/README.md`。
+
+P1-29 時間範圍：前台無合法 URL 選項時預設「近 90 天」，API 缺少 window 時仍維持 day；recent 從 Perth 當日零時往前 89 日，包含今日共 90 日。本機管理端首次匯入與 Cloudflare 自然 Cron 執行分別記錄；feed 最多解析前 40 項，相關候選最多核對 8 項，不能宣稱遍覽所有官方消息。
 
 搜尋互動加固（P1-30）：索引載入失敗或 10 秒逾時可在同頁重試並清理失敗 script／計時器；各入口共用 pending 與錯誤狀態。開啟立即聚焦輸入，載入完成不搶焦點；關閉後舊回應失效並返回來源，來源已移除、停用或 CSS 隱藏時返回 header 搜尋。中文 IME 組字期間不提交、不因 Escape 或斜線快捷鍵誤觸；正常狀態的重試鈕不顯示。
 
@@ -92,7 +94,7 @@
 | 6 題找職類 | 首頁 `#job-quiz`（由 `#job-quiz` hash 開啟；靜態六大類清單無 JS 可用） | 6 題各 3 個 chips：工作地點、體力、英文口說、互動程度、證照意願、偏遠意願 | 純前端計分到六大職類（採收與農場／餐飲與服務／清潔與房務／工廠倉儲與物流／零售與門市／辦公與專業）；答案不保存 | 職類結果＋`work.html` 錨點連結 | check.ps1 首頁區塊；vm 煙霧測試 78 斷言（暫存區，未入 repo） |
 | 各地社團目錄（首頁快覽） | 首頁 `#communities` | 地點搜尋框（60 字）、平台 select（全部／LINE／Reddit）、9 格州別地圖鈕、清除 | `main.js` 只在當頁過濾 `data-community-*` 條目；Facebook／Reddit 平台搜尋 href 由輸入或州名 `encodeURIComponent` 組成；不寫 storage、不 fetch；9 個公開入口（1 LINE＋8 Reddit）皆登錄 `third-party-register.json` | 過濾後清單＋狀態文字＋空結果提示＋兩個平台搜尋鈕 | check.ps1「商業合作與第三方入口」區塊（LINE 邀請連結全站只在首頁）；篩選邏輯無自動測試（人工） |
 | 各地社團目錄（完整頁，P1-21） | `communities.html`；入口為首頁入口卡與 21 個釐清器出口的「看公開討論」（帶 `?need=`） | 8 州＋全部地區 chips × 12 需求 chips；`?region=&need=` 可直接預套 | `community-directory.json` 是單一事實來源，HTML 是手寫鏡像，`check.ps1` 比對 id／entryType／到期日／入口網址；風險分級決定入口型態——`high-risk-intermediary`（找工作、租屋、集簽情報）永遠只有平台搜尋或說明卡，不得直連；`main.js` 只讀 `URLSearchParams`，不寫 storage、不改網址、不 fetch；平台搜尋依所選地區改寫查詢字串並顯示給使用者看 | 卡片含平台／入口型態／風險等級標籤、風險提示、邊界句、查核日與到期日；空結果提示 | check.ps1「社團目錄（P1-21）」區塊 7 項；到期的直連若仍出現 `entryUrl` 即 FAIL |
-| 自動核對新聞（P1-29） | `news.html`＋`assets/news.js`；`GET /api/news` | 今天／本週／本月、固定主題 chips；URL query 只接受 `window=day|week|month` 與白名單 topic；同一則消息可屬多個固定主題 | Worker 每 6 小時讀固定官方 feed；項目需同時通過官方來源白名單、HTTPS 原文同網域、日期合理、原文 HTML 可取、標題相符度至少 0.6 才寫 D1 公開表；不儲存未核對全文、不用 AI 摘要或自由分類；來源失敗保留狀態且不把空結果說成無新聞；前端只用 `textContent`／DOM API，`credentials:omit`、`no-referrer`、不寫 storage；`/robots.txt` 只開放此公開 read-only endpoint，其他 API 禁止爬取 | 每則最多 5 個固定關鍵字、一句 feed 摘要、官方原文、發布時間、核對時間；來源最近同步狀態；最多 40 則 | `worker/test/news.test.ts` 8 案例＋`scripts/test_news_ui.mjs`；check.ps1「自動核對新聞（P1-29）」；尚未部署時不得宣稱已自動更新 |
+| 自動核對新聞（P1-29） | `news.html`＋`assets/news.js`；`GET /api/news` | 近 90 天／今天／本週／本月、固定主題 chips；URL query 只接受 `window=recent|day|week|month` 與白名單 topic；同一則消息可屬多個固定主題 | Worker 每 6 小時讀固定官方 feed；項目需同時通過官方來源白名單、HTTPS 原文同網域、日期合理、原文 HTML 可取、標題相符度至少 0.6 才寫 D1 公開表；不儲存未核對全文、不用 AI 摘要或自由分類；下載的 12 秒總期限同時包含 headers 與 bounded body；來源失敗保留狀態且不把空結果說成無新聞；前端只用 `textContent`／DOM API，`credentials:omit`、`no-referrer`、不寫 storage；`/robots.txt` 只開放此公開 read-only endpoint，其他 API 禁止爬取 | 每則最多 5 個固定關鍵字、一句 feed 摘要、官方原文、發布時間、核對時間；來源最近同步狀態；最多 40 則 | `worker/test/news.test.ts` 8 案例＋`scripts/test_news_ui.mjs`；check.ps1「自動核對新聞（P1-29）」；尚未部署時不得宣稱已自動更新 |
 | 站內搜尋與 Cloudflare AI（C-4／P1-32） | 首頁 `#assist` 與其他根層頁面 `#assist-dialog` 共用邏輯；`assistEnabled` 控制入口，`lang/` 不載入此功能 | 本機 2–200 字；AI 4–200 字與 Turnstile | 一般送出只比對公開索引，不載入驗證、不送出問題；可信主題／答案最多選 3 個入口。未命中且 Cloudflare 模式有效時，另選 AI 動作才揭露資料接收者與載入驗證，再次確認後 POST `/api/assist/cloudflare`，body 只有 `{question, turnstileToken}`，`credentials: omit`、`no-referrer`。安全／個人判定先給固定出口；編輯、取消或關閉即撤銷待送問題、token 與舊請求。舊 `/api/assist` 固定 410，不讀取或轉發問題 | 本機結果標為本站整理；AI 成功回覆必須標明 `provider: "cloudflare"`，模型只選白名單 href，文字由固定模板組成。驗證、額度、網路、設定或供應商異常保留可用本機入口；晚到的驗證或回應不得重開、重畫、移焦點或恢復同意 | `scripts/test_local_assist.mjs`、`test_search.mjs`、`test_search_ui.mjs`、`clarifier-contract.mjs`、`worker/test/assist.test.ts` 與 `check.ps1`；正式啟用狀態見 ROADMAP P1-32 |
 | 全站搜尋（P0-9／P1-30） | header 搜尋鈕＋首頁 `#search`（h2「卡片裡沒有你的說法？直接搜尋」）＋JS dialog；手機釐清器底部固定「搜尋」鈕 | 關鍵詞；8 個熱門 chip 皆為 `<a href>` 直接綁錨點（`work.html#verify`、`visa.html#counting`、`housing.html#bond`、`prep.html#first-week`、`english.html#reality`、`cost.html#budget`、`lang/en/visa/#choose`、`health.html#insurance`；首頁與 dialog 一致，無 JS 可點）；鍵盤 `/` | 首次使用才載入 `search-index.js`（頁數與入口數以 `scripts/build_search.py` 的 `ALL_PAGES` 與產物 `entries` 為準；含 `lang/en/visa/` 與 21 個出口卡 `data-search-entry`）；查詢改寫：NFKC → 去疑問詞／語助詞（`SEARCH_STOP_WORDS`）後 AND 比對 → 仍零結果才二字詞 OR 降級（命中過半）並標示「已用相近詞找」；原詞 1.0、同義詞（索引 `keywords`，48 題意圖表）0.7；排除 `hidden`、`data-search-ui` 與未啟用 UI；不保存、不送出；動態文字只用 `textContent` | 最多 8 個同站深連結；零結果依序：釐清器 4 階段 chip → 安全列入口 → 只揭露「問一次 AI」按鈕（不自動開啟、不移焦點、不載入 Turnstile）→ GitHub 連結最後 | `python scripts/build_search.py --check` 與 `node scripts/test_search.mjs`（10 句零結果數 0、指定第 1 名、不回歸集；皆由 check.ps1 執行）；check.ps1「站內搜尋」「P0-9 搜尋強化」區塊；索引大小前後見 DECISIONS D-2026-09-03-02 |
 | 多國語言 Quick Start | 全站語言 select＋`lang/` | 38 種語言 | 49 個現行 417／462 首簽護照國家／地區映射到靜態 locale；`hreflang`、canonical、RTL、reviewStatus；不保存選擇 | 每語言一頁快速入口＋官方 417／462 連結；7 個完整英文頁為 editorial beta，未經母語專業校對不得標 reviewed | `python scripts/build_i18n.py --check`；check.ps1 七個「完整英文…頁」區塊 |

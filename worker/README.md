@@ -157,3 +157,12 @@ Contact API 的確認信走 Resend HTTP API（`POST https://api.resend.com/email
 回滾：先把 `contactSubmitEnabled` 改回 `false` 並 push；需要停寄信時可 `npx wrangler secret delete RESEND_API_KEY --env production` 後再 deploy（會回到 DisabledMailTransport，案件仍會寫入且 `emailStatus:"queued"`）。
 
 住宿平台另須逐一通過 [`docs/ACCOMMODATION_PROVIDER_ONBOARDING.md`](../docs/ACCOMMODATION_PROVIDER_ONBOARDING.md)；沒有平台合約／書面許可時，不能把 provider mock 或外部入口稱為站內即時房源。
+
+## 2026-10-11 新聞正式啟用紀錄
+
+- 正式 D1 `0004_verified_news.sql`／`0005_news_topics.sql` 均成功；保留舊 CRM schema 與內容。
+- `GET /api/news` 支援 `recent|day|week|month`。recent 為 Perth 當日零時往前 89 日；API 缺參數仍預設 day。前台預設近 90 天，不能把不同發布日期的資料說成本月新聞。
+- 來源 feed＋原文保留白名單、大小、日期、標題與 SHA-256 gate；總下載期限 12 秒含 headers＋完整 bounded body，逾時不阻塞後續來源。
+- 首次真資料匯入由只綁定正式 D1 的 loopback 管理 executor 執行，8 則 CAV 通過；Scamwatch 403、JSA／Health timeout 保留來源異常。執行位置是本機 workerd，不代表 Cloudflare 出站結果。
+- 正式排程保留 `47 */6 * * *` 新聞同步及 `17 3 * * *` 既有保留期清理；自然 Cron 首次執行與來源恢復仍待讀回。沒有新增 public sync route、放寬 WAF/CORS 或呼叫模型。
+- 版本與發布、公開網頁回放證據見 `docs/DECISIONS.md` D-2026-10-11-01；回滾 Worker 時通常保留新增的新聞 schema，不用整庫 Time Travel 回退 CRM。

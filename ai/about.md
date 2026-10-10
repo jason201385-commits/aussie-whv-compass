@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/about.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-10-09
+- 來源內容修改日期（不是本次事實查核）: 2026-10-11
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: no-evidence-card
 - 證據卡查核日期: 未記錄
@@ -146,7 +146,7 @@ LEVEL 3
 
 - 恢復、修正或永久移除都在公開登錄表留下日期、理由與狀態；付款方不能要求刪除必要的負面資訊。
 
-[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
+[查看第三方關係登錄表（JSON）](https://www.aussiewhvcompass.com/third-party-register.json?v=20261011-01) [公開回報錯誤或疑慮](https://github.com/jason201385-commits/aussie-whv-compass/issues/new?template=report.yml) [含敏感資料時改用私人聯絡](https://www.aussiewhvcompass.com/about.html#private-contact)
 
 ## 留下感謝與肯定
 

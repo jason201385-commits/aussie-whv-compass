@@ -458,7 +458,7 @@
       else resolveLoad(entries);
     };
     searchLoadCancel = function () { finish(new Error("search closed")); };
-    script.src = "assets/search-index.js?v=20261009-03";
+    script.src = "assets/search-index.js?v=20261011-01";
     script.async = true;
     script.onload = function () {
       if (window.WHV_SEARCH_INDEX && Array.isArray(window.WHV_SEARCH_INDEX.entries)) {

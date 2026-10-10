@@ -30,7 +30,7 @@ from build_task_answers import load as load_task_answers, search_answer
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "search-index.js"
-VERSION = "2026-10-09"
+VERSION = "2026-10-11"
 TASK_DATA = load_task_answers()
 TASK_BY_HREF = {a["href"]: a for a in TASK_DATA["answers"]}
 # P0-9 驗收 8：索引檔大小增加不得超過改版前（178,908 bytes）的 30%。

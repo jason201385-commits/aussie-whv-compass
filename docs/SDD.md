@@ -1,6 +1,6 @@
 # 澳打指南針 — 系統設計文件（SDD）
 
-> 版本 2.0｜最後更新 2026-10-09｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
+> 版本 2.0｜最後更新 2026-10-11｜本文件是「憲法與架構」：只寫不可協商的原則、系統邊界、
 > 資料契約、設計 token 與教訓。功能行為在 `SPEC.md`，待辦狀態在 `ROADMAP.md`，
 > 決策與證據在 `DECISIONS.md`，閱讀路線在 `README.md`。改動本文件的任一條原則都必須先在
 > `DECISIONS.md` 新增站長條目。
@@ -330,3 +330,5 @@ inline link 持續顯示底線，不只靠顏色辨識；官方來源連結必�
 
 `answers.json` → `scripts/build_task_answers.py` → 原生 HTML 卡片；同一筆資料經 `build_search.py` 產生小型 `answer` 欄位供 `main.js` 的精確整題查詢使用，再由現有 `build_seo.py` 產生閱讀版。產生格式不等於重新查核。所有新內容對人與爬蟲一致；不新增新頁面、不增加問答 API，也不切換量測開關。
 `assets/cash-runway.js` 為獨立純函式與 DOM adaptor，不修改原本存錢試算器的資料／storage 契約。新增入口以原生連結為基線；缺 JavaScript 時仍能讀條件與公式。金額不進 URL、事件、storage 或遠端。操作結果加 `data-ai-exclude` 並排除搜尋。
+
+2026-10-11 更新（P1-29）：正式 D1 新聞 schema、Worker/API 與原兩支 Cron 已更新；下載 12 秒總期限包含回應本文。專用本機管理 executor 首次匯入 8 則 CAV 已核對資料，其他三源標示 degraded；自然 Cron 實際首次觸發仍另驗。前台新增固定 recent（含當日 90 天）範圍，完整回執見 DECISIONS D-2026-10-11-01。

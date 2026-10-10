@@ -14,6 +14,8 @@ const FEED_MAX_BYTES = 1_000_000;
 const ARTICLE_MAX_BYTES = 320_000;
 const FETCH_TIMEOUT_MS = 12_000;
 const MAX_ITEMS_PER_SOURCE = 8;
+const NEWS_WINDOWS = ["day", "week", "month", "recent"] as const;
+type NewsWindow = (typeof NEWS_WINDOWS)[number];
 const TOPIC_IDS = ["work", "housing", "visa", "money", "safety", "health", "transport", "weather", "general"] as const;
 type NewsTopic = (typeof TOPIC_IDS)[number];
 
@@ -356,7 +358,7 @@ export async function syncOfficialNews(
   return results;
 }
 
-function perthWindowStart(now: Date, windowKey: "day" | "week" | "month"): string {
+function perthWindowStart(now: Date, windowKey: NewsWindow): string {
   const perth = new Date(now.getTime() + 8 * 3_600_000);
   const year = perth.getUTCFullYear();
   const month = perth.getUTCMonth();
@@ -369,6 +371,9 @@ function perthWindowStart(now: Date, windowKey: "day" | "week" | "month"): strin
   } else if (windowKey === "month") {
     startDay = 1;
     startMonth = month;
+  } else if (windowKey === "recent") {
+    // Include today plus the previous 89 Perth calendar days.
+    startDay = date - 89;
   }
   return new Date(Date.UTC(year, startMonth, startDay, 0, 0, 0) - 8 * 3_600_000).toISOString();
 }
@@ -387,10 +392,10 @@ function publicNewsResponse(body: unknown): Response {
 export async function getVerifiedNews(request: Request, db: D1Database, now = new Date()): Promise<Response> {
   const url = new URL(request.url);
   const requestedWindow = url.searchParams.get("window") ?? "day";
-  if (!(["day", "week", "month"] as const).includes(requestedWindow as "day" | "week" | "month")) {
-    throw new HttpError(400, "news_window_invalid", "新聞區間只接受 day、week 或 month。");
+  if (!NEWS_WINDOWS.includes(requestedWindow as NewsWindow)) {
+    throw new HttpError(400, "news_window_invalid", "新聞區間只接受 day、week、month 或 recent。");
   }
-  const windowKey = requestedWindow as "day" | "week" | "month";
+  const windowKey = requestedWindow as NewsWindow;
   const requestedTopic = url.searchParams.get("topic");
   const topic = requestedTopic === null || requestedTopic === "all" ? null : requestedTopic;
   if (topic !== null && !TOPIC_IDS.includes(topic as NewsTopic)) {

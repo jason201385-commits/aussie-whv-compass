@@ -1,6 +1,6 @@
 # 澳打指南針 — 路線圖與待辦狀態（ROADMAP）
 
-> 版本 2.0｜最後更新 2026-10-09｜這是全部 P0／P1／P2 編號的**唯一來源**。
+> 版本 2.0｜最後更新 2026-10-11｜這是全部 P0／P1／P2 編號的**唯一來源**。
 > 任何規格檔（`SPEC.md`、`PERFORMANCE_AND_RETENTION_SPEC.md`、`CLARIFIER_SPEC.md`）
 > 只能引用這裡已存在的 ID；新增 ID 先在本表登記，`scripts/check.ps1` 會檢查。
 > 狀態敘述與證據不寫在這裡，寫在 `DECISIONS.md`，本表只留一行狀態與指標。
@@ -60,9 +60,9 @@
 | P1-25 | 免費二手入口、手機操作與同城分享 | 程式完成／本機驗證 | 正式發布及實機分享仍需驗收 | SPEC §7 | scripts/test_free_board_access.cjs、test_free_board_access_browser.cjs |
 | P1-27 | 新手任務入口、適用條件答案卡與無收入緩衝期 | 程式完成／本機驗證 | 正式發布待驗收；真人任務測試與推廣未執行 | SPEC §9、TASK_FIRST_ROLLOUT.md | scripts/test_task_answers.py、test_task_answers.cjs、test_task_answers_browser.cjs |
 | P1-28 | 常見問題研究與情境模擬器 v2 | 程式完成／本機驗證 | 正式站回放須等本輪部署後執行 | WHV_COMMON_PROBLEMS_RESEARCH.md、SPEC §1.2 | D-2026-09-12-01～03 |
-| P1-29 | 官方消息自動核對與關鍵字新聞區 | 程式完成／本機驗證 | 正式 D1 0004–0005、Worker Cron/API 與前端須協調部署；部署後做來源同步與 live 回放 | SPEC §1.2、SDD §3.1 | D-2026-10-02-01 |
-| P1-30 | 搜尋恢復與手機導覽加固 | 程式完成／本機驗證 | 正式站回放待部署 | SPEC §1.1～1.2 | D-2026-10-03-01 |
-| P1-31 | LINE 需求研究與近期重要消息入口 | 程式完成／本機驗證 | 僅取得一個澳洲群組；其他群組匯出尚未取得；正式新聞 API 2026-10-03 回 404，P1-29 仍待協調部署 | SPEC §1.2 | D-2026-10-03-02 |
+| P1-29 | 官方消息自動核對與關鍵字新聞區 | 部分完成（正式 D1／Worker／API，手動首次匯入已驗） | 自然 Cron 首次觸發另驗；Scamwatch／JSA／Health 來源暫降級；不擴核對門檻 | SPEC §1.2、SDD §3.1 | D-2026-10-11-01 |
+| P1-30 | 搜尋恢復與手機導覽加固 | 程式完成／本機驗證 | 前台已發布，正式手機回放另驗 | SPEC §1.1～1.2 | D-2026-10-03-01 |
+| P1-31 | LINE 需求研究與近期重要消息入口 | 程式完成／本機驗證 | 僅取得一個澳洲群組；其他群組匯出尚未取得；正式前台已發布；新聞後端已更新，來源與自然 Cron 狀態見 P1-29 | SPEC §1.2 | D-2026-10-03-02 |
 | P1-32 | 站內搜尋與 Cloudflare 單一 AI 入口 | 程式完成／本機驗證 | local 前端已發布並核對公開資產；正式瀏覽器回放、Cloudflare Worker／binding／模型驗收及舊 secret 清除未完成 | SPEC §1.2、worker/README.md | DECISIONS D-2026-10-09-03；PR #6 |
 | P2-1 | 雙主題「Red Centre／Coast」切換 | 未開始 | 先解 token 三態、附設計稿 | ROADMAP §2.2 | — |
 | P2-2 | 英文版（i18n） | 部分完成（Quick Start 38 語言＋7 頁完整英文 beta） | 母語或合格專業人士校對後才可標 reviewed | SPEC §1.2 | ab6dbbf、6cc0450、30b7902 |

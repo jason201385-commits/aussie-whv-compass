@@ -3691,6 +3691,7 @@ if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Te
   $newsMigrationText = [System.IO.File]::ReadAllText($newsMigrationPath, [System.Text.Encoding]::UTF8)
   $newsTopicsMigrationText = [System.IO.File]::ReadAllText($newsTopicsMigrationPath, [System.Text.Encoding]::UTF8)
   foreach ($newsPageNeedle in @(
+    'data-news-window="recent"',
     'data-news-window="day"',
     'data-news-window="week"',
     'data-news-window="month"',
@@ -3702,7 +3703,7 @@ if (-not (Test-Path $newsPagePath) -or -not (Test-Path $newsJsPath) -or -not (Te
     '覆蓋範圍有限，沒有列出不代表沒有消息',
     '不是對政策影響的個案判定',
     'assets/news.js?v='
-    '<link rel="alternate" type="application/json" href="https://api.aussiewhvcompass.com/api/news?window=month&amp;topic=all"'
+    '<link rel="alternate" type="application/json" href="https://api.aussiewhvcompass.com/api/news?window=recent&amp;topic=all"'
   )) {
     if (-not $newsPageText.Contains($newsPageNeedle)) { Write-Output "FAIL [news.html] 缺時間、來源或查核邊界：$newsPageNeedle"; $errors++ }
   }

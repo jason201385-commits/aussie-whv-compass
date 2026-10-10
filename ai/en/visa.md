@@ -2,7 +2,7 @@
 
 - Canonical source: https://www.aussiewhvcompass.com/lang/en/visa/
 - Language: en
-- Source content modification date (not a new fact check): 2026-10-09
+- Source content modification date (not a new fact check): 2026-10-11
 - Editorial status: editorial-draft-unreviewed-by-native-domain-professional
 - Evidence scope: no-evidence-card
 - Evidence checked: Not recorded

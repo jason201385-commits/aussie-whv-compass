@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/market.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-10-09
+- 來源內容修改日期（不是本次事實查核）: 2026-10-11
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: first-action-only
 - 證據卡查核日期: 2026-09-01
@@ -68,7 +68,7 @@ Scamwatch 建議高價商品付款前看實物、使用平台建議的安全付�
 
 [**Facebook Marketplace**搜尋本地二手品；進站後重新確認地點與平台規則](https://www.facebook.com/marketplace/search/?query=working%20holiday) [**eBay Australia**搜尋可寄送或自取商品；付款與保障依平台條款](https://www.ebay.com.au/sch/i.html?_nkw=working+holiday) [**Gumtree Australia**開啟官方首頁後自行搜尋城市與品項](https://www.gumtree.com.au/) [**Facebook 購物安全中心**交易前先看平台安全、禁售品與檢舉說明](https://www.facebook.com/help/123884166448529/)
 
-關係狀態：全部為外部原始入口；無付費、無佣金、無資料交換｜2026-09-01 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03)
+關係狀態：全部為外部原始入口；無付費、無佣金、無資料交換｜2026-09-01 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20261011-01)
 
 ## 面交或付款前，五件事都要完成
 

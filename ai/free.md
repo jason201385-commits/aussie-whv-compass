@@ -2,7 +2,7 @@
 
 - 原始網頁: https://www.aussiewhvcompass.com/free.html
 - 語言: zh-Hant
-- 來源內容修改日期（不是本次事實查核）: 2026-10-09
+- 來源內容修改日期（不是本次事實查核）: 2026-10-11
 - 編輯狀態: human-edited-unreviewed-by-domain-professional
 - 證據卡範圍: no-evidence-card
 - 證據卡查核日期: 未記錄

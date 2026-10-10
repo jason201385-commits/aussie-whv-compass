@@ -1,9 +1,9 @@
 (function () {
   "use strict";
 
-  var ALLOWED_WINDOWS = ["day", "week", "month"];
+  var ALLOWED_WINDOWS = ["day", "week", "month", "recent"];
   var ALLOWED_TOPICS = ["all", "work", "housing", "visa", "money", "safety", "health", "transport", "weather"];
-  var windowKey = "day";
+  var windowKey = "recent";
   var topicKey = "all";
   var activeRequest = null;
 
@@ -176,7 +176,7 @@
       renderItems(payload.items);
       renderSources(payload.sources);
       var degraded = payload.sources.filter(function (source) { return source.status !== "healthy"; }).length;
-      var scope = windowKey === "day" ? "今天" : windowKey === "week" ? "本週" : "本月";
+      var scope = windowKey === "day" ? "今天" : windowKey === "week" ? "本週" : windowKey === "month" ? "本月" : "近 90 天";
       if (!payload.items.length) {
         status.textContent = scope + "尚無符合條件且通過核對的消息；這不代表沒有其他消息。";
       } else {
