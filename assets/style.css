@@ -1611,6 +1611,10 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .clarifier-assist-answer p { margin: 0 0 10px; }
 .clarifier-assist-answer ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .clarifier-assist-answer li { margin: 0; }
+.clarifier-assist-ai { margin-top: 16px; }
+.clarifier-assist-ai-panel { display: grid; gap: 12px; margin-top: 12px; padding: 16px; border: 1px solid var(--line-soft); border-radius: 12px; }
+.clarifier-assist-ai-panel h3 { margin: 0; }
+.clarifier-assist-ai .btn { max-width: 100%; min-height: 44px; white-space: normal; text-align: left; }
 .clarifier-panel[hidden],
 .clarifier-passport[hidden],
 .clarifier-passport-static[hidden],
@@ -1623,6 +1627,8 @@ body:not(.home-page) main > p { max-width: 76ch; }
 .clarifier-assist-off[hidden],
 .clarifier-assist-box[hidden],
 .clarifier-assist-form[hidden],
+.clarifier-assist-ai[hidden],
+.clarifier-assist-ai-panel[hidden],
 .clarifier-assist-answer[hidden] { display: none; }
 
 /* ---------- 卡片：奶油紙張與檸檬色布標 ---------- */

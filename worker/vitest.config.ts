@@ -8,6 +8,8 @@ const projectDirectory = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [
     cloudflareTest(async () => ({
+      // AI bindings must be mocked: never create a remote session or incur inference usage in tests.
+      remoteBindings: false,
       wrangler: { configPath: path.join(projectDirectory, "wrangler.jsonc") },
       miniflare: {
         bindings: {

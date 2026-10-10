@@ -364,7 +364,7 @@ LINE・PERTH・版主同意分享
 
 [Reddit・WA**r/perth**Perth／WA 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/perth/) [Reddit・NSW**r/sydney**Sydney 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/sydney/) [Reddit・VIC**r/melbourne**Melbourne 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/melbourne/) [Reddit・QLD**r/brisbane**Brisbane 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/brisbane/) [Reddit・SA**r/Adelaide**Adelaide 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/Adelaide/) [Reddit・ACT**r/canberra**Canberra 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/canberra/) [Reddit・NT**r/darwin**Darwin 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/darwin/) [Reddit・TAS**r/tasmania**Tasmania 公開在地討論・非 WHV 專屬・無合作關係](https://www.reddit.com/r/tasmania/)
 
-名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-01)
+名單僅代表入口曾可公開開啟，不代表內容背書；加入前仍要閱讀群規並自行查證｜2026-08-31 查核・[公開第三方關係登錄表](https://www.aussiewhvcompass.com/third-party-register.json?v=20261009-03)
 
 PLAY BEFORE REAL LIFE
 

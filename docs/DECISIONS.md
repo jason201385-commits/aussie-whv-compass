@@ -581,3 +581,30 @@ P1-24 已由 PR #2／Pages run 35111266701 成功發布，本次同步其 ROADMA
 - 私人 LINE 原文、研究目錄與既有 `.mailmap` 不上傳。GitHub Pages 發布只代表前端；自動新聞另需正式 D1 0004～0005、Worker／Cron 與成功來源同步證據，不能把推送成功當成後端啟用。
 - 本輪瀏覽器安全政策拒絕讀取原有錯誤頁（URL protocol not allowed），不以替代瀏覽器介面繞過；正式自訂網域的本機 HTTP 讀取也回 403。本輪將以本機驗收、GitHub Pages 回執與儲存庫版本核對發布，線上互動仍另列未驗證。
 - 發布前驗收：無損索引 198 入口／231,851 bytes，保留 232,580 bytes 上限；Node VM／Python 與原完整 payload 欄位及順序一致。完整 `scripts/check.ps1` exit 0、`ALL CHECKS PASSED (19 pages)`、Worker 68 tests 通過。修正檢查腳本的 Windows 換行處理，信箱斷言／測試 mock 同步遠端已更正設定；免費二手導覽測試改核對共用資產版本，避免固定舊日期。未弱化資料、權限或大小檢查。
+
+## D-2026-10-09-02 P1-32 以站內導覽提供不依賴 MiniMax 的替代處理
+
+- 請求與範圍：站長回報「AI 暫時無法回覆」，並確認原用 MiniMax，要求查看其他處理方式。本批準備獨立替代分支；不把研究替代方案解讀為新付費服務的正式啟用，亦不修改 Cloudflare 帳戶、secrets 或正式資料庫。
+- 原始證據：`fb0eff13ff24bb93db8f08984d6cd67af73cf4cc` 的 Worker 僅用 MiniMax 選取目錄連結，再以固定模板顯示；前端非 429 錯誤一律變成同一句。原句「到澳洲怎麼省錢比較好?」在既有搜尋純函式只回 `english.html#quick-answers`；「省錢」則以 `cost.html#food` 排第一。正式 `GET /api/health` 回 200，只能證明 Worker 路由在線，不能證明 MiniMax 金鑰或上游可用。
+- 實作方向：在原入口提供 `assistMode: "local"` 的站內導覽，不需要模型金鑰、Turnstile 或 `/api/assist`；先以主題訊號找既有站內內容，無可信命中時提供分類選項，不以弱近似結果冒充確定答案。保留原有敏感／個人判定固定出口、不保存問題、不自動寄信或傳送第三方。
+- 可選遠端：Worker 增加 `ASSIST_PROVIDER` 的明確切換，保留 MiniMax adapter，另支援 Cloudflare 原生 AI binding；不把 MiniMax key 或 URL 改送其他主機，不做跨供應商自動重試。兩種遠端仍共用驗證、限流、每日上限、站內白名單與固定模板。Cloudflare provider 的本機測試全部使用 mock，停用測試的 remote bindings。
+- 外部依據：Cloudflare 官方 [Workers AI bindings](https://developers.cloudflare.com/workers-ai/configuration/bindings/)、[Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/) 與 [pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)（2026-10-09 讀取）。免第三方模型 key 仍有 Cloudflare 配額與計費；binding 與 vars 必須在 production 明確列出。
+- 取代範圍：替代分支擴充 D-2026-09-02-01／D-2026-09-04-01 的 MiniMax 單一路徑，保留「AI 只兜底、問題不留痕、不能做個人判定」原則；不改原部署證據。
+- 驗證：原始完整 gate 與 Worker 68 案例先通過。替代 Worker 9 檔／77 案例、TypeScript、5 支本機 migration 與 dry-run 通過；新增本機／遠端 DOM 回放 20 案例，既有搜尋 198 入口、搜尋 UI 12 案例與釐清器 25 案例通過。全站資產（含手寫英文頁與動態索引 URL）升為 `20261009-02`，i18n／SEO／搜尋重建；索引保留 198 入口／231,388 bytes，未放寬 232,580 bytes 上限。檢查腳本同步新入口字面與跨平台 npm 呼叫，不放寬原資料／權限 gate。
+- 瀏覽器驗收：本機 HTTP＋Chromium 的 11 個案例通過，包含 1280px 首頁、390px 內容頁 dialog、原句三個正確深連結、未知題不硬選、安全／個人判定出口、遠端 503 備援與取消／關閉後的晚回應隔離。兩種 local 尺寸皆零 `/api/assist`、零 Turnstile 請求、storage 前後不變、無水平溢出或未捕捉 JavaScript 錯誤。網站外部連線全部攔截或 mock；此證據不等於正式部署、真實 Turnstile 或 Cloudflare 模型品質／延遲／用量驗收。
+- 最終整合回執：`scripts/check.ps1` exit 0、`ALL CHECKS PASSED (19 pages)`，含上述前後端案例、SEO／AI 閱讀／i18n／索引一致性、既有免費二手與工具回歸；`git diff --check` 通過。正式上線與真實 Cloudflare 模型驗收仍未執行。
+
+## D-2026-10-09-03 P1-32 移除 MiniMax，使用 Cloudflare 原生 AI 與站內搜尋
+
+- 站長新指示：明確要求「把 minimax 拿掉」，使用 Cloudflare 資源做站內搜尋或 AI 入口。此決定取代 D-2026-10-09-02 的雙供應商相容設計；保留已驗證的本站資料查找，不保留 MiniMax adapter、key／URL／model 設定或默認回退路徑。原決策與部署證據保留歷史，不再是現行設定指引。
+- 資料流：一般「找答案」只比對本站公開索引；沒有可信結果時才讓使用者另選 Cloudflare AI。AI 動作先揭露，再載入 Turnstile，完成驗證且確認送出才傳問題。編輯、取消或關閉會撤銷同意、清除 token，舊 callback／請求結果不得恢復已取消狀態。
+- 遷移：新端點為 `POST /api/assist/cloudflare`，Cloudflare 原生 binding 是唯一模型路徑。舊 `POST /api/assist` 固定回 410，不讀 body、不做 Turnstile／D1／模型呼叫，兩條路徑均不記 request log；避免舊快取仍顯示原供應商揭露卻被送往新的資料接收者。
+- Cloudflare 資源選擇：既有公開索引負責一般搜尋，Workers AI 原生 binding 負責受限的站內目錄選取，沿用 D1 每日聚合計數與 Turnstile。現有內容規模不需再引入整套遠端索引同步。官方 [AI Search 計費與資源](https://developers.cloudflare.com/ai-search/platform/limits-pricing/) 與 [AI Gateway 關係](https://developers.cloudflare.com/ai-search/configuration/models/ai-gateway/) 顯示 AI Search 另有索引、查詢與生成處理範圍；不把另一套服務當成此次必要相依。
+- 存取狀態：使用既有 Wrangler 執行 `whoami`，實際回覆 `You are not authenticated`。本輪已取得功能改動方向，但目前環境沒有 Cloudflare 部署憑證；不建立臨時帳號代替正式帳號，也不把程式驗證宣稱成模型已啟用。前端保持 local，直到正式 Worker／AI binding 與受控模型驗收完成。正式舊 Worker 與舊 secret 的清除須在可操作的站長帳號中完成。
+- 驗證基線：上一輪 PR #6 的 `e6ba8fb0b32e78ed65fa9714617e119892da3b9c` 已有完整 gate、77 個 Worker 案例與本機 Chromium 證據；本輪整合結果另附於本條，不能沿用舊案例數稱新路徑已驗證。
+- 本輪驗證：完整 `scripts/check.ps1` exit 0、`ALL CHECKS PASSED (19 pages)`；Worker 9 個測試檔／75 案例、TypeScript、既有本機 D1 migration 狀態檢查與 Wrangler dry-run 通過。搜尋保留 198 入口／231,349 bytes，未提高 232,580 bytes 上限；搜尋 UI 12、Local／Cloudflare Assist 23、釐清器 25 案例通過。資產版本統一 `20261009-03` 並重建 i18n／SEO／AI 閱讀／搜尋。
+- 獨立 Chromium 20／20：桌機 1280px 與手機 390px、本機省錢路由、無命中／敏感題不送模型、Cloudflare 兩步明示、舊／不完整設定降回本機、503／410／429／provider 不符備援、取消／修改／關閉後晚回應失效；刻意不提供 AbortController 仍能隔離舊回覆。未見水平溢位或未捕捉 JavaScript 錯誤，問題未存入瀏覽器儲存。全部外部請求模擬或封鎖，不代表正式模型、Turnstile 或帳戶設定已驗收。
+- 發布範圍：本批前端固定 `assistMode: "local"`。Repo workflows 沒有 Worker deploy、遠端 migration 或 secret 操作；Cloudflare 帳戶是否另設外部自動化尚未查驗。GitHub 發布回執與正式 Worker／舊 secret 完成證據必須分別記錄。
+- GitHub 發布：功能 commit `3ad5b495599a5cb384267415efd3b3975c6248f1` 與本機驗收 tree `b88bad13e47aba26247c1a452798f22a4e1be15f` 一致；[PR #6](https://github.com/jason201385-commits/aussie-whv-compass/pull/6) 合併為 `97194838d55ca6e19acdb59a887dfad830cf2ad2`。main 的 [AI discovery consistency](https://github.com/jason201385-commits/aussie-whv-compass/actions/runs/37850646906) 與 [GitHub Pages deployment](https://github.com/jason201385-commits/aussie-whv-compass/actions/runs/37850646154) 均回 success。
+- 公開檔案驗收：正式 `www` 網域的 `api-config.js`、`main.js`、`style.css`、`search-index.js` 均回 200，位元組與本機發布版相同；首頁與 About 已引用 `20261009-03` 且不含舊供應商。HTML 另有 Cloudflare 注入的 beacon 與 Email Obfuscation，不能將 HTML 稱為逐位元相同。直接用 Chromium 開正式網址回 `net::ERR_EMPTY_RESPONSE`，尚未進入互動；這是本環境驗收未完成的證據，不足以判定網站故障，也不能用本機 20 案代替正式回放。
+- 正式後端仍待部署：以正式 Origin、空 JSON body 作不會進模型的路由核對，舊 `/api/assist` 回 400 `assist_fields_invalid`，新 `/api/assist/cloudflare` 回 404 `not_found`。因此尚未把新 Worker 或舊路由 410 視為正式完成；本次沒有送出問題／Turnstile token、呼叫真實模型或刪除遠端 secret。前端 local 讓新版訪客可先使用搜尋，Cloudflare 帳戶內的部署與驗收仍依 Worker 手冊完成。

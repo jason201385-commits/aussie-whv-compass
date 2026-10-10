@@ -60,8 +60,8 @@ function createFetchHandler(dependencies: AppDependencies) {
   ): Promise<Response> {
     const url = new URL(request.url);
     const isAggregateMetric = url.pathname === "/api/metrics";
-    // /api/assist keeps no request log line either (CLARIFIER_SPEC §4).
-    const skipRequestLog = isAggregateMetric || url.pathname === "/api/assist";
+    // Active and retired assist routes keep no request log line (CLARIFIER_SPEC §4).
+    const skipRequestLog = isAggregateMetric || url.pathname === "/api/assist" || url.pathname === "/api/assist/cloudflare";
     const requestId = skipRequestLog ? "" : crypto.randomUUID();
     const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
     let origin: string | null = null;
@@ -110,6 +110,16 @@ function createFetchHandler(dependencies: AppDependencies) {
       } else if (request.method === "POST" && url.pathname === "/api/accommodation/search") {
         response = await searchLicensedAccommodation(request, env, dependencies);
       } else if (request.method === "POST" && url.pathname === "/api/assist") {
+        // Cached clients disclosed a different provider. Retire their endpoint
+        // without reading the question or touching verification, D1 or AI.
+        response = jsonResponse({
+          ok: false,
+          error: {
+            code: "assist_endpoint_retired",
+            message: "站內找答案已更新，請重新整理網頁，或改用站內搜尋。",
+          },
+        }, 410);
+      } else if (request.method === "POST" && url.pathname === "/api/assist/cloudflare") {
         response = await answerAssistQuestion(request, env, dependencies);
       } else {
         response = jsonResponse(
