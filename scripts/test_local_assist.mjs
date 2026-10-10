@@ -409,17 +409,39 @@ await test("驗證 script 載入失敗可返回本機，再次展開可重試", 
   assert.equal(h.fetchCalls.length, 0);
 });
 
+function compileAssistPattern(source, name) {
+  const declaration = new RegExp("(?:export const|var) " + name + " =\\s*([\\s\\S]*?);\\r?\\n");
+  const match = source.match(declaration);
+  assert(match, name + " declaration missing");
+  const compiled = vm.runInNewContext(match[1]);
+  assert.equal(Object.prototype.toString.call(compiled), "[object RegExp]", name + " must be a RegExp");
+  return compiled;
+}
+
 await test("個人判定正規式與 Worker 一致", () => {
   const frontend = read("assets/main.js");
   const backend = read("worker/src/assist.ts");
   for (const name of ["ASSIST_DETERMINATION", "ASSIST_TOPIC_VISA", "ASSIST_TOPIC_MEDICAL", "ASSIST_TOPIC_TAX", "ASSIST_TOPIC_WORK"]) {
-    const pattern = new RegExp("(?:export const|var) " + name + " =\\s*([\\s\\S]*?);\\n");
-    const left = frontend.match(pattern), right = backend.match(pattern);
-    assert(left && right, name);
-    const a = vm.runInNewContext(left[1]), b = vm.runInNewContext(right[1]);
+    const a = compileAssistPattern(frontend, name), b = compileAssistPattern(backend, name);
     assert.equal(a.source, b.source, name);
     assert.equal(a.flags, b.flags, name);
   }
+});
+
+await test("規則提取支援 LF／CRLF，仍辨識真實 pattern／flags 差異", () => {
+  const name = "ASSIST_DETERMINATION";
+  const lf = "var " + name + " =\n  /eligible\\s+visa/i;\n";
+  const crlf = lf.replaceAll("\n", "\r\n");
+  const a = compileAssistPattern(lf, name), b = compileAssistPattern(crlf, name);
+  assert.equal(a.source, String.raw`eligible\s+visa`);
+  assert.equal(a.source, b.source);
+  assert.equal(a.flags, b.flags);
+  const changedPattern = compileAssistPattern(crlf.replace("eligible", "qualified"), name);
+  assert.notEqual(a.source, changedPattern.source, "真實規則差異不能被換行正規化抹平");
+  const changedFlags = compileAssistPattern(crlf.replace("/i;", "/im;"), name);
+  assert.equal(a.source, changedFlags.source);
+  assert.notEqual(a.flags, changedFlags.flags, "flags 差異必須留給一致性守門判斷");
+  assert.throws(() => compileAssistPattern("var " + name + " = 42;\r\n", name), /must be a RegExp/);
 });
 
 if (failures.length) {
