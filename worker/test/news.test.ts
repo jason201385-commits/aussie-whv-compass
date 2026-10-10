@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppEnv } from "../src/index";
 import { articleTitleMatch, classifyNews, parseOfficialFeed, syncOfficialNews } from "../src/news";
 import { NEWS_SOURCES, type NewsSource } from "../src/news-sources";
@@ -72,6 +72,12 @@ const successfulNewsFetch: typeof fetch = async (input) => {
   return new Response("not found", { status: 404 });
 };
 
+afterEach(() => { vi.useRealTimers(); });
+
+function inputUrl(input: Parameters<typeof fetch>[0]): string {
+  return typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+}
+
 describe("verified official news", () => {
   it("parses only current HTTPS items from an allowed official host", () => {
     const source = NEWS_SOURCES[0];
@@ -124,6 +130,130 @@ describe("verified official news", () => {
     expect(rows.results).toHaveLength(NEWS_SOURCES.length);
     expect(rows.results.every((row) => row.verification_method === "official-feed+source-page")).toBe(true);
     expect(rows.results.every((row) => /^[a-f0-9]{64}$/.test(row.source_content_hash))).toBe(true);
+  });
+
+  it("times out headers even when the transport ignores abort, then syncs later sources", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const first = NEWS_SOURCES[0];
+    if (first === undefined) throw new Error("missing source fixture");
+    let signal: AbortSignal | null | undefined;
+    let entered: () => void = () => {};
+    const pending = new Promise<void>((resolve) => { entered = resolve; });
+    const transport: typeof fetch = async (input, init) => {
+      if (inputUrl(input) === first.feedUrl) {
+        signal = init?.signal;
+        entered();
+        return new Promise<Response>(() => {});
+      }
+      return successfulNewsFetch(input, init);
+    };
+    const run = syncOfficialNews(env.DB, { newsFetch: transport, now: () => fixedNow });
+    await pending;
+    await vi.advanceTimersByTimeAsync(12_000);
+    const results = await run;
+
+    expect(signal?.aborted).toBe(true);
+    expect(results[0]).toMatchObject({ status: "failed", errorCode: "fetch_timeout", httpStatus: null });
+    expect(results.slice(1).every((result) => result.status === "success" && result.verifiedCount === 1)).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each(["feed", "article"] as const)("bounds a stalled %s body and never waits for a stalled cancel promise", async (stage) => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const first = NEWS_SOURCES[0];
+    if (first === undefined) throw new Error("missing source fixture");
+    const target = stage === "feed" ? first.feedUrl : fixtureFor(first).url;
+    const cancel = vi.fn(() => new Promise<void>(() => {}));
+    let signal: AbortSignal | null | undefined;
+    let entered: () => void = () => {};
+    const pending = new Promise<void>((resolve) => { entered = resolve; });
+    const transport: typeof fetch = async (input, init) => {
+      if (inputUrl(input) !== target) return successfulNewsFetch(input, init);
+      signal = init?.signal;
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) { controller.enqueue(new TextEncoder().encode(stage === "feed" ? "<rss>" : "<html>")); },
+        pull() { return new Promise<void>(() => {}); },
+        cancel,
+      });
+      entered();
+      return new Response(body, { headers: { "Content-Type": stage === "feed" ? "application/rss+xml" : "text/html" } });
+    };
+    const run = syncOfficialNews(env.DB, { newsFetch: transport, now: () => fixedNow });
+    await pending;
+    await vi.advanceTimersByTimeAsync(12_000);
+    const results = await run;
+
+    expect(signal?.aborted).toBe(true);
+    expect(cancel).toHaveBeenCalledOnce();
+    if (stage === "feed") {
+      expect(results[0]).toMatchObject({ status: "failed", errorCode: "fetch_timeout", httpStatus: 200 });
+    } else {
+      expect(results[0]).toMatchObject({ status: "success", candidateCount: 1, rejectedCount: 1, verifiedCount: 0 });
+    }
+    expect(results.slice(1).every((result) => result.status === "success" && result.verifiedCount === 1)).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("uses one cumulative deadline across delayed headers and slow body chunks", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const first = NEWS_SOURCES[0];
+    if (first === undefined) throw new Error("missing source fixture");
+    let pullTimer: ReturnType<typeof setTimeout> | undefined;
+    let chunks = 0;
+    const cancel = vi.fn(() => { if (pullTimer !== undefined) clearTimeout(pullTimer); });
+    const transport: typeof fetch = async (input, init) => {
+      if (inputUrl(input) !== first.feedUrl) return successfulNewsFetch(input, init);
+      await new Promise<void>((resolve) => { setTimeout(resolve, 6_000); });
+      const body = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          return new Promise<void>((resolve) => {
+            pullTimer = setTimeout(() => {
+              chunks += 1;
+              controller.enqueue(new TextEncoder().encode("<rss>"));
+              resolve();
+            }, 4_000);
+          });
+        },
+        cancel,
+      });
+      return new Response(body, { headers: { "Content-Type": "application/rss+xml" } });
+    };
+    const run = syncOfficialNews(env.DB, { newsFetch: transport, now: () => fixedNow });
+    await vi.advanceTimersByTimeAsync(11_999);
+    expect(chunks).toBe(1);
+    expect(cancel).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    const results = await run;
+
+    expect(results[0]).toMatchObject({ status: "failed", errorCode: "fetch_timeout" });
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(chunks).toBe(1);
+    expect(results.slice(1).every((result) => result.verifiedCount === 1)).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each(["feed", "article"] as const)("still cancels an oversized %s without waiting for cancellation", async (stage) => {
+    const first = NEWS_SOURCES[0];
+    if (first === undefined) throw new Error("missing source fixture");
+    const target = stage === "feed" ? first.feedUrl : fixtureFor(first).url;
+    const cancel = vi.fn(() => new Promise<void>(() => {}));
+    const transport: typeof fetch = async (input, init) => {
+      if (inputUrl(input) !== target) return successfulNewsFetch(input, init);
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) { controller.enqueue(new Uint8Array((stage === "feed" ? 1_000_000 : 320_000) + 1)); },
+        cancel,
+      });
+      return new Response(body, { headers: { "Content-Type": stage === "feed" ? "application/rss+xml" : "text/html" } });
+    };
+    const results = await syncOfficialNews(env.DB, { newsFetch: transport, now: () => fixedNow });
+
+    expect(cancel).toHaveBeenCalledOnce();
+    if (stage === "feed") {
+      expect(results[0]).toMatchObject({ status: "failed", errorCode: "response_too_large", httpStatus: 200 });
+    } else {
+      expect(results[0]).toMatchObject({ status: "success", rejectedCount: 1, verifiedCount: 0 });
+    }
+    expect(results.slice(1).every((result) => result.verifiedCount === 1)).toBe(true);
   });
 
   it("serves day, week and month windows with public verification evidence", async () => {

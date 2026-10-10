@@ -146,15 +146,22 @@ export function classifyNews(source: NewsSource, title: string, summary: string)
   return { relevant: true, primaryTopic: primary.id, topics: [...new Set(topics)], keywords: [...new Set(labels)].slice(0, 5) };
 }
 
-async function readBoundedResponse(response: Response, maxBytes: number): Promise<string> {
+async function readBoundedResponse(response: Response, maxBytes: number, signal: AbortSignal): Promise<string> {
   if (response.body === null) return "";
   const reader = response.body.getReader();
+  const cancelReader = (): void => {
+    // Cancellation itself may never settle; it must not extend the fetch deadline.
+    void reader.cancel().catch(() => { /* already closed */ });
+  };
+  signal.addEventListener("abort", cancelReader, { once: true });
   const decoder = new TextDecoder();
   let total = 0;
   let output = "";
   try {
+    if (signal.aborted) throw new NewsSyncError("fetch_timeout", response.status);
     while (true) {
       const { done, value } = await reader.read();
+      if (signal.aborted) throw new NewsSyncError("fetch_timeout", response.status);
       if (done) break;
       total += value.byteLength;
       if (total > maxBytes) throw new NewsSyncError("response_too_large", response.status);
@@ -163,15 +170,28 @@ async function readBoundedResponse(response: Response, maxBytes: number): Promis
     output += decoder.decode();
     return output;
   } finally {
-    try { await reader.cancel(); } catch { /* already closed */ }
+    signal.removeEventListener("abort", cancelReader);
+    cancelReader();
   }
 }
 
-async function timedFetch(transport: typeof fetch, url: string, accept: string): Promise<Response> {
+async function timedFetch<T>(
+  transport: typeof fetch,
+  url: string,
+  accept: string,
+  consumeResponse: (response: Response, signal: AbortSignal) => Promise<T>,
+): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    return await transport(url, {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timeout = setTimeout(() => {
+      // Race the whole operation as well as aborting it: a transport may ignore the signal.
+      reject(new NewsSyncError("fetch_timeout"));
+      controller.abort();
+    }, FETCH_TIMEOUT_MS);
+  });
+  const operation = async (): Promise<T> => {
+    const response = await transport(url, {
       redirect: "follow",
       signal: controller.signal,
       headers: {
@@ -179,11 +199,20 @@ async function timedFetch(transport: typeof fetch, url: string, accept: string):
         "User-Agent": "AussieWHVCompass-NewsBot/1.0 (+https://www.aussiewhvcompass.com/about.html)",
       },
     });
+    if (controller.signal.aborted) {
+      void response.body?.cancel().catch(() => { /* already closed */ });
+      throw new NewsSyncError("fetch_timeout", response.status);
+    }
+    return consumeResponse(response, controller.signal);
+  };
+  try {
+    return await Promise.race([operation(), deadline]);
   } catch (error) {
     if (error instanceof NewsSyncError) throw error;
     throw new NewsSyncError(error instanceof DOMException && error.name === "AbortError" ? "fetch_timeout" : "fetch_failed");
   } finally {
-    clearTimeout(timeout);
+    if (timeout !== undefined) clearTimeout(timeout);
+    controller.abort();
   }
 }
 
@@ -218,13 +247,15 @@ async function verifyArticle(
   item: ParsedFeedItem,
   transport: typeof fetch,
 ): Promise<{ score: number; hash: string } | null> {
-  const response = await timedFetch(transport, item.url, "text/html,application/xhtml+xml;q=0.9");
-  if (!response.ok) return null;
-  const finalUrl = canonicalSourceUrl(response.url || item.url, source);
-  if (finalUrl === null) return null;
-  const contentType = (response.headers.get("Content-Type") ?? "").toLowerCase();
-  if (!contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) return null;
-  const html = await readBoundedResponse(response, ARTICLE_MAX_BYTES);
+  const html = await timedFetch(transport, item.url, "text/html,application/xhtml+xml;q=0.9", async (response, signal) => {
+    if (!response.ok) return null;
+    const finalUrl = canonicalSourceUrl(response.url || item.url, source);
+    if (finalUrl === null) return null;
+    const contentType = (response.headers.get("Content-Type") ?? "").toLowerCase();
+    if (!contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) return null;
+    return readBoundedResponse(response, ARTICLE_MAX_BYTES, signal);
+  });
+  if (html === null) return null;
   const score = articleTitleMatch(item.title, html);
   if (score < 0.6) return null;
   return { score, hash: await sha256(html) };
@@ -254,12 +285,13 @@ async function syncOneSource(
     errorCode: null,
   };
   try {
-    const response = await timedFetch(transport, source.feedUrl, "application/rss+xml,application/atom+xml,application/xml,text/xml;q=0.9");
-    base.httpStatus = response.status;
-    if (!response.ok) throw new NewsSyncError("feed_http_error", response.status);
-    const contentType = (response.headers.get("Content-Type") ?? "").toLowerCase();
-    if (!/(rss|atom|xml)/.test(contentType)) throw new NewsSyncError("feed_content_type_invalid", response.status);
-    const xml = await readBoundedResponse(response, FEED_MAX_BYTES);
+    const xml = await timedFetch(transport, source.feedUrl, "application/rss+xml,application/atom+xml,application/xml,text/xml;q=0.9", async (response, signal) => {
+      base.httpStatus = response.status;
+      if (!response.ok) throw new NewsSyncError("feed_http_error", response.status);
+      const contentType = (response.headers.get("Content-Type") ?? "").toLowerCase();
+      if (!/(rss|atom|xml)/.test(contentType)) throw new NewsSyncError("feed_content_type_invalid", response.status);
+      return readBoundedResponse(response, FEED_MAX_BYTES, signal);
+    });
     const parsed = parseOfficialFeed(xml, source, now);
     base.fetchedCount = parsed.length;
     const candidates = parsed
