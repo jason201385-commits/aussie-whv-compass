@@ -615,5 +615,7 @@ P1-24 已由 PR #2／Pages run 35111266701 成功發布，本次同步其 ROADMA
 - 獨立 QA 重現來源 headers 已到但 body 卡住的問題。12 秒期限改為涵蓋 fetch、狀態／類型／網址驗證與 bounded body，並取消 reader；無回應 transport／取消 Promise 都不能無限拖住來源輪替。新聞 focused tests 14 案例通過，並保留所有來源與內容 gate。
 - 保留 GitHub 最新 P1-32 本機找答案／Cloudflare 原生備援與退休的舊端點；前台 assistMode 維持 local，不呼叫模型。整合版 Worker 首次正式發布 version `490a0d80-5d5c-42e9-94ee-7887580e0013`（git `ee2b88f881815c38d4a1d3906ea8a8865c3d2648`），自訂 API 網域及兩支原 Cron 已更新。
 - 本機 HTTP 與遠端 preview 管理測試被 Cloudflare 1010／403 拒絕，沒有換 UA、改 WAF、擴 CORS 或新開 public trigger。改以既有 owner OAuth，在 loopback 專用單次 POST 管理入口、僅綁定正式 D1，使用相同 syncOfficialNews 與驗證規則做首次匯入。這是本機 workerd executor → 正式 D1 的真來源匯入，不冒充自然 Cron／Cloudflare executor 已完成抓取。
-- 第一次匯入 CAV 8 項全部通過官方原文、標題與內容雜湊核對；Scamwatch HTTP 403、JSA／Health 逾時，保留 degraded。8 項發布於 2026-08-04～2026-09-22，標題相符分數全部 1。10 月 1 日的買房公告不符合既有 WHV 類別，因此本月空結果正常；不改相關性條件或資料日期來補量。
+- 第一次匯入 CAV 8 項全部通過官方原文、標題與內容雜湊核對；Scamwatch HTTP 403、JSA／Health 逾時，保留 degraded。8 項發布於 2026-08-04～2026-09-22（UTC；前台顯示 Perth 為 8 月 5 日～9 月 23 日），標題相符分數全部 1。10 月 1 日的買房公告不符合既有 WHV 類別，因此本月空結果正常；不改相關性條件或資料日期來補量。
 - 新增固定近 90 天入口，讓使用者能讀到已核對的跨月消息；保留今天／本週／本月與原 API 預設。公開網頁已以真瀏覽器讀到正式來源狀態；直接 health URL 仍被客戶端阻擋，沒有繞過。自然 Cron 的第一次觸發證據仍須另驗，不能由 deployment 回執代替。
+- 最終發布回執：程式 commit `f846763712d62b58927d9915751e6c5a76f05228` 已推 GitHub；Pages run `38067661887` 與 AI 一致性 run `38067662661` 均 success。Cloudflare 最終 version `303c087e-272f-44af-bf65-acaad5146f55`，兩支原 Cron 與自訂 API 網域均部署成功。完整驗收 exit 0／19 頁、Worker 84 tests 通過，新聞 focused 17 cases 與前端回放通過。
+- 真瀏覽器公開頁回放：recent／全部顯示 8 則，租屋主題 3 則，本月租屋 0 則並保留非完整新聞聲明，恢復 recent／全部仍 8 則。來源顯示 1 正常／3 異常；每則保留來源、發布與核對時間、原文連結。首次匯入 helper／remote preview 已停止，8790～8793 無監聽；私人回執、DOM、截圖與 LINE 研究均不入 GitHub。自然 Cron 首次觸發與來源恢復保持待驗，直接 health URL 的客戶端限制也未以繞過或更動安全設定處理。
